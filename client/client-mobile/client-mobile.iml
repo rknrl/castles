@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="client-mobile">
+    <configurations>
+      <configuration name="client-mobile" target-platform="Mobile" pure-as="true" main-class="ru.rknrl.castles.MainMobile" output-file="client-mobile.swf" output-folder="$MODULE_DIR$/target">
+        <dependencies target-player="14.0">
+          <entries>
+            <entry module-name="client-base" build-configuration-name="client-base">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="common-client" build-configuration-name="common-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="878460e1-9446-4087-b90d-5319a72c0849">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="social-client-mobile" build-configuration-name="social-client-mobile">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="social-client" build-configuration-name="social-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="dto-client" build-configuration-name="dto-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="rmi-client" build-configuration-name="rmi-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="cd83876e-2486-41d6-8144-07449b7b31fc">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="ane-android-flash" build-configuration-name="ane-android-flash">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="air" />
+        </dependencies>
+        <compiler-options>
+          <map>
+            <entry key="compiler.debug.swf" value="true" />
+          </map>
+        </compiler-options>
+        <packaging-air-desktop />
+        <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-android.xml" package-file-name="Castles">
+          <files-to-package>
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - EN.tsv" path-in-package="castles - EN.tsv" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
+          </files-to-package>
+          <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/android/android.p12" use-temp-certificate="false" />
+        </packaging-android>
+        <packaging-ios enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-ios.xml" package-file-name="Castles">
+          <files-to-package>
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - EN.tsv" path-in-package="castles - EN.tsv" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-568h@2x.png" path-in-package="Default-568h@2x.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape.png" path-in-package="Default-Landscape.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape@2x.png" path-in-package="Default-Landscape@2x.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default.png" path-in-package="Default.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default@2x.png" path-in-package="Default@2x.png" />
+          </files-to-package>
+          <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/ios/ios_development.p12" provisioning-profile-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/castles_development.mobileprovision" />
+        </packaging-ios>
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/flex" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="jdk" jdkName="air" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="878460e1-9446-4087-b90d-5319a72c0849" />
+        <CLASSES>
+          <root url="jar://$MAVEN_REPOSITORY$/ru/rknrl/castles/base-swc/1.0-SNAPSHOT/base-swc-1.0-SNAPSHOT.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="common-client" exported="" />
+    <orderEntry type="module" module-name="client-base" exported="" />
+    <orderEntry type="module" module-name="social-client-mobile" exported="" />
+    <orderEntry type="module" module-name="social-client" exported="" />
+    <orderEntry type="module" module-name="rmi-core-client" exported="" />
+    <orderEntry type="module" module-name="rmi-client" exported="" />
+    <orderEntry type="module" module-name="dto-client" exported="" />
+    <orderEntry type="module" module-name="dto-core-client" exported="" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="cd83876e-2486-41d6-8144-07449b7b31fc" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../core/ane/ane-android/ane/CoreExtension.ane!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="ane-android-flash" exported="" />
+  </component>
+</module>

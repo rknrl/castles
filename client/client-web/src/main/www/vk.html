@@ -1,0 +1,152 @@
+<html>
+
+<head>
+    <title>Game</title>
+
+    <script src="http://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+
+    <script type="text/javascript" src="swfobject.js"></script>
+
+    <script type="text/javascript" src="getflashvars.js"></script>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function flash() {
+            return document.getElementById("flashContent");
+        }
+
+        VK.init(function () {
+                    VK.addCallback("onOrderSuccess", function (orderId) {
+                        flash().onPaymentSuccess();
+                    });
+
+                    VK.addCallback("onOrderCancel", function () {
+                        flash().onPaymentClosed();
+                    });
+
+                    VK.addCallback("onOrderFail", function (errorCode) {
+                        flash().onPaymentFail(errorCode);
+                    });
+
+                    flashVars.rknrlAccountType = "VKONTAKTE";
+
+                    swfobject.embedSWF("castles.swf", "flashContent", "100%", "100%", "10.0.0", "expressInstall.swf", flashVars,
+                            {
+                                quality: "high",
+                                allowFullScreenInteractive: 'true',
+                                allowfullscreen: true
+                            });
+                },
+                function () {
+                    alert("init fail");
+                },
+                5.26);
+
+        /**
+         * http://vk.com/pages?oid=-1&p=users.get
+         */
+        function getMyUserInfo(callbackId) {
+            VK.api("users.get",
+                    {
+                        fields: "photoId,verified,blacklisted,sex,bdate,city,country,home_town,photo_50,photo_100,photo_200_orig,photo_200,photo_400,photo_max,photo_max_orig,online",
+                        test_mode: 1
+                    },
+                    function (data) {
+                        if (data.response) {
+                            sendResult(callbackId, data.response[0]);
+                        } else {
+                            sendError(callbackId, data)
+                        }
+                    });
+        }
+
+        /**
+         * http://vk.com/pages?oid=-1&p=friends.get
+         */
+        function getFriends(callbackId) {
+            VK.api("friends.get",
+                    {
+                        fields: "sex,bdate,city,country,timezone,photo_50,photo_100,photo_200_orig",
+                        test_mode: 1
+                    },
+                    function (data) {
+                        if (data.response) {
+                            sendResult(callbackId, data.response.items);
+                        } else {
+                            sendError(callbackId, data)
+                        }
+                    });
+        }
+
+        /**
+         * http://vk.com/pages?oid=-1&p=friends.getAppUsers
+         */
+        function getAppFriends(callbackId) {
+            VK.api("friends.getAppUsers",
+                    {
+                        test_mode: 1
+                    },
+                    function (data) {
+                        if (data.response) {
+                            sendResult(callbackId, data.response);
+                        } else {
+                            sendError(callbackId, data)
+                        }
+                    }
+            );
+        }
+
+        /**
+         * https://vk.com/dev/payments_dialog
+         */
+        function showPaymentDialog(p) {
+            VK.callMethod("showOrderBox", {
+                type: p.type,
+                votes: p.votes
+            });
+        }
+
+        /**
+         * https://vk.com/dev/Javascript_API
+         */
+        function showInviteDialog(p) {
+            VK.callMethod("showInviteBox", {});
+        }
+
+        function sendResult(callbackId, value) {
+            flash().onResult({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function sendError(callbackId, value) {
+            flash().onFail({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function reloadPage() {
+            document.location.reload(true)
+        }
+    </script>
+</head>
+
+<body>
+
+<div id="flashContent">
+    <p><a href="http://www.adobe.com/go/getflashplayer"><img
+            src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
+            alt="Get Adobe Flash player"/></a></p>
+</div>
+
+</body>
+
+</html>

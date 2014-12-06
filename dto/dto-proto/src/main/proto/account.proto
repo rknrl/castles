@@ -1,0 +1,91 @@
+package ru.rknrl.dto;
+
+option java_outer_classname = "AccountDTO";
+
+option optimize_for = SPEED;
+
+import "common.proto";
+
+message AccountStateDTO {
+    required StartLocationDTO startLocation = 1;
+    required SkillsDTO skills = 2;
+    required ItemsDTO items = 3;
+    required int32 gold = 4;
+    required PricesDTO prices = 5;
+    optional NodeLocator game = 6;
+}
+
+// skills
+
+message SkillsDTO {
+    repeated SkillLevelDTO levels = 1;
+}
+
+message SkillLevelDTO {
+    required SkillType type = 1;
+    required SkillLevel level = 2;
+}
+
+// items
+
+message ItemsDTO {
+    repeated ItemDTO items = 1;
+}
+
+message ItemDTO {
+    required ItemType type = 1;
+    required int32 count = 2;
+}
+
+// start location
+
+message StartLocationDTO {
+    repeated SlotDTO slots = 1;
+}
+
+message SlotDTO {
+    required SlotId id = 1;
+    optional BuildingPrototypeDTO buildingPrototype = 2;
+}
+
+// prices
+
+message PricesDTO {
+    repeated BuildingPriceDTO buildings = 1;
+    required int32 skillsUpgradePrice = 2;
+    required int32 itemPrice = 3;
+    required int32 goldByDollar = 4;
+}
+
+message BuildingPriceDTO {
+    required BuildingLevel level = 1;
+    required int32 price = 2;
+}
+
+// actions
+
+message SwapSlotsDTO {
+    required SlotId id1 = 1;
+    required SlotId id2 = 2;
+}
+
+message BuyBuildingDTO {
+    required SlotId id = 1;
+    required BuildingType buildingType = 2;
+}
+
+message UpgradeBuildingDTO {
+    required SlotId id = 1;
+}
+
+message RemoveBuildingDTO {
+    required SlotId id = 1;
+}
+
+message UpgradeSkillDTO {
+    required SkillType type = 1;
+}
+
+message BuyItemDTO {
+    required ItemType type = 1;
+}

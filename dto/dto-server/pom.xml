@@ -1,0 +1,82 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ru.rknrl.castles.dto</groupId>
+    <artifactId>dto-server</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>dto-server</name>
+
+    <parent>
+        <groupId>ru.rknrl.castles</groupId>
+        <artifactId>dto</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <build>
+        <plugins>
+            <!-- Client -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-java</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <exec executable="protoc">
+                                    <arg value="--as3_out=${project.basedir}/../dto-client/src/main/flex"/>
+                                    <arg value="--proto_path=${project.basedir}/../dto-proto/src/main/proto/"/>
+                                    <arg value="--plugin=protoc-gen-as3=${rknrl.core}/dto/protoc-gen-as3/protoc-gen-as3"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/auth.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/common.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/account.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/game.proto"/>
+                                </exec>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Server -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-java</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <exec executable="protoc">
+                                    <arg value="--java_out=${project.basedir}/src/main/java"/>
+                                    <arg value="--proto_path=${project.basedir}/../dto-proto/src/main/proto/"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/auth.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/common.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/account.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/game.proto"/>
+                                </exec>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+    </dependencies>
+</project>

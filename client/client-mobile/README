@@ -1,0 +1,12 @@
+android:
+
+Включить "Запускать приложения из непроверенных источников"
+Включить "Разрешить отладку по USB"
+Поставить Adobe Air из гугл маркета (Для дебага по usb)
+
+Keystore file
+
+ios:
+
+Provisioning profile
+Keystore file

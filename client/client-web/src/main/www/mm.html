@@ -1,0 +1,135 @@
+<html>
+
+<head>
+    <title>Castles</title>
+
+    <script type="text/javascript" src="http://connect.mail.ru/js/loader.js"></script>
+
+    <script type="text/javascript" src="swfobject.js"></script>
+
+    <script type="text/javascript" src="getflashvars.js"></script>
+
+    <script type="text/javascript">
+
+        function flash() {
+            return document.getElementById("flashContent");
+        }
+
+        mailru.loader.require('api', function () {
+            mailru.app.init("05ba20802b21da64c5daab3ad3ceb05d");
+
+            mailru.events.listen(mailru.app.events.paymentDialogStatus, function (d) {
+                if (d.status == "opened") {
+                    // nothing to do
+                } else if (d.status == "closed") {
+                    flash().onPaymentDialogClosed();
+                }
+            });
+            mailru.events.listen(mailru.app.events.incomingPayment, function (d) {
+                if (d.status == "success") {
+                    alert(str(d));
+                    flash().onPaymentSuccess();
+                } else {
+                    flash().onPaymentFail(d);
+                }
+            });
+        });
+
+        function str(m) {
+            var s = "";
+            for (key in m) {
+                s += key + "=" + m[key];
+            }
+            return s;
+        }
+
+        /**
+         * http://api.mail.ru/docs/reference/js/users-getinfo/
+         */
+        function getMyUserInfo(callbackId) {
+            mailru.app.users.getInfo(function (result) {
+                if (result.error) {
+                    sendError(callbackId, result.error);
+                } else {
+                    sendResult(callbackId, result[0]);
+                }
+            });
+        }
+
+        /**
+         * http://api.mail.ru/docs/reference/js/friends.getExtended/
+         */
+        function getFriends(callbackId) {
+            mailru.common.friends.getExtended(
+                    function (result) {
+                        if (result.error) {
+                            sendError(callbackId, result.error);
+                        } else {
+                            sendResult(callbackId, result);
+                        }
+                    });
+        }
+
+        /**
+         * http://api.mail.ru/docs/reference/js/friends.getAppUsers/
+         */
+        function getAppFriends(callbackId) {
+            mailru.common.friends.getAppUsers(
+                    function (result) {
+                        if (result.error) {
+                            sendError(callbackId, result.error);
+                        } else {
+                            sendResult(callbackId, result);
+                        }
+                    });
+        }
+
+        /**
+         * http://api.mail.ru/docs/reference/js/payments-showdialog/
+         */
+        function showPaymentDialog(params) {
+            mailru.app.payments.showDialog(params);
+        }
+
+        /**
+         * http://api.mail.ru/docs/reference/js/friends-request/
+         */
+        function showInviteDialog(params) {
+            mailru.app.friends.request(params);
+        }
+
+        function sendResult(callbackId, value) {
+            flash().onResult({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function sendError(callbackId, value) {
+            flash().onFail({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function reloadPage() {
+            document.location.reload(true)
+        }
+
+        flashVars.rknrlAccountType = "MOIMIR";
+
+        swfobject.embedSWF(
+                "castles.swf", "flashContent",
+                "100%", "100%",
+                "10.0.0", "playerProductInstall.swf",
+                flashVars, {}, {});
+
+        swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+    </script>
+</head>
+
+<body>
+<div id="flashContent"></div>
+</body>
+
+</html>

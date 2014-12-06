@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/13.0">
+
+    <id>ru.rknrl.castles</id>
+
+    <filename>Castles</filename>
+
+    <name>Castles</name>
+
+    <versionNumber>0.0.1</versionNumber>
+    <versionLabel>0.0.1</versionLabel>
+
+    <supportedLanguages>en ru</supportedLanguages>
+
+    <description>
+        <text xml:lang="en">Castles description en</text>
+        <text xml:lang="ru">Castles description ru</text>
+    </description>
+
+    <copyright>Толя Янот</copyright>
+
+    <initialWindow>
+        <content>CastlesMobile.swf</content>
+
+        <visible>true</visible>
+
+        <aspectRatio>portrait</aspectRatio>
+
+        <autoOrients>false</autoOrients>
+
+        <fullScreen>true</fullScreen>
+
+        <renderMode>gpu</renderMode>
+    </initialWindow>
+
+    <iPhone>
+        <InfoAdditions><![CDATA[
+            <key>MinimumOSVersion</key>
+			<string>5.0</string>
+
+            <key>UIDeviceFamily</key>
+            <array>
+                <!-- iPhone and iPod touch devices -->
+                <string>1</string>
+                <!-- iPad devices -->
+                <string>2</string>
+            </array>
+
+            <key>UIPrerenderedIcon</key>
+            <true/>
+
+            <!--<key>UIStatusBarStyle</key>-->
+            <!--<string>UIStatusBarStyleBlackOpaque</string>-->
+            <!--<key>UIRequiresPersistentWiFi</key>-->
+            <!--<string>YES</string>-->
+        ]]></InfoAdditions>
+
+        <Entitlements>
+            <![CDATA[
+                <key>aps-environment</key>
+                <string>development</string>
+            ]]>
+        </Entitlements>
+
+        <requestedDisplayResolution>high</requestedDisplayResolution>
+    </iPhone>
+
+</application>
