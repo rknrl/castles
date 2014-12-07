@@ -1,0 +1,92 @@
+{
+  "tcpIp": "127.0.0.1",
+  "tcpPort": 2335,
+  "account": {
+    "buildingPrices": {
+      "level1": 4,
+      "level2": 16,
+      "level3": 64
+    },
+    "itemPrice": 1,
+    "goldByDollar": 100
+  },
+  "game": {
+    "buildings": {
+      "tower": {
+        "regeneration": 1,
+        "startPopulation": 10,
+        "stat": {
+          "attack": 2,
+          "defence": 3,
+          "speed": 1
+        }
+      },
+      "house": {
+        "regeneration": 3,
+        "startPopulation": 30,
+        "stat": {
+          "attack": 2,
+          "defence": 2,
+          "speed": 2
+        }
+      },
+      "church": {
+        "regeneration": 2,
+        "startPopulation": 20,
+        "stat": {
+          "attack": 1,
+          "defence": 1,
+          "speed": 4
+        }
+      }
+    },
+    "levelToFactor": {
+      "level1": 1.0,
+      "level2": 1.5,
+      "level3": 2.0
+    },
+    "constants": {
+      "unitToExitFactor": 0.5,
+      "itemCooldown": 5000
+    },
+    "fireball": {
+      "damage": 10
+    },
+    "volcano": {
+      "damage": 10,
+      "duration": 2000
+    },
+    "tornado": {
+      "damage": 10,
+      "duration": 2000,
+      "speed": 0.004
+    },
+    "strengthening": {
+      "factor": 1.5,
+      "duration": 5000
+    },
+    "shooting": {
+      "damage": 2,
+      "speed": 0.004,
+      "shootInterval": 3000,
+      "shootRadius": 1
+    },
+    "assistance": {
+      "count": 50
+    }
+  },
+  "social": {
+    "vk": {
+      "appId": "enter vk id",
+      "appSecret": "enter vk secret"
+    },
+    "ok": {
+      "appId": "enter ok id",
+      "appSecret": "enter ok secret"
+    },
+    "mm": {
+      "appId": "enter mm id",
+      "appSecret": "enter mm secret"
+    }
+  }
+}

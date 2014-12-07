@@ -1,9 +1,11 @@
 package ru.rknrl.castles.game
 
 import ru.rknrl.castles.account.objects.BuildingPrototype
+import ru.rknrl.castles.config.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.game.objects.buildings.Building
 import ru.rknrl.castles.game.objects.players.PlayerState
 import ru.rknrl.castles.game.objects.units.GameUnit
+import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 class Constants(val unitToExitFactor: Double,
                 val itemCooldown: Long)
@@ -23,10 +25,11 @@ class StrengtheningConfig(val factor: Double,
 class ShootingConfig(val damage: Double,
                      val speed: Double,
                      val shootInterval: Long,
-                     val shootRadius: Int)
+                     val shootRadius: Double)
 
-class AssistanceConfig(val buildingPrototype: BuildingPrototype,
-                       val count: Int)
+class AssistanceConfig(val count: Int) {
+  val buildingPrototype = new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)
+}
 
 class BuildingConfig(val regeneration: Double,
                      val startPopulation: Int,
@@ -35,13 +38,27 @@ class BuildingConfig(val regeneration: Double,
 }
 
 class GameConfig(val constants: Constants,
-                 buildings: Map[BuildingPrototype, BuildingConfig],
+
+                 buildingsConfig: BuildingsConfig,
+                 levelToFactor: BuildingLevelToFactor,
+
                  fireball: FireballConfig,
                  volcano: VolcanoConfig,
                  tornado: TornadoConfig,
                  strengthening: StrengtheningConfig,
                  shooting: ShootingConfig,
                  assistance: AssistanceConfig) {
+
+  def buildingConfig(buildingType: BuildingType, buildingLevel: BuildingLevel) =
+    buildingsConfig(buildingType) * levelToFactor(buildingLevel)
+
+  val buildings: Map[BuildingPrototype, BuildingConfig] =
+    (
+      for (buildingType ← BuildingType.values();
+           buildingLevel ← BuildingLevel.values())
+      yield new BuildingPrototype(buildingType, buildingLevel) → buildingConfig(buildingType, buildingLevel)
+      ).toMap
+
 
   private def toFactor(strengthened: Boolean) =
     if (strengthened) strengthening.factor else 1.0

@@ -1,4 +1,4 @@
-package ru.rknrl.castles
+package ru.rknrl.castles.config
 
 import ru.rknrl.castles.account.objects.BuildingPrototype
 import ru.rknrl.castles.game.objects.buildings.{Building, BuildingId}
@@ -9,9 +9,17 @@ import ru.rknrl.core.social.SocialConfigs
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType, SkillLevel}
 import ru.rknrl.utils.Point
 
+import scala.io.Source
+import ru.rknrl.castles.config.ConfigJsonProtocol._
+import spray.json._
+
 object PrintGameConfig {
   def main(args: Array[String]): Unit = {
-    val config = new Config(new SocialConfigs(None, None, None)).gameConfig
+    val configPath = "/Users/tolyayanot/dev/rknrl/castles/server/src/main/resources/dev.json"
+
+    val configString = Source.fromFile(configPath).mkString
+
+    val config = configString.parseJson.convertTo[Config].game
 
     val population = 99
 

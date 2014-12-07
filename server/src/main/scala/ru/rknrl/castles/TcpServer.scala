@@ -4,6 +4,7 @@ import java.net.InetSocketAddress
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.{IO, Tcp}
+import ru.rknrl.castles.config.Config
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling

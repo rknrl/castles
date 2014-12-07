@@ -2,6 +2,7 @@ package ru.rknrl.castles
 
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.account.{Account, GetAccountState}
+import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.rmi.b2c.{AuthRMI, AuthenticateMsg, AuthenticationResultMsg}
 import ru.rknrl.core.rmi.{CloseConnection, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth

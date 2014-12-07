@@ -28,9 +28,8 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
-    private static const host:String = "178.62.255.28";
-//    private static const host:String = "192.168.199.3.";
-//    private static const host:String = "127.0.0.1";
+//    private static const host:String = "178.62.255.28";
+    private static const host:String = "127.0.0.1";
     private static const port:int = 2335;
 
     private static const defaultName:String = "Гость";

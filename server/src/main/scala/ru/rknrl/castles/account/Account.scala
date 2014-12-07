@@ -3,6 +3,7 @@ package ru.rknrl.castles.account
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
+import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.game.Game.{Join, Offline}
 import ru.rknrl.castles.rmi.b2c._
 import ru.rknrl.core.rmi.{RegisterReceiver, UnregisterReceiver}
@@ -25,7 +26,7 @@ class Account(externalAccountId: AccountId,
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
   tcpReceiver ! RegisterReceiver(accountRmi)
 
-  private var state = AccountState.initAccount(config.accountConfig)
+  private var state = AccountState.initAccount(config.account)
 
   def receive = {
     case EnterGameMsg() ⇒
