@@ -15,6 +15,7 @@ public class MenuButton extends TextField {
 
     public function MenuButton(id:String, textFormat:TextFormat, text:String, color:uint) {
         _id = id;
+        embedFonts = true;
         autoSize = TextFieldAutoSize.LEFT;
         selectable = false;
         defaultTextFormat = textFormat;
