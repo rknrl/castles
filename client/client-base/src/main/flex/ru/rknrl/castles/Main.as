@@ -28,11 +28,10 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
-//    private static const host:String = "178.62.255.28";
-    private static const host:String = "127.0.0.1";
-    private static const port:int = 2335;
-
     private static const defaultName:String = "Гость";
+
+    private var host:String;
+    private var port:int;
 
     private var authenticate:AuthenticateDTO;
     private var localesUrl:String;
@@ -53,7 +52,9 @@ public class Main extends Sprite implements IAuthFacade {
     private var locale:CastlesLocale;
     private var layout:Layout;
 
-    public function Main(authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
+    public function Main(host:String, port:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
+        this.host = host;
+        this.port = port;
         this.authenticate = authenticate;
         this.localesUrl = localesUrl;
         this.defaultLocale = defaultLocale;
@@ -116,7 +117,7 @@ public class Main extends Sprite implements IAuthFacade {
     }
 
     private function createConnection(host:String, port:int):void {
-        if(connection) throw new Error("already connected");
+        if (connection) throw new Error("already connected");
 
         connection = new Connection();
         connection.addEventListener(Event.CONNECT, onConnect);

@@ -2,7 +2,6 @@ package ru.rknrl.castles {
 import flash.utils.ByteArray;
 
 import ru.rknrl.castles.utils.layout.LayoutPortrait;
-import ru.rknrl.core.ane.AndroidANE;
 import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
@@ -14,6 +13,9 @@ import ru.rknrl.log.Log;
 public class MainMobile extends Main {
     [Embed(source="/castles - EN.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
+
+    private static const host:String = "178.62.255.28";
+    private static const port:int = 2335;
 
     public function MainMobile() {
         const log:Log = new Log();
@@ -43,13 +45,13 @@ public class MainMobile extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-/*
-        var ane:AndroidANE = new AndroidANE();
-        const deviceLocale:String = ane.getDeviceLocale();
-        trace("deviceLocale:" + deviceLocale);
-*/
+        /*
+         var ane:AndroidANE = new AndroidANE();
+         const deviceLocale:String = ane.getDeviceLocale();
+         trace("deviceLocale:" + deviceLocale);
+         */
 
-        super(authenticate, localesUrl, defaultLocale, log, social, layout);
+        super(host, port, authenticate, localesUrl, defaultLocale, log, social, layout);
     }
 }
 }
