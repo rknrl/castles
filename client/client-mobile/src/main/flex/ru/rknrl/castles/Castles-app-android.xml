@@ -38,8 +38,6 @@
 
         <visible>true</visible>
 
-        <aspectRatio>portrait</aspectRatio>
-
         <autoOrients>true</autoOrients>
 
         <fullScreen>true</fullScreen>
