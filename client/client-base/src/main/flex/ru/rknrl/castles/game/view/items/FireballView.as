@@ -2,8 +2,6 @@ package ru.rknrl.castles.game.view.items {
 import flash.display.Shape;
 import flash.display.Sprite;
 
-import ru.rknrl.castles.game.view.GameConstants;
-
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.utils.createCircle;
@@ -30,14 +28,14 @@ public class FireballView extends Sprite {
     private var dx:Number;
     private var dy:Number;
 
-    public function FireballView(startTime:int, dx:Number, dy:Number) {
+    public function FireballView(startTime:int, flyDuration:int, dx:Number, dy:Number) {
         this._startTime = startTime;
         this.dx = dx;
         this.dy = dy;
 
         alpha = 0.7;
 
-        flyDuration = Math.sqrt(dx * dx + dy * dy) / GameConstants.fireballSpeed;
+        this.flyDuration = flyDuration;
 
         addChild(ball = createCircle(radius, 0x000000));
         ball.x = dx;

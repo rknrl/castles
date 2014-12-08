@@ -10,7 +10,8 @@ import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 class Constants(val unitToExitFactor: Double,
                 val itemCooldown: Long)
 
-class FireballConfig(val damage: Double)
+class FireballConfig(val damage: Double,
+                     val flyDuration: Long)
 
 class VolcanoConfig(val damage: Double,
                     val duration: Long)
@@ -38,10 +39,8 @@ class BuildingConfig(val regeneration: Double,
 }
 
 class GameConfig(val constants: Constants,
-
                  buildingsConfig: BuildingsConfig,
                  levelToFactor: BuildingLevelToFactor,
-
                  fireball: FireballConfig,
                  volcano: VolcanoConfig,
                  tornado: TornadoConfig,
@@ -80,17 +79,19 @@ class GameConfig(val constants: Constants,
     stat.defence * toFactor(strengthened)
   }
 
-  def fireballRadius(player: PlayerState) = 10
+  def fireballSplashRadius(player: PlayerState) = 1
+
+  def fireballFlyDuration = fireball.flyDuration
 
   def volcanoDuration(player: PlayerState) = volcano.duration
 
-  def tornadoRadius(player: PlayerState) = 10
+  def volcanoRadius(player: PlayerState) = 1
+
+  def tornadoRadius(player: PlayerState) = 1
 
   def tornadoDuration(player: PlayerState) = tornado.duration
 
   def tornadoSpeed = tornado.speed
-
-  def volcanoRadius(player: PlayerState) = 10
 
   def strengtheningDuration(player: Option[PlayerState]) =
     5000 + (if (player.isDefined) churchesPopulationToStrengtheningDuration(player.get.churchesPopulation) else 0)

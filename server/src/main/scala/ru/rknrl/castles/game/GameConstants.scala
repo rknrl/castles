@@ -5,6 +5,4 @@ package ru.rknrl.castles.game
  */
 object GameConstants {
   val cellSize = 39
-  val fireballSpeed = 0.8
-  val tornadoSpeed = 0.0004
 }

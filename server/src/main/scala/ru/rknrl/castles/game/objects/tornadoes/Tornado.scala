@@ -19,6 +19,7 @@ class Tornado(val playerId: PlayerId,
 
     TornadoDTO.newBuilder()
       .addAllPoints(points.dto.asJava)
+      .setSpeed(speed.toFloat)
       .setMillisFromStart(millisFromsStart(time))
       .setMillisTillEnd(millisTillEnd(time))
       .build()

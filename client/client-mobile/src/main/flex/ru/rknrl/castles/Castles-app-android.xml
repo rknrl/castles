@@ -38,7 +38,7 @@
 
         <visible>true</visible>
 
-        <autoOrients>true</autoOrients>
+        <autoOrients>false</autoOrients>
 
         <fullScreen>true</fullScreen>
 

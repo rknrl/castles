@@ -13,30 +13,30 @@
   "game": {
     "buildings": {
       "tower": {
-        "regeneration": 1,
+        "regeneration": 0.0001,
         "startPopulation": 10,
         "stat": {
           "attack": 2,
           "defence": 3,
-          "speed": 1
+          "speed": 0.025
         }
       },
       "house": {
-        "regeneration": 3,
+        "regeneration": 0.0003,
         "startPopulation": 30,
         "stat": {
           "attack": 2,
           "defence": 2,
-          "speed": 2
+          "speed": 0.05
         }
       },
       "church": {
-        "regeneration": 2,
+        "regeneration": 0.0002,
         "startPopulation": 20,
         "stat": {
           "attack": 1,
           "defence": 1,
-          "speed": 4
+          "speed": 0.1
         }
       }
     },
@@ -50,24 +50,25 @@
       "itemCooldown": 5000
     },
     "fireball": {
-      "damage": 10
+      "damage": 0.1,
+      "flyDuration": 1000
     },
     "volcano": {
-      "damage": 10,
+      "damage": 0.1,
       "duration": 2000
     },
     "tornado": {
-      "damage": 10,
+      "damage": 0.1,
       "duration": 2000,
-      "speed": 0.004
+      "speed": 0.05
     },
     "strengthening": {
       "factor": 1.5,
       "duration": 5000
     },
     "shooting": {
-      "damage": 2,
-      "speed": 0.004,
+      "damage": 0.0,
+      "speed": 0.0004,
       "shootInterval": 3000,
       "shootRadius": 1
     },

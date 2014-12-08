@@ -92,7 +92,8 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
       case JsObject(map) ⇒
         implicit val m = map
         new FireballConfig(
-          damage = getDouble("damage")
+          damage = getDouble("damage"),
+          flyDuration = getInt("flyDuration")
         )
       case _ => deserializationError("Fireball isn't object, but " + value)
     }

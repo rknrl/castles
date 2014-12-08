@@ -23,8 +23,8 @@ class GameArea(big: Boolean) {
   val bigH = 16
   val bigV = 16
 
-  val h = if(big) bigH else smallH
-  val v = if(big) bigV else smallV
+  val h = if (big) bigH else smallH
+  val v = if (big) bigV else smallV
 
 
   val width = h * GameConstants.cellSize
@@ -142,6 +142,7 @@ object GameState {
       new Players(players.map(p ⇒ p.id → p).toMap),
       new Buildings(buildings.map(b ⇒ b.id → b).toMap),
       new GameUnits(List.empty),
+      new Fireballs(List.empty),
       new Volcanoes(List.empty),
       new Tornadoes(List.empty),
       new Bullets(List.empty),
@@ -158,6 +159,7 @@ class GameState(val time: Long,
                 val players: Players,
                 val buildings: Buildings,
                 val units: GameUnits,
+                val fireballs: Fireballs,
                 val volcanoes: Volcanoes,
                 val tornadoes: Tornadoes,
                 val bullets: Bullets,
@@ -193,13 +195,13 @@ class GameState(val time: Long,
 
     val createdBullets = createBullets(buildings, units, time, config, playerStates)
 
-    val createdFireballs = `casts→fireballs`(fireballCasts)
+    val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
     val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)
     val createdTornadoes = `casts→tornadoes`(tornadoCasts, time, config, playerStates)
 
     val addBulletsMessages = `bullets→addMessage`(createdBullets, time)
 
-    val addFireballMessages = `fireballs→addMessages`(createdFireballs)
+    val addFireballMessages = `fireballs→addMessages`(createdFireballs, time)
     val addVolcanoMessages = `volcanoes→addMessages`(createdVolcanoes, time)
     val addTornadoMessages = `tornadoes→addMessages`(createdTornadoes, time)
 
@@ -212,6 +214,8 @@ class GameState(val time: Long,
 
     val cooldowns = GameItems.getCooldownMessages(gameItems, newGameItems, config, time)
 
+    val finishedFireballs = fireballs.getFinished(time)
+
     val newBuildings = buildings
       .updatePopulation(deltaTime, config)
       .applyStrengtheningCasts(strengtheningCasts, time)
@@ -219,7 +223,7 @@ class GameState(val time: Long,
       .applyExitUnits(exitUnits, config)
       .applyEnterUnits(enterUnits, config, playerStates)
       .applyShots(time, createdBullets)
-      .applyFireballs(createdFireballs, playerStates, config)
+      .applyFireballs(finishedFireballs, playerStates, config)
       .applyVolcanoes(volcanoes.list, playerStates, config)
       .applyTornadoes(tornadoes.list, playerStates, config, time)
 
@@ -227,7 +231,7 @@ class GameState(val time: Long,
 
     val newUnits = units
       .add(createdUnits)
-      .applyFireballs(createdFireballs, playerStates, config, time)
+      .applyFireballs(finishedFireballs, playerStates, config, time)
       .applyVolcanoes(volcanoes.list, playerStates, config, time)
       .applyTornadoes(tornadoes.list, playerStates, config, time)
       .applyBullets(finishedBullets, playerStates, config, time)
@@ -235,6 +239,10 @@ class GameState(val time: Long,
 
     val updateBuildingMessages = Buildings.getUpdateMessages(buildings.buildings, newBuildings.buildings)
     val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
+
+    val newFireballs = fireballs
+      .add(createdFireballs)
+      .cleanup(time)
 
     val newVolcanoes = volcanoes
       .add(createdVolcanoes)
@@ -255,6 +263,7 @@ class GameState(val time: Long,
       players,
       newBuildings,
       newUnits,
+      newFireballs,
       newVolcanoes,
       newTornadoes,
       newBullets,

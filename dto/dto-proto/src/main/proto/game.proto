@@ -35,10 +35,11 @@ message GameStateDTO {
     required PlayerIdDTO selfId = 3;
     repeated BuildingDTO buildings = 4;
     repeated UnitDTO units = 5;
-    repeated TornadoDTO tornadoes = 6;
-    repeated VolcanoDTO volcanoes = 7;
-    repeated BulletDTO bullets = 8;
-    required ItemsStateDTO itemsState = 9;
+    repeated FireballDTO fireballs = 6;
+    repeated TornadoDTO tornadoes = 7;
+    repeated VolcanoDTO volcanoes = 8;
+    repeated BulletDTO bullets = 9;
+    required ItemsStateDTO itemsState = 10;
 }
 
 enum StartLocationOrientation {
@@ -93,6 +94,7 @@ message UnitUpdateDTO {
 message FireballDTO {
     required float x = 1;
     required float y = 2;
+    required int32 millisTillSplash = 3;
 }
 
 message VolcanoDTO {
@@ -103,8 +105,9 @@ message VolcanoDTO {
 
 message TornadoDTO {
     repeated PointDTO points = 1;
-    required int32 millisFromStart = 2;
-    required int32 millisTillEnd = 3;
+    required float speed = 2;
+    required int32 millisFromStart = 3;
+    required int32 millisTillEnd = 4;
 }
 
 message BulletDTO {

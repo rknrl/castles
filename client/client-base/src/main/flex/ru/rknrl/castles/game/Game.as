@@ -156,6 +156,10 @@ public class Game extends Sprite implements IGameFacade {
             onAddUnit(unit);
         }
 
+        for each(var fireball:FireballDTO in gameState.fireballs) {
+            onAddFireball(fireball);
+        }
+
         for each(var volcano:VolcanoDTO in gameState.volcanoes) {
             onAddVolcano(volcano);
         }
@@ -273,7 +277,7 @@ public class Game extends Sprite implements IGameFacade {
         const dy:Number = fromTop ? dto.y : gameLayout.originalGameHeight - dto.y;
         const d:Number = Math.max(dx, dy);
 
-        const fireball:FireballView = new FireballView(getTimer(), fromLeft ? -d : d, fromTop ? -d : d);
+        const fireball:FireballView = new FireballView(getTimer(), dto.millisTillSplash, fromLeft ? -d : d, fromTop ? -d : d);
         fireball.x = dto.x;
         fireball.y = dto.y;
         view.addFireball(fireball);
@@ -331,7 +335,7 @@ public class Game extends Sprite implements IGameFacade {
     private const tornadoes:Vector.<TornadoView> = new <TornadoView>[];
 
     public function onAddTornado(dto:TornadoDTO):void {
-        const tornado:TornadoView = new TornadoView(getTimer(), dto.millisFromStart, dto.millisTillEnd, new Points(dtoToPoints(dto.points)), GameConstants.tornadoSpeed);
+        const tornado:TornadoView = new TornadoView(getTimer(), dto.millisFromStart, dto.millisTillEnd, new Points(dtoToPoints(dto.points)), dto.speed);
         tornadoes.push(tornado);
         view.addTornado(tornado);
     }
