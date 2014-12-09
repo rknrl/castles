@@ -1,6 +1,5 @@
 package ru.rknrl.castles.menu.screens.main.popup.build {
 import flash.display.DisplayObject;
-import flash.display.Sprite;
 import flash.events.MouseEvent;
 
 import ru.rknrl.castles.menu.screens.main.popup.popup.Popup;
@@ -10,7 +9,7 @@ import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SlotId;
 
-public class BuildPopup extends Sprite {
+public class BuildPopup extends Popup {
     private var slotId:SlotId;
 
     private var items:Vector.<BuildItem> = new <BuildItem>[];
@@ -36,12 +35,12 @@ public class BuildPopup extends Sprite {
         }
     }
 
-    public function animate():void {
-        // todo item.animate();
+    override public function set transition(value:Number):void {
+        popup.transition = value;
     }
 
-    public function close():void {
-        popup.close();
+    public function animate():void {
+        // todo item.animate();
     }
 
     private function onItemClick(event:MouseEvent):void {

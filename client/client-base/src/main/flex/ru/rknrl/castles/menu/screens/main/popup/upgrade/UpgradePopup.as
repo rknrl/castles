@@ -12,7 +12,7 @@ import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SlotId;
 
-public class UpgradePopup extends Sprite {
+public class UpgradePopup extends Popup {
     private var slotId:SlotId;
     private var buildingLevel:BuildingLevel;
 
@@ -47,12 +47,12 @@ public class UpgradePopup extends Sprite {
         if (removeItem) removeItem.updateLayout(layout);
     }
 
-    public function animate():void {
-        upgradeItem.animate();
+    override public function set transition(value:Number):void {
+        popup.transition = value;
     }
 
-    public function close():void {
-        popup.close();
+    public function animate():void {
+        upgradeItem.animate();
     }
 
     private function onRemoveClick(event:MouseEvent):void {

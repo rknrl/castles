@@ -55,7 +55,7 @@ public class PopupLandscape extends Popup {
         }
     }
 
-    override protected function updateValue(value:Number):void {
+    override public function set transition(value:Number):void {
         scaleX = scaleY = value;
     }
 }

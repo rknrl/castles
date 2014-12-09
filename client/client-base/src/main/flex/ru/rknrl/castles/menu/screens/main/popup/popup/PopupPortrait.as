@@ -51,11 +51,18 @@ public class PopupPortrait extends Popup {
         background.graphics.drawRoundRect(0, 0, layout.stageWidth, height + cornerRadius, cornerRadius, cornerRadius);
         background.graphics.endFill();
 
-        updateValue(value);
+        updateY();
     }
 
-    override protected function updateValue(value:Number):void {
-        y = layout.stageHeight - value * height;
+    private var _transition: Number;
+
+    override public function set transition(value:Number):void {
+        _transition = value;
+        updateY();
+    }
+
+    private function updateY():void {
+        y = layout.stageHeight - _transition * height;
     }
 }
 }

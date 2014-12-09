@@ -3,8 +3,8 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 
+import ru.rknrl.castles.menu.PopupManager;
 import ru.rknrl.castles.menu.screens.MenuScreen;
-import ru.rknrl.castles.menu.screens.main.popup.PopupScreen;
 import ru.rknrl.castles.menu.screens.main.popup.build.BuildEvent;
 import ru.rknrl.castles.menu.screens.main.popup.build.BuildPopup;
 import ru.rknrl.castles.menu.screens.main.popup.upgrade.RemoveEvent;
@@ -19,10 +19,8 @@ import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.BuyBuildingDTO;
 import ru.rknrl.dto.RemoveBuildingDTO;
-import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.StartLocationDTO;
 import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
@@ -40,11 +38,13 @@ public class MainScreen extends MenuScreen {
     private var points:Points;
     private var playLabel:TextField;
     private var locale:CastlesLocale;
+    private var popupManager:PopupManager;
 
-    public function MainScreen(id:String, startLocation:StartLocationDTO, buildingsPrices:BuildingPrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
+    public function MainScreen(id:String, startLocation:StartLocationDTO, buildingsPrices:BuildingPrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale, popupManager:PopupManager) {
         this.buildingsPrices = buildingsPrices;
         this.sender = sender;
         this.locale = locale;
+        this.popupManager = popupManager;
 
         startLocationView = new StartLocationView(startLocation, layout);
         startLocationView.addEventListener(OpenBuildPopupEvent.OPEN_BUILD_POPUP, openBuildPopup);
@@ -84,7 +84,6 @@ public class MainScreen extends MenuScreen {
         points.x = layout.stageCenterX;
         points.y = layout.pointsCenterY;
 
-        if (popupScreen) popupScreen.updateLayout(layout);
         if (buildPopup) buildPopup.updateLayout(layout);
         if (upgradePopup) upgradePopup.updateLayout(layout);
     }
@@ -109,43 +108,21 @@ public class MainScreen extends MenuScreen {
         playLabel.textColor = Colors.randomColor();
     }
 
-    private var popupScreen:PopupScreen;
-
     // build popup
 
     private var buildPopup:BuildPopup;
 
     private function openBuildPopup(event:OpenBuildPopupEvent):void {
-        if (buildPopup) throw new Error("Build popup already open");
-
-        popupScreen = new PopupScreen(layout);
-        popupScreen.addEventListener(MouseEvent.MOUSE_DOWN, closeBuildPopup);
-        addChild(popupScreen);
-
-        buildPopup = createBuildPopup(event.slotId, _buildingsPrices.getBuildPrice());
+        buildPopup = new BuildPopup(event.slotId, _buildingsPrices.getBuildPrice(), layout, locale);
         buildPopup.addEventListener(BuildEvent.BUILD, onBuild);
-        addChild(buildPopup);
+
+        popupManager.addEventListener(PopupManager.START_CLOSE, onStartCloseBuildPopup);
+        popupManager.openPopup(buildPopup);
     }
 
-    private function createBuildPopup(slotId:SlotId, buildPrice:int):BuildPopup {
-        return new BuildPopup(slotId, buildPrice, layout, locale);
-    }
-
-    private function closeBuildPopup(event:Event = null):void {
+    private function onStartCloseBuildPopup(event:Event = null):void {
         buildPopup.removeEventListener(BuildEvent.BUILD, onBuild);
-        buildPopup.close();
-
-        popupScreen.removeEventListener(MouseEvent.MOUSE_DOWN, closeBuildPopup);
-        popupScreen.addEventListener(Event.COMPLETE, onBuildCloseComplete);
-        popupScreen.close();
-    }
-
-    private function onBuildCloseComplete(event:Event):void {
-        popupScreen.removeEventListener(Event.COMPLETE, onBuildCloseComplete);
-        removeChild(buildPopup);
-        buildPopup = null;
-        removeChild(popupScreen);
-        popupScreen = null;
+        popupManager.removeEventListener(PopupManager.START_CLOSE, onStartCloseBuildPopup);
     }
 
     private function onBuild(event:BuildEvent):void {
@@ -160,7 +137,7 @@ public class MainScreen extends MenuScreen {
             dto.buildingType = event.buildingType;
             sender.buyBuilding(dto);
 
-            closeBuildPopup();
+            popupManager.closePopup();
         }
     }
 
@@ -169,44 +146,25 @@ public class MainScreen extends MenuScreen {
     private var upgradePopup:UpgradePopup;
 
     private function openUpgradePopup(event:OpenUpgradePopupEvent):void {
-        if (upgradePopup) throw new Error("upgrade popup already open");
-
         const canUpgrade:Boolean = event.buildingLevel != BuildingLevel.LEVEL_3;
         const canRemove:Boolean = event.buildingsCount > 1;
         if (!canUpgrade && !canRemove) return;
 
-        popupScreen = new PopupScreen(layout);
-        popupScreen.addEventListener(MouseEvent.MOUSE_DOWN, closeUpgradePopup);
-        addChild(popupScreen);
-
         const price:int = event.buildingLevel != BuildingLevel.LEVEL_3 ? _buildingsPrices.getPrice(Utils.nextBuildingLevel(event.buildingLevel)) : 0;
 
-        upgradePopup = createUpgradePopup(event.slotId, event.buildingType, event.buildingLevel, event.buildingsCount, price);
+        upgradePopup = new UpgradePopup(event.slotId, event.buildingType, event.buildingLevel, event.buildingsCount, price, layout, locale);
         upgradePopup.addEventListener(UpgradeEvent.UPGRADE, onUpgrade);
         upgradePopup.addEventListener(RemoveEvent.REMOVE, onRemove);
-        addChild(upgradePopup);
+
+        popupManager.addEventListener(PopupManager.START_CLOSE, onStartCloseUpgradePopup);
+        popupManager.openPopup(upgradePopup);
     }
 
-    private function createUpgradePopup(slotId:SlotId, buildingType:BuildingType, buildingLevel:BuildingLevel, buildingsCount:int, price:int):UpgradePopup {
-        return new UpgradePopup(slotId, buildingType, buildingLevel, buildingsCount, price, layout, locale);
-    }
+    private function onStartCloseUpgradePopup(event:Event = null):void {
+        popupManager.removeEventListener(PopupManager.START_CLOSE, onStartCloseUpgradePopup);
 
-    private function closeUpgradePopup(event:Event = null):void {
         upgradePopup.removeEventListener(UpgradeEvent.UPGRADE, onUpgrade);
         upgradePopup.removeEventListener(RemoveEvent.REMOVE, onRemove);
-        upgradePopup.close();
-
-        popupScreen.removeEventListener(MouseEvent.MOUSE_DOWN, closeUpgradePopup);
-        popupScreen.addEventListener(Event.COMPLETE, onUpgradeCloseComplete);
-        popupScreen.close();
-    }
-
-    private function onUpgradeCloseComplete(event:Event):void {
-        popupScreen.removeEventListener(Event.COMPLETE, onUpgradeCloseComplete);
-        removeChild(upgradePopup);
-        upgradePopup = null;
-        removeChild(popupScreen);
-        popupScreen = null;
     }
 
     private function onUpgrade(event:UpgradeEvent):void {
@@ -220,7 +178,7 @@ public class MainScreen extends MenuScreen {
             dto.id = event.slotId;
             sender.upgradeBuilding(dto);
 
-            closeUpgradePopup();
+            popupManager.closePopup();
         }
     }
 
@@ -231,7 +189,7 @@ public class MainScreen extends MenuScreen {
         dto.id = event.slotId;
         sender.removeBuilding(dto);
 
-        closeUpgradePopup();
+        popupManager.closePopup();
     }
 
     // swap

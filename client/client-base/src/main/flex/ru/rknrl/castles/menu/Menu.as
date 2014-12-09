@@ -50,6 +50,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private var shopScreen:ShopScreen;
     private var screens:Vector.<MenuScreen>;
 
+    private var popups:PopupManager;
     private var header:Header;
 
     private var screenSlider:ScreenSlider;
@@ -67,7 +68,9 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         this.locale = locale;
         this.layout = layout;
 
-        mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(accountState.prices.buildings), sender, layout, locale);
+        popups = new PopupManager(layout);
+
+        mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(accountState.prices.buildings), sender, layout, locale, popups);
 
         skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), accountState.prices.skillsUpgradePrice, sender, layout, locale);
 
@@ -86,6 +89,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         screenSlider = layout.createSlider(screens, locale);
 
         addChild(screenSlider);
+        addChild(popups);
         addChild(header);
 
         screenSlider.visible = !accountState.game;
@@ -107,6 +111,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         bankScreen.updateLayout(layout);
         shopScreen.updateLayout(layout);
         header.updateLayout(layout);
+        popups.updateLayout(layout);
         layout.updateSlider(screenSlider);
         if (enterGameScreen) enterGameScreen.updateLayout(layout, layout.enterGameTextFormat);
         if (game) game.updateLayout(layout);
