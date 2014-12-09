@@ -25,7 +25,7 @@ object GameConfigTest {
 
 class GameConfigTest extends FlatSpec with Matchers {
   "GameConfig" should "be correct deserialize from json" in {
-    game.stripMargin.parseJson.convertTo[GameConfig]
+    game.stripMargin.parseJson.convertTo[GameConfig] // todo
   }
 
   "GameConfig without buildings" should "throw Exception" in {
