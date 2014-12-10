@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/13.0">
+
+    <id>ru.rknrl.castles</id>
+
+    <filename>Castles</filename>
+
+    <name>Castles</name>
+
+    <versionNumber>0.0.1</versionNumber>
+    <versionLabel>0.0.1</versionLabel>
+
+    <supportedLanguages>en ru</supportedLanguages>
+
+    <description>
+        <text xml:lang="en">Castles description</text>
+        <text xml:lang="ru">Башенки описание</text>
+    </description>
+
+    <copyright>Tolya Yanot</copyright>
+
+    <!--
+        <icon>
+            <image36x36>icons_android/36.png</image36x36>
+            <image48x48>icons_android/48.png</image48x48>
+            <image72x72>icons_android/72.png</image72x72>
+            <image96x96>icons_android/96.png</image96x96>
+            <image144x144>icons_android/144.png</image144x144>
+        </icon>
+    -->
+
+    <initialWindow>
+        <content>CastlesMobile.swf</content>
+
+        <visible>true</visible>
+
+        <autoOrients>false</autoOrients>
+
+        <fullScreen>true</fullScreen>
+
+        <renderMode>gpu</renderMode>
+    </initialWindow>
+</application>
