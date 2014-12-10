@@ -1,10 +1,6 @@
 package ru.rknrl.castles {
-import flash.events.Event;
 import flash.system.Security;
-import flash.utils.ByteArray;
 
-import ru.rknrl.castles.utils.layout.Layout;
-import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.core.social.MM;
 import ru.rknrl.core.social.OK;
 import ru.rknrl.core.social.SocialWeb;
@@ -18,16 +14,11 @@ import ru.rknrl.log.Log;
 import ru.rknrl.utils.print;
 
 [SWF(width="1024", height="768", frameRate="60", quality="high")]
-public class MainWeb extends Main {
-    [Embed(source="/castles - EN.tsv", mimeType="application/octet-stream")]
-    public static const DefaultLocaleByteArray:Class;
-
-    private var log:Log;
-
+public class MainWeb extends MainWebBase {
     public function MainWeb() {
         Security.allowDomain("*");
 
-        log = new Log();
+        const log:Log = new Log();
 
         const flashVars:Object = loaderInfo.parameters;
         log.add("flashVars:\n" + print(flashVars));
@@ -46,22 +37,12 @@ public class MainWeb extends Main {
         authenticationSecret.body = social.flashVars.authenticationSecret;
         authenticationSecret.params = social.flashVars.authenticationParams;
 
-        log.add("authenticationSecret=" + authenticationSecret.body);
-        log.add("authenticationParams=" + authenticationSecret.params);
-
         const authenticate:AuthenticateDTO = new AuthenticateDTO();
         authenticate.accountId = accountId;
         authenticate.deviceType = DeviceType.CANVAS;
         authenticate.secret = authenticationSecret;
 
-        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight);
-
-        const localesUrl:String = "";
-        const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
-
-        super(host, port, authenticate, localesUrl, defaultLocale, log, social, layout);
-
-        stage.addEventListener(Event.RESIZE, onResize);
+        super(log, host, port, accountId, authenticationSecret, social);
     }
 
     private static function getAccountType(name:String):AccountType {
@@ -81,11 +62,6 @@ public class MainWeb extends Main {
                 return new MM(log, flashVars);
         }
         throw new Error("unknown account type " + accountType);
-    }
-
-    private function onResize(event:Event):void {
-        log.add("resize " + stage.stageWidth + "x" + stage.stageHeight);
-        updateLayout(new LayoutLandscape(stage.stageWidth, stage.stageHeight));
     }
 }
 }
