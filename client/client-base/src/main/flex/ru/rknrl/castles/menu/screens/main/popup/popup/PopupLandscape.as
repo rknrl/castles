@@ -1,15 +1,15 @@
 package ru.rknrl.castles.menu.screens.main.popup.popup {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.text.TextField;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class PopupLandscape extends Popup {
     private var background:Sprite;
-    private var title:TextField;
+    private var title:Label;
 
     private var items:Vector.<DisplayObject>;
 

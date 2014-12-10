@@ -1,18 +1,18 @@
 package ru.rknrl.castles.game.ui.avatar {
 import flash.display.Shape;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.BitmapUtils;
 import ru.rknrl.castles.game.layout.GameLayoutPortrait;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class AvatarPortrait extends Sprite {
     private var left:Boolean;
 
     private var avatar:Shape;
-    private var nameTextField:TextField;
+    private var nameTextField:Label;
 
     public function AvatarPortrait(data:AvatarData, left:Boolean, layout:GameLayoutPortrait) {
         mouseChildren = false;

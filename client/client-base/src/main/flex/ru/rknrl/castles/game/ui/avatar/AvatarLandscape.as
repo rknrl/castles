@@ -1,22 +1,22 @@
 package ru.rknrl.castles.game.ui.avatar {
 import flash.display.Shape;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.BitmapUtils;
 import ru.rknrl.castles.game.layout.GameLayoutLandscape;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.utils.changeTextFormat;
 
 public class AvatarLandscape extends Sprite {
     private var avatar:Shape;
-    private var nameTextField:TextField;
+    private var nameTextField:Label;
 
     public function AvatarLandscape(data:AvatarData, layout:GameLayoutLandscape) {
         mouseChildren = false;
 
         addChild(avatar = BitmapUtils.createCircleShape(data.bitmapData));
 
-        addChild(nameTextField = new TextField());
+        addChild(nameTextField = new Label());
         nameTextField.embedFonts = true;
         nameTextField.wordWrap = true;
         nameTextField.defaultTextFormat = layout.avatarTextFormat;

@@ -1,15 +1,15 @@
 package ru.rknrl.funnyUi.buttons {
-import flash.text.TextField;
 import flash.text.TextFormat;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.funnyUi.Animated;
 import ru.rknrl.funnyUi.Lock;
 import ru.rknrl.utils.centerize;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class RectButton extends Animated {
-    protected var textField:TextField;
+    protected var textField:Label;
     private var lockView:Lock;
     private var w:int;
     private var h:int;

@@ -2,25 +2,25 @@ package ru.rknrl.castles.menu.screens.gameOver {
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
 import ru.rknrl.castles.menu.screens.*;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.funnyUi.buttons.RectButton;
 import ru.rknrl.utils.centerize;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class GameOverScreen extends Screen {
     public static const TO_MENU:String = "toMenu";
     public static const PLAY_AGAIN:String = "playAgain";
 
     private var titleHolder:Sprite;
-    private var title:TextField;
+    private var title:Label;
     private var rewardHolder:Sprite;
-    private var rewardLabel:TextField;
+    private var rewardLabel:Label;
     private var toMenuButton:RectButton;
 
     private var againButton:RectButton;
@@ -64,14 +64,14 @@ public class GameOverScreen extends Screen {
         toMenuButton.y = layout.gameOverToMenuButtonCenterY;
     }
 
-    private static function createTitle(text:String, layout:Layout):TextField {
-        const title:TextField = createTextField(layout.gameOverTitleTextFormat, text);
+    private static function createTitle(text:String, layout:Layout):Label {
+        const title:Label = createTextField(layout.gameOverTitleTextFormat, text);
         title.textColor = Colors.randomColor();
         return title;
     }
 
-    private static function createRewardLabel(text:String, layout:Layout):TextField {
-        const label:TextField = createTextField(layout.gameOverRewardTextFormat, text);
+    private static function createRewardLabel(text:String, layout:Layout):Label {
+        const label:Label = createTextField(layout.gameOverRewardTextFormat, text);
         label.textColor = Colors.randomColor();
         return label;
     }

@@ -1,16 +1,16 @@
 package ru.rknrl.castles.menu.screens.main.popup.popup {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.text.TextField;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.layout.LayoutPortrait;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class PopupPortrait extends Popup {
     private var background:Sprite;
-    private var title:TextField;
+    private var title:Label;
     private var items:Vector.<DisplayObject>;
 
     public function PopupPortrait(titleText:String, items:Vector.<DisplayObject>, layout:LayoutPortrait) {
@@ -54,7 +54,7 @@ public class PopupPortrait extends Popup {
         updateY();
     }
 
-    private var _transition: Number;
+    private var _transition:Number;
 
     override public function set transition(value:Number):void {
         _transition = value;

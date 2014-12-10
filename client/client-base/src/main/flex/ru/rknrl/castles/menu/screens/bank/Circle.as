@@ -1,15 +1,15 @@
 package ru.rknrl.castles.menu.screens.bank {
 import flash.display.Sprite;
-import flash.text.TextField;
 import flash.text.TextFormat;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.utils.centerize;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 import ru.rknrl.utils.drawCircle;
 
 public class Circle extends Sprite {
-    private var textField:TextField;
+    private var textField:Label;
 
     public function Circle(text:String, textFormat:TextFormat, radius:int, color:uint) {
         mouseChildren = false;

@@ -1,18 +1,18 @@
 package ru.rknrl.castles.menu.screens.main.popup.popup.item {
 import flash.display.DisplayObject;
-import flash.text.TextField;
 
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.LayoutPortrait;
 import ru.rknrl.funnyUi.GoldTextField;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class PopupItemPortrait extends PopupItem {
     private var icon:DisplayObject;
-    private var iconOriginalHeight: int;
-    private var nameTextField:TextField;
-    private var infoTextField:TextField;
+    private var iconOriginalHeight:int;
+    private var nameTextField:Label;
+    private var infoTextField:Label;
     private var priceTextField:GoldTextField;
 
     public function PopupItemPortrait(icon:DisplayObject, name:String, info:String, price:int, color:uint, popupWidth:int, layout:LayoutPortrait) {

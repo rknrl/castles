@@ -2,18 +2,18 @@ package ru.rknrl.castles.menu {
 import flash.display.BitmapData;
 import flash.display.Shape;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.BitmapUtils;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.funnyUi.GoldTextField;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class Header extends Sprite {
     private var avatar:Shape;
-    private var nameTextField:TextField;
+    private var nameTextField:Label;
     private var goldTextField:GoldTextField;
     private var layout:Layout;
 

@@ -2,20 +2,20 @@ package ru.rknrl.castles.menu.screens {
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class LoadingScreen extends Screen {
     private var color:uint;
     private var holder:Sprite;
     private var progressBar:Shape;
-    private var label:TextField;
+    private var label:Label;
 
     public function LoadingScreen(text:String, textFormat:TextFormat, layout:Layout) {
         color = Colors.randomColor();

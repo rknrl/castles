@@ -1,15 +1,15 @@
 package ru.rknrl.castles.game.view {
 import flash.geom.ColorTransform;
-import flash.text.TextField;
 
 import ru.rknrl.castles.game.*;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.funnyUi.Animated;
 import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
 
 public class Building extends BuildingBase {
     private var _id:int;
@@ -27,7 +27,7 @@ public class Building extends BuildingBase {
     private var _population:int;
     private var buildingLevel:BuildingLevel;
     private var textFieldHolder:Animated;
-    private var textField:TextField;
+    private var textField:Label;
 
     public function Building(id:int, x:Number, y:Number, buildingType:BuildingType, buildingLevel:BuildingLevel, population:int, colorTransform:ColorTransform, owner:BuildingOwner, strengthened:Boolean) {
         _id = id;

@@ -57,25 +57,19 @@ public class Layout {
     }
 
     // fonts
-    [Embed(source='/segoeuil.ttf', fontName="LightFont", embedAsCFF="false")]
-    private static const lightFontClass:Class;
-
-    [Embed(source='/segoeuib.ttf', fontName="BoldFont", embedAsCFF="false")]
-    private static const boldFontClass:Class;
-
-    Font.registerFont(lightFontClass);
-    Font.registerFont(boldFontClass);
+    private static const lightFont:Font = new LightFont();
+    private static const boldFont:Font = new BoldFont();
 
     public static function light(size:Number, color:Object = null):TextFormat {
-        return new TextFormat("LightFont", size, color);
+        return new TextFormat(lightFont.fontName, size, color);
     }
 
     protected static function bold(size:Number, color:Object = null):TextFormat {
-        return new TextFormat("BoldFont", size, color, true);
+        return new TextFormat(boldFont.fontName, size, color, true);
     }
 
     public static function lightCenter(size:Number, color:Object = null):TextFormat {
-        return new TextFormat("LightFont", size, color, null, null, null, null, null, TextFormatAlign.CENTER);
+        return new TextFormat(lightFont.fontName, size, color, null, null, null, null, null, TextFormatAlign.CENTER);
     }
 
     public static const unitCounterTextFormat:TextFormat = bold(18);

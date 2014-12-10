@@ -2,22 +2,22 @@ package ru.rknrl.castles.menu.screens.noConnection {
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
 import ru.rknrl.castles.menu.screens.*;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.funnyUi.buttons.RectButton;
 import ru.rknrl.utils.centerize;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class NoConnectionScreen extends Screen {
     public static const TRY_CONNECT:String = "tryConnect";
 
     private var titleHolder:Sprite;
-    private var title:TextField;
+    private var title:Label;
     private var button:RectButton;
 
     public function NoConnectionScreen(layout:Layout, locale:CastlesLocale) {

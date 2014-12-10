@@ -1,7 +1,6 @@
 package ru.rknrl.castles.menu.screens.main {
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
 import ru.rknrl.castles.menu.PopupManager;
 import ru.rknrl.castles.menu.screens.MenuScreen;
@@ -15,7 +14,9 @@ import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenBuildPopupEve
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenUpgradePopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.SwapEvent;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuildingLevel;
@@ -26,7 +27,6 @@ import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.jnb.rmi.AccountFacadeSender;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class MainScreen extends MenuScreen {
     private var sender:AccountFacadeSender;
@@ -34,9 +34,9 @@ public class MainScreen extends MenuScreen {
 
     private var startLocationView:StartLocationView;
 
-    private var title:TextField;
+    private var title:Label;
     private var points:Points;
-    private var playLabel:TextField;
+    private var playLabel:Label;
     private var locale:CastlesLocale;
     private var popupManager:PopupManager;
 

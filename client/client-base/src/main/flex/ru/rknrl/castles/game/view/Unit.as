@@ -3,13 +3,13 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.geom.Point;
-import flash.text.TextField;
 
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.funnyUi.Animated;
-import ru.rknrl.utils.createTextField;
 
 public class Unit extends Sprite {
     public static const unitCounterY:Number = -30;
@@ -102,7 +102,7 @@ public class Unit extends Sprite {
     }
 
     private var textFieldHolder:Animated;
-    private var textField:TextField;
+    private var textField:Label;
 
     private static function createTextHolder():Animated {
         const textFieldHolder:Animated = new Animated();

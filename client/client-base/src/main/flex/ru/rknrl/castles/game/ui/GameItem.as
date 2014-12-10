@@ -5,16 +5,16 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
-import flash.text.TextField;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.game.layout.GameLayout;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
 
 public class GameItem extends Sprite {
     private var _itemType:ItemType;
@@ -25,7 +25,7 @@ public class GameItem extends Sprite {
 
     private var icon:Sprite;
     private var cooldownIcon:Bitmap;
-    private var countTextField:TextField;
+    private var countTextField:Label;
 
     private var originalIconWidth:Number;
     private var originalIconHeight:Number;

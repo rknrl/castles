@@ -3,8 +3,9 @@ package ru.rknrl.castles.menu.screens.skills {
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.SkillLevel;
@@ -12,7 +13,6 @@ import ru.rknrl.dto.SkillType;
 import ru.rknrl.funnyUi.buttons.round.OkButton;
 import ru.rknrl.funnyUi.buttons.round.PlusButton;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class SkillView extends Sprite {
     public static const UPGRADE:String = "upgrade";
@@ -24,7 +24,7 @@ public class SkillView extends Sprite {
         return _skillType;
     }
 
-    private var nameTextField:TextField;
+    private var nameTextField:Label;
     private var progress:SkillProgress;
     private var plusButton:PlusButton;
     private var okButton:OkButton;

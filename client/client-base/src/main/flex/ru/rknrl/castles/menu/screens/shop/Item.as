@@ -1,17 +1,17 @@
 package ru.rknrl.castles.menu.screens.shop {
 import flash.display.Sprite;
-import flash.text.TextField;
 import flash.text.TextFormat;
 
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.funnyUi.Animated;
 import ru.rknrl.funnyUi.Lock;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class Item extends Animated {
     private var _itemType:ItemType;
@@ -26,10 +26,10 @@ public class Item extends Animated {
 
     private var holder:Sprite;
 
-    private var countTextField:TextField;
+    private var countTextField:Label;
     private var lockView:Lock;
 
-    private var nameTextField:TextField;
+    private var nameTextField:Label;
 
     public function Item(itemType:ItemType, count:int, color:uint, layout:Layout, locale:CastlesLocale) {
         _itemType = itemType;
@@ -72,8 +72,8 @@ public class Item extends Animated {
         centerizeCount();
     }
 
-    private static function addNameTextField(itemType:ItemType, color:uint, textFormat:TextFormat, locale:CastlesLocale):TextField {
-        const nameTextField:TextField = createTextField(textFormat, locale.getItemName(itemType));
+    private static function addNameTextField(itemType:ItemType, color:uint, textFormat:TextFormat, locale:CastlesLocale):Label {
+        const nameTextField:Label = createTextField(textFormat, locale.getItemName(itemType));
         nameTextField.textColor = color;
         return nameTextField;
     }

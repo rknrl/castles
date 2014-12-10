@@ -1,17 +1,17 @@
 package ru.rknrl.funnyUi {
 import flash.display.Sprite;
-import flash.text.TextField;
 import flash.text.TextFormat;
 
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.utils.changeTextFormat;
-import ru.rknrl.utils.createTextField;
 
 public class GoldTextField extends Sprite {
     private static const STAR:String = "★";
 
-    private var textField:TextField;
+    private var textField:Label;
     private var goldHolder:Animated;
-    private var goldTextField:TextField;
+    private var goldTextField:Label;
 
     public function GoldTextField(text:String, textFormat:TextFormat, gold:int, color:uint) {
         mouseChildren = false;
