@@ -1,10 +1,10 @@
 package ru.rknrl.castles.game.objects.fireballs
 
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.objects.players.{PlayerStates, PlayerId}
-import ru.rknrl.utils.{PeriodObjectCollection, Point}
-import ru.rknrl.castles.rmi.b2c.AddFireballMsg
+import ru.rknrl.castles.game.objects.players.{PlayerId, PlayerStates}
+import ru.rknrl.castles.rmi.AddFireballMsg
 import ru.rknrl.dto.GameDTO.{FireballDTO, PointDTO}
+import ru.rknrl.utils.{PeriodObjectCollection, Point}
 
 object Fireballs {
   type Fireballs = PeriodObjectCollection[FireballDTO, Fireball]

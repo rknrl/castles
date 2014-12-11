@@ -3,19 +3,17 @@ package ru.rknrl.castles
 import java.net.InetSocketAddress
 
 import akka.actor.{Actor, ActorRef, Props}
-import akka.io.{IO, Tcp}
 import ru.rknrl.castles.config.Config
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling
-class TcpServer(config: Config, matchmaking: ActorRef) extends Actor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef) extends Actor {
 
   import akka.io.Tcp._
-  import context.system
 
   val address = new InetSocketAddress(config.tcpIp, config.tcpPort)
 
-  IO(Tcp) ! Bind(self, address)
+  tcp ! Bind(self, address)
 
   def receive = {
     case Bound(localAddress) ⇒

@@ -3,7 +3,7 @@ package ru.rknrl.castles
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.account.{Account, GetAccountState}
 import ru.rknrl.castles.config.Config
-import ru.rknrl.castles.rmi.b2c._
+import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO

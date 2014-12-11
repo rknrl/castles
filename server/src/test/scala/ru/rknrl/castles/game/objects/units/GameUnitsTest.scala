@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.account.objects.BuildingPrototype
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.PlayerId
-import ru.rknrl.castles.rmi.b2c.RemoveUnitMsg
+import ru.rknrl.castles.rmi.RemoveUnitMsg
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 import ru.rknrl.utils.Point
 

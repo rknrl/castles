@@ -6,7 +6,7 @@ import ru.rknrl.castles.game.objects.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.objects.players.PlayerStates
 import ru.rknrl.castles.game.objects.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.objects.volcanoes.{Volcano, Volcanoes}
-import ru.rknrl.castles.rmi.b2c.{AddUnitMsg, RemoveUnitMsg, UpdateUnitMsg}
+import ru.rknrl.castles.rmi.{AddUnitMsg, RemoveUnitMsg, UpdateUnitMsg}
 
 class GameUnits(val units: Iterable[GameUnit]) {
   def add(newUnits: Iterable[GameUnit]) =

@@ -5,7 +5,7 @@ import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.game.Game.{Join, Offline}
-import ru.rknrl.castles.rmi.b2c._
+import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.DeviceType

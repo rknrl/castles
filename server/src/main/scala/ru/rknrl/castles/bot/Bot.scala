@@ -5,7 +5,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameState
-import ru.rknrl.castles.rmi.b2c._
+import ru.rknrl.castles.rmi.JoinGameMsg
 import ru.rknrl.dto.GameDTO.GameStateDTO
 
 class Bot(val externalAccountId: AccountId) extends Actor {

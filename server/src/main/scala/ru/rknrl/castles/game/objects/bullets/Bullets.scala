@@ -2,11 +2,11 @@ package ru.rknrl.castles.game.objects.bullets
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.buildings.{Building, Buildings}
-import ru.rknrl.castles.game.objects.players.{PlayerStates, Players}
+import ru.rknrl.castles.game.objects.players.PlayerStates
 import ru.rknrl.castles.game.objects.units.{GameUnit, GameUnits}
-import ru.rknrl.utils.{PeriodObjectCollection, Point}
-import ru.rknrl.castles.rmi.b2c.AddBulletMsg
+import ru.rknrl.castles.rmi.AddBulletMsg
 import ru.rknrl.dto.GameDTO.BulletDTO
+import ru.rknrl.utils.{PeriodObjectCollection, Point}
 
 object Bullets {
   type Bullets = PeriodObjectCollection[BulletDTO, Bullet]

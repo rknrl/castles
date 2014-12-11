@@ -7,7 +7,7 @@ import ru.rknrl.castles.account.LeaveGame
 import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
-import ru.rknrl.castles.rmi.b2c._
+import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.GameDTO._
 
 import scala.collection.mutable

@@ -7,7 +7,7 @@ import ru.rknrl.castles.game.objects.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.objects.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.objects.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.objects.volcanoes.{Volcano, Volcanoes}
-import ru.rknrl.castles.rmi.b2c.UpdateBuildingMsg
+import ru.rknrl.castles.rmi.UpdateBuildingMsg
 
 class Buildings(val buildings: Map[BuildingId, Building]) {
   def apply(id: BuildingId) = buildings(id)

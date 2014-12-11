@@ -1,6 +1,7 @@
 package ru.rknrl.castles
 
 import akka.actor.Actor
+import ru.rknrl.castles.MatchMaking.{InGameResponse, InGame}
 import ru.rknrl.castles.config.ConfigTest
 
 object CastlesTestSpec {
@@ -19,6 +20,8 @@ object CastlesTestSpec {
 
   class MatchmakingMock extends Actor {
     override def receive = {
+      case InGame(_) ⇒
+        sender() ! InGameResponse(None)
       case _ ⇒
     }
   }
