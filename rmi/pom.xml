@@ -14,6 +14,7 @@
 
     <modules>
         <module>rmi-interfaces</module>
+        <module>rmi-client-gen</module>
         <module>rmi-server</module>
     </modules>
 </project>

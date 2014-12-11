@@ -26,6 +26,8 @@ object ConfigTest {
       |}
       """
 
+  val configMock = config.stripMargin.parseJson.convertTo[Config]
+
 }
 
 class ConfigTest extends FlatSpec with Matchers {

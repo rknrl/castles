@@ -24,7 +24,7 @@ class Account(externalAccountId: AccountId,
               name: String) extends Actor {
 
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
-  tcpReceiver ! RegisterReceiver(accountRmi)
+  tcpReceiver ! RegisterReceiver(accountRmi, AccountRMI.allCommands)
 
   private var state = AccountState.initAccount(config.account)
 
@@ -134,10 +134,10 @@ class Account(externalAccountId: AccountId,
     assert(this.gameRmi.isEmpty)
 
     val enterGameRmi = context.actorOf(Props(classOf[EnterGameRMI], tcpSender, game), "enter-game-rmi" + name)
-    tcpReceiver ! RegisterReceiver(enterGameRmi)
+    tcpReceiver ! RegisterReceiver(enterGameRmi, EnterGameRMI.allCommands)
 
     val gameRmi = context.actorOf(Props(classOf[GameRMI], tcpSender, game), "game-rmi" + name)
-    tcpReceiver ! RegisterReceiver(gameRmi)
+    tcpReceiver ! RegisterReceiver(gameRmi, GameRMI.allCommands)
 
     game ! Join(externalAccountId, enterGameRmi, gameRmi)
 

@@ -6,7 +6,6 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
-import flash.utils.setTimeout;
 
 import ru.rknrl.castles.menu.Menu;
 import ru.rknrl.castles.menu.screens.LoadingScreen;
@@ -43,6 +42,7 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var connection:Connection;
     private var authFacadeReceiver:AuthFacadeReceiver;
+    private var authFacadeSender: AuthFacadeSender;
     private var accountFacadeReceiver:AccountFacadeReceiver;
     private var menu:Menu;
     private var noConnectionScreen:NoConnectionScreen;
@@ -133,9 +133,11 @@ public class Main extends Sprite implements IAuthFacade {
         authFacadeReceiver = new AuthFacadeReceiver(this);
         connection.registerReceiver(authFacadeReceiver);
 
-        setTimeout(function () { // todo
-            new AuthFacadeSender(connection).authenticate(authenticate);
-        }, 1000);
+        authFacadeSender = new AuthFacadeSender(connection);
+    }
+
+    public function onAuthReady():void {
+        authFacadeSender.authenticate(authenticate);
     }
 
     public function onAuthenticationResult(accountState:AccountStateDTO):void {

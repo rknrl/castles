@@ -1,10 +1,11 @@
+<!--todo Сделать как нибудь получше -->
 <project>
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.rknrl.castles.dto</groupId>
-    <artifactId>dto-server</artifactId>
+    <artifactId>dto-client-gen</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>dto-server</name>
+    <name>dto-client-gen</name>
 
     <parent>
         <groupId>ru.rknrl.castles</groupId>
@@ -24,8 +25,9 @@
                         <configuration>
                             <tasks>
                                 <exec executable="protoc">
-                                    <arg value="--java_out=${project.basedir}/src/main/java"/>
+                                    <arg value="--as3_out=${project.basedir}/../dto-client/src/main/flex"/>
                                     <arg value="--proto_path=${project.basedir}/../dto-proto/src/main/proto/"/>
+                                    <arg value="--plugin=protoc-gen-as3=${rknrl.core}/dto/protoc-gen-as3/protoc-gen-as3"/>
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/auth.proto"/>
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/common.proto"/>
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/account.proto"/>
@@ -41,11 +43,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-        </dependency>
-    </dependencies>
 </project>
