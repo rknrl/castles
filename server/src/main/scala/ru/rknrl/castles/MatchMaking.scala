@@ -55,7 +55,7 @@ class PlayerIdIterator extends IdIterator {
   def next = new PlayerId(nextInt)
 }
 
-class MatchMaking(gameConfig: GameConfig) extends Actor {
+class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Actor {
 
   class GameInfo(val gameRef: ActorRef,
                  val externalAccountIds: Iterable[AccountId])
@@ -68,7 +68,7 @@ class MatchMaking(gameConfig: GameConfig) extends Actor {
 
   import context.dispatcher
 
-  context.system.scheduler.schedule(0 seconds, 10 seconds, self, TryCreateGames)
+  context.system.scheduler.schedule(0 seconds, interval, self, TryCreateGames)
 
   def receive = {
     /**
