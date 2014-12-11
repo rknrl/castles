@@ -62,6 +62,10 @@ message BuildingPriceDTO {
     required int32 price = 2;
 }
 
+message GoldUpdatedDTO {
+    required int32 gold = 1;
+}
+
 // actions
 
 message SwapSlotsDTO {

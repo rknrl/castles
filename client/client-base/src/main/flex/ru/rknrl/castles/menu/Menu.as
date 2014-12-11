@@ -23,6 +23,7 @@ import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.GameStateDTO;
+import ru.rknrl.dto.GoldUpdatedDTO;
 import ru.rknrl.dto.ItemsDTO;
 import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.dto.PricesDTO;
@@ -219,8 +220,8 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         throw new Error(event.toString);
     }
 
-    public function onGoldUpdated(value:int):void {
-        gold = value;
+    public function onGoldUpdated(dto:GoldUpdatedDTO):void {
+        gold = dto.gold;
     }
 
     public function onPricesUpdated(pricesDTO:PricesDTO):void {

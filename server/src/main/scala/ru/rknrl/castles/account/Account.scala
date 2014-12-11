@@ -28,6 +28,8 @@ class Account(externalAccountId: AccountId,
 
   private var state = AccountState.initAccount(config.account)
 
+  private def goldDto = GoldUpdatedDTO.newBuilder().setGold(state.gold).build()
+
   def receive = {
     case EnterGameMsg() ⇒
       matchmaking ! PlaceGameOrder(new GameOrder(externalAccountId, deviceType, self, state.startLocation, state.skills, state.items, isBot = false))
@@ -38,12 +40,12 @@ class Account(externalAccountId: AccountId,
 
     case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
       state = state.buyBuilding(buy.getId, buy.getBuildingType)
-      sender ! GoldUpdatedMsg(state.gold)
+      sender ! GoldUpdatedMsg(goldDto)
       sender ! StartLocationUpdatedMsg(state.startLocation.dto)
 
     case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
       state = state.upgradeBuilding(dto.getId)
-      sender ! GoldUpdatedMsg(state.gold)
+      sender ! GoldUpdatedMsg(goldDto)
       sender ! StartLocationUpdatedMsg(state.startLocation.dto)
 
     case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
@@ -52,18 +54,18 @@ class Account(externalAccountId: AccountId,
 
     case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
       state = state.upgradeSkill(upgrade.getType)
-      sender ! GoldUpdatedMsg(state.gold)
+      sender ! GoldUpdatedMsg(goldDto)
       sender ! PricesUpdatedMsg(state.prices)
       sender ! SkillsUpdatedMsg(state.skills.dto)
 
     case BuyItemMsg(buy: BuyItemDTO) ⇒
       state = state.buyItem(buy.getType)
-      sender ! GoldUpdatedMsg(state.gold)
+      sender ! GoldUpdatedMsg(goldDto)
       sender ! ItemsUpdatedMsg(state.items.dto)
 
     case BuyGoldMsg() ⇒
       state = state.addGold(state.config.goldByDollar)
-      sender ! GoldUpdatedMsg(state.gold)
+      sender ! GoldUpdatedMsg(goldDto)
 
     /**
      * Auth спрашивает accountState
