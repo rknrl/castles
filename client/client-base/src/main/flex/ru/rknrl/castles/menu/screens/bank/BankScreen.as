@@ -9,7 +9,7 @@ import ru.rknrl.core.social.PaymentDialogData;
 import ru.rknrl.core.social.PaymentDialogEvent;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.funnyUi.buttons.RectButton;
-import ru.rknrl.jnb.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 
 public class BankScreen extends MenuScreen {
     private var sender:AccountFacadeSender;

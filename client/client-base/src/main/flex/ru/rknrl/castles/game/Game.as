@@ -51,8 +51,8 @@ import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
-import ru.rknrl.jnb.rmi.GameFacadeSender;
-import ru.rknrl.jnb.rmi.IGameFacade;
+import ru.rknrl.castles.rmi.GameFacadeSender;
+import ru.rknrl.castles.rmi.IGameFacade;
 
 public class Game extends Sprite implements IGameFacade {
     private var sender:GameFacadeSender;

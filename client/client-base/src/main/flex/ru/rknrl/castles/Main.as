@@ -18,11 +18,11 @@ import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticateDTO;
-import ru.rknrl.jnb.rmi.AccountFacadeReceiver;
-import ru.rknrl.jnb.rmi.AccountFacadeSender;
-import ru.rknrl.jnb.rmi.AuthFacadeReceiver;
-import ru.rknrl.jnb.rmi.AuthFacadeSender;
-import ru.rknrl.jnb.rmi.IAuthFacade;
+import ru.rknrl.castles.rmi.AccountFacadeReceiver;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.AuthFacadeReceiver;
+import ru.rknrl.castles.rmi.AuthFacadeSender;
+import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 

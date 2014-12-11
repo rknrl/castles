@@ -29,13 +29,13 @@ import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.dto.PricesDTO;
 import ru.rknrl.dto.SkillsDTO;
 import ru.rknrl.dto.StartLocationDTO;
-import ru.rknrl.jnb.rmi.AccountFacadeSender;
-import ru.rknrl.jnb.rmi.EnterGameFacadeReceiver;
-import ru.rknrl.jnb.rmi.EnterGameFacadeSender;
-import ru.rknrl.jnb.rmi.GameFacadeReceiver;
-import ru.rknrl.jnb.rmi.GameFacadeSender;
-import ru.rknrl.jnb.rmi.IAccountFacade;
-import ru.rknrl.jnb.rmi.IEnterGameFacade;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
+import ru.rknrl.castles.rmi.EnterGameFacadeSender;
+import ru.rknrl.castles.rmi.GameFacadeReceiver;
+import ru.rknrl.castles.rmi.GameFacadeSender;
+import ru.rknrl.castles.rmi.IAccountFacade;
+import ru.rknrl.castles.rmi.IEnterGameFacade;
 import ru.rknrl.log.Log;
 
 public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {

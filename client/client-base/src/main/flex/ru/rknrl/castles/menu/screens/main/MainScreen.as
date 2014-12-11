@@ -25,7 +25,7 @@ import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.StartLocationDTO;
 import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
-import ru.rknrl.jnb.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.utils.changeTextFormat;
 
 public class MainScreen extends MenuScreen {

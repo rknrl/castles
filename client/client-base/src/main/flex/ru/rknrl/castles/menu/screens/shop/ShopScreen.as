@@ -13,7 +13,7 @@ import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuyItemDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.funnyUi.GoldTextField;
-import ru.rknrl.jnb.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.utils.centerize;
 
 public class ShopScreen extends MenuScreen {
