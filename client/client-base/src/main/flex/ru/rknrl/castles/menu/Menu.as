@@ -93,14 +93,16 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         addChild(popups);
         addChild(header);
 
-        screenSlider.visible = !accountState.hasGame;
-        header.visible = !accountState.hasGame;
+        screenSlider.visible = !accountState.hasGame && !accountState.enterGame;
+        header.visible = !accountState.hasGame && !accountState.enterGame;
 
         gold = accountState.gold;
 
         screenSlider.addEventListener(Utils.PLAY, onPlayButtonClick);
 
-        if (accountState.hasGame) {
+        if (accountState.enterGame) {
+            addEnterGameScreen();
+        } else if (accountState.hasGame) {
             onEnteredGame(accountState.game);
         }
     }
@@ -136,10 +138,12 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private function onPlayButtonClick(event:Event = null):void {
         header.visible = false;
         screenSlider.visible = false;
-
-        addChild(enterGameScreen = new LoadingScreen(locale.enterGame, layout.enterGameTextFormat, layout));
-
+        addEnterGameScreen();
         sender.enterGame();
+    }
+
+    private function addEnterGameScreen():void {
+        addChild(enterGameScreen = new LoadingScreen(locale.enterGame, layout.enterGameTextFormat, layout));
     }
 
     // ENTER GAME

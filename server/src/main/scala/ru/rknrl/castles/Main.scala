@@ -22,7 +22,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 15 seconds, config.game), "matchmaking")
 
     new Web(config)
 

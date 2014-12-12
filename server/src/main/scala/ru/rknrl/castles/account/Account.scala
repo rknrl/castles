@@ -46,7 +46,7 @@ class Account(externalAccountId: AccountId,
 
   def receive = {
     case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(externalAccountId, deviceType, self, state.startLocation, state.skills, state.items, isBot = false))
+      matchmaking ! PlaceGameOrder(new GameOrder(externalAccountId, deviceType, state.startLocation, state.skills, state.items, isBot = false))
 
     case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
       state = state.swapSlots(swap.getId1, swap.getId2)
@@ -92,13 +92,13 @@ class Account(externalAccountId: AccountId,
      * Matchmaking ответил на InGame
      * Отправляем Auth accountState
      */
-    case InGameResponse(gameRef) ⇒
+    case InGameResponse(gameRef, enterGame) ⇒
       if (gameRef.isDefined) {
         reenterGame = true
         connectToGame(gameRef.get)
       } else {
         reenterGame = false
-        auth ! state.dto.build()
+        auth ! state.dto.setEnterGame(enterGame).build()
       }
 
     /**
@@ -182,7 +182,7 @@ class Account(externalAccountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! state.dto.setGame(gameAddress).build()
+        auth ! state.dto.setGame(gameAddress).setEnterGame(false).build()
         reenterGame = false
       } else
         accountRmi ! EnteredGameMsg(gameAddress)

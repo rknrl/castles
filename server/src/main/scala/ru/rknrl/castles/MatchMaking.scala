@@ -15,9 +15,8 @@ import scala.concurrent.duration._
 
 object MatchMaking {
 
-  class GameOrder(val externalAccountId: AccountId,
+  class GameOrder(val accountId: AccountId,
                   val deviceType: DeviceType,
-                  val accountRef: ActorRef,
                   val startLocation: StartLocation,
                   val skills: Skills,
                   val items: Items,
@@ -31,7 +30,7 @@ object MatchMaking {
 
   // matchmaking -> account
 
-  case class InGameResponse(gameRef: Option[ActorRef])
+  case class InGameResponse(gameRef: Option[ActorRef], enterGame: Boolean)
 
   case class ConnectToGame(game: ActorRef)
 
@@ -62,7 +61,12 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
 
   private val gameOrders = mutable.ListBuffer[GameOrder]()
 
-  private val playerToGameInfo = mutable.Map[AccountId, GameInfo]()
+  private def findInGameOrders(accountId: AccountId) =
+    gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId)
+
+  private var accountIdToGameInfo = Map[AccountId, GameInfo]()
+
+  private var accountIdToAccountRef = Map[AccountId, ActorRef]()
 
   case object TryCreateGames
 
@@ -75,26 +79,29 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
      * Аккаунт спрашивает находится ли он сейчас в игре?
      * В ответ отпарвялем InGameState
      */
-    case InGame(externalAccountId) ⇒
-      val gameInfo = playerToGameInfo.get(externalAccountId)
+    case InGame(accountId) ⇒
+      accountIdToAccountRef = accountIdToAccountRef.updated(accountId, sender)
+
+      val gameInfo = accountIdToGameInfo.get(accountId)
       if (gameInfo.isEmpty)
-        sender ! InGameResponse(None)
+        sender ! InGameResponse(None, enterGame = findInGameOrders(accountId))
       else
-        sender ! InGameResponse(Some(gameInfo.get.gameRef))
+        sender ! InGameResponse(Some(gameInfo.get.gameRef), enterGame = false)
 
     /**
      * Аккаунт присылает заявку на игру
      */
     case PlaceGameOrder(gameOrder) ⇒
-      assert(playerToGameInfo.get(gameOrder.externalAccountId).isEmpty)
-
+      assert(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
+      println("place game order")
+      accountIdToAccountRef = accountIdToAccountRef.updated(gameOrder.accountId, sender)
       gameOrders += gameOrder
 
     /**
      * Game оповещает, что игрок вышел из игры
      */
-    case Leaved(externalAccountId) ⇒
-      playerToGameInfo -= externalAccountId
+    case Leaved(accountId) ⇒
+      accountIdToGameInfo = accountIdToGameInfo - accountId
 
     /**
      * Game оповещает, что игра закончена - останавливаем актор игры
@@ -109,22 +116,30 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   }
 
   /**
+   * Дабы игра не была создана раньше чем interval (Нужно для тестов)
+   */
+  private var currentGameOrders = mutable.ListBuffer[GameOrder]()
+
+  /**
    * Создать игры из имеющихся заявок
    * Если заявок две - создаем игру между этими двумя игроками
    * Если заявка одна - создаем игру с ботом
    */
   private def tryCreateGames() = {
-    if (gameOrders.size == 2 && friendlyDevices(gameOrders(0).deviceType, gameOrders(1).deviceType)) {
-      val order1 = gameOrders(0)
-      val order2 = gameOrders(1)
+    if (currentGameOrders.size == 2 && friendlyDevices(currentGameOrders(0).deviceType, currentGameOrders(1).deviceType)) {
+      val order1 = currentGameOrders(0)
+      val order2 = currentGameOrders(1)
       gameOrders -= order1
       gameOrders -= order2
+
       createGame(isBigGame(order1.deviceType), List(order1, order2))
-    } else if (gameOrders.size == 1) {
-      val order = gameOrders(0)
+    } else if (currentGameOrders.size == 1) {
+      val order = currentGameOrders(0)
       gameOrders -= order
       createGameWithBot(order)
     }
+
+    currentGameOrders = gameOrders.clone()
   }
 
   private def friendlyDevices(a: DeviceType, b: DeviceType) =
@@ -137,7 +152,8 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   private def createGameWithBot(order: GameOrder) = {
     val externalAccountId = botIdIterator.next
     val bot = context.actorOf(Props(classOf[Bot], externalAccountId), externalAccountId.id)
-    val botOrder = new GameOrder(externalAccountId, DeviceType.CANVAS, bot, order.startLocation, order.skills, order.items, isBot = true)
+    accountIdToAccountRef = accountIdToAccountRef.updated(externalAccountId, bot)
+    val botOrder = new GameOrder(externalAccountId, DeviceType.CANVAS, order.startLocation, order.skills, order.items, isBot = true)
     val orders = List(order, botOrder)
     createGame(isBigGame(order.deviceType), orders)
   }
@@ -150,18 +166,18 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      playerId → new Player(playerId, order.externalAccountId, order.startLocation, order.skills, order.items, isBot = order.isBot)
+      playerId → new Player(playerId, order.accountId, order.startLocation, order.skills, order.items, isBot = order.isBot)
     }
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, gameConfig, self), gameIdIterator.next)
 
-    val ids = orders.map(_.externalAccountId)
+    val ids = orders.map(_.accountId)
 
     val info = new GameInfo(game, ids)
 
     for (order ← orders) {
-      playerToGameInfo += order.externalAccountId → info
-      order.accountRef ! ConnectToGame(game)
+      accountIdToGameInfo = accountIdToGameInfo + (order.accountId → info)
+      accountIdToAccountRef(order.accountId) ! ConnectToGame(game)
     }
   }
 }
