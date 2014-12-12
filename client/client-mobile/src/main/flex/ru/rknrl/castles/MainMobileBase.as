@@ -24,7 +24,7 @@ public class MainMobileBase extends Main {
         return inch > maxPhoneInch;
     }
 
-    public function MainMobileBase(host:String, port:uint) {
+    public function MainMobileBase(host:String, gamePort:int, policyPort:int) {
         const log:Log = new Log();
         log.add(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
 
@@ -66,7 +66,7 @@ public class MainMobileBase extends Main {
          trace("deviceLocale:" + deviceLocale);
          */
 
-        super(host, port, authenticate, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, authenticate, localesUrl, defaultLocale, log, social, layout);
     }
 }
 }

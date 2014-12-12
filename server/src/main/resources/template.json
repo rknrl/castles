@@ -1,6 +1,7 @@
 {
-  "tcpIp": "127.0.0.1",
-  "tcpPort": 2335,
+  "host": "127.0.0.1",
+  "gamePort": 2335,
+  "policyPort": 2336,
   "account": {
     "buildingPrices": {
       "level1": 4,

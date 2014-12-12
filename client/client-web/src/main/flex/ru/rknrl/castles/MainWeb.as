@@ -23,8 +23,9 @@ public class MainWeb extends MainWebBase {
         const flashVars:Object = loaderInfo.parameters;
         log.add("flashVars:\n" + print(flashVars));
 
-        const host:String = flashVars.rknrlServerHost;
-        const port:int = flashVars.rknrlServerPort;
+        const host:String = flashVars.rknrlHost;
+        const gamePort:int = flashVars.rknrlGamePort;
+        const policyPort:int = flashVars.rknrlPolicyPort;
 
         const accountType:AccountType = getAccountType(flashVars.rknrlAccountType);
         const social:SocialWeb = createSocial(accountType, log, flashVars);
@@ -42,7 +43,7 @@ public class MainWeb extends MainWebBase {
         authenticate.deviceType = DeviceType.CANVAS;
         authenticate.secret = authenticationSecret;
 
-        super(log, host, port, accountId, authenticationSecret, social);
+        super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
     }
 
     private static function getAccountType(name:String):AccountType {

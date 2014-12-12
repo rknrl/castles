@@ -18,8 +18,9 @@ object ConfigTest {
   val config =
     s"""
       |{
-      |  "tcpIp": "127.0.0.1",
-      |  "tcpPort": 2335,
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
+      |  "policyPort": 2336,
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": $socialConfigs
@@ -33,15 +34,17 @@ object ConfigTest {
 class ConfigTest extends FlatSpec with Matchers {
   "Config" should "be correct deserialize from json" in {
     val c = config.stripMargin.parseJson.convertTo[Config]
-    c.tcpIp should be("127.0.0.1")
-    c.tcpPort should be(2335)
+    c.host should be("127.0.0.1")
+    c.gamePort should be(2335)
+    c.policyPort should be(2336)
   }
 
-  "Config without tcpId" should "throw Exception" in {
+  "Config without host" should "throw Exception" in {
     a[Exception] should be thrownBy {
       s"""
       |{
-      |  "tcpPort": 2335,
+      |  "gamePort": 2335,
+      |  "policyPort": 2336,
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
@@ -50,11 +53,26 @@ class ConfigTest extends FlatSpec with Matchers {
     }
   }
 
-  "Config without tcpPort" should "throw Exception" in {
+  "Config without gamePort" should "throw Exception" in {
     a[Exception] should be thrownBy {
       s"""
       |{
-      |  "tcpIp": "127.0.0.1",
+      |  "host": "127.0.0.1",
+      |  "policyPort": 2336,
+      |  "account": ${AccountConfigTest.account},
+      |  "game": ${GameConfigTest.game},
+      |  "social": ${ConfigTest.socialConfigs}
+      |}
+      """.stripMargin.parseJson.convertTo[Config]
+    }
+  }
+
+  "Config without policyPort" should "throw Exception" in {
+    a[Exception] should be thrownBy {
+      s"""
+      |{
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
@@ -67,8 +85,8 @@ class ConfigTest extends FlatSpec with Matchers {
     a[Exception] should be thrownBy {
       s"""
       |{
-      |  "tcpIp": "127.0.0.1",
-      |  "tcpPort": 2335,
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
       |}
@@ -80,8 +98,8 @@ class ConfigTest extends FlatSpec with Matchers {
     a[Exception] should be thrownBy {
       s"""
       |{
-      |  "tcpIp": "127.0.0.1",
-      |  "tcpPort": 2335,
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
       |  "account": ${AccountConfigTest.account},
       |  "social": ${ConfigTest.socialConfigs}
       |}
@@ -93,8 +111,8 @@ class ConfigTest extends FlatSpec with Matchers {
     a[Exception] should be thrownBy {
       s"""
       |{
-      |  "tcpIp": "127.0.0.1",
-      |  "tcpPort": 2335,
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game}
       |}

@@ -11,7 +11,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef) extends Ac
 
   import akka.io.Tcp._
 
-  val address = new InetSocketAddress(config.tcpIp, config.tcpPort)
+  val address = new InetSocketAddress(config.host, config.gamePort)
 
   tcp ! Bind(self, address)
 
@@ -35,6 +35,7 @@ class CastlesTcpReceiver(tcpSender: ActorRef,
                          matchmaking: ActorRef,
                          config: Config,
                          name: String) extends TcpReceiver(name) {
+
   context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, config, name), "auth" + name)
 
   override def preStart(): Unit = println("TcpReceiver start " + name)

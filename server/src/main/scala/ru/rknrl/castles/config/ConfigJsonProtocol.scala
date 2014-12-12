@@ -200,8 +200,9 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
         implicit val m = map
 
         new Config(
-          tcpIp = getNotEmptyString("tcpIp"),
-          tcpPort = getInt("tcpPort"),
+          host = getNotEmptyString("host"),
+          gamePort = getInt("gamePort"),
+          policyPort = getInt("policyPort"),
           social = map("social").convertTo[SocialConfigs],
           account = map("account").convertTo[AccountConfig],
           game = map("game").convertTo[GameConfig]

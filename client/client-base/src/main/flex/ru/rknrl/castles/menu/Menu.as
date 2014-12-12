@@ -3,6 +3,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
+import flash.system.Security;
 
 import ru.rknrl.castles.game.Game;
 import ru.rknrl.castles.menu.screens.LoadingScreen;
@@ -61,9 +62,11 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private var game:Game;
     private var gameConnection:Connection;
     private var gameFacadeReceiver:GameFacadeReceiver;
+    private var policyPort:int;
 
-    public function Menu(accountState:AccountStateDTO, connection:Connection, sender:AccountFacadeSender, log:Log, layout:Layout, social:Social, locale:CastlesLocale) {
+    public function Menu(accountState:AccountStateDTO, connection:Connection, policyPort: int, sender:AccountFacadeSender, log:Log, layout:Layout, social:Social, locale:CastlesLocale) {
         this.connection = connection;
+        this.policyPort = policyPort;
         this.sender = sender;
         this.log = log;
         this.locale = locale;
@@ -155,6 +158,8 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
             gameConnection = connection;
             onGameConnect()
         } else {
+            Security.loadPolicyFile("xmlsocket://" + connection.host + ":" + policyPort);
+
             gameConnection = new Connection();
             gameConnection.addEventListener(Event.CONNECT, onGameConnect);
             gameConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onGameConnectionError);

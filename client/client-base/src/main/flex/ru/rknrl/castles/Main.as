@@ -6,10 +6,16 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
+import flash.system.Security;
 
 import ru.rknrl.castles.menu.Menu;
 import ru.rknrl.castles.menu.screens.LoadingScreen;
 import ru.rknrl.castles.menu.screens.noConnection.NoConnectionScreen;
+import ru.rknrl.castles.rmi.AccountFacadeReceiver;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.AuthFacadeReceiver;
+import ru.rknrl.castles.rmi.AuthFacadeSender;
+import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.core.rmi.Connection;
@@ -18,11 +24,6 @@ import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticateDTO;
-import ru.rknrl.castles.rmi.AccountFacadeReceiver;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.rmi.AuthFacadeReceiver;
-import ru.rknrl.castles.rmi.AuthFacadeSender;
-import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
@@ -30,7 +31,8 @@ public class Main extends Sprite implements IAuthFacade {
     private static const defaultName:String = "Гость";
 
     private var host:String;
-    private var port:int;
+    private var gamePort:int;
+    private var policyPort:int;
 
     private var authenticate:AuthenticateDTO;
     private var localesUrl:String;
@@ -42,7 +44,7 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var connection:Connection;
     private var authFacadeReceiver:AuthFacadeReceiver;
-    private var authFacadeSender: AuthFacadeSender;
+    private var authFacadeSender:AuthFacadeSender;
     private var accountFacadeReceiver:AccountFacadeReceiver;
     private var menu:Menu;
     private var noConnectionScreen:NoConnectionScreen;
@@ -52,9 +54,10 @@ public class Main extends Sprite implements IAuthFacade {
     private var locale:CastlesLocale;
     private var layout:Layout;
 
-    public function Main(host:String, port:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
+    public function Main(host:String, gamePort:int, policyPort:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
         this.host = host;
-        this.port = port;
+        this.gamePort = gamePort;
+        this.policyPort = policyPort;
         this.authenticate = authenticate;
         this.localesUrl = localesUrl;
         this.defaultLocale = defaultLocale;
@@ -113,11 +116,13 @@ public class Main extends Sprite implements IAuthFacade {
     }
 
     private function tryConnect():void {
-        createConnection(host, port)
+        createConnection(host, gamePort)
     }
 
     private function createConnection(host:String, port:int):void {
         if (connection) throw new Error("already connected");
+
+        Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
 
         connection = new Connection();
         connection.addEventListener(Event.CONNECT, onConnect);
@@ -147,7 +152,7 @@ public class Main extends Sprite implements IAuthFacade {
 
         removeLoadingScreen();
 
-        menu = new Menu(accountState, connection, new AccountFacadeSender(connection), log, layout, social, locale);
+        menu = new Menu(accountState, connection, policyPort, new AccountFacadeSender(connection), log, layout, social, locale);
         addChild(menu);
         accountFacadeReceiver = new AccountFacadeReceiver(menu);
         connection.registerReceiver(accountFacadeReceiver);

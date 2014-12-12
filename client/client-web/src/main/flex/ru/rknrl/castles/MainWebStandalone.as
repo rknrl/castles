@@ -13,7 +13,8 @@ import ru.rknrl.log.Log;
 [SWF(width="1024", height="768", frameRate="60", quality="high")]
 public class MainWebStandalone extends MainWebBase {
     private static const host:String = "127.0.0.1";
-    private static const port:int = 2335;
+    private static const gamePort:int = 2335;
+    private static const policyPort:int = 2336;
 
     public function MainWebStandalone() {
         Security.allowDomain("*");
@@ -35,7 +36,7 @@ public class MainWebStandalone extends MainWebBase {
         authenticate.deviceType = DeviceType.CANVAS;
         authenticate.secret = authenticationSecret;
 
-        super(log, host, port, accountId, authenticationSecret, social);
+        super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
     }
 }
 }

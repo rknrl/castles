@@ -5,10 +5,11 @@ import akka.io.{IO, Tcp}
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.config.ConfigJsonProtocol._
 import ru.rknrl.castles.web.Web
+import ru.rknrl.utils.PolicyServer
 import spray.json._
 
-import scala.io.Source
 import scala.concurrent.duration._
+import scala.io.Source
 
 object Main {
 
@@ -22,10 +23,12 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 15 seconds, config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, config.game), "matchmaking")
 
     new Web(config)
 
-    system.actorOf(Props(classOf[TcpServer], IO(Tcp), config, matchmaking), "tcp-server")
+    val tcp = IO(Tcp)
+    system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking), "tcp-server")
   }
 }

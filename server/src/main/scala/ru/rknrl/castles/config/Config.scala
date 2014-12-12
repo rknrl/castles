@@ -11,8 +11,9 @@ object Config {
   type BuildingLevelToFactor = Map[BuildingLevel, Double]
 }
 
-class Config(val tcpIp: String,
-             val tcpPort: Int,
+class Config(val host: String,
+             val gamePort: Int,
+             val policyPort: Int,
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig) {

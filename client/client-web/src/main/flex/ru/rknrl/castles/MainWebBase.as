@@ -19,7 +19,7 @@ public class MainWebBase extends Main {
 
     private var log:Log;
 
-    public function MainWebBase(log:Log, host:String, port:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
+    public function MainWebBase(log:Log, host:String, gamePort:int, policyPort: int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
         this.log = log;
 
         Security.allowDomain("*");
@@ -37,7 +37,7 @@ public class MainWebBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        super(host, port, authenticate, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, authenticate, localesUrl, defaultLocale, log, social, layout);
 
         stage.addEventListener(Event.RESIZE, onResize);
     }

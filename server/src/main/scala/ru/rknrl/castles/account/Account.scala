@@ -177,8 +177,8 @@ class Account(externalAccountId: AccountId,
   private def sendJoin(): Unit =
     if (accountRmiRegistered && enterGameRmiRegistered && gameRmiRegistered) {
       val gameAddress = NodeLocator.newBuilder()
-        .setHost(config.tcpIp)
-        .setPort(config.tcpPort)
+        .setHost(config.host)
+        .setPort(config.gamePort)
         .build()
 
       if (reenterGame) {
