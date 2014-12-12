@@ -1,11 +1,13 @@
 package ru.rknrl.castles
 
+import java.net.InetSocketAddress
+
 import _root_.ru.rknrl.castles.config.ConfigTest
 import _root_.ru.rknrl.castles.rmi._
-import _root_.ru.rknrl.core.rmi.{RegisterReceiver, TcpReceiver}
+import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import _root_.ru.rknrl.dto.AuthDTO._
 import akka.actor.{ActorSystem, Props}
-import akka.io.Tcp.PeerClosed
+import akka.io.Tcp.{Connect, PeerClosed}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import ru.rknrl.core.rmi.testkit._
@@ -31,28 +33,36 @@ class ReEnterGameTest
 
       val tcpMock = system.actorOf(Props(classOf[TcpMock], testActor), "tcp-mock")
 
+      // create tcp server
+
       val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking), "tcpServer")
 
       expectMsgPF(100 millis) {
         case ServerBounded() ⇒ true
       }
 
+      // create tcp client
+
       val clientReceiver = system.actorOf(Props(classOf[TcpReceiver], "client-tcp-receiver"), "client-tcp-receiver")
 
       val tcpClientMock = system.actorOf(Props(classOf[TcpClientMock], clientReceiver, tcpMock), "tcp-client-mock")
-
-      expectMsgPF(100 millis) {
-        case ClientConnected() ⇒ true
-      }
 
       // create client ath rmi
 
       val authRmiClientMock = system.actorOf(Props(classOf[AuthRMIClientMock], tcpClientMock, testActor), "auth-rmi-client-mock")
 
-      clientReceiver ! RegisterReceiver(authRmiClientMock, AuthRMIClientMock.allCommands)
+      clientReceiver ! RegisterReceiver(authRmiClientMock)
 
       expectMsgPF(100 millis) {
-        case AuthRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
+      }
+
+      // connect to server
+
+      tcpClientMock ! Connect(new InetSocketAddress("localhost", 12345))
+
+      expectMsgPF(100 millis) {
+        case ClientConnected() ⇒ true
       }
 
       // get auth ready from server
@@ -88,10 +98,10 @@ class ReEnterGameTest
 
       val accountRmiClientMock = system.actorOf(Props(classOf[AccountRMIClientMock], tcpClientMock, testActor), "account-rmi-client-mock")
 
-      clientReceiver ! RegisterReceiver(accountRmiClientMock, AccountRMIClientMock.allCommands)
+      clientReceiver ! RegisterReceiver(accountRmiClientMock)
 
       expectMsgPF(100 millis) {
-        case AccountRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
 
       // enter game
@@ -106,10 +116,10 @@ class ReEnterGameTest
 
       val enterGameRmiClientMock = system.actorOf(Props(classOf[EnterGameRMIClientMock], tcpClientMock, testActor), "enter-game-rmi-client-mock")
 
-      clientReceiver ! RegisterReceiver(enterGameRmiClientMock, EnterGameRMIClientMock.allCommands)
+      clientReceiver ! RegisterReceiver(enterGameRmiClientMock)
 
       expectMsgPF(100 millis) {
-        case EnterGameRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
 
       // join game
@@ -124,10 +134,10 @@ class ReEnterGameTest
 
       val gameRmiClientMock = system.actorOf(Props(classOf[GameRMIClientMock], tcpClientMock, testActor), "game-rmi-client-mock")
 
-      clientReceiver ! RegisterReceiver(gameRmiClientMock, GameRMIClientMock.allCommands)
+      clientReceiver ! RegisterReceiver(gameRmiClientMock)
 
       expectMsgPF(100 millis) {
-        case GameRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
 
       // close client connection
@@ -149,24 +159,28 @@ class ReEnterGameTest
       //
       //--------------------------------------------------
 
-      // create client tcp connection
+      // create client tcp
 
       val clientReceiver2 = system.actorOf(Props(classOf[TcpReceiver], "client-tcp-receiver"), "client-tcp-receiver")
 
       val tcpClientMock2 = system.actorOf(Props(classOf[TcpClientMock], clientReceiver2, tcpMock), "tcp-client-mock")
 
-      expectMsgPF(100 millis) {
-        case ClientConnected() ⇒ true
-      }
-
       // create client ath rmi
 
       val authRmiClientMock2 = system.actorOf(Props(classOf[AuthRMIClientMock], tcpClientMock2, testActor), "auth-rmi-client-mock")
 
-      clientReceiver2 ! RegisterReceiver(authRmiClientMock2, AuthRMIClientMock.allCommands)
+      clientReceiver2 ! RegisterReceiver(authRmiClientMock2)
 
       expectMsgPF(100 millis) {
-        case AuthRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
+      }
+
+      // connect to server
+
+      tcpClientMock2 ! Connect(new InetSocketAddress("localhost", 12345))
+
+      expectMsgPF(100 millis) {
+        case ClientConnected() ⇒ true
       }
 
       // get auth ready from server
@@ -189,20 +203,20 @@ class ReEnterGameTest
 
       val accountRmiClientMock2 = system.actorOf(Props(classOf[AccountRMIClientMock], tcpClientMock2, testActor), "account-rmi-client-mock")
 
-      clientReceiver2 ! RegisterReceiver(accountRmiClientMock2, AccountRMIClientMock.allCommands)
+      clientReceiver2 ! RegisterReceiver(accountRmiClientMock2)
 
       expectMsgPF(100 millis) {
-        case AccountRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
 
       // create client enter game rmi
 
       val enterGameRmiClientMock2 = system.actorOf(Props(classOf[EnterGameRMIClientMock], tcpClientMock2, testActor), "enter-game-rmi-client-mock")
 
-      clientReceiver2 ! RegisterReceiver(enterGameRmiClientMock2, EnterGameRMIClientMock.allCommands)
+      clientReceiver2 ! RegisterReceiver(enterGameRmiClientMock2)
 
       expectMsgPF(100 millis) {
-        case EnterGameRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
 
       // join game
@@ -217,13 +231,11 @@ class ReEnterGameTest
 
       val gameRmiClientMock2 = system.actorOf(Props(classOf[GameRMIClientMock], tcpClientMock2, testActor), "game-rmi-client-mock")
 
-      clientReceiver2 ! RegisterReceiver(gameRmiClientMock2, GameRMIClientMock.allCommands)
+      clientReceiver2 ! RegisterReceiver(gameRmiClientMock2)
 
       expectMsgPF(100 millis) {
-        case GameRMIClientMockReady() ⇒ true
+        case ReceiverRegistered(ref) ⇒ true
       }
-
-
     }
   }
 

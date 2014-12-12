@@ -8,6 +8,7 @@ import ru.rknrl.castles.web.Web
 import spray.json._
 
 import scala.io.Source
+import scala.concurrent.duration._
 
 object Main {
 
@@ -21,7 +22,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, config.game), "matchmaking")
 
     new Web(config)
 

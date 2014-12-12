@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.account.{Account, GetAccountState}
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.rmi._
-import ru.rknrl.core.rmi.{CloseConnection, RegisterReceiver, UnregisterReceiver}
+import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.{AccountType, AuthenticateDTO}
@@ -16,7 +16,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
 
   private val authRmi = context.actorOf(Props(classOf[AuthRMI], tcpSender, self), "auth-rmi" + name)
 
-  tcpReceiver ! RegisterReceiver(authRmi, AuthRMI.allCommands)
+  tcpReceiver ! RegisterReceiver(authRmi)
 
   def checkSecret(authenticate: AuthenticateDTO) =
     authenticate.getAccountId.getType match {
@@ -41,7 +41,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
   }
 
   def receive = {
-    case AuthRMIReady() ⇒
+    case ReceiverRegistered(ref) ⇒
       authRmi ! AuthReadyMsg()
 
     /**

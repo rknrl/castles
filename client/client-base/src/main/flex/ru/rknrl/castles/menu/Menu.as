@@ -16,6 +16,13 @@ import ru.rknrl.castles.menu.screens.shop.ShopScreen;
 import ru.rknrl.castles.menu.screens.skills.SkillLevels;
 import ru.rknrl.castles.menu.screens.skills.SkillsScreen;
 import ru.rknrl.castles.menu.slider.ScreenSlider;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
+import ru.rknrl.castles.rmi.EnterGameFacadeSender;
+import ru.rknrl.castles.rmi.GameFacadeReceiver;
+import ru.rknrl.castles.rmi.GameFacadeSender;
+import ru.rknrl.castles.rmi.IAccountFacade;
+import ru.rknrl.castles.rmi.IEnterGameFacade;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
@@ -29,13 +36,6 @@ import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.dto.PricesDTO;
 import ru.rknrl.dto.SkillsDTO;
 import ru.rknrl.dto.StartLocationDTO;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
-import ru.rknrl.castles.rmi.EnterGameFacadeSender;
-import ru.rknrl.castles.rmi.GameFacadeReceiver;
-import ru.rknrl.castles.rmi.GameFacadeSender;
-import ru.rknrl.castles.rmi.IAccountFacade;
-import ru.rknrl.castles.rmi.IEnterGameFacade;
 import ru.rknrl.log.Log;
 
 public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
@@ -93,14 +93,14 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         addChild(popups);
         addChild(header);
 
-        screenSlider.visible = !accountState.game;
-        header.visible = !accountState.game;
+        screenSlider.visible = !accountState.hasGame;
+        header.visible = !accountState.hasGame;
 
         gold = accountState.gold;
 
         screenSlider.addEventListener(Utils.PLAY, onPlayButtonClick);
 
-        if (accountState.game) {
+        if (accountState.hasGame) {
             onEnteredGame(accountState.game);
         }
     }

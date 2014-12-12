@@ -6,7 +6,7 @@ import ru.rknrl.castles._
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.game.Game.{Join, Offline}
 import ru.rknrl.castles.rmi._
-import ru.rknrl.core.rmi.{RegisterReceiver, UnregisterReceiver}
+import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.DeviceType
 import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
@@ -23,8 +23,22 @@ class Account(externalAccountId: AccountId,
               config: Config,
               name: String) extends Actor {
 
+  private var accountRmiRegistered: Boolean = false
+
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
-  tcpReceiver ! RegisterReceiver(accountRmi, AccountRMI.allCommands)
+  tcpReceiver ! RegisterReceiver(accountRmi)
+
+  private var reenterGame: Boolean = true
+
+  private var enterGameRmiRegistered: Boolean = false
+
+  private var enterGameRmi: Option[ActorRef] = None
+
+  private var gameRmiRegistered: Boolean = false
+
+  private var gameRmi: Option[ActorRef] = None
+
+  private var game: Option[ActorRef] = None
 
   private var state = AccountState.initAccount(config.account)
 
@@ -79,19 +93,13 @@ class Account(externalAccountId: AccountId,
      * Отправляем Auth accountState
      */
     case InGameResponse(gameRef) ⇒
-      val builder = state.dto
-
-      if (gameRef.isDefined)
-        builder.setGame(
-          NodeLocator.newBuilder()
-            .setHost("localhost")
-            .setPort(config.tcpPort)
-            .build()
-        )
-
-      auth ! builder.build
-
-      if (gameRef.isDefined) connectToGame(gameRef.get)
+      if (gameRef.isDefined) {
+        reenterGame = true
+        connectToGame(gameRef.get)
+      } else {
+        reenterGame = false
+        auth ! state.dto.build()
+      }
 
     /**
      * Matchmaking говорит к какой игре коннектится
@@ -99,12 +107,26 @@ class Account(externalAccountId: AccountId,
     case ConnectToGame(gameRef) ⇒
       connectToGame(gameRef)
 
-      accountRmi ! EnteredGameMsg(
-        NodeLocator.newBuilder()
-          .setHost(config.tcpIp) // todo: если localhost то клиент не приконнкится
-          .setPort(config.tcpPort)
-          .build()
-      )
+    case ReceiverRegistered(ref) ⇒
+      if (ref == accountRmi)
+        if (accountRmiRegistered)
+          throw new IllegalStateException("accountRmi already registered")
+        else
+          accountRmiRegistered = true
+      else if (ref == enterGameRmi.get)
+        if (enterGameRmiRegistered)
+          throw new IllegalStateException("enterGameRmi already registered")
+        else
+          enterGameRmiRegistered = true
+      else if (ref == gameRmi.get)
+        if (gameRmiRegistered)
+          throw new IllegalStateException("gameRmiRegistered already registered")
+        else
+          gameRmiRegistered = true
+      else
+        throw new IllegalArgumentException("unknown receiver " + ref)
+
+      sendJoin()
 
     /**
      * Game говорит, что для этого игрока бой завершен
@@ -124,35 +146,48 @@ class Account(externalAccountId: AccountId,
       context stop gameRmi.get
 
       game = None
+
       enterGameRmi = None
+      enterGameRmiRegistered = false
+
       gameRmi = None
+      gameRmiRegistered = false
 
       accountRmi ! ItemsUpdatedMsg(state.items.dto)
   }
 
-  protected def connectToGame(game: ActorRef) = {
+  private def connectToGame(game: ActorRef) = {
     assert(this.game.isEmpty)
     assert(this.enterGameRmi.isEmpty)
     assert(this.gameRmi.isEmpty)
 
     val enterGameRmi = context.actorOf(Props(classOf[EnterGameRMI], tcpSender, game), "enter-game-rmi" + name)
-    tcpReceiver ! RegisterReceiver(enterGameRmi, EnterGameRMI.allCommands)
+    tcpReceiver ! RegisterReceiver(enterGameRmi)
 
     val gameRmi = context.actorOf(Props(classOf[GameRMI], tcpSender, game), "game-rmi" + name)
-    tcpReceiver ! RegisterReceiver(gameRmi, GameRMI.allCommands)
+    tcpReceiver ! RegisterReceiver(gameRmi)
 
     game ! Join(externalAccountId, enterGameRmi, gameRmi)
 
+    this.game = Some(game)
     this.enterGameRmi = Some(enterGameRmi)
     this.gameRmi = Some(gameRmi)
-    this.game = Some(game)
   }
 
-  private var game: Option[ActorRef] = None
+  private def sendJoin(): Unit =
+    if (accountRmiRegistered && enterGameRmiRegistered && gameRmiRegistered) {
+      val gameAddress = NodeLocator.newBuilder()
+        .setHost(config.tcpIp)
+        .setPort(config.tcpPort)
+        .build()
 
-  private var enterGameRmi: Option[ActorRef] = None
+      if (reenterGame) {
+        auth ! state.dto.setGame(gameAddress).build()
+        reenterGame = false
+      } else
+        accountRmi ! EnteredGameMsg(gameAddress)
+    }
 
-  private var gameRmi: Option[ActorRef] = None
 
   override def preStart(): Unit = println("AccountService start " + name)
 

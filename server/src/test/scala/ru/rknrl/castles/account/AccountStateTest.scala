@@ -158,7 +158,7 @@ class AccountStateTest extends FlatSpec with Matchers {
 
   "dto" should "be correct" in {
     val state = accountState()
-    val dto = state.dto
+    val dto = state.dto.build()
     dto.getGold should be(state.gold)
     checkPrices(state, dto.getPrices)
   }
