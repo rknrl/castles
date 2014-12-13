@@ -20,7 +20,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           BuildingLevel.LEVEL_2 → getInt("level2"),
           BuildingLevel.LEVEL_3 → getInt("level3")
         )
-      case _ => deserializationError("BuildingPrices isn't object, but " + value)
+      case _ ⇒ deserializationError("BuildingPrices isn't object, but " + value)
     }
   }
 
@@ -32,7 +32,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           buildingPrices = map("buildingPrices").convertTo[BuildingPrices],
           itemPrice = getInt("itemPrice"),
           goldByDollar = getInt("goldByDollar"))
-      case _ => deserializationError("Account isn't object, but " + value)
+      case _ ⇒ deserializationError("Account isn't object, but " + value)
     }
   }
 
@@ -45,7 +45,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           defence = getDouble("defence"),
           speed = getDouble("speed")
         )
-      case _ => deserializationError("Stat isn't object, but" + value)
+      case _ ⇒ deserializationError("Stat isn't object, but" + value)
     }
   }
 
@@ -58,7 +58,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           startPopulation = getInt("startPopulation"),
           stat = map("stat").convertTo[Stat]
         )
-      case _ => deserializationError("BuildingConfig isn't object, but " + value)
+      case _ ⇒ deserializationError("BuildingConfig isn't object, but " + value)
     }
   }
 
@@ -71,7 +71,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           BuildingLevel.LEVEL_2 → getDouble("level2"),
           BuildingLevel.LEVEL_3 → getDouble("level3")
         )
-      case _ => deserializationError("BuildingLevelToFactor isn't object, but " + value)
+      case _ ⇒ deserializationError("BuildingLevelToFactor isn't object, but " + value)
     }
   }
 
@@ -83,7 +83,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           unitToExitFactor = getDouble("unitToExitFactor"),
           itemCooldown = getInt("itemCooldown")
         )
-      case _ => deserializationError("Constants isn't object, but " + value)
+      case _ ⇒ deserializationError("Constants isn't object, but " + value)
     }
   }
 
@@ -95,7 +95,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           damage = getDouble("damage"),
           flyDuration = getInt("flyDuration")
         )
-      case _ => deserializationError("Fireball isn't object, but " + value)
+      case _ ⇒ deserializationError("Fireball isn't object, but " + value)
     }
   }
 
@@ -107,7 +107,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           damage = getDouble("damage"),
           duration = getInt("duration")
         )
-      case _ => deserializationError("Volcano isn't object, but " + value)
+      case _ ⇒ deserializationError("Volcano isn't object, but " + value)
     }
   }
 
@@ -120,7 +120,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           duration = getInt("duration"),
           speed = getDouble("speed")
         )
-      case _ => deserializationError("Tornado isn't object, but " + value)
+      case _ ⇒ deserializationError("Tornado isn't object, but " + value)
     }
   }
 
@@ -132,7 +132,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           factor = getDouble("factor"),
           duration = getInt("duration")
         )
-      case _ => deserializationError("Strengthening isn't object, but " + value)
+      case _ ⇒ deserializationError("Strengthening isn't object, but " + value)
     }
   }
 
@@ -146,7 +146,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           shootInterval = getInt("shootInterval"),
           shootRadius = getDouble("shootRadius")
         )
-      case _ => deserializationError("Shooting isn't object, but " + value)
+      case _ ⇒ deserializationError("Shooting isn't object, but " + value)
     }
   }
 
@@ -157,7 +157,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
         new AssistanceConfig(
           count = getInt("count")
         )
-      case _ => deserializationError("Assistance isn't object, but " + value)
+      case _ ⇒ deserializationError("Assistance isn't object, but " + value)
     }
   }
 
@@ -169,7 +169,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           BuildingType.HOUSE → map("house").convertTo[BuildingConfig],
           BuildingType.CHURCH → map("church").convertTo[BuildingConfig]
         )
-      case _ => deserializationError("BuildingsConfig isn't object, but " + value)
+      case _ ⇒ deserializationError("BuildingsConfig isn't object, but " + value)
     }
   }
 
@@ -188,7 +188,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           assistance = map("assistance").convertTo[AssistanceConfig]
         )
 
-      case _ => deserializationError("GameConfig isn't object, but " + value)
+      case _ ⇒ deserializationError("GameConfig isn't object, but " + value)
     }
   }
 
@@ -208,7 +208,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           game = map("game").convertTo[GameConfig]
         )
 
-      case _ => deserializationError("Config isn't object, but " + value)
+      case _ ⇒ deserializationError("Config isn't object, but " + value)
     }
   }
 
