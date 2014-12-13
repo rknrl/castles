@@ -10,7 +10,6 @@ import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.GameDTO._
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 
 object Game {
@@ -38,6 +37,7 @@ class Game(players: Map[PlayerId, Player],
 
   private var losers = Set[PlayerId]()
   private var leaved = Set[PlayerId]()
+  private var online = Set[PlayerId]()
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -46,21 +46,19 @@ class Game(players: Map[PlayerId, Player],
   private def `playerId→accountId`(id: PlayerId) =
     `accountId→playerId`.find { case (accountId, playerId) ⇒ playerId == id}.get._1
 
-  private val online = mutable.ListBuffer[PlayerId]()
+  private var `playerId→accountRef` = Map[PlayerId, ActorRef]()
 
-  private val `playerId→accountRef` = mutable.Map[PlayerId, ActorRef]()
-
-  private val `playerId→enterGameRef` = mutable.Map[PlayerId, ActorRef]()
+  private var `playerId→enterGameRef` = Map[PlayerId, ActorRef]()
 
   private def `enterGameRef→playerId`(ref: ActorRef) =
     `ref→playerId`(ref, `playerId→enterGameRef`)
 
-  private val `playerId→gameRef` = mutable.Map[PlayerId, ActorRef]()
+  private var `playerId→gameRef` = Map[PlayerId, ActorRef]()
 
   private def `gameRef→playerId`(ref: ActorRef) =
     `ref→playerId`(ref, `playerId→gameRef`)
 
-  def `ref→playerId`(actorRef: ActorRef, map: mutable.Map[PlayerId, ActorRef]) =
+  def `ref→playerId`(actorRef: ActorRef, map: Map[PlayerId, ActorRef]) =
     map.find { case (id: PlayerId, ref: ActorRef) ⇒ ref == actorRef}.get._1
 
   private val sendFps = 30
@@ -74,20 +72,20 @@ class Game(players: Map[PlayerId, Player],
 
   private var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, config)
 
-  private val moveActions = mutable.Map[PlayerId, MoveDTO]()
-  private val fireballCasts = mutable.Map[PlayerId, PointDTO]()
-  private val strengtheningCasts = mutable.Map[PlayerId, BuildingId]()
-  private val volcanoCasts = mutable.Map[PlayerId, PointDTO]()
-  private val tornadoCasts = mutable.Map[PlayerId, CastTorandoDTO]()
-  private val assistanceCasts = mutable.Map[PlayerId, BuildingId]()
+  private var moveActions = Map[PlayerId, MoveDTO]()
+  private var fireballCasts = Map[PlayerId, PointDTO]()
+  private var strengtheningCasts = Map[PlayerId, BuildingId]()
+  private var volcanoCasts = Map[PlayerId, PointDTO]()
+  private var tornadoCasts = Map[PlayerId, CastTorandoDTO]()
+  private var assistanceCasts = Map[PlayerId, BuildingId]()
 
   private def clearMaps(): Unit = {
-    moveActions.clear()
-    fireballCasts.clear()
-    strengtheningCasts.clear()
-    volcanoCasts.clear()
-    tornadoCasts.clear()
-    assistanceCasts.clear()
+    moveActions = Map.empty
+    fireballCasts = Map.empty
+    strengtheningCasts = Map.empty
+    volcanoCasts = Map.empty
+    tornadoCasts = Map.empty
+    assistanceCasts = Map.empty
   }
 
   private def updateGameState = {
@@ -144,9 +142,9 @@ class Game(players: Map[PlayerId, Player],
      */
     case Join(accountId, enterGameRef, gameRef) ⇒
       val playerId = `accountId→playerId`(accountId)
-      `playerId→accountRef` += playerId → sender
-      `playerId→enterGameRef` += playerId → enterGameRef
-      `playerId→gameRef` += playerId → gameRef
+      `playerId→accountRef` = `playerId→accountRef` + (playerId → sender)
+      `playerId→enterGameRef` = `playerId→enterGameRef` + (playerId → enterGameRef)
+      `playerId→gameRef` = `playerId→gameRef` + (playerId → gameRef)
 
     /**
      * Аккаунт говорит, что потеряли связь с игроком
@@ -154,7 +152,7 @@ class Game(players: Map[PlayerId, Player],
      */
     case Offline(accountId) ⇒
       val playerId = `accountId→playerId`(accountId)
-      online -= playerId
+      online = online - playerId
 
     /**
      * Игрок входит в бой
@@ -164,7 +162,7 @@ class Game(players: Map[PlayerId, Player],
     case JoinMsg() ⇒
       val playerId = `enterGameRef→playerId`(sender)
       println("JoinMsg from playerId " + playerId)
-      online += playerId
+      online = online + playerId
       sender ! JoinGameMsg(gameState.dto(playerId))
 
     /**
@@ -243,42 +241,42 @@ class Game(players: Map[PlayerId, Player],
      */
     case MoveMsg(dto: MoveDTO) ⇒
       assertCanPlay()
-      moveActions += getPlayerId → dto
+      moveActions = moveActions + (getPlayerId → dto)
 
     /**
      * Игрок кастует "Фаерболл" - кладем в мапу
      */
     case CastFireballMsg(point: PointDTO) ⇒
       assertCanPlay()
-      fireballCasts += getPlayerId → point
+      fireballCasts = fireballCasts + (getPlayerId → point)
 
     /**
      * Игрок кастует "Усиление" - кладем в мапу
      */
     case CastStrengtheningMsg(buildingId: BuildingIdDTO) ⇒
       assertCanPlay()
-      strengtheningCasts += getPlayerId → new BuildingId(buildingId.getId)
+      strengtheningCasts = strengtheningCasts + (getPlayerId → new BuildingId(buildingId.getId))
 
     /**
      * Игрок кастует "Вулкан" - кладем в мапу
      */
     case CastVolcanoMsg(point: PointDTO) ⇒
       assertCanPlay()
-      volcanoCasts += getPlayerId → point
+      volcanoCasts = volcanoCasts + (getPlayerId → point)
 
     /**
      * Игрок кастует "Торнадо" - кладем в мапу
      */
     case CastTornadoMsg(dto: CastTorandoDTO) ⇒
       assertCanPlay()
-      tornadoCasts += getPlayerId → dto
+      tornadoCasts = tornadoCasts + (getPlayerId → dto)
 
     /**
      * Игрок кастует "Призыв" - кладем в мапу
      */
     case CastAssistanceMsg(buildingId: BuildingIdDTO) ⇒
       assertCanPlay()
-      assistanceCasts += getPlayerId → new BuildingId(buildingId.getId)
+      assistanceCasts = assistanceCasts + (getPlayerId → new BuildingId(buildingId.getId))
   }
 
   def onePlayerLeft = losers.size + leaved.size == players.size - 1

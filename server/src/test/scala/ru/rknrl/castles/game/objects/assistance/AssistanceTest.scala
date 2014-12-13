@@ -66,15 +66,4 @@ class AssistanceTest extends FlatSpec with Matchers {
     val units = Assistance.`casts→units`(Map(cast1, cast2), buildings, config, playerStates, unitIdIterator, time)
     units.size should be(2)
   }
-
-  "casts→units" should "throw AssertionError if building.owner != cast owner" in {
-    val unitIdIterator = new UnitIdIterator
-
-    val cast1 = playerId0 → id1
-    val cast2 = playerId1 → id0
-
-    a[AssertionError] should be thrownBy {
-      val units = Assistance.`casts→units`(Map(cast1, cast2), buildings, config, playerStates, unitIdIterator, time)
-    }
-  }
 }

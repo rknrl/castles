@@ -10,7 +10,6 @@ import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.dto.AuthDTO.{AccountType, DeviceType}
 import ru.rknrl.utils.IdIterator
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 
 object MatchMaking {
@@ -59,10 +58,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   class GameInfo(val gameRef: ActorRef,
                  val externalAccountIds: Iterable[AccountId])
 
-  private val gameOrders = mutable.ListBuffer[GameOrder]()
-
-  private def findInGameOrders(accountId: AccountId) =
-    gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId)
+  private var gameOrders = List[GameOrder]()
 
   private var accountIdToGameInfo = Map[AccountId, GameInfo]()
 
@@ -84,7 +80,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
 
       val gameInfo = accountIdToGameInfo.get(accountId)
       if (gameInfo.isEmpty)
-        sender ! InGameResponse(None, enterGame = findInGameOrders(accountId))
+        sender ! InGameResponse(None, enterGame = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId))
       else
         sender ! InGameResponse(Some(gameInfo.get.gameRef), enterGame = false)
 
@@ -95,7 +91,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
       assert(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
       println("place game order")
       accountIdToAccountRef = accountIdToAccountRef.updated(gameOrder.accountId, sender)
-      gameOrders += gameOrder
+      gameOrders = gameOrders :+ gameOrder
 
     /**
      * Game оповещает, что игрок вышел из игры
@@ -118,7 +114,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   /**
    * Дабы игра не была создана раньше чем interval (Нужно для тестов)
    */
-  private var currentGameOrders = mutable.ListBuffer[GameOrder]()
+  private var currentGameOrders = List[GameOrder]()
 
   /**
    * Создать игры из имеющихся заявок
@@ -129,17 +125,17 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
     if (currentGameOrders.size == 2 && friendlyDevices(currentGameOrders(0).deviceType, currentGameOrders(1).deviceType)) {
       val order1 = currentGameOrders(0)
       val order2 = currentGameOrders(1)
-      gameOrders -= order1
-      gameOrders -= order2
+      gameOrders = gameOrders.filter(_ != order1)
+      gameOrders = gameOrders.filter(_ != order2)
 
       createGame(isBigGame(order1.deviceType), List(order1, order2))
     } else if (currentGameOrders.size == 1) {
       val order = currentGameOrders(0)
-      gameOrders -= order
+      gameOrders = gameOrders.filter(_ != order)
       createGameWithBot(order)
     }
 
-    currentGameOrders = gameOrders.clone()
+    currentGameOrders = gameOrders
   }
 
   private def friendlyDevices(a: DeviceType, b: DeviceType) =
