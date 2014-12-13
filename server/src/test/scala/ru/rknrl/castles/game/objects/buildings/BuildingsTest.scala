@@ -235,7 +235,7 @@ class BuildingsTest extends FlatSpec with Matchers {
     val unit = GameUnitTest.unit(count = 500, targetBuildingId = id1, owner = new PlayerId(0))
     val enter = EnterUnit(unit)
 
-    val config = GameConfigMock.gameConfig(GameConfigMock.constantsMock(), Map.empty, Map.empty)
+    val config = GameConfigMock.gameConfig()
 
     val updated = new Buildings(Map(id0 → b0, id1 → b1, id2 → b2)).applyEnterUnits(List(enter), config, PlayerStateTest.playerStates)
 
@@ -271,7 +271,7 @@ class BuildingsTest extends FlatSpec with Matchers {
 
     val updated = new Buildings(Map(id0 → b0, id1 → b1, id2 → b2)).cleanupStrengthening(10000, config, PlayerStateTest.playerStates)
     updated(id0).strengthened should be(false)
-    updated(id1).strengthened should be(true)
+    updated(id1).strengthened should be(false)
     updated(id2).strengthened should be(true)
   }
 

@@ -37,15 +37,6 @@ class GameUnitTest extends FlatSpec with Matchers {
 
   import ru.rknrl.castles.game.objects.units.GameUnitTest._
 
-  it should "throw AssertionError when initialized with non-positive count" in {
-    a[AssertionError] should be thrownBy {
-      unit(count = 0)
-    }
-    a[AssertionError] should be thrownBy {
-      unit(count = -1)
-    }
-  }
-
   "setCount" should "change count value & don't change other values" in {
     val a = unit(count = 2)
     val b = a.setCount(33)

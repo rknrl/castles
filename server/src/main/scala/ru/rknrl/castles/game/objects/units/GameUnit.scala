@@ -29,6 +29,8 @@ class GameUnit(val id: UnitId,
                val owner: PlayerId,
                val strengthened: Boolean) {
 
+  // todo count может быть и не положительным, в ситуации после получения юнитами дамага
+
   def setCount(value: Double) = copy(newCount = value)
 
   def getPos(time: Long) = startPos.lerp(endPos, startTime, time, speed)

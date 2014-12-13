@@ -39,7 +39,7 @@ class AssistanceTest extends FlatSpec with Matchers {
     unitIdIterator.next
     unitIdIterator.next
 
-    val cast = playerId0 → id1
+    val cast = playerId0 → id0
 
     val units = Assistance.`casts→units`(Map(cast), buildings, config, playerStates, unitIdIterator, time)
     units.size should be(1)
@@ -47,12 +47,12 @@ class AssistanceTest extends FlatSpec with Matchers {
 
     unit.id.id should be(3)
     unit.buildingPrototype should be(config.assistanceBuildingPrototype)
-    unit.count should be(66)
+    unit.count should be(config.assistanceCount(playerStates.states(playerId0)))
     // todo unit.startPos should be()
     //    todo unit.endPos should be()
     unit.startTime should be(1990)
     unit.speed should be(config.getUnitSpeed(config.assistanceBuildingPrototype, playerStates.states(playerId0), strengthened = false))
-    unit.targetBuildingId should be(id1)
+    unit.targetBuildingId should be(id0)
     unit.owner should be(playerId0)
     unit.strengthened should be(false)
   }
@@ -60,8 +60,8 @@ class AssistanceTest extends FlatSpec with Matchers {
   "casts→units" should "create units" in {
     val unitIdIterator = new UnitIdIterator
 
-    val cast1 = playerId0 → id1
-    val cast2 = playerId1 → id0
+    val cast1 = playerId0 → id0
+    val cast2 = playerId1 → id1
 
     val units = Assistance.`casts→units`(Map(cast1, cast2), buildings, config, playerStates, unitIdIterator, time)
     units.size should be(2)
@@ -70,8 +70,8 @@ class AssistanceTest extends FlatSpec with Matchers {
   "casts→units" should "throw AssertionError if building.owner != cast owner" in {
     val unitIdIterator = new UnitIdIterator
 
-    val cast1 = playerId1 → id1
-    val cast2 = playerId0 → id0
+    val cast1 = playerId0 → id1
+    val cast2 = playerId1 → id0
 
     a[AssertionError] should be thrownBy {
       val units = Assistance.`casts→units`(Map(cast1, cast2), buildings, config, playerStates, unitIdIterator, time)

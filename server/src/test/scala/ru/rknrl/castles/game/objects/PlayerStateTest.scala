@@ -19,7 +19,9 @@ object PlayerStateTest {
 
   val playerStates = new PlayerStates(Map(
     new PlayerId(0) → playerState(churchesPopulation = 100),
-    new PlayerId(1) → playerState(churchesPopulation = 0)
+    new PlayerId(1) → playerState(churchesPopulation = 0),
+    new PlayerId(2) → playerState(churchesPopulation = 20),
+    new PlayerId(3) → playerState(churchesPopulation = 30)
   ))
 }
 
