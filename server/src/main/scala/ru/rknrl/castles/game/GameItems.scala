@@ -2,6 +2,7 @@ package ru.rknrl.castles.game
 
 import ru.rknrl.castles.account.objects.Items
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.castles.rmi.UpdateItemStatesMsg
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.{ItemStateDTO, ItemsStateDTO}
 
@@ -9,16 +10,16 @@ import scala.collection.JavaConverters._
 
 class GameItemState(val itemType: ItemType,
                     val count: Int,
-                    val useTime: Long) {
+                    val lastUseTime: Long) {
   assert(count >= 0)
 
-  def use(time: Long) = new GameItemState(itemType, count - 1, useTime = time)
+  def use(time: Long) = new GameItemState(itemType, count - 1, lastUseTime = time)
 
   def differentWith(state: GameItemState) =
-    useTime != state.useTime || count != state.count
+    lastUseTime != state.lastUseTime || count != state.count
 
   def dto(time: Long, config: GameConfig) = {
-    val millisTillEnd: Long = Math.max(0, config.constants.itemCooldown - (time - useTime))
+    val millisTillEnd: Long = Math.max(0, config.constants.itemCooldown - (time - lastUseTime))
     ItemStateDTO.newBuilder()
       .setItemType(itemType)
       .setCount(count)
@@ -55,8 +56,6 @@ class GameItemsState(val playerId: PlayerId,
     for ((itemType, state) ← items) yield itemType → 0
 }
 
-case class Cooldown(playerId: PlayerId, dto: ItemsStateDTO)
-
 object GameItems {
   private def initMap(items: Items) =
     for ((itemType, item) ← items.items)
@@ -65,11 +64,11 @@ object GameItems {
   def init(playerId: PlayerId, items: Items) =
     new GameItemsState(playerId, initMap(items))
 
-  def getCooldownMessages(oldItems: GameItems, item: GameItems, config: GameConfig, time: Long) =
+  def getUpdateItemsStatesMessages(oldItems: GameItems, item: GameItems, config: GameConfig, time: Long) =
     for ((playerId, state) ← item.states;
          oldState = oldItems.states(playerId)
          if state differentWith oldState
-    ) yield Cooldown(playerId, state.dto(time, config))
+    ) yield new PersonalMessage(playerId, new UpdateItemStatesMsg(state.dto(time, config)))
 }
 
 class GameItems(val states: Map[PlayerId, GameItemsState]) {
@@ -84,7 +83,7 @@ class GameItems(val states: Map[PlayerId, GameItemsState]) {
     )
 
   def canCast(playerId: PlayerId, itemType: ItemType, config: GameConfig, time: Long) =
-    time - states(playerId).items(itemType).useTime >= config.constants.itemCooldown
+    time - states(playerId).items(itemType).lastUseTime >= config.constants.itemCooldown
 
   def assertCasts(casts: Map[PlayerId, _], itemType: ItemType, config: GameConfig, time: Long) =
     for ((playerId, _) ← casts)

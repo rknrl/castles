@@ -187,8 +187,7 @@ class Account(externalAccountId: AccountId,
       } else
         accountRmi ! EnteredGameMsg(gameAddress)
     }
-
-
+  
   override def preStart(): Unit = println("AccountService start " + name)
 
   override def postStop(): Unit = {

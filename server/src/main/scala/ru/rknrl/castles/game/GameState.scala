@@ -53,7 +53,6 @@ class GameArea(big: Boolean) {
 
 object GameState {
 
-
   def getPlayersSlotPositions(startLocationPositions: Map[Int, IJ]) =
     for ((id, pos) ← startLocationPositions;
          slotId ← SlotId.values())
@@ -212,7 +211,7 @@ class GameState(val time: Long,
       .applyCasts(volcanoCasts, ItemType.VOLCANO, time)
       .applyCasts(assistanceCasts, ItemType.ASSISTANCE, time)
 
-    val cooldowns = GameItems.getCooldownMessages(gameItems, newGameItems, config, time)
+    val updateItemsStatesMessages = GameItems.getUpdateItemsStatesMessages(gameItems, newGameItems, config, time)
 
     val finishedFireballs = fireballs.getFinished(time)
 
@@ -278,7 +277,9 @@ class GameState(val time: Long,
       updateBuildingMessages ++
       addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages
 
-    (newGameState, messages, cooldowns)
+    val personalMessages = updateItemsStatesMessages
+
+    (newGameState, messages, personalMessages)
   }
 
   def isPlayerLose(playerId: PlayerId) =
