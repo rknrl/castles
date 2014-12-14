@@ -11,7 +11,17 @@ message AccountStateDTO {
     required SkillsDTO skills = 2;
     required ItemsDTO items = 3;
     required int32 gold = 4;
-    required PricesDTO prices = 5;
+}
+
+// start location
+
+message StartLocationDTO {
+    repeated SlotDTO slots = 1;
+}
+
+message SlotDTO {
+    required SlotId id = 1;
+    optional BuildingPrototypeDTO buildingPrototype = 2;
 }
 
 // skills
@@ -36,33 +46,23 @@ message ItemDTO {
     required int32 count = 2;
 }
 
-// start location
+// config
 
-message StartLocationDTO {
-    repeated SlotDTO slots = 1;
-}
-
-message SlotDTO {
-    required SlotId id = 1;
-    optional BuildingPrototypeDTO buildingPrototype = 2;
-}
-
-// prices
-
-message PricesDTO {
+message AccountConfigDTO {
     repeated BuildingPriceDTO buildings = 1;
-    required int32 skillsUpgradePrice = 2;
+    repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
     required int32 itemPrice = 3;
     required int32 goldByDollar = 4;
+}
+
+message SkillUpgradePriceDTO {
+    required int32 totalLevel = 1;
+    required int32 price = 2;
 }
 
 message BuildingPriceDTO {
     required BuildingLevel level = 1;
     required int32 price = 2;
-}
-
-message GoldUpdatedDTO {
-    required int32 gold = 1;
 }
 
 // actions
@@ -91,4 +91,8 @@ message UpgradeSkillDTO {
 
 message BuyItemDTO {
     required ItemType type = 1;
+}
+
+message GoldUpdatedDTO {
+    required int32 gold = 1;
 }

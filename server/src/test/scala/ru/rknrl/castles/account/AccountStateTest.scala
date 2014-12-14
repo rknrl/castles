@@ -5,7 +5,6 @@ import ru.rknrl.castles.account.objects.items.ItemsTest
 import ru.rknrl.castles.account.objects.skills.SkillsTest
 import ru.rknrl.castles.account.objects.startLocation.StartLocationTest
 import ru.rknrl.castles.account.objects.{BuildingPrototype, Items, Skills, StartLocation}
-import ru.rknrl.dto.AccountDTO.PricesDTO
 import ru.rknrl.dto.CommonDTO._
 
 object AccountStateTest {
@@ -89,16 +88,17 @@ class AccountStateTest extends FlatSpec with Matchers {
 
   "upgradeSkill" should "throw AssertionError if price < gold" in {
     a[AssertionError] should be thrownBy {
-      accountState(gold = 0).upgradeSkill(SkillType.ATTACK)
+      val state = accountState(gold = 0)
+      state.upgradeSkill(SkillType.ATTACK, state.config)
     }
   }
 
   "upgradeSkill" should "change startLocation and gold & not change others" in {
     val state = accountState(gold = 666)
-    val updated = state.upgradeSkill(SkillType.ATTACK)
+    val updated = state.upgradeSkill(SkillType.ATTACK, state.config)
     updated.skills.levels(SkillType.ATTACK) should be(SkillLevel.SKILL_LEVEL_2)
 
-    updated.gold should be(666 - state.skills.upgradePrice)
+    updated.gold should be(666 - state.config.skillUpgradePrices(state.skills.nextTotalLevel))
 
     updated.startLocation should be(state.startLocation)
     updated.items should be(state.items)
@@ -139,27 +139,5 @@ class AccountStateTest extends FlatSpec with Matchers {
     updated.skills should be(state.skills)
     updated.items should be(state.items)
     updated.config should be(state.config)
-  }
-
-  def checkPrices(state: AccountState, dto: PricesDTO) = {
-    dto.getBuildingsCount should be(3)
-    dto.getBuildings(0).getPrice should be(state.config.buildingPrices(BuildingLevel.LEVEL_1))
-    dto.getBuildings(1).getPrice should be(state.config.buildingPrices(BuildingLevel.LEVEL_2))
-    dto.getBuildings(2).getPrice should be(state.config.buildingPrices(BuildingLevel.LEVEL_3))
-    dto.getSkillsUpgradePrice should be(state.skills.upgradePrice)
-    dto.getItemPrice should be(state.config.itemPrice)
-    dto.getGoldByDollar should be(state.config.goldByDollar)
-  }
-
-  "pricesDto" should "be correct" in {
-    val state = accountState()
-    checkPrices(state, state.prices)
-  }
-
-  "dto" should "be correct" in {
-    val state = accountState()
-    val dto = state.dto
-    dto.getGold should be(state.gold)
-    checkPrices(state, dto.getPrices)
   }
 }

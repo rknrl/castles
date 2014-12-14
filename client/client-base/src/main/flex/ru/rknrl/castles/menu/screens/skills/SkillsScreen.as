@@ -5,35 +5,46 @@ import flash.events.Event;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.main.SkillUpgradePrices;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.UpgradeSkillDTO;
 import ru.rknrl.funnyUi.GoldTextField;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.utils.centerize;
+import ru.rknrl.utils.changeTextFormat;
 
 public class SkillsScreen extends MenuScreen {
     private var sender:AccountFacadeSender;
+    private var skillUpgradePrices:SkillUpgradePrices;
 
     private var titleHolder:Sprite;
     private var title:GoldTextField;
+    private var completeTitle:Label;
 
     private const typeToSkillView:Dictionary = new Dictionary();
 
     private const animated:Vector.<DisplayObject> = new <DisplayObject>[];
 
-    public function SkillsScreen(id:String, skillLevels:SkillLevels, skillsUpgradePrice:int, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
+    public function SkillsScreen(id:String, skillLevels:SkillLevels, skillUpgradePrices:SkillUpgradePrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
+        this.skillUpgradePrices = skillUpgradePrices;
 
         titleHolder = new Sprite();
         animated.push(titleHolder);
         addChild(titleHolder);
 
-        title = new GoldTextField(locale.skillsTitle, layout.skillsTitleTextFormat, skillsUpgradePrice, Colors.randomColor());
+        title = new GoldTextField(locale.skillsTitle, layout.skillsTitleTextFormat, 0, Colors.randomColor());
         titleHolder.addChild(title);
+
+        completeTitle = createTextField(layout.skillsTitleTextFormat, locale.skillsTitleComplete);
+        completeTitle.textColor = Colors.randomColor();
+        titleHolder.addChild(completeTitle);
 
         for (var i:int = 0; i < SkillType.values.length; i++) {
             const skillType:SkillType = SkillType.values[i];
@@ -45,10 +56,13 @@ public class SkillsScreen extends MenuScreen {
         }
 
         this.skillLevels = skillLevels;
-        this.skillsUpgradePrice = skillsUpgradePrice;
         updateLayout(layout);
 
         super(id);
+    }
+
+    private function getPrice():int {
+        return skillUpgradePrices.getPrice(_skillLevels.getNextTotalLevel());
     }
 
     public function updateLayout(layout:Layout):void {
@@ -57,6 +71,9 @@ public class SkillsScreen extends MenuScreen {
 
         title.textFormat = layout.skillsTitleTextFormat;
         centerize(title);
+
+        changeTextFormat(completeTitle, layout.skillsTitleTextFormat);
+        centerize(completeTitle);
 
         for (var i:int = 0; i < SkillType.values.length; i++) {
             const skillType:SkillType = SkillType.values[i];
@@ -85,6 +102,7 @@ public class SkillsScreen extends MenuScreen {
 
     override public function changeColors():void {
         title.color = Colors.randomColor();
+        completeTitle.textColor = Colors.randomColor();
         for each(var skillView:SkillView in typeToSkillView) {
             skillView.color = Colors.randomColor();
         }
@@ -96,24 +114,30 @@ public class SkillsScreen extends MenuScreen {
         }
     }
 
+    private var _skillLevels:SkillLevels;
+
     public function set skillLevels(value:SkillLevels):void {
+        _skillLevels = value;
         unlock();
 
         for each(var skillType:SkillType in SkillType.values) {
             SkillView(typeToSkillView[skillType]).skillLevel = value.getLevel(skillType);
         }
-    }
 
-    private var _skillsUpgradePrice:int;
+        if (_skillLevels.isLastTotalLevel) {
+            completeTitle.visible = true;
+            title.visible = false;
+        } else {
+            completeTitle.visible = false;
+            title.visible = true;
+            title.gold = getPrice();
+        }
 
-    public function set skillsUpgradePrice(value:int):void {
-        _skillsUpgradePrice = value;
-        title.gold = value;
         centerize(title);
     }
 
     private function onUpgrade(event:Event):void {
-        if (gold < _skillsUpgradePrice) {
+        if (gold < getPrice()) {
             title.animate();
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {

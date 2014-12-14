@@ -8,8 +8,6 @@ abstract class AccountFacade {
 
   def goldUpdated(value: GoldUpdatedDTO)
 
-  def pricesUpdated(prices: PricesDTO)
-
   def startLocationUpdated(startLocation: StartLocationDTO)
 
   def skillsUpdated(skills: SkillsDTO)

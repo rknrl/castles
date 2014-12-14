@@ -6,9 +6,29 @@ import ru.rknrl.dto.SkillsDTO;
 
 public class SkillLevels {
     private var skills:SkillsDTO;
+    private var _totalLevel: int;
 
     public function SkillLevels(skills:SkillsDTO) {
         this.skills = skills;
+
+        var totalLevel:int = 0;
+        for each(var level:SkillLevelDTO in skills.levels) {
+            totalLevel += level.level.id();
+        }
+        _totalLevel = totalLevel;
+    }
+
+    public function get totalLevel():int {
+        return _totalLevel;
+    }
+
+    public function get isLastTotalLevel():Boolean {
+        return totalLevel == 9;
+    }
+
+    public function getNextTotalLevel():int {
+        if (isLastTotalLevel) throw new Error("get nextLevel on lastLevel");
+        return totalLevel + 1;
     }
 
     public function getLevel(skillType:SkillType):SkillLevel {

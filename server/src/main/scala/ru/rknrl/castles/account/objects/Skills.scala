@@ -14,12 +14,17 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
     new Skills(levels.updated(skillType, nextLevel))
   }
 
-  def upgradePrice = {
+  def totalLevel = {
     var total = 0
-    for ((skillType, level) ← levels) {
-      total += Skills.levelToInt(level)
-    }
-    Math.pow(2, total).toInt
+    for ((skillType, level) ← levels) total += level.getNumber
+    total
+  }
+
+  def isLastTotalLevel = totalLevel == 9
+
+  def nextTotalLevel = {
+    assert(!isLastTotalLevel)
+    totalLevel + 1
   }
 
   private def levelsDto =

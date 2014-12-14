@@ -24,6 +24,7 @@ public class CastlesLocale extends Locale {
     private static const ASSISTANCE:String = "assistance";
     private static const SHOP_TITLE:String = "shop_title";
     private static const SKILLS_TITLE:String = "skills_title";
+    private static const SKILLS_TITLE_COMPLETE:String = "skills_title_complete";
     private static const ATTACK:String = "attack";
     private static const DEFENCE:String = "defence";
     private static const SPEED:String = "speed";
@@ -108,6 +109,10 @@ public class CastlesLocale extends Locale {
 
     public function get skillsTitle():String {
         return translate(SKILLS_TITLE) + " ";
+    }
+
+    public function get skillsTitleComplete():String {
+        return translate(SKILLS_TITLE_COMPLETE);
     }
 
     public function getSkillName(skillType:SkillType):String {

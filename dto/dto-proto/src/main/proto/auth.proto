@@ -42,9 +42,11 @@ message AuthenticateDTO {
 message AuthenticationSuccessDTO {
     required AccountStateDTO accountState = 1;
 
+    required AccountConfigDTO config = 2;
+
     // Клиент находится в процессе поиска противников для игры
-    required bool enterGame = 2;
+    required bool enterGame = 3;
 
     // Клиент находится в игре
-    optional NodeLocator game = 3;
+    optional NodeLocator game = 4;
 }

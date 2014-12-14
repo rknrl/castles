@@ -12,6 +12,7 @@ import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.bank.BankScreen;
 import ru.rknrl.castles.menu.screens.main.BuildingPrices;
 import ru.rknrl.castles.menu.screens.main.MainScreen;
+import ru.rknrl.castles.menu.screens.main.SkillUpgradePrices;
 import ru.rknrl.castles.menu.screens.shop.ItemsCount;
 import ru.rknrl.castles.menu.screens.shop.ShopScreen;
 import ru.rknrl.castles.menu.screens.skills.SkillLevels;
@@ -29,6 +30,7 @@ import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
+import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.GameStateDTO;
@@ -73,17 +75,18 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         this.locale = locale;
         this.layout = layout;
 
-        const accountState:AccountStateDTO = authenticationSuccess.accountState
+        const accountState:AccountStateDTO = authenticationSuccess.accountState;
+        const config: AccountConfigDTO = authenticationSuccess.config;
 
         popups = new PopupManager(layout);
 
-        mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(accountState.prices.buildings), sender, layout, locale, popups);
+        mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(config.buildings), sender, layout, locale, popups);
 
-        skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), accountState.prices.skillsUpgradePrice, sender, layout, locale);
+        skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), new SkillUpgradePrices(config.skillUpgradePrices), sender, layout, locale);
 
-        bankScreen = new BankScreen(Utils.SCREEN_BANK, accountState.prices.goldByDollar, sender, layout, social, locale);
+        bankScreen = new BankScreen(Utils.SCREEN_BANK, config.goldByDollar, sender, layout, social, locale);
 
-        shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), accountState.prices.itemPrice, sender, layout, locale);
+        shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
 
         screens = new <MenuScreen>[mainScreen, skillsScreen, bankScreen, shopScreen];
 
@@ -234,13 +237,6 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
 
     public function onGoldUpdated(dto:GoldUpdatedDTO):void {
         gold = dto.gold;
-    }
-
-    public function onPricesUpdated(pricesDTO:PricesDTO):void {
-        mainScreen.buildingsPrices = new BuildingPrices(pricesDTO.buildings);
-        skillsScreen.skillsUpgradePrice = pricesDTO.skillsUpgradePrice;
-        bankScreen.goldByDollar = pricesDTO.goldByDollar;
-        shopScreen.itemPrice = pricesDTO.itemPrice;
     }
 
     public function onStartLocationUpdated(dto:StartLocationDTO):void {

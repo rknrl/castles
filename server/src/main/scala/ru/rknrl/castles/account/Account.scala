@@ -69,9 +69,8 @@ class Account(accountId: AccountId,
       sender ! StartLocationUpdatedMsg(state.startLocation.dto)
 
     case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
-      state = state.upgradeSkill(upgrade.getType)
+      state = state.upgradeSkill(upgrade.getType, config.account)
       sender ! GoldUpdatedMsg(goldDto)
-      sender ! PricesUpdatedMsg(state.prices)
       sender ! SkillsUpdatedMsg(state.skills.dto)
 
     case BuyItemMsg(buy: BuyItemDTO) ⇒
@@ -103,6 +102,7 @@ class Account(accountId: AccountId,
 
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
+          .setConfig(config.account.dto)
           .setEnterGame(enterGame)
           .build
       }
@@ -190,6 +190,7 @@ class Account(accountId: AccountId,
       if (reenterGame) {
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
+          .setConfig(config.account.dto)
           .setEnterGame(false)
           .setGame(gameAddress)
           .build

@@ -1,7 +1,7 @@
 package ru.rknrl.castles.config
 
 import ru.rknrl.castles.account.AccountConfig
-import ru.rknrl.castles.account.AccountConfig.BuildingPrices
+import ru.rknrl.castles.account.AccountConfig.{BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.castles.config.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.JsonUtils._
@@ -24,12 +24,24 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
     }
   }
 
+  implicit object SkillUpgradePricesJsonFormat extends RootJsonReader[SkillUpgradePrices] {
+    override def read(value: JsValue) = value match {
+      case JsObject(map) ⇒
+        implicit val m = map
+        var prices = Map[Int, Int]()
+        for(i ← 1 to 9) prices = prices + (i → getInt(i.toString))
+        prices
+      case _ ⇒ deserializationError("SkillUpgradePrices isn't object, but " + value)
+    }
+  }
+
   implicit object AccountConfigJsonFormat extends RootJsonReader[AccountConfig] {
     override def read(value: JsValue) = value match {
       case JsObject(map) ⇒
         implicit val m = map
         new AccountConfig(
           buildingPrices = map("buildingPrices").convertTo[BuildingPrices],
+          skillUpgradePrices = map("skillUpgradePrices").convertTo[SkillUpgradePrices],
           itemPrice = getInt("itemPrice"),
           goldByDollar = getInt("goldByDollar"))
       case _ ⇒ deserializationError("Account isn't object, but " + value)

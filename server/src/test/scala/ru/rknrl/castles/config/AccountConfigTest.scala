@@ -13,6 +13,7 @@ object AccountConfigTest {
       |{
       |"itemPrice":100,
       |"goldByDollar":777,
+      |"skillUpgradePrices":${SkillUpgradePricesTest.skillUpgradePrices},
       |"buildingPrices":${BuildingPricesTest.buildingPrices}
       |}
     """.stripMargin

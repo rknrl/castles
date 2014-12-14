@@ -36,32 +36,6 @@ class SkillsTest extends FlatSpec with Matchers {
     updated(SkillType.SPEED) should be(SkillLevel.SKILL_LEVEL_3)
   }
 
-  "upgradePrice" should "be pow of 2" in {
-    new Skills(Map(
-      SkillType.ATTACK → SkillLevel.SKILL_LEVEL_0,
-      SkillType.DEFENCE → SkillLevel.SKILL_LEVEL_0,
-      SkillType.SPEED → SkillLevel.SKILL_LEVEL_0
-    )).upgradePrice should be(1)
-
-    new Skills(Map(
-      SkillType.ATTACK → SkillLevel.SKILL_LEVEL_0,
-      SkillType.DEFENCE → SkillLevel.SKILL_LEVEL_1,
-      SkillType.SPEED → SkillLevel.SKILL_LEVEL_0
-    )).upgradePrice should be(2)
-
-    new Skills(Map(
-      SkillType.ATTACK → SkillLevel.SKILL_LEVEL_0,
-      SkillType.DEFENCE → SkillLevel.SKILL_LEVEL_1,
-      SkillType.SPEED → SkillLevel.SKILL_LEVEL_1
-    )).upgradePrice should be(4)
-
-    new Skills(Map(
-      SkillType.ATTACK → SkillLevel.SKILL_LEVEL_0,
-      SkillType.DEFENCE → SkillLevel.SKILL_LEVEL_2,
-      SkillType.SPEED → SkillLevel.SKILL_LEVEL_1
-    )).upgradePrice should be(8)
-  }
-
   "dto" should "be correct" in {
     checkDto(skills, skills.dto)
   }

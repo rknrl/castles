@@ -9,6 +9,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.Tcp.{Connect, PeerClosed}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import ru.rknrl.core.rmi.testkit._
 
@@ -29,13 +30,15 @@ class ReEnterSearchOpponentsToGameTest
   "Клиент, который оборвал соединение во время поиска противников" should {
     "при следующем заходе попасть в бой, если к этому времени противники были найдены" in {
 
+      val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")
+
       // create tcp connection
 
       val tcpMock = system.actorOf(Props(classOf[TcpMock], testActor), "tcp-mock")
 
       // create tcp server
 
-      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking), "tcpServer")
+      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking, accountStateDb), "tcpServer")
 
       expectMsgPF(100 millis) {
         case ServerBounded() ⇒ true

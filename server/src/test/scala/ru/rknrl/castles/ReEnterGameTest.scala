@@ -4,6 +4,7 @@ import java.net.InetSocketAddress
 
 import _root_.ru.rknrl.castles.config.ConfigTest
 import _root_.ru.rknrl.castles.rmi._
+import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import _root_.ru.rknrl.dto.AuthDTO._
 import akka.actor.{ActorSystem, Props}
@@ -29,13 +30,15 @@ class ReEnterGameTest
   "Клиент, который оборвал соединение во время боя" should {
     "при следующем заходе попасть в бой" in {
 
+      val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")
+
       // create tcp connection
 
       val tcpMock = system.actorOf(Props(classOf[TcpMock], testActor), "tcp-mock")
 
       // create tcp server
 
-      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking), "tcpServer")
+      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking, accountStateDb), "tcpServer")
 
       expectMsgPF(100 millis) {
         case ServerBounded() ⇒ true

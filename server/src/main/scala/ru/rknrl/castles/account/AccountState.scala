@@ -31,8 +31,8 @@ class AccountState(val startLocation: StartLocation,
   def removeBuilding(id: SlotId): AccountState =
     copy(newStartLocation = startLocation.remove(id))
 
-  def upgradeSkill(skillType: SkillType) = {
-    val price = skills.upgradePrice
+  def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
+    val price = config.skillUpgradePrices(skills.nextTotalLevel)
     assert(price <= gold)
     copy(newSkills = skills.upgrade(skillType), newGold = gold - price)
   }
@@ -65,20 +65,12 @@ class AccountState(val startLocation: StartLocation,
       .setLevel(level)
       .setPrice(price)
       .build()
-
-  def prices = PricesDTO.newBuilder()
-    .addAllBuildings(buildingPricesDto.asJava)
-    .setSkillsUpgradePrice(skills.upgradePrice)
-    .setItemPrice(config.itemPrice)
-    .setGoldByDollar(config.goldByDollar)
-    .build()
-
+  
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
     .setSkills(skills.dto)
     .setItems(items.dto)
     .setGold(gold)
-    .setPrices(prices)
     .build()
 }
 

@@ -7,6 +7,7 @@ import akka.io.Tcp.Connect
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import ru.rknrl.castles.config.ConfigTest
+import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.testkit.{ClientConnected, ServerBounded, TcpClientMock, TcpMock}
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
@@ -32,13 +33,15 @@ class ActorsTest
     "accept client connection" +
       "response with AuthReadyMsg" in {
 
+      val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")
+
       // create tcp connection
 
       val tcpMock = system.actorOf(Props(classOf[TcpMock], testActor), "tcp-mock")
 
       // create tcp server
 
-      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking), "tcpServer")
+      val tcpServer = system.actorOf(Props(classOf[TcpServer], tcpMock, configMock, matchmaking, accountStateDb), "tcpServer")
 
       expectMsgPF(100 millis) {
         case ServerBounded() ⇒ true
@@ -133,10 +136,6 @@ class ActorsTest
 
       expectMsgPF(1000 millis) {
         case GoldUpdatedMsg(dto) ⇒ true
-      }
-
-      expectMsgPF(1000 millis) {
-        case PricesUpdatedMsg(dto) ⇒ true
       }
 
       expectMsgPF(1000 millis) {
