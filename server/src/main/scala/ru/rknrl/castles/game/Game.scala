@@ -11,6 +11,7 @@ import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.GameDTO._
 
 import scala.concurrent.duration._
+import scala.collection.JavaConverters._
 
 object Game {
 
@@ -22,35 +23,51 @@ object Game {
 
 }
 
+object PlayerState extends Enumeration {
+  type PlayerState = Value
+
+  /**
+   * Игрок может играть
+   * при переконнекте должен попасть опять в это состояние
+   * если игрок сдается или при проигрыше или выигрыше(он остался один в состоянии game) становимся gameOver
+   */
+  val GAME = Value
+
+  /**
+   * Игрок закончил играть, видит GameOverScreen, он больше не может играть, но видит, что происходит в игре
+   * при переконнекте должен попасть опять в это состояние
+   * по нажатию кнопки Leave переходит в leaved
+   */
+  val GAME_OVER = Value
+
+  /**
+   * Игрок окончательно вышел из игры и не получает никаких сообщений
+   * переконнекта нет
+   *
+   * Игра будет висеть вечно, в ожидании пока все игроки не сделают leave
+   */
+  val LEAVED = Value
+}
+
+
+/**
+ *
+ * Online/Offline:
+ *
+ * Игрок может терять соединение, в этом случае к нам приходит сообщение Offline
+ * Когда игрок снова подконнектится он сделает Join
+ *
+ * Finish game:
+ *
+ * Когда все игроки перешли в состояние leaved отправляем Matchmaking сообщение GameOver, а он нам в ответ StopGame, удаляем актор игры
+ *
+ */
 class Game(players: Map[PlayerId, Player],
            big: Boolean,
            config: GameConfig,
            matchmaking: ActorRef) extends Actor {
 
   private val playersList = for ((id, player) ← players) yield player
-
-  private def noBotCount = {
-    var i = 0
-    for ((id, player) ← players if !player.isBot) i += 1
-    i
-  }
-
-  /**
-   * Игроки, с которыми в данный момент установлено соединение
-   * Удаление из сэта происходит при потере коннекта
-   */
-  private var online = Set[PlayerId]()
-
-  /**
-   * Игроки которые закончили игру
-   * Видят GameOverScreen у себя на клиенте
-   */
-  private var losers = Set[PlayerId]()
-
-  /**
-   * Игроки которые вышли из игры окончательно
-   */
-  private var leaved = Set[PlayerId]()
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -59,6 +76,22 @@ class Game(players: Map[PlayerId, Player],
   private val `playerId→accountId` =
     for ((playerId, player) ← players)
     yield playerId → player.accountId
+
+  /**
+   * Игроки, с которыми в данный момент установлено соединение
+   * Добавление происходит на сообщение JoinMsg
+   * Удаление происходит при потере коннекта, на сообщение Offline
+   */
+  private var online = Set[PlayerId]()
+
+  private var playerStates =
+    for ((playerId, player) ← players)
+    yield playerId → PlayerState.GAME
+
+  /**
+   * Список игроков, которые завершили игру, их места и награды
+   */
+  private var gameOvers = List[GameOverDTO]()
 
   private var `playerId→account` = Map[PlayerId, ActorRef]()
 
@@ -69,6 +102,35 @@ class Game(players: Map[PlayerId, Player],
   private var `playerId→gameRmi` = Map[PlayerId, ActorRef]()
 
   private var `gameRmi→playerId` = Map[ActorRef, PlayerId]()
+
+  /**
+   * Кол-во игроков завершивших игру
+   */
+  private def gameOverCount =
+    playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.GAME}
+
+  /**
+   * Игроки еще не завершившие игру
+   */
+  private def playersInGame =
+    for ((playerId, playerState) ← playerStates
+         if playerState == PlayerState.GAME)
+    yield playerId
+
+  private def getPlace =
+    players.size - playersInGame.size
+
+  /**
+   * Все вышли из игры
+   */
+  private def allLeaved =
+    playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
+
+  private def getNewLosers =
+    for ((playerId, playerState) ← playerStates
+         if playerState == PlayerState.GAME
+         if gameState.isPlayerLose(playerId))
+    yield playerId
 
   private val sendFps = 30
   private val sendInterval = 1000 / sendFps
@@ -115,33 +177,40 @@ class Game(players: Map[PlayerId, Player],
     (newGameState, messages, personalMessages)
   }
 
+  private def canSendMessage(playerId: PlayerId) =
+    (online contains playerId) &&
+      (playerStates(playerId) != PlayerState.LEAVED) &&
+      !players(playerId).isBot
+
   /**
-   * Отправляем online игрокам сообщения об изменении gameState
-   * Ботам отправляем просто новый gameState
+   * Отправить онлайн игрокам общие сообщения одинаковые для всех
    */
   private def sendMessagesToPlayers(messages: Iterable[Any]) =
-    for ((playerId, ref) ← `playerId→gameRmi`
-         if online contains playerId
-         if !(leaved contains playerId))
-      if (players(playerId).isBot)
-        ref ! gameState
-      else
-        for (message ← messages) ref ! message
+    for ((playerId, gameRmi) ← `playerId→gameRmi`
+         if canSendMessage(playerId))
+      for (message ← messages) gameRmi ! message
 
+  /**
+   * Отправить онлайн игрокам персональные сообщения
+   */
   private def sendPersonalMessagesToPlayers(personalMessages: Iterable[PersonalMessage]) =
     for (personalMessage ← personalMessages;
          playerId = personalMessage.playerId
-         if online contains playerId
-         if !(leaved contains playerId))
+         if canSendMessage(playerId))
       `playerId→gameRmi`(playerId) ! personalMessage.msg
+
+  /**
+   * Отправить игрокам-ботам геймстейт
+   */
+  private def sendGameStateToBots() =
+    for ((playerId, ref) ← `playerId→gameRmi`
+         if players(playerId).isBot)
+      ref ! gameState
 
   private def getPlayerId = `gameRmi→playerId`(sender)
 
-  private def assertCanPlay() = {
-    val playerId = getPlayerId
-    assert(!leaved.contains(playerId))
-    assert(!losers.contains(playerId))
-  }
+  private def assertCanPlay() =
+    assert(playerStates(getPlayerId) == PlayerState.GAME)
 
   override def receive = {
     /**
@@ -174,51 +243,22 @@ class Game(players: Map[PlayerId, Player],
     case JoinMsg() ⇒
       val playerId = `enterGameRmi→playerId`(sender)
       online = online + playerId
-      sender ! JoinGameMsg(gameState.dto(playerId))
+      val builder = gameState.dtoBuilder(playerId)
+      sender ! JoinGameMsg(builder.addAllGameOvers(gameOvers.asJava).build)
 
     /**
      * Игрок сдается
      */
-    case SurrenderMsg() ⇒ // todo
-      sender ! GameOverMsg(GameOverDTO.newBuilder()
-        .setPlayerId(getPlayerId.dto)
-        .setWin(false)
-        .setPlace(2)
-        .setReward(0)
-        .build())
+    case SurrenderMsg() ⇒
+      assert(playerStates(getPlayerId) == PlayerState.GAME)
+      addLoser(getPlayerId, getPlace)
 
     /**
      * Игрок окончательно выходит из боя (нажал leave в GameOverScreen)
      */
     case LeaveMsg() ⇒
-      // Кладем игрока в мапу выбывших
-
-      val playerId = getPlayerId
-      leaved += playerId
-
-      // Если в бою остался один игрок - объявляем его победителем
-
-      if (onePlayerLeft) {
-        sendMessagesToPlayers(List(getWinMessage))
-        scheduler.cancel()
-      }
-
-      // Говорим матчмейкингу, что игрок вышел
-
-      val accountId = `playerId→accountId`(playerId)
-      matchmaking ! Leaved(accountId)
-
-      // Ответ самому игроку
-
-      `playerId→enterGameRmi`(playerId) ! LeaveGameMsg()
-
-      // Говорим аккаунту
-
-      `playerId→account`(playerId) ! LeaveGame(gameState.gameItems.states(playerId).usedItems)
-
-      // Если вышли все - завершаем игру
-
-      if (leaved.size == noBotCount) matchmaking ! GameOver
+      assert(playerStates(getPlayerId) == PlayerState.GAME_OVER)
+      addLeaved(getPlayerId)
 
     /**
      * Matchmaking завершает игру (Ответ на GameOver)
@@ -233,18 +273,13 @@ class Game(players: Map[PlayerId, Player],
       val (newGameState, messages, personalMessages) = updateGameState
       gameState = newGameState
 
-      val newLosers = getNewLosers
-
-      val loseMessages = `losers→gameOverMessages`(newLosers, place = losers.size)
-
-      losers = losers ++ newLosers
-
-      val winMessages = if (onePlayerLeft) List(getWinMessage) else List.empty
-
-      if (winMessages.nonEmpty) scheduler.cancel()
-
-      sendMessagesToPlayers(messages ++ loseMessages ++ winMessages)
+      sendMessagesToPlayers(messages)
       sendPersonalMessagesToPlayers(personalMessages)
+      sendGameStateToBots()
+
+      val newLosers = getNewLosers
+      val place = getPlace
+      for (playerId ← newLosers) addLoser(playerId, place)
 
     /**
      * Игрок отправляет отряд из домика в домик - кладем в мапу
@@ -289,34 +324,62 @@ class Game(players: Map[PlayerId, Player],
       assistanceCasts = assistanceCasts + (getPlayerId → new BuildingId(buildingId.getId))
   }
 
-  private def onePlayerLeft = losers.size + leaved.size == players.size - 1
+  private def addLoser(playerId: PlayerId, place: Int) {
+    playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
 
-  private def getWinner = playersList.find(p ⇒ !losers.contains(p.id) && !leaved.contains(p.id)).get
+    val dto = getLoseDto(playerId, place)
+    gameOvers = gameOvers :+ dto
+    sendMessagesToPlayers(List(GameOverMsg(dto)))
 
-  private def getWinMessage =
-    GameOverMsg(GameOverDTO.newBuilder()
-      .setPlayerId(getWinner.id.dto)
+    // Если в бою остался один игрок - объявляем его победителем
+
+    val winnerId = if (playersInGame.size == 1) Some(playersInGame.head) else None
+
+    if (winnerId.isDefined) {
+      playerStates = playerStates.updated(winnerId, PlayerState.GAME_OVER)
+      val winDto = getWinDto(winnerId.get)
+      gameOvers = gameOvers :+ winDto
+      sendMessagesToPlayers(List(GameOverMsg(winDto)))
+      scheduler.cancel()
+    }
+  }
+
+  private def getWinDto(playerId: PlayerId) =
+    GameOverDTO.newBuilder()
+      .setPlayerId(playerId.dto)
       .setWin(true)
       .setPlace(1)
       .setReward(config.winReward)
-      .build())
+      .build()
 
-  private def getNewLosers =
-    for (player ← playersList
-         if !losers.contains(player.id)
-         if gameState.isPlayerLose(player.id))
-    yield player.id
+  private def getLoseDto(playerId: PlayerId, place: Int) =
+    GameOverDTO.newBuilder()
+      .setPlayerId(playerId.dto)
+      .setWin(false)
+      .setPlace(place)
+      .setReward(0)
+      .build()
 
-  private def `losers→gameOverMessages`(losers: Iterable[PlayerId], place: Int) =
-    for (playerId ← losers)
-    yield GameOverMsg(
-      GameOverDTO.newBuilder()
-        .setPlayerId(playerId.dto)
-        .setWin(false)
-        .setPlace(place)
-        .setReward(0)
-        .build()
-    )
+  private def addLeaved(playerId: PlayerId) {
+    playerStates = playerStates.updated(playerId, PlayerState.LEAVED)
+
+    // Говорим матчмейкингу, что игрок вышел
+
+    val accountId = `playerId→accountId`(playerId)
+    matchmaking ! Leaved(accountId)
+
+    // Ответ самому игроку
+
+    `playerId→enterGameRmi`(playerId) ! LeaveGameMsg()
+
+    // Говорим аккаунту
+
+    `playerId→account`(playerId) ! LeaveGame(gameState.gameItems.states(playerId).usedItems)
+
+    // Если вышли все - завершаем игру
+
+    if (allLeaved) matchmaking ! GameOver
+  }
 
   override def preStart(): Unit = println("Game start")
 

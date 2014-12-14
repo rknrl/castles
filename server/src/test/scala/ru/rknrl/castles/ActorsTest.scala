@@ -223,6 +223,19 @@ class ActorsTest
 
       // leave game
 
+      gameRmiClientMock ! SurrenderMsg()
+
+      ignoreMsg{
+        case msg: GameOverMsg ⇒ false
+        case _ ⇒ true
+      }
+
+      expectMsgPF(1000 millis) {
+        case GameOverMsg(dto) ⇒ true
+      }
+
+      // leave game
+
       gameRmiClientMock ! LeaveMsg()
 
       ignoreMsg{

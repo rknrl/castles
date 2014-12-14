@@ -285,7 +285,7 @@ class GameState(val time: Long,
   def isPlayerLose(playerId: PlayerId) =
     !buildings.buildings.exists { case (buildingId, building) ⇒ building.owner == Some(playerId)}
 
-  def dto(id: PlayerId) =
+  def dtoBuilder(id: PlayerId) =
     GameStateDTO.newBuilder()
       .setSelfId(id.dto)
       .addAllPlayers(players.dto.asJava)
@@ -296,5 +296,4 @@ class GameState(val time: Long,
       .addAllTornadoes(tornadoes.dto(time).asJava)
       .addAllBullets(bullets.dto(time).asJava)
       .setItemsState(gameItems.dto(id, time, config))
-      .build()
 }

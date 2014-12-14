@@ -98,7 +98,7 @@ class Account(externalAccountId: AccountId,
         connectToGame(gameRef.get)
       } else {
         reenterGame = false
-        auth ! state.dto.setEnterGame(enterGame).build()
+        auth ! state.dtoBuilder.setEnterGame(enterGame).build()
       }
 
     /**
@@ -182,7 +182,7 @@ class Account(externalAccountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! state.dto.setGame(gameAddress).setEnterGame(false).build()
+        auth ! state.dtoBuilder.setGame(gameAddress).setEnterGame(false).build()
         reenterGame = false
       } else
         accountRmi ! EnteredGameMsg(gameAddress)

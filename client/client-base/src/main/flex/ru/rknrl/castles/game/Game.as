@@ -77,9 +77,9 @@ public class Game extends Sprite implements IGameFacade {
 
         updateLayout(layout);
 
-        parseGameState(gameState);
-
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        parseGameState(gameState);
     }
 
     public function updateLayout(layout:Layout):void {
@@ -170,6 +170,10 @@ public class Game extends Sprite implements IGameFacade {
 
         for each(var bullet:BulletDTO in gameState.bullets) {
             onAddBullet(bullet);
+        }
+
+        for each(var gameOver: GameOverDTO in gameState.gameOvers) {
+            onGameOver(gameOver);
         }
     }
 

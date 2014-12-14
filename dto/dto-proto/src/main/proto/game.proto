@@ -40,6 +40,7 @@ message GameStateDTO {
     repeated VolcanoDTO volcanoes = 8;
     repeated BulletDTO bullets = 9;
     required ItemsStateDTO itemsState = 10;
+    repeated GameOverDTO gameOvers = 11;
 }
 
 enum StartLocationOrientation {

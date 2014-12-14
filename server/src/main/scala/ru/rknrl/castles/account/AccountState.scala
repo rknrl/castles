@@ -73,7 +73,7 @@ class AccountState(val startLocation: StartLocation,
     .setGoldByDollar(config.goldByDollar)
     .build()
 
-  def dto = AccountStateDTO.newBuilder()
+  def dtoBuilder = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
     .setSkills(skills.dto)
     .setItems(items.dto)
