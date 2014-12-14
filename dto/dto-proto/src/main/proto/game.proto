@@ -34,17 +34,19 @@ message PointDTO {
 // server -> client
 
 message GameStateDTO {
-    repeated PlayerDTO players = 1;
-    repeated StartLocationPosDTO startLocations = 2;
-    required PlayerIdDTO selfId = 3;
-    repeated BuildingDTO buildings = 4;
-    repeated UnitDTO units = 5;
-    repeated FireballDTO fireballs = 6;
-    repeated TornadoDTO tornadoes = 7;
-    repeated VolcanoDTO volcanoes = 8;
-    repeated BulletDTO bullets = 9;
-    required ItemsStateDTO itemsState = 10;
-    repeated GameOverDTO gameOvers = 11;
+    required int32 width = 1;
+    required int32 height = 2;
+    repeated PlayerDTO players = 3;
+    repeated StartLocationPosDTO startLocations = 4;
+    required PlayerIdDTO selfId = 5;
+    repeated BuildingDTO buildings = 6;
+    repeated UnitDTO units = 7;
+    repeated FireballDTO fireballs = 8;
+    repeated TornadoDTO tornadoes = 9;
+    repeated VolcanoDTO volcanoes = 10;
+    repeated BulletDTO bullets = 11;
+    required ItemsStateDTO itemsState = 12;
+    repeated GameOverDTO gameOvers = 13;
 }
 
 enum StartLocationOrientation {

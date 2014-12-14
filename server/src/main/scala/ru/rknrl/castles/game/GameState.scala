@@ -138,6 +138,8 @@ object GameState {
 
     new GameState(
       time,
+      gameArea.width,
+      gameArea.height,
       new Players(players.map(p ⇒ p.id → p).toMap),
       new Buildings(buildings.map(b ⇒ b.id → b).toMap),
       new GameUnits(List.empty),
@@ -155,6 +157,8 @@ object GameState {
 }
 
 class GameState(val time: Long,
+                val width: Int,
+                val height: Int,
                 val players: Players,
                 val buildings: Buildings,
                 val units: GameUnits,
@@ -259,6 +263,8 @@ class GameState(val time: Long,
 
     val newGameState = new GameState(
       newTime,
+      width,
+      height,
       players,
       newBuildings,
       newUnits,
@@ -287,6 +293,8 @@ class GameState(val time: Long,
 
   def dtoBuilder(id: PlayerId) =
     GameStateDTO.newBuilder()
+      .setWidth(width)
+      .setHeight(height)
       .setSelfId(id.dto)
       .addAllPlayers(players.dto.asJava)
       .addAllStartLocations(startLocations.asJava)

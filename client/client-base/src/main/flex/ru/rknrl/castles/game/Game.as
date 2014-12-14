@@ -28,7 +28,6 @@ import ru.rknrl.castles.rmi.IGameFacade;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
-import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -64,8 +63,8 @@ public class Game extends Sprite implements IGameFacade {
     public function Game(sender:GameFacadeSender, gameState:GameStateDTO, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
 
-        const w:int = layout is LayoutLandscape ? 16 : 8;
-        const h:int = layout is LayoutLandscape ? 16 : 12;
+        const w:int = Math.round(gameState.width / CellSize.SIZE.id());
+        const h:int = Math.round(gameState.height / CellSize.SIZE.id());
 
         gameLayout = layout.createGameLayout(w, h);
 
@@ -139,8 +138,8 @@ public class Game extends Sprite implements IGameFacade {
         for each(var starLocation:StartLocationPosDTO in gameState.startLocations) {
             for each(var slotId:SlotId in SlotId.values) {
                 const pos:Point = Utils.slotsPositions[slotId];
-                const x:Number = starLocation.x + pos.x;
-                const y:Number = starLocation.orientation == StartLocationOrientation.TOP ? starLocation.y - pos.y : starLocation.y + pos.y;
+                const x:Number = starLocation.x + pos.x * CellSize.SIZE.id();
+                const y:Number = starLocation.orientation == StartLocationOrientation.TOP ? starLocation.y - pos.y * CellSize.SIZE.id() : starLocation.y + pos.y * CellSize.SIZE.id();
                 view.updateGroundColor(x, y, new BuildingOwner(true, starLocation.playerId.id));
             }
         }
@@ -149,6 +148,7 @@ public class Game extends Sprite implements IGameFacade {
             const colorTransform:ColorTransform = building.hasOwner ? Colors.playerColorTransforms[building.owner.id] : Colors.noOwnerColorTransform;
             const owner:BuildingOwner = building.hasOwner ? new BuildingOwner(true, building.owner.id) : new BuildingOwner(false);
             addBuilding(new Building(building.id.id, building.x, building.y, building.building.type, building.building.level, building.population, colorTransform, owner, building.strengthened));
+            view.updateGroundColor(building.x, building.y, owner);
         }
 
         for each(var unit:UnitDTO in gameState.units) {
@@ -217,7 +217,6 @@ public class Game extends Sprite implements IGameFacade {
         const owner:BuildingOwner = update.hasOwner ? new BuildingOwner(true, update.owner.id) : new BuildingOwner(false);
         const building:Building = getBuildingById(update.id.id);
         building.update(update.population, colorTransform, owner, update.strengthened);
-
         view.updateGroundColor(building.x, building.y, owner);
     }
 
@@ -403,6 +402,7 @@ public class Game extends Sprite implements IGameFacade {
     }
 
     // item states
+
     public function onUpdateItemStates(dto:ItemsStateDTO):void {
         for each(var itemState:ItemStateDTO in dto.items) {
             ui.updateItem(itemState.itemType, itemState.millisTillCooldownEnd, getTimer(), itemState.cooldownDuration, itemState.count);

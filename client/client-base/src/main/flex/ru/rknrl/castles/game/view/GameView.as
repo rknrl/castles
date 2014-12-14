@@ -94,6 +94,8 @@ public class GameView extends Sprite {
         arrowLayer.removeChild(arrow);
     }
 
+    // tornado path
+
     public function drawTornadoPoints(tornadoPoints:Vector.<Point>):void {
         const g:Graphics = tornadoPathLayer.graphics;
         g.clear();
@@ -108,6 +110,8 @@ public class GameView extends Sprite {
     public function clearTornadoPoints():void {
         tornadoPathLayer.graphics.clear();
     }
+
+    // ground
 
     private const grounds:Dictionary = new Dictionary();
 
@@ -131,10 +135,11 @@ public class GameView extends Sprite {
         }
     }
 
-    // todo
-    public function updateGroundColor(i:int, j:int, owner:BuildingOwner):void {
+    public function updateGroundColor(x: int, y: int, owner: BuildingOwner):void {
+        const i:int = x / CellSize.SIZE.id();
+        const j:int = y / CellSize.SIZE.id();
         const color:BitmapData = owner.hasOwner ? Colors.groundColors[owner.ownerId] : Colors.noOwnerGroundColor;
-//        getGround(i, j).bitmapData = color;
+        getGround(i, j).bitmapData = color;
     }
 }
 }
