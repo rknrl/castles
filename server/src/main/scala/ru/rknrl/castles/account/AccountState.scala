@@ -73,12 +73,13 @@ class AccountState(val startLocation: StartLocation,
     .setGoldByDollar(config.goldByDollar)
     .build()
 
-  def dtoBuilder = AccountStateDTO.newBuilder()
+  def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
     .setSkills(skills.dto)
     .setItems(items.dto)
     .setGold(gold)
     .setPrices(prices)
+    .build()
 }
 
 object AccountState {
@@ -104,4 +105,12 @@ object AccountState {
   private val initGold = 8
 
   def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems, initGold, config)
+
+  def fromDto(dto: AccountStateDTO, config: AccountConfig) = new AccountState(
+    StartLocation.fromDto(dto.getStartLocation),
+    Skills.fromDto(dto.getSkills),
+    Items.fromDto(dto.getItems),
+    dto.getGold,
+    config
+  )
 }

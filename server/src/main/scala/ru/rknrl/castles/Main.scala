@@ -4,6 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.config.ConfigJsonProtocol._
+import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.web.Web
 import ru.rknrl.utils.PolicyServer
 import spray.json._
@@ -27,8 +28,10 @@ object Main {
 
     new Web(config)
 
+    val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")
+    
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking), "tcp-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, accountStateDb), "tcp-server")
   }
 }

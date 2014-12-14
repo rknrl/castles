@@ -29,4 +29,6 @@ object BuildingPrototype {
     for (buildingType ← BuildingType.values();
          level ← BuildingLevel.values())
     yield new BuildingPrototype(buildingType, level)
+
+  def fromDto(dto: BuildingPrototypeDTO) = new BuildingPrototype(dto.getType, dto.getLevel)
 }

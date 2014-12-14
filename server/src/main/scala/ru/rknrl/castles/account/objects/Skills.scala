@@ -51,4 +51,10 @@ object Skills {
     }
 
   def levelToInt(level: SkillLevel) = level.getNumber
+
+  def fromDto(dto: SkillsDTO) = {
+    val skills = for (skillDto ← dto.getLevelsList.asScala) yield skillDto.getType → skillDto.getLevel
+
+    new Skills(skills.toMap)
+  }
 }

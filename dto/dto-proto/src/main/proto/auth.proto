@@ -6,6 +6,8 @@ option optimize_for = SPEED;
 
 import "common.proto";
 
+import "account.proto";
+
 enum AccountType {
     DEV = 1;
     VKONTAKTE = 2;
@@ -35,4 +37,14 @@ message AuthenticateDTO {
     required AccountIdDTO accountId = 1;
     required DeviceType deviceType = 2;
     required AuthenticationSecretDTO secret = 3;
+}
+
+message AuthenticationSuccessDTO {
+    required AccountStateDTO accountState = 1;
+
+    // Клиент находится в процессе поиска противников для игры
+    required bool enterGame = 2;
+
+    // Клиент находится в игре
+    optional NodeLocator game = 3;
 }

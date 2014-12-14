@@ -12,12 +12,6 @@ message AccountStateDTO {
     required ItemsDTO items = 3;
     required int32 gold = 4;
     required PricesDTO prices = 5;
-
-    // Клиент находится в процессе поиска противников для игры
-    required bool enterGame = 6;
-
-    // Клиент находится в игре
-    optional NodeLocator game = 7;
 }
 
 // skills

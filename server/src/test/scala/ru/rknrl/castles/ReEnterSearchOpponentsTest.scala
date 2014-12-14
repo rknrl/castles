@@ -91,7 +91,7 @@ class ReEnterSearchOpponentsTest
       authRmiClientMock ! AuthenticateMsg(authenticate)
 
       expectMsgPF(1000 millis) {
-        case AuthenticationResultMsg(state) ⇒ true
+        case AuthenticationSuccessMsg(state) ⇒ true
       }
 
       // create client account rmi
@@ -162,7 +162,7 @@ class ReEnterSearchOpponentsTest
       authRmiClientMock2 ! AuthenticateMsg(authenticate)
 
       expectMsgPF(1000 millis) {
-        case AuthenticationResultMsg(state) ⇒
+        case AuthenticationSuccessMsg(state) ⇒
           state.hasGame should be(false)
           state.getEnterGame should be(true)
           true

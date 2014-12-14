@@ -30,6 +30,7 @@ import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountStateDTO;
+import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.GoldUpdatedDTO;
 import ru.rknrl.dto.ItemsDTO;
@@ -64,13 +65,15 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private var gameFacadeReceiver:GameFacadeReceiver;
     private var policyPort:int;
 
-    public function Menu(accountState:AccountStateDTO, connection:Connection, policyPort: int, sender:AccountFacadeSender, log:Log, layout:Layout, social:Social, locale:CastlesLocale) {
+    public function Menu(authenticationSuccess:AuthenticationSuccessDTO, connection:Connection, policyPort:int, sender:AccountFacadeSender, log:Log, layout:Layout, social:Social, locale:CastlesLocale) {
         this.connection = connection;
         this.policyPort = policyPort;
         this.sender = sender;
         this.log = log;
         this.locale = locale;
         this.layout = layout;
+
+        const accountState:AccountStateDTO = authenticationSuccess.accountState
 
         popups = new PopupManager(layout);
 
@@ -96,17 +99,17 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         addChild(popups);
         addChild(header);
 
-        screenSlider.visible = !accountState.hasGame && !accountState.enterGame;
-        header.visible = !accountState.hasGame && !accountState.enterGame;
+        screenSlider.visible = !authenticationSuccess.hasGame && !authenticationSuccess.enterGame;
+        header.visible = !authenticationSuccess.hasGame && !authenticationSuccess.enterGame;
 
         gold = accountState.gold;
 
         screenSlider.addEventListener(Utils.PLAY, onPlayButtonClick);
 
-        if (accountState.enterGame) {
+        if (authenticationSuccess.enterGame) {
             addEnterGameScreen();
-        } else if (accountState.hasGame) {
-            onEnteredGame(accountState.game);
+        } else if (authenticationSuccess.hasGame) {
+            onEnteredGame(authenticationSuccess.game);
         }
     }
 

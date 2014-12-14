@@ -18,6 +18,10 @@ class Item(val itemType: ItemType,
     .build()
 }
 
+object Item {
+  def fromDto(dto: ItemDTO) = new Item(dto.getType, dto.getCount)
+}
+
 class Items(val items: Map[ItemType, Item]) {
 
   for (itemType ← ItemType.values()) assert(items.contains(itemType))
@@ -30,4 +34,11 @@ class Items(val items: Map[ItemType, Item]) {
   def dto = ItemsDTO.newBuilder()
     .addAllItems(itemsDto.asJava)
     .build()
+}
+
+object Items {
+  def fromDto(dto: ItemsDTO) = {
+    val items = for(itemDto ← dto.getItemsList.asScala) yield itemDto.getType → Item.fromDto(itemDto)
+    new Items(items.toMap)
+  }
 }

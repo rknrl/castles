@@ -94,7 +94,7 @@ class ActorsTest
       authRmiClientMock ! AuthenticateMsg(authenticate)
 
       expectMsgPF(1000 millis) {
-        case AuthenticationResultMsg(state) ⇒ true
+        case AuthenticationSuccessMsg(state) ⇒ true
       }
 
       // create client account rmi

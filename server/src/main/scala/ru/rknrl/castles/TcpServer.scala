@@ -7,7 +7,7 @@ import ru.rknrl.castles.config.Config
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef) extends Actor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends Actor {
 
   import akka.io.Tcp._
 
@@ -26,17 +26,18 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef) extends Ac
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       val tcpSender = sender()
-      val tcpReceiver = context.actorOf(Props(classOf[CastlesTcpReceiver], tcpSender, matchmaking, config, name), "tcp-receiver" + name)
+      val tcpReceiver = context.actorOf(Props(classOf[CastlesTcpReceiver], tcpSender, matchmaking, accountStateDb, config, name), "tcp-receiver" + name)
       tcpSender ! Register(tcpReceiver)
   }
 }
 
 class CastlesTcpReceiver(tcpSender: ActorRef,
                          matchmaking: ActorRef,
+                         accountStateDb: ActorRef,
                          config: Config,
                          name: String) extends TcpReceiver(name) {
 
-  context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, config, name), "auth" + name)
+  context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
 
   override def preStart(): Unit = println("TcpReceiver start " + name)
 

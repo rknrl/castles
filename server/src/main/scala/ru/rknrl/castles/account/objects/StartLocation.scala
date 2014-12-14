@@ -87,4 +87,10 @@ object StartLocation {
   val right = 2
   val top = Math.abs(-1)
   val bottom = 0
+
+  def fromDto(dto: StartLocationDTO) = {
+    val slots = for (slotDto ← dto.getSlotsList.asScala) yield slotDto.getId → StartLocationSlot.fromDto(slotDto)
+
+    new StartLocation(slots.toMap)
+  }
 }

@@ -8,17 +8,19 @@ import ru.rknrl.castles.game.Game.{Join, Offline}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
-import ru.rknrl.dto.AuthDTO.DeviceType
+import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, DeviceType}
 import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
 
 case object GetAccountState
 
 case class LeaveGame(usedItems: Map[ItemType, Int])
 
-class Account(externalAccountId: AccountId,
+class Account(accountId: AccountId,
+              accountState: AccountState,
               deviceType: DeviceType,
               tcpSender: ActorRef, tcpReceiver: ActorRef,
               matchmaking: ActorRef,
+              accountStateDb: ActorRef,
               auth: ActorRef,
               config: Config,
               name: String) extends Actor {
@@ -27,6 +29,8 @@ class Account(externalAccountId: AccountId,
 
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
   tcpReceiver ! RegisterReceiver(accountRmi)
+
+  private var state = accountState
 
   private var reenterGame: Boolean = true
 
@@ -40,13 +44,11 @@ class Account(externalAccountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  private var state = AccountState.initAccount(config.account)
-
   private def goldDto = GoldUpdatedDTO.newBuilder().setGold(state.gold).build()
 
   def receive = {
     case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(externalAccountId, deviceType, state.startLocation, state.skills, state.items, isBot = false))
+      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, state.startLocation, state.skills, state.items, isBot = false))
 
     case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
       state = state.swapSlots(swap.getId1, swap.getId2)
@@ -86,7 +88,7 @@ class Account(externalAccountId: AccountId,
      * Спрашиваем матчмейкинг находится ли этот игрок в бою
      */
     case GetAccountState ⇒
-      matchmaking ! InGame(externalAccountId)
+      matchmaking ! InGame(accountId)
 
     /**
      * Matchmaking ответил на InGame
@@ -98,7 +100,11 @@ class Account(externalAccountId: AccountId,
         connectToGame(gameRef.get)
       } else {
         reenterGame = false
-        auth ! state.dtoBuilder.setEnterGame(enterGame).build()
+
+        auth ! AuthenticationSuccessDTO.newBuilder()
+          .setAccountState(state.dto)
+          .setEnterGame(enterGame)
+          .build
       }
 
     /**
@@ -167,7 +173,7 @@ class Account(externalAccountId: AccountId,
     val gameRmi = context.actorOf(Props(classOf[GameRMI], tcpSender, game), "game-rmi" + name)
     tcpReceiver ! RegisterReceiver(gameRmi)
 
-    game ! Join(externalAccountId, enterGameRmi, gameRmi)
+    game ! Join(accountId, enterGameRmi, gameRmi)
 
     this.game = Some(game)
     this.enterGameRmi = Some(enterGameRmi)
@@ -182,16 +188,21 @@ class Account(externalAccountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! state.dtoBuilder.setGame(gameAddress).setEnterGame(false).build()
+        auth ! AuthenticationSuccessDTO.newBuilder()
+          .setAccountState(state.dto)
+          .setEnterGame(false)
+          .setGame(gameAddress)
+          .build
+
         reenterGame = false
       } else
         accountRmi ! EnteredGameMsg(gameAddress)
     }
-  
+
   override def preStart(): Unit = println("AccountService start " + name)
 
   override def postStop(): Unit = {
-    if (game.isDefined) game.get ! Offline(externalAccountId)
+    if (game.isDefined) game.get ! Offline(accountId)
     println("AccountService stop " + name)
   }
 }

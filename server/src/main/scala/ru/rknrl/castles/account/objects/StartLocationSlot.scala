@@ -28,3 +28,11 @@ class StartLocationSlot(val id: SlotId,
     builder.build()
   }
 }
+
+object StartLocationSlot {
+  def fromDto(dto: SlotDTO) =
+    new StartLocationSlot(
+      dto.getId,
+      if (dto.hasBuildingPrototype) Some(BuildingPrototype.fromDto(dto.getBuildingPrototype)) else None
+    )
+}

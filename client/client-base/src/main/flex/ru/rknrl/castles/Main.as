@@ -24,6 +24,7 @@ import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticateDTO;
+import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
@@ -145,14 +146,14 @@ public class Main extends Sprite implements IAuthFacade {
         authFacadeSender.authenticate(authenticate);
     }
 
-    public function onAuthenticationResult(accountState:AccountStateDTO):void {
+    public function onAuthenticationSuccess(authenticationSuccess:AuthenticationSuccessDTO):void {
         log.add("onAuthenticationResult");
 
         connection.unregisterReceiver(authFacadeReceiver);
 
         removeLoadingScreen();
 
-        menu = new Menu(accountState, connection, policyPort, new AccountFacadeSender(connection), log, layout, social, locale);
+        menu = new Menu(authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, layout, social, locale);
         addChild(menu);
         accountFacadeReceiver = new AccountFacadeReceiver(menu);
         connection.registerReceiver(accountFacadeReceiver);
