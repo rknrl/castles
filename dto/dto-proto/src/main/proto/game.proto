@@ -6,6 +6,10 @@ option optimize_for = SPEED;
 
 import "common.proto";
 
+enum CellSize {
+    SIZE = 39;
+}
+
 message BuildingIdDTO {
     required int32 id = 1;
 }

@@ -336,7 +336,7 @@ class Game(players: Map[PlayerId, Player],
     val winnerId = if (playersInGame.size == 1) Some(playersInGame.head) else None
 
     if (winnerId.isDefined) {
-      playerStates = playerStates.updated(winnerId, PlayerState.GAME_OVER)
+      playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
       gameOvers = gameOvers :+ winDto
       sendMessagesToPlayers(List(GameOverMsg(winDto)))

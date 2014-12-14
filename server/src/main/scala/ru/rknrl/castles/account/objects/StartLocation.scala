@@ -1,8 +1,8 @@
 package ru.rknrl.castles.account.objects
 
-import ru.rknrl.castles.game.GameConstants
 import ru.rknrl.dto.AccountDTO.StartLocationDTO
 import ru.rknrl.dto.CommonDTO.{BuildingType, SlotId}
+import ru.rknrl.dto.GameDTO.CellSize
 import ru.rknrl.utils.Point
 
 import scala.collection.JavaConverters._
@@ -68,7 +68,7 @@ class IJ(val i: Int, val j: Int) {
 
   def downRight = new IJ(i + 1, j + 1)
 
-  def toXY = new Point((i + 0.5) * GameConstants.cellSize, (j + 0.5) * GameConstants.cellSize)
+  def toXY = new Point((i + 0.5) * CellSize.SIZE_VALUE, (j + 0.5) * CellSize.SIZE_VALUE)
 
   def near(that: IJ) = up == that || upLeft == that || upRight == that ||
     this == that || left == that || right == that ||

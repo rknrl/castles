@@ -2,11 +2,11 @@ package ru.rknrl.castles.menu.screens.main.startLocation.objects {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.game.view.BuildingBase;
-import ru.rknrl.castles.game.view.GameConstants;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.funnyUi.buttons.round.PlusButton;
@@ -31,7 +31,7 @@ public class MenuBuilding extends BuildingBase {
 
         addChild(bodyHolder = new Sprite());
 
-        const halfCellSize:Number = GameConstants.cellSize * buildingScale / 2;
+        const halfCellSize:Number = CellSize.SIZE.id() * buildingScale / 2;
 
         addChild(upCircle = new UpButton(16, Colors.darkMagenta));
         upCircle.x = halfCellSize - 4;

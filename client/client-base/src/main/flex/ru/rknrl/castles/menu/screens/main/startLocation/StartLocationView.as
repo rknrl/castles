@@ -5,7 +5,6 @@ import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.game.view.GameConstants;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenBuildPopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenUpgradePopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.SwapEvent;
@@ -15,6 +14,7 @@ import ru.rknrl.castles.menu.screens.main.startLocation.objects.MenuGround;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.StartLocationDTO;
@@ -30,7 +30,7 @@ public class StartLocationView extends Sprite {
 
         addChild(buildingLayer = new Sprite());
 
-        const cellSize:int = GameConstants.cellSize * layout.menuBuildingScale;
+        const cellSize:int = CellSize.SIZE.id() * layout.menuBuildingScale;
 
         for each(var id:SlotId in SlotId.values) {
             const pos:Point = Utils.slotsPositions[id];

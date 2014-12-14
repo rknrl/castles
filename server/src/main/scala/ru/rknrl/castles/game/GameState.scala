@@ -27,8 +27,8 @@ class GameArea(big: Boolean) {
   val v = if (big) bigV else smallV
 
 
-  val width = h * GameConstants.cellSize
-  val height = v * GameConstants.cellSize
+  val width = h * CellSize.SIZE_VALUE
+  val height = v * CellSize.SIZE_VALUE
 
   val hForRandom = h - 1 - StartLocation.left - StartLocation.right
   val vForRandom = Math.floor((v - 1) / 2).toInt - StartLocation.top - StartLocation.bottom

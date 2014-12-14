@@ -17,6 +17,7 @@ import ru.rknrl.castles.game.view.items.FireballView;
 import ru.rknrl.castles.game.view.items.TornadoView;
 import ru.rknrl.castles.game.view.items.VolcanoView;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.dto.CellSize;
 
 public class GameView extends Sprite {
     private var groundLayer:Sprite;
@@ -120,10 +121,10 @@ public class GameView extends Sprite {
         for (var i:int = 0; i < h; i++) {
             for (var j:int = 0; j < v; j++) {
                 const bitmap:Bitmap = new Bitmap(Colors.groundColor);
-                bitmap.width = GameConstants.cellSize - gap;
-                bitmap.height = GameConstants.cellSize - gap;
-                bitmap.x = i * GameConstants.cellSize + gap / 2;
-                bitmap.y = j * GameConstants.cellSize + gap / 2;
+                bitmap.width = CellSize.SIZE.id() - gap;
+                bitmap.height = CellSize.SIZE.id() - gap;
+                bitmap.x = i * CellSize.SIZE.id() + gap / 2;
+                bitmap.y = j * CellSize.SIZE.id() + gap / 2;
                 grounds[i + "_" + j] = bitmap;
                 groundLayer.addChild(bitmap);
             }

@@ -7,7 +7,6 @@ import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
 import flash.geom.Point;
 import flash.ui.Keyboard;
-import flash.utils.Dictionary;
 import flash.utils.getTimer;
 
 import ru.rknrl.Points;
@@ -17,7 +16,6 @@ import ru.rknrl.castles.game.ui.GameUI;
 import ru.rknrl.castles.game.ui.ItemClickEvent;
 import ru.rknrl.castles.game.view.Arrow;
 import ru.rknrl.castles.game.view.Building;
-import ru.rknrl.castles.game.view.GameConstants;
 import ru.rknrl.castles.game.view.GameView;
 import ru.rknrl.castles.game.view.Unit;
 import ru.rknrl.castles.game.view.items.BulletView;
@@ -25,6 +23,8 @@ import ru.rknrl.castles.game.view.items.FireballView;
 import ru.rknrl.castles.game.view.items.TornadoView;
 import ru.rknrl.castles.game.view.items.VolcanoView;
 import ru.rknrl.castles.menu.screens.gameOver.GameOverScreen;
+import ru.rknrl.castles.rmi.GameFacadeSender;
+import ru.rknrl.castles.rmi.IGameFacade;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
@@ -35,6 +35,7 @@ import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
 import ru.rknrl.dto.BulletDTO;
 import ru.rknrl.dto.CastTorandoDTO;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
@@ -51,8 +52,6 @@ import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
-import ru.rknrl.castles.rmi.GameFacadeSender;
-import ru.rknrl.castles.rmi.IGameFacade;
 
 public class Game extends Sprite implements IGameFacade {
     private var sender:GameFacadeSender;
@@ -172,7 +171,7 @@ public class Game extends Sprite implements IGameFacade {
             onAddBullet(bullet);
         }
 
-        for each(var gameOver: GameOverDTO in gameState.gameOvers) {
+        for each(var gameOver:GameOverDTO in gameState.gameOvers) {
             onGameOver(gameOver);
         }
     }
@@ -193,7 +192,7 @@ public class Game extends Sprite implements IGameFacade {
             const dx:Number = building.x - pos.x;
             const dy:Number = building.y - pos.y;
             const distance:Number = Math.sqrt(dx * dx + dy * dy);
-            if (distance < GameConstants.cellSize / 2) return building;
+            if (distance < CellSize.SIZE.id() / 2) return building;
         }
         return null;
     }

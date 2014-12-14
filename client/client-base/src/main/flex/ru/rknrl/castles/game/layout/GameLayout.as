@@ -2,7 +2,7 @@ package ru.rknrl.castles.game.layout {
 import flash.display.DisplayObject;
 
 import ru.rknrl.castles.game.ui.avatar.AvatarData;
-import ru.rknrl.castles.game.view.GameConstants;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.utils.OverrideMe;
 
@@ -10,8 +10,8 @@ public class GameLayout {
     public function GameLayout(w:int, h:int, stageWidth:int, stageHeight:int, scale:Number) {
         _w = w;
         _h = h;
-        _originalGameWidth = w * GameConstants.cellSize;
-        _originalGameHeight = h * GameConstants.cellSize;
+        _originalGameWidth = w * CellSize.SIZE.id();
+        _originalGameHeight = h * CellSize.SIZE.id();
 
         update(stageWidth, stageHeight, scale)
     }
