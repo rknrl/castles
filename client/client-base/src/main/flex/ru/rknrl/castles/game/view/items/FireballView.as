@@ -42,9 +42,9 @@ public class FireballView extends Sprite {
         ball.y = dy;
 
         const offset:int = explosionRadius / 2;
-        addChild(explosions[0] = addExplosion(-offset, -offset, radius));
-        addChild(explosions[1] = addExplosion(0, offset, radius));
-        addChild(explosions[2] = addExplosion(offset, -offset, radius));
+        addChild(explosions[0] = addExplosion(-offset, -offset, explosionRadius));
+        addChild(explosions[1] = addExplosion(0, offset, explosionRadius));
+        addChild(explosions[2] = addExplosion(offset, -offset, explosionRadius));
     }
 
     private static function addExplosion(x:Number, y:Number, radius:int):Shape {

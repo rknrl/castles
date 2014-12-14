@@ -135,7 +135,8 @@ message ItemsStateDTO {
 message ItemStateDTO {
     required ItemType itemType = 1;
     required int32 count = 2;
-    required int32 millisTillEnd = 3;
+    required int32 millisTillCooldownEnd = 3;
+    required int32 cooldownDuration= 4; // todo можно не посылать каждый раз
 }
 
 // client -> server

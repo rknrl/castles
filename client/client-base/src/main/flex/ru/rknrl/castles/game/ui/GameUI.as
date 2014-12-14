@@ -25,7 +25,7 @@ public class GameUI extends Sprite {
     private const typeToItem:Dictionary = new Dictionary();
     private const avatars:Vector.<DisplayObject> = new <DisplayObject>[];
 
-    public function GameUI(layout:Layout, gameLayout:GameLayout, locale:CastlesLocale, itemsState:ItemsStateDTO, cooldownDuration:int) {
+    public function GameUI(layout:Layout, gameLayout:GameLayout, locale:CastlesLocale, itemsState:ItemsStateDTO) {
         this.locale = locale;
 
         const avatarsDatas:Vector.<AvatarData> =
@@ -39,7 +39,7 @@ public class GameUI extends Sprite {
         avatarsDatas.length = 2;
 
         addAvatars(gameLayout, avatarsDatas);
-        addItems(gameLayout, itemsState, cooldownDuration);
+        addItems(gameLayout, itemsState);
         updateLayout(layout, gameLayout);
     }
 
@@ -69,7 +69,7 @@ public class GameUI extends Sprite {
         }
     }
 
-    private function addItems(layout:GameLayout, itemsState:ItemsStateDTO, cooldownDuration:int):void {
+    private function addItems(layout:GameLayout, itemsState:ItemsStateDTO):void {
         function getItemState(itemType:ItemType):ItemStateDTO {
             for each(var itemState:ItemStateDTO in itemsState.items) {
                 if (itemState.itemType == itemType) {
@@ -82,16 +82,16 @@ public class GameUI extends Sprite {
         for (var i:int = 0; i < Utils.ALL_ITEMS.length; i++) {
             const itemType:ItemType = Utils.ALL_ITEMS[i];
             const itemState:ItemStateDTO = getItemState(itemType);
-            const item:GameItem = new GameItem(itemType, layout, itemState.millisTillEnd, getTimer(), cooldownDuration, itemState.count);
+            const item:GameItem = new GameItem(itemType, layout, itemState.millisTillCooldownEnd, getTimer(), itemState.cooldownDuration, itemState.count);
             item.addEventListener(MouseEvent.CLICK, onItemClick);
             typeToItem[itemType] = item;
             addChild(item);
         }
     }
 
-    public function updateItem(itemType:ItemType, millisTillEnd:int, time:int, cooldownDuration:int, count:int):void {
+    public function updateItem(itemType:ItemType, millisTillCooldownEnd:int, time:int, cooldownDuration:int, count:int):void {
         const item:GameItem = typeToItem[itemType];
-        item.update(millisTillEnd, time, cooldownDuration, count);
+        item.update(millisTillCooldownEnd, time, cooldownDuration, count);
     }
 
     private function onItemClick(event:MouseEvent):void {

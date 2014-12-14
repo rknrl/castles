@@ -31,7 +31,7 @@ public class GameItem extends Sprite {
     private var originalIconHeight:Number;
     private var ratio:Number;
 
-    public function GameItem(itemType:ItemType, layout:GameLayout, millisTillEnd:int, time:int, cooldownDuration:int, count:int) {
+    public function GameItem(itemType:ItemType, layout:GameLayout, millisTillCooldownEnd:int, time:int, cooldownDuration:int, count:int) {
         _itemType = itemType;
 
         mouseChildren = false;
@@ -47,7 +47,7 @@ public class GameItem extends Sprite {
         addChild(countTextField = createTextField(Layout.gameItemCounterTextFormat));
 
         updateLayout(layout);
-        update(millisTillEnd, time, cooldownDuration, count);
+        update(millisTillCooldownEnd, time, cooldownDuration, count);
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
@@ -79,7 +79,7 @@ public class GameItem extends Sprite {
     private var startTime:int;
     private var endTime:int;
 
-    public function update(millisTillEnd:int, time:int, cooldownDuration:int, count:int):void {
+    public function update(millisTillCooldownEnd:int, time:int, cooldownDuration:int, count:int):void {
         if (_count > count) unlock();
         _count = count;
 
@@ -87,7 +87,7 @@ public class GameItem extends Sprite {
         centerize(countTextField);
 
         this.cooldownDuration = cooldownDuration;
-        endTime = time + millisTillEnd;
+        endTime = time + millisTillCooldownEnd;
         startTime = endTime - cooldownDuration;
     }
 

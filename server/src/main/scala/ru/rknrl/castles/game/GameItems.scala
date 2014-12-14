@@ -19,11 +19,12 @@ class GameItemState(val itemType: ItemType,
     lastUseTime != state.lastUseTime || count != state.count
 
   def dto(time: Long, config: GameConfig) = {
-    val millisTillEnd: Long = Math.max(0, config.constants.itemCooldown - (time - lastUseTime))
+    val millisTillCooldownEnd: Long = Math.max(0, config.constants.itemCooldown - (time - lastUseTime))
     ItemStateDTO.newBuilder()
       .setItemType(itemType)
       .setCount(count)
-      .setMillisTillEnd(millisTillEnd.toInt)
+      .setMillisTillCooldownEnd(millisTillCooldownEnd.toInt)
+      .setCooldownDuration(config.constants.itemCooldown.toInt)
       .build()
   }
 }

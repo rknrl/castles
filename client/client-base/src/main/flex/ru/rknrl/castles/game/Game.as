@@ -71,7 +71,7 @@ public class Game extends Sprite implements IGameFacade {
 
         addChild(view = new GameView(w, h));
 
-        addChild(ui = new GameUI(layout, gameLayout, locale, gameState.itemsState, cooldownDuration));
+        addChild(ui = new GameUI(layout, gameLayout, locale, gameState.itemsState));
         ui.addEventListener(ItemClickEvent.ITEM_CLICK, onItemClick);
 
         updateLayout(layout);
@@ -403,11 +403,9 @@ public class Game extends Sprite implements IGameFacade {
     }
 
     // item states
-    private static const cooldownDuration:int = 5000; // todo
-
     public function onUpdateItemStates(dto:ItemsStateDTO):void {
         for each(var itemState:ItemStateDTO in dto.items) {
-            ui.updateItem(itemState.itemType, itemState.millisTillEnd, getTimer(), cooldownDuration, itemState.count);
+            ui.updateItem(itemState.itemType, itemState.millisTillCooldownEnd, getTimer(), itemState.cooldownDuration, itemState.count);
         }
     }
 
