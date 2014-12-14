@@ -27,7 +27,7 @@
                     });
 
                     VK.addCallback("onOrderCancel", function () {
-                        flash().onPaymentClosed();
+                        flash().onPaymentDialogClosed();
                     });
 
                     VK.addCallback("onOrderFail", function (errorCode) {
