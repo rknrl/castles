@@ -115,7 +115,7 @@ class ActorsTest
       accountRmiClientMock ! BuyGoldMsg()
 
       expectMsgPF(1000 millis) {
-        case GoldUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // buy item
@@ -123,11 +123,7 @@ class ActorsTest
       accountRmiClientMock ! BuyItemMsg(BuyItemDTO.newBuilder().setType(ItemType.FIREBALL).build())
 
       expectMsgPF(1000 millis) {
-        case GoldUpdatedMsg(dto) ⇒ true
-      }
-
-      expectMsgPF(1000 millis) {
-        case ItemsUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // upgrade skill
@@ -135,11 +131,7 @@ class ActorsTest
       accountRmiClientMock ! UpgradeSkillMsg(UpgradeSkillDTO.newBuilder().setType(SkillType.ATTACK).build())
 
       expectMsgPF(1000 millis) {
-        case GoldUpdatedMsg(dto) ⇒ true
-      }
-
-      expectMsgPF(1000 millis) {
-        case SkillsUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // upgrade building
@@ -147,11 +139,7 @@ class ActorsTest
       accountRmiClientMock ! UpgradeBuildingMsg(UpgradeBuildingDTO.newBuilder().setId(SlotId.SLOT_1).build())
 
       expectMsgPF(1000 millis) {
-        case GoldUpdatedMsg(dto) ⇒ true
-      }
-
-      expectMsgPF(1000 millis) {
-        case StartLocationUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // build building
@@ -159,11 +147,7 @@ class ActorsTest
       accountRmiClientMock ! BuyBuildingMsg(BuyBuildingDTO.newBuilder().setId(SlotId.SLOT_2).setBuildingType(BuildingType.TOWER).build())
 
       expectMsgPF(1000 millis) {
-        case GoldUpdatedMsg(dto) ⇒ true
-      }
-
-      expectMsgPF(1000 millis) {
-        case StartLocationUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // swap slots
@@ -171,7 +155,7 @@ class ActorsTest
       accountRmiClientMock ! SwapSlotsMsg(SwapSlotsDTO.newBuilder().setId1(SlotId.SLOT_1).setId2(SlotId.SLOT_2).build())
 
       expectMsgPF(1000 millis) {
-        case StartLocationUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // remove building
@@ -179,7 +163,7 @@ class ActorsTest
       accountRmiClientMock ! RemoveBuildingMsg(RemoveBuildingDTO.newBuilder().setId(SlotId.SLOT_1).build())
 
       expectMsgPF(1000 millis) {
-        case StartLocationUpdatedMsg(dto) ⇒ true
+        case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
       // enter game

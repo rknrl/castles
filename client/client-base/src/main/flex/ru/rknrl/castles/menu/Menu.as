@@ -34,12 +34,7 @@ import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.GameStateDTO;
-import ru.rknrl.dto.GoldUpdatedDTO;
-import ru.rknrl.dto.ItemsDTO;
 import ru.rknrl.dto.NodeLocator;
-import ru.rknrl.dto.PricesDTO;
-import ru.rknrl.dto.SkillsDTO;
-import ru.rknrl.dto.StartLocationDTO;
 import ru.rknrl.log.Log;
 
 public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
@@ -76,7 +71,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         this.layout = layout;
 
         const accountState:AccountStateDTO = authenticationSuccess.accountState;
-        const config: AccountConfigDTO = authenticationSuccess.config;
+        const config:AccountConfigDTO = authenticationSuccess.config;
 
         popups = new PopupManager(layout);
 
@@ -235,20 +230,11 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
         throw new Error(event.toString);
     }
 
-    public function onGoldUpdated(dto:GoldUpdatedDTO):void {
+    public function onAccountStateUpdated(dto:AccountStateDTO):void {
         gold = dto.gold;
-    }
-
-    public function onStartLocationUpdated(dto:StartLocationDTO):void {
-        mainScreen.startLocation = dto;
-    }
-
-    public function onSkillsUpdated(skills:SkillsDTO):void {
-        skillsScreen.skillLevels = new SkillLevels(skills);
-    }
-
-    public function onItemsUpdated(items:ItemsDTO):void {
-        shopScreen.itemsCount = new ItemsCount(items);
+        mainScreen.startLocation = dto.startLocation;
+        skillsScreen.skillLevels = new SkillLevels(dto.skills);
+        shopScreen.itemsCount = new ItemsCount(dto.items);
     }
 
     private function onNotEnoughGold(event:Event):void {

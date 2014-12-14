@@ -52,35 +52,31 @@ class Account(accountId: AccountId,
 
     case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
       state = state.swapSlots(swap.getId1, swap.getId2)
-      sender ! StartLocationUpdatedMsg(state.startLocation.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
       state = state.buyBuilding(buy.getId, buy.getBuildingType)
-      sender ! GoldUpdatedMsg(goldDto)
-      sender ! StartLocationUpdatedMsg(state.startLocation.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
       state = state.upgradeBuilding(dto.getId)
-      sender ! GoldUpdatedMsg(goldDto)
-      sender ! StartLocationUpdatedMsg(state.startLocation.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
       state = state.removeBuilding(dto.getId)
-      sender ! StartLocationUpdatedMsg(state.startLocation.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
       state = state.upgradeSkill(upgrade.getType, config.account)
-      sender ! GoldUpdatedMsg(goldDto)
-      sender ! SkillsUpdatedMsg(state.skills.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case BuyItemMsg(buy: BuyItemDTO) ⇒
       state = state.buyItem(buy.getType)
-      sender ! GoldUpdatedMsg(goldDto)
-      sender ! ItemsUpdatedMsg(state.items.dto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     case BuyGoldMsg() ⇒
       state = state.addGold(state.config.goldByDollar)
-      sender ! GoldUpdatedMsg(goldDto)
+      sender ! AccountStateUpdatedMsg(state.dto)
 
     /**
      * Auth спрашивает accountState
@@ -159,7 +155,7 @@ class Account(accountId: AccountId,
       gameRmi = None
       gameRmiRegistered = false
 
-      accountRmi ! ItemsUpdatedMsg(state.items.dto)
+      accountRmi ! AccountStateUpdatedMsg(state.dto)
   }
 
   private def connectToGame(game: ActorRef) = {
