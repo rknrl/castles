@@ -5,7 +5,7 @@ import akka.io.{IO, Tcp}
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.config.ConfigJsonProtocol._
 import ru.rknrl.castles.database.InMemoryDb
-import ru.rknrl.castles.web.VkPayments
+import ru.rknrl.castles.payments.PaymentsServer
 import ru.rknrl.utils.PolicyServer
 import spray.can.Http
 import spray.json._
@@ -27,8 +27,8 @@ object Main {
 
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, config.game), "matchmaking")
 
-    val web = system.actorOf(Props(classOf[VkPayments], config.social.vk.get), "web")
-    IO(Http) ! Http.Bind(web, config.host, 8080)
+    val payments = system.actorOf(Props(classOf[PaymentsServer], config.social), "payment-server")
+    IO(Http) ! Http.Bind(payments, config.host, 8080)
 
     val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")
 

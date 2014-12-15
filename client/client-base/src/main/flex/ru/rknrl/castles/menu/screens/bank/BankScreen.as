@@ -77,7 +77,6 @@ public class BankScreen extends MenuScreen {
     private function onClick(event:MouseEvent):void {
         social.showPaymentDialog(new PaymentDialogData(1, "Звездочки", "Description", 100));
 
-        sender.buyGold();
         buyButton.lock();
         buyButton.playBounce();
     }

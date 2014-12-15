@@ -1,16 +1,21 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef, Props}
+import akka.pattern.Patterns
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.database.AccountStateDb.Put
 import ru.rknrl.castles.game.Game.{Join, Offline}
+import ru.rknrl.castles.payments.PaymentsServer.{AddGold, GoldAdded}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, DeviceType}
 import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 case object GetAccountState
 
@@ -79,9 +84,20 @@ class Account(accountId: AccountId,
       state = state.buyItem(buy.getType)
       accountStateDb ! Put(accountId, state.dto)
 
-    case BuyGoldMsg() ⇒
-      state = state.addGold(state.config.goldByDollar)
-      accountStateDb ! Put(accountId, state.dto)
+    case AddGold(orderId, amount) ⇒
+      state = state.addGold(amount * state.config.goldByDollar)
+      val future = Patterns.ask(accountStateDb, Put(accountId, state.dto), 5 seconds)
+      val result = Await.result(future, 5 seconds)
+      result match {
+        case Put(accountId, accountStateDto) ⇒
+          if (accountStateDto.getGold == state.gold) {
+            sender ! GoldAdded(orderId)
+            accountRmi ! AccountStateUpdatedMsg(accountStateDto)
+          } else {
+            // error
+          }
+        case _ ⇒ // error
+      }
 
     /**
      * Auth спрашивает accountState

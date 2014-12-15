@@ -110,14 +110,6 @@ class ActorsTest
         case ReceiverRegistered(ref) ⇒ true
       }
 
-      // buy gold
-
-      accountRmiClientMock ! BuyGoldMsg()
-
-      expectMsgPF(1000 millis) {
-        case AccountStateUpdatedMsg(dto) ⇒ true
-      }
-
       // buy item
 
       accountRmiClientMock ! BuyItemMsg(BuyItemDTO.newBuilder().setType(ItemType.FIREBALL).build())
