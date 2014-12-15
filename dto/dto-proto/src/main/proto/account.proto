@@ -92,7 +92,3 @@ message UpgradeSkillDTO {
 message BuyItemDTO {
     required ItemType type = 1;
 }
-
-message GoldUpdatedDTO {
-    required int32 gold = 1;
-}

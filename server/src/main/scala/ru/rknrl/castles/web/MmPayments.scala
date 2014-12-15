@@ -51,7 +51,7 @@ class MmPayments extends Actor with HttpService {
     path("") {
       requestUri { uri ⇒
         try {
-          val params = new Params(uri)
+          val params = new UriParams(uri)
 
           val appId = params.getParam("app_id") // int	идентификатор вашего приложения
 
@@ -75,7 +75,7 @@ class MmPayments extends Actor with HttpService {
             complete(HttpResponse(entity = successResponse()))
           }
         } catch {
-          case _ ⇒
+          case _: Throwable ⇒
             respondWithMediaType(`text/plain`) {
               complete(HttpResponse(entity = errorResponse(STATUS_FAIL, OTHER_ERROR)))
             }

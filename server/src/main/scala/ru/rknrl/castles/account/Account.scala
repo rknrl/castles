@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
 import ru.rknrl.castles.config.Config
+import ru.rknrl.castles.database.AccountStateDb.Put
 import ru.rknrl.castles.game.Game.{Join, Offline}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
@@ -44,39 +45,43 @@ class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  private def goldDto = GoldUpdatedDTO.newBuilder().setGold(state.gold).build()
-
   def receive = {
     case EnterGameMsg() ⇒
       matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, state.startLocation, state.skills, state.items, isBot = false))
 
+    /**
+     * from accountStateDb
+     */
+    case Put(accountId, accountStateDto) ⇒
+      accountRmi ! AccountStateUpdatedMsg(accountStateDto)
+
     case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
       state = state.swapSlots(swap.getId1, swap.getId2)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
       state = state.buyBuilding(buy.getId, buy.getBuildingType)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
       state = state.upgradeBuilding(dto.getId)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
       state = state.removeBuilding(dto.getId)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
       state = state.upgradeSkill(upgrade.getType, config.account)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case BuyItemMsg(buy: BuyItemDTO) ⇒
       state = state.buyItem(buy.getType)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     case BuyGoldMsg() ⇒
       state = state.addGold(state.config.goldByDollar)
-      sender ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
 
     /**
      * Auth спрашивает accountState
@@ -155,7 +160,7 @@ class Account(accountId: AccountId,
       gameRmi = None
       gameRmiRegistered = false
 
-      accountRmi ! AccountStateUpdatedMsg(state.dto)
+      accountStateDb ! Put(accountId, state.dto)
   }
 
   private def connectToGame(game: ActorRef) = {

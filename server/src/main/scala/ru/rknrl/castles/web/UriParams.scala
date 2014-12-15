@@ -2,7 +2,7 @@ package ru.rknrl.castles.web
 
 import spray.http.Uri
 
-class Params(uri: Uri) {
+class UriParams(uri: Uri) {
   private val params = parseParams(getParams(uri))
 
   def getParam(name: String) = params(name)
@@ -16,5 +16,18 @@ class Params(uri: Uri) {
   private def splitByEqual(s: String) = {
     val split = s.split("=", 2)
     split(0) → split(1)
+  }
+
+  def concat = {
+    val sorted = params.toList.sorted(new Ordering[(String, String)] {
+      override def compare(x: (String, String), y: (String, String)) =
+        String.CASE_INSENSITIVE_ORDER.compare(x._1, y._1)
+    })
+
+    var s = ""
+    for ((key, value) ← sorted) {
+      s += key + "=" + value
+    }
+    s
   }
 }
