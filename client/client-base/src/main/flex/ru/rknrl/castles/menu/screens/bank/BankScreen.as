@@ -8,6 +8,7 @@ import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.core.social.PaymentDialogData;
 import ru.rknrl.core.social.PaymentDialogEvent;
 import ru.rknrl.core.social.Social;
+import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.funnyUi.buttons.RectButton;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 
@@ -20,10 +21,12 @@ public class BankScreen extends MenuScreen {
     private var saleCircle:Circle;
     private var buyButton:RectButton;
 
-    public function BankScreen(id:String, goldByDollar:int, sender:AccountFacadeSender, layout:Layout, social:Social, locale:CastlesLocale) {
+    public function BankScreen(id:String, products: Vector.<ProductDTO>, sender:AccountFacadeSender, layout:Layout, social:Social, locale:CastlesLocale) {
         this.sender = sender;
         this.social = social;
         this.locale = locale;
+
+        const goldByDollar: int = products[0].count;
 
         addChild(fastAndTrust = new Circle(locale.fastAndTrust, layout.bankCircleTextFormat, layout.fastAndTrustCircleRadius, Colors.randomLightColor()));
         addChild(saleCircle = new Circle(locale.sale, layout.bankCircleTextFormat, layout.saleCircleRadius, Colors.randomLightColor()));

@@ -41,10 +41,12 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
       case JsObject(map) ⇒
         implicit val m = map
         new AccountConfig(
+          initGold = getInt("initGold"),
+          initItemCount = getInt("initItemCount"),
           buildingPrices = map("buildingPrices").convertTo[BuildingPrices],
           skillUpgradePrices = map("skillUpgradePrices").convertTo[SkillUpgradePrices],
-          itemPrice = getInt("itemPrice"),
-          goldByDollar = getInt("goldByDollar"))
+          itemPrice = getInt("itemPrice")
+        )
       case _ ⇒ deserializationError("Account isn't object, but " + value)
     }
   }

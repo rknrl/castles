@@ -8,16 +8,6 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, Put}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 
-object AccountStateDb {
-
-  case class Put(key: AccountId, value: AccountStateDTO)
-
-  case class Get(key: AccountId)
-
-  case class NoExist(key: AccountId)
-
-}
-
 class InMemoryDb extends Actor {
   private var map = Map[AccountId, ByteString]()
 

@@ -3,9 +3,10 @@ package ru.rknrl.castles.payments
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.castles.AccountId
+import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.castles.payments.PaymentsServer._
-import ru.rknrl.core.social.SocialConfigs
+import ru.rknrl.core.social.{Product, SocialConfig}
 import spray.http.MediaTypes._
 import spray.routing.HttpService
 
@@ -37,16 +38,16 @@ object PaymentsServer {
   /**
    * Payments -> Account
    */
-  case class AddGold(oderId: String, amount: Int)
+  case class AddProduct(oderId: String, product: Product, count: Int)
 
   /**
    * Account -> Payments response
    */
-  case class GoldAdded(orderId: String)
+  case class ProductAdded(orderId: String)
 
 }
 
-class PaymentsServer(config: SocialConfigs) extends Actor with HttpService {
+class PaymentsServer(config: Config) extends Actor with HttpService {
 
   private var accountIdToAccount = Map[AccountId, ActorRef]()
 
@@ -55,44 +56,60 @@ class PaymentsServer(config: SocialConfigs) extends Actor with HttpService {
       requestUri {
         uri ⇒
           respondWithMediaType(`text/plain`) {
-            completePayment(new PaymentsCallbackVk(uri, config.vk.get))
+            val vk = config.social.vk.get
+            completePayment(new PaymentsCallbackVk(uri, vk), vk)
           }
       }
     } ~ path("ok_callback") {
       requestUri {
         uri ⇒
           respondWithMediaType(`application/xml`) {
-            completePayment(new PaymentsCallbackOk(uri, config.ok.get))
+            val ok = config.social.ok.get
+            completePayment(new PaymentsCallbackOk(uri, ok), ok)
           }
       }
     } ~ path("mm_callback") {
       requestUri {
         uri ⇒
           respondWithMediaType(`text/plain`) {
-            completePayment(new PaymentsCallbackMm(uri, config.mm.get))
+            val mm = config.social.mm.get
+            completePayment(new PaymentsCallbackMm(uri, mm), mm)
           }
       }
     }
 
-  def completePayment(callback: PaymentsCallback) = {
+  def completePayment(callback: PaymentsCallback, socialConfig: SocialConfig) = {
     val response = callback.response
 
     response match {
-      case PaymentResponse(orderId, accountId, price, httpResponse) ⇒
+      case PaymentResponse(orderId, accountId, productId, price, httpResponse) ⇒
         if (!(accountIdToAccount contains accountId))
-          complete(callback.accountNotFoundError)
-        else {
-          val future = Patterns.ask(accountIdToAccount(accountId), AddGold(orderId, price), 5 seconds)
-          val result = Await.result(future, 5 seconds)
 
-          result match {
-            case GoldAdded(oId) ⇒
-              if (orderId == oId)
-                complete(httpResponse)
-              else
+          complete(callback.accountNotFoundError)
+
+        else if (!(config.products contains productId))
+
+          complete(callback.accountNotFoundError)
+
+        else {
+          val product = config.products(productId)
+          val productInfo = socialConfig.productsInfo(productId)
+
+          if (productInfo.price != price) {
+            complete(callback.accountNotFoundError)
+          } else {
+            val future = Patterns.ask(accountIdToAccount(accountId), AddProduct(orderId, product, productInfo.count), 5 seconds)
+            val result = Await.result(future, 5 seconds)
+
+            result match {
+              case ProductAdded(oId) ⇒
+                if (orderId == oId)
+                  complete(httpResponse)
+                else
+                  complete(callback.databaseError)
+              case _ ⇒
                 complete(callback.databaseError)
-            case _ ⇒
-              complete(callback.databaseError)
+            }
           }
         }
 

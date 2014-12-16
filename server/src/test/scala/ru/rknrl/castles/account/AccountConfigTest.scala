@@ -4,6 +4,8 @@ import ru.rknrl.dto.CommonDTO.BuildingLevel
 
 object AccountConfigTest {
   def config = new AccountConfig(
+    initGold = 100,
+    initItemCount = 2,
     buildingPrices = Map(
       BuildingLevel.LEVEL_1 → 4,
       BuildingLevel.LEVEL_2 → 16,
@@ -20,8 +22,7 @@ object AccountConfigTest {
       8 → 128,
       9 → 256
     ),
-    itemPrice = 1,
-    goldByDollar = 100
+    itemPrice = 1
   )
 }
 

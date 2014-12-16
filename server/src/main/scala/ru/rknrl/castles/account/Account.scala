@@ -7,7 +7,7 @@ import ru.rknrl.castles._
 import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.database.AccountStateDb.Put
 import ru.rknrl.castles.game.Game.{Join, Offline}
-import ru.rknrl.castles.payments.PaymentsServer.{AddGold, GoldAdded}
+import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
@@ -16,6 +16,7 @@ import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.collection.JavaConverters._
 
 case object GetAccountState
 
@@ -84,19 +85,24 @@ class Account(accountId: AccountId,
       state = state.buyItem(buy.getType)
       accountStateDb ! Put(accountId, state.dto)
 
-    case AddGold(orderId, amount) ⇒
-      state = state.addGold(amount * state.config.goldByDollar)
+    case AddProduct(orderId, product, count) ⇒
+      product.id match {
+        case 1 ⇒ state = state.addGold(count)
+        case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
+      }
+
       val future = Patterns.ask(accountStateDb, Put(accountId, state.dto), 5 seconds)
       val result = Await.result(future, 5 seconds)
+
       result match {
         case Put(accountId, accountStateDto) ⇒
           if (accountStateDto.getGold == state.gold) {
-            sender ! GoldAdded(orderId)
+            sender ! ProductAdded(orderId)
             accountRmi ! AccountStateUpdatedMsg(accountStateDto)
           } else {
-            // error
+            // send error
           }
-        case _ ⇒ // error
+        case _ ⇒ // send error
       }
 
     /**
@@ -120,6 +126,7 @@ class Account(accountId: AccountId,
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
           .setConfig(config.account.dto)
+          .addAllProducts(config.productsDto(accountId.accountType).asJava)
           .setEnterGame(enterGame)
           .build
       }
@@ -208,6 +215,7 @@ class Account(accountId: AccountId,
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
           .setConfig(config.account.dto)
+          .addAllProducts(config.productsDto(accountId.accountType).asJava)
           .setEnterGame(false)
           .setGame(gameAddress)
           .build

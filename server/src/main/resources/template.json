@@ -11,6 +11,8 @@
     }
   ],
   "account": {
+    "initGold": 8,
+    "initItemCount": 2,
     "buildingPrices": {
       "level1": 4,
       "level2": 16,
@@ -27,8 +29,7 @@
       "8": 128,
       "9": 256
     },
-    "itemPrice": 1,
-    "goldByDollar": 100
+    "itemPrice": 1
   },
   "game": {
     "buildings": {
@@ -102,6 +103,7 @@
       "appSecret": "enter vk secret",
       "productsInfo": {
         "1": {
+          "count": 100,
           "price": 1
         }
       }
@@ -111,6 +113,7 @@
       "appSecret": "enter ok secret",
       "productsInfo": {
         "1": {
+          "count": 100,
           "price": 1
         }
       }
@@ -120,6 +123,7 @@
       "appSecret": "enter mm secret",
       "productsInfo": {
         "1": {
+          "count": 100,
           "price": 1
         }
       }

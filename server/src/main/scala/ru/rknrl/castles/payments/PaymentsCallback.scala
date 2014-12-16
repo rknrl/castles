@@ -15,7 +15,7 @@ object PaymentsCallback {
    * @param price         стоимость в валюте соц. cети
    * @param httpResponse  ответ для соц сети
    */
-  case class PaymentResponse(orderId: String, accountId: AccountId, price: Int, httpResponse: HttpResponse) extends ResponseBase
+  case class PaymentResponse(orderId: String, accountId: AccountId, productId: Int, price: Int, httpResponse: HttpResponse) extends ResponseBase
 
   /**
    * Не платеж
@@ -47,6 +47,18 @@ trait PaymentsCallback {
    * НЕ ожидаем перезапроса от соц. сети
    */
   def accountNotFoundError: HttpResponse
+
+  /**
+   * Товара не существует
+   * НЕ ожидаем перезапроса от соц. сети
+   */
+  def itemNotFoundError: HttpResponse
+
+  /**
+   * Цена в запросе не соответствует цене на сервере
+   * НЕ ожидаем перезапроса от соц. сети
+   */
+  def invalidPriceError: HttpResponse
 
   protected def response(string: String) = Response(HttpResponse(entity = string))
 }

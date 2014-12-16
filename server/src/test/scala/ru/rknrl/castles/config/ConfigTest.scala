@@ -13,24 +13,24 @@ object ConfigTest {
       |"appId":"vkAppId",
       |"appSecret":"vkAppSecret",
       |"productsInfo": {
-      |"1": {"price": 123},
-      |"2": {"price": 321}
+      |"1": {"count": 100, "price": 123},
+      |"2": {"count": 100, "price": 321}
       |}
       |},
       |"ok":{
       |"appId":"okAppId",
       |"appSecret":"okAppSecret",
       |"productsInfo": {
-      |"1": {"price": 123},
-      |"2": {"price": 321}
+      |"1": {"count": 100, "price": 123},
+      |"2": {"count": 100, "price": 321}
       |}
       |},
       |"mm":{
       |"appId":"mmAppId",
       |"appSecret":"mmAppSecret",
       |"productsInfo": {
-      |"1": {"price": 123},
-      |"2": {"price": 321}
+      |"1": {"count": 100, "price": 123},
+      |"2": {"count": 100, "price": 321}
       |}
       |}
       |}

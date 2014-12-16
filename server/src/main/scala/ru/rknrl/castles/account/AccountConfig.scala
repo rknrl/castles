@@ -11,10 +11,11 @@ object AccountConfig {
   type SkillUpgradePrices = Map[Int, Int]
 }
 
-class AccountConfig(val buildingPrices: BuildingPrices,
+class AccountConfig(val initGold: Int,
+                    val initItemCount: Int,
+                    val buildingPrices: BuildingPrices,
                     val skillUpgradePrices: SkillUpgradePrices,
-                    val itemPrice: Int,
-                    val goldByDollar: Int) {
+                    val itemPrice: Int) {
 
   private def buildingPricesDto =
     for ((buildingLevel, price) ← buildingPrices)
@@ -28,6 +29,5 @@ class AccountConfig(val buildingPrices: BuildingPrices,
     .addAllBuildings(buildingPricesDto.asJava)
     .addAllSkillUpgradePrices(skillUpgradePricesDto.asJava)
     .setItemPrice(itemPrice)
-    .setGoldByDollar(goldByDollar)
     .build()
 }

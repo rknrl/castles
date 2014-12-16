@@ -57,11 +57,16 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def accountNotFoundError = HttpResponse(entity = errorResponse(MmStatus.FAIL, MmErrorCode.USER_NOT_FOUND))
 
+  override def itemNotFoundError = HttpResponse(entity = errorResponse(MmStatus.FAIL, MmErrorCode.SERVICE_NOT_FOUND))
+
+  override def invalidPriceError = HttpResponse(entity = errorResponse(MmStatus.FAIL, MmErrorCode.INCORRECT_PRICE))
+
   override def response =
     try {
       val params = new UriParams(uri)
 
-      val appId = params.getParam("app_id") // int	идентификатор вашего приложения
+      // (Int) идентификатор вашего приложения
+      val appId = params.getParam("app_id")
 
       assert(appId == config.appId)
 
@@ -96,6 +101,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
         PaymentResponse(
           orderId = transactionId,
           accountId = new AccountId(AccountType.ODNOKLASSNIKI, uid),
+          productId = serviceId,
           price = mailikiPrice,
           httpResponse = HttpResponse(entity = successResponse())
         )

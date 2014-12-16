@@ -4,8 +4,6 @@ import ru.rknrl.castles.account.objects._
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.CommonDTO._
 
-import scala.collection.JavaConverters._
-
 class AccountState(val startLocation: StartLocation,
                    val skills: Skills,
                    val items: Items,
@@ -58,14 +56,6 @@ class AccountState(val startLocation: StartLocation,
                    newGold: Int = gold) =
     new AccountState(newStartLocation, newSkills, newItems, newGold, config)
 
-
-  private def buildingPricesDto =
-    for ((level, price) ← config.buildingPrices)
-    yield BuildingPriceDTO.newBuilder()
-      .setLevel(level)
-      .setPrice(price)
-      .build()
-  
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
     .setSkills(skills.dto)
@@ -90,13 +80,11 @@ object AccountState {
 
   private def initSkills = new Skills(initSkillLevels.toMap)
 
-  private def initItemsCount = for (itemType ← ItemType.values()) yield itemType → new Item(itemType, 1)
+  private def initItemsCount(config: AccountConfig) = for (itemType ← ItemType.values()) yield itemType → new Item(itemType, config.initItemCount)
 
-  private def initItems = new Items(initItemsCount.toMap)
+  private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)
 
-  private val initGold = 8
-
-  def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems, initGold, config)
+  def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems(config), config.initGold, config)
 
   def fromDto(dto: AccountStateDTO, config: AccountConfig) = new AccountState(
     StartLocation.fromDto(dto.getStartLocation),

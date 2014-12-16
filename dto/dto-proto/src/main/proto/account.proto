@@ -52,7 +52,6 @@ message AccountConfigDTO {
     repeated BuildingPriceDTO buildings = 1;
     repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
     required int32 itemPrice = 3;
-    required int32 goldByDollar = 4;
 }
 
 message SkillUpgradePriceDTO {
@@ -65,7 +64,7 @@ message BuildingPriceDTO {
     required int32 price = 2;
 }
 
-// actions
+// client->server actions
 
 message SwapSlotsDTO {
     required SlotId id1 = 1;

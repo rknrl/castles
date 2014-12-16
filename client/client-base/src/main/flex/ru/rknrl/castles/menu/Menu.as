@@ -79,7 +79,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
 
         skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), new SkillUpgradePrices(config.skillUpgradePrices), sender, layout, locale);
 
-        bankScreen = new BankScreen(Utils.SCREEN_BANK, config.goldByDollar, sender, layout, social, locale);
+        bankScreen = new BankScreen(Utils.SCREEN_BANK, authenticationSuccess.products, sender, layout, social, locale);
 
         shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
 

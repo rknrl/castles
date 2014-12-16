@@ -44,9 +44,20 @@ message AuthenticationSuccessDTO {
 
     required AccountConfigDTO config = 2;
 
+    repeated ProductDTO products = 3;
+
     // Клиент находится в процессе поиска противников для игры
-    required bool enterGame = 3;
+    required bool enterGame = 4;
 
     // Клиент находится в игре
-    optional NodeLocator game = 4;
+    optional NodeLocator game = 5;
+}
+
+message ProductDTO {
+    required uint32 id = 1;
+    required string title = 2;
+    required string description = 3;
+    required string photoUlr = 4;
+    required int32 count = 5;
+    required int32 price = 6;
 }

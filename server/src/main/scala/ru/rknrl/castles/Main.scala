@@ -27,7 +27,7 @@ object Main {
 
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, config.game), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[PaymentsServer], config.social), "payment-server")
+    val payments = system.actorOf(Props(classOf[PaymentsServer], config), "payment-server")
     IO(Http) ! Http.Bind(payments, config.host, 8080)
 
     val accountStateDb = system.actorOf(Props(classOf[InMemoryDb]), "account-state-db")

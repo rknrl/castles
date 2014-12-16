@@ -19,6 +19,10 @@ class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def accountNotFoundError = errorResponse(OkErrorCode.CALLBACK_INVALID_PAYMENT)
 
+  override def itemNotFoundError = errorResponse(OkErrorCode.CALLBACK_INVALID_PAYMENT)
+
+  override def invalidPriceError = errorResponse(OkErrorCode.CALLBACK_INVALID_PAYMENT)
+
   override def response =
     try {
       val params = new UriParams(uri)
@@ -60,6 +64,7 @@ class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
         PaymentResponse(
           orderId = transactionId,
           accountId = new AccountId(AccountType.ODNOKLASSNIKI, uid),
+          productId = productCode.toInt,
           price = amount,
           httpResponse = HttpResponse(entity = successResponse())
         )

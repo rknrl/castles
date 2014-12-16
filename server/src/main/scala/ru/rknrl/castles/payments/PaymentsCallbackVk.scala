@@ -48,6 +48,10 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def accountNotFoundError = HttpResponse(entity = VkPaymentsError.ACCOUNT_NOT_FOUND.toString)
 
+  override def itemNotFoundError = HttpResponse(entity = VkPaymentsError.ITEM_NOT_FOUND.toString)
+
+  override def invalidPriceError = HttpResponse(entity = VkPaymentsError.INVALID_REQUEST.toString)
+
   override def response =
     try {
       val params = new UriParams(uri)
@@ -107,7 +111,13 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
             // (String) стоимость товара
             val itemPrice = params.getParam("item_price").toInt
 
-            PaymentResponse(orderId, accountId, itemPrice, HttpResponse(entity = successResponse(orderId, appOrderId = None)))
+            PaymentResponse(
+              orderId = orderId,
+              accountId = accountId,
+              productId = itemId.toInt,
+              price = itemPrice,
+              httpResponse = HttpResponse(entity = successResponse(orderId, appOrderId = None))
+            )
 
           /**
            * http://vk.com/dev/payments_getitem
