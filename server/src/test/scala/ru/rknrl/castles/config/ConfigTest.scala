@@ -9,10 +9,49 @@ object ConfigTest {
   val socialConfigs =
     """
       |{
-      |"vk":{"appId":"vkAppId","appSecret":"vkAppSecret"},
-      |"ok":{"appId":"okAppId","appSecret":"okAppSecret"},
-      |"mm":{"appId":"mmAppId","appSecret":"mmAppSecret"}
+      |"vk":{
+      |"appId":"vkAppId",
+      |"appSecret":"vkAppSecret",
+      |"productsInfo": {
+      |"1": {"price": 123},
+      |"2": {"price": 321}
       |}
+      |},
+      |"ok":{
+      |"appId":"okAppId",
+      |"appSecret":"okAppSecret",
+      |"productsInfo": {
+      |"1": {"price": 123},
+      |"2": {"price": 321}
+      |}
+      |},
+      |"mm":{
+      |"appId":"mmAppId",
+      |"appSecret":"mmAppSecret",
+      |"productsInfo": {
+      |"1": {"price": 123},
+      |"2": {"price": 321}
+      |}
+      |}
+      |}
+    """.stripMargin
+
+  val productsMock =
+    """
+      |[
+      |    {
+      |      "id": 1,
+      |      "title": "Звезды",
+      |      "description": "Ведь если звезды зажигают-значит-это кому-нибудь нужно?",
+      |      "photoUrl": "http://castles.rknrl.ru/start.png"
+      |    },
+      |    {
+      |      "id": 2,
+      |      "title": "Платиновый аккаунт",
+      |      "description": "Ведь если платиновый аккаунт зажигают-значит-это кому-нибудь нужно?",
+      |      "photoUrl": "http://castles.rknrl.ru/platinum.png"
+      |    }
+      |]
     """.stripMargin
 
   val config =
@@ -21,6 +60,7 @@ object ConfigTest {
       |  "host": "127.0.0.1",
       |  "gamePort": 2335,
       |  "policyPort": 2336,
+      |  "products": $productsMock,
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": $socialConfigs
@@ -45,6 +85,7 @@ class ConfigTest extends FlatSpec with Matchers {
       |{
       |  "gamePort": 2335,
       |  "policyPort": 2336,
+      |  "products: ${ConfigTest.productsMock},"
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
@@ -59,6 +100,7 @@ class ConfigTest extends FlatSpec with Matchers {
       |{
       |  "host": "127.0.0.1",
       |  "policyPort": 2336,
+      |  "products: ${ConfigTest.productsMock},"
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
@@ -68,6 +110,21 @@ class ConfigTest extends FlatSpec with Matchers {
   }
 
   "Config without policyPort" should "throw Exception" in {
+    a[Exception] should be thrownBy {
+      s"""
+      |{
+      |  "host": "127.0.0.1",
+      |  "gamePort": 2335,
+      |  "products: ${ConfigTest.productsMock},"
+      |  "account": ${AccountConfigTest.account},
+      |  "game": ${GameConfigTest.game},
+      |  "social": ${ConfigTest.socialConfigs}
+      |}
+      """.stripMargin.parseJson.convertTo[Config]
+    }
+  }
+
+  "Config without products" should "throw Exception" in {
     a[Exception] should be thrownBy {
       s"""
       |{
@@ -87,6 +144,7 @@ class ConfigTest extends FlatSpec with Matchers {
       |{
       |  "host": "127.0.0.1",
       |  "gamePort": 2335,
+      |  "products: ${ConfigTest.productsMock},"
       |  "game": ${GameConfigTest.game},
       |  "social": ${ConfigTest.socialConfigs}
       |}
@@ -100,6 +158,7 @@ class ConfigTest extends FlatSpec with Matchers {
       |{
       |  "host": "127.0.0.1",
       |  "gamePort": 2335,
+      |  "products: ${ConfigTest.productsMock},"
       |  "account": ${AccountConfigTest.account},
       |  "social": ${ConfigTest.socialConfigs}
       |}
@@ -113,6 +172,7 @@ class ConfigTest extends FlatSpec with Matchers {
       |{
       |  "host": "127.0.0.1",
       |  "gamePort": 2335,
+      |  "products: ${ConfigTest.productsMock},"
       |  "account": ${AccountConfigTest.account},
       |  "game": ${GameConfigTest.game}
       |}

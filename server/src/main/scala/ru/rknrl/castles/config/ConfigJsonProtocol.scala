@@ -5,6 +5,7 @@ import ru.rknrl.castles.account.AccountConfig.{BuildingPrices, SkillUpgradePrice
 import ru.rknrl.castles.config.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.JsonUtils._
+import ru.rknrl.core.social.Products.Products
 import ru.rknrl.core.social.SocialConfigs
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 import spray.json._
@@ -29,7 +30,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
       case JsObject(map) ⇒
         implicit val m = map
         var prices = Map[Int, Int]()
-        for(i ← 1 to 9) prices = prices + (i → getInt(i.toString))
+        for (i ← 1 to 9) prices = prices + (i → getInt(i.toString))
         prices
       case _ ⇒ deserializationError("SkillUpgradePrices isn't object, but " + value)
     }
@@ -204,6 +205,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
     }
   }
 
+  import ru.rknrl.core.social.ProductJsonProtocol._
   import ru.rknrl.core.social.SocialConfigJsonProtocol._
 
   implicit object ConfigJsonFormat extends RootJsonReader[Config] {
@@ -215,6 +217,7 @@ object ConfigJsonProtocol extends DefaultJsonProtocol {
           host = getNotEmptyString("host"),
           gamePort = getInt("gamePort"),
           policyPort = getInt("policyPort"),
+          products = map("products").convertTo[Products],
           social = map("social").convertTo[SocialConfigs],
           account = map("account").convertTo[AccountConfig],
           game = map("game").convertTo[GameConfig]

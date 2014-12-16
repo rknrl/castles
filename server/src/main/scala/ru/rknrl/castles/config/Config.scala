@@ -2,6 +2,7 @@ package ru.rknrl.castles.config
 
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.game._
+import ru.rknrl.core.social.Products.Products
 import ru.rknrl.core.social.SocialConfigs
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
@@ -14,6 +15,7 @@ object Config {
 class Config(val host: String,
              val gamePort: Int,
              val policyPort: Int,
+             val products: Products,
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig) {
