@@ -8,7 +8,7 @@ import flash.utils.Dictionary;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.game.layout.GameLayout;
-import ru.rknrl.castles.game.ui.avatar.AvatarData;
+import ru.rknrl.castles.game.ui.avatar.GameAvatarData;
 import ru.rknrl.castles.menu.screens.gameOver.GameOverScreen;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
@@ -28,12 +28,12 @@ public class GameUI extends Sprite {
     public function GameUI(layout:Layout, gameLayout:GameLayout, locale:CastlesLocale, itemsState:ItemsStateDTO) {
         this.locale = locale;
 
-        const avatarsDatas:Vector.<AvatarData> =
-                new <AvatarData>[
-                    new AvatarData(new BitmapData(64, 64, false, 0), "Тамара Григорьевна", Colors.yellow),
-                    new AvatarData(new BitmapData(64, 64, false, 0), "Alexandra Serova", Colors.cyan),
-                    new AvatarData(new BitmapData(64, 64, false, 0), "Толя Янот", Colors.magenta),
-                    new AvatarData(new BitmapData(64, 64, false, 0), "Наполеон II", Colors.red)
+        const avatarsDatas:Vector.<GameAvatarData> =
+                new <GameAvatarData>[
+                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Тамара Григорьевна", Colors.yellow),
+                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Alexandra Serova", Colors.cyan),
+                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Толя Янот", Colors.magenta),
+                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Наполеон II", Colors.red)
                 ];
 
         avatarsDatas.length = 2;
@@ -61,7 +61,7 @@ public class GameUI extends Sprite {
         }
     }
 
-    private function addAvatars(gameLayout:GameLayout, datas:Vector.<AvatarData>):void {
+    private function addAvatars(gameLayout:GameLayout, datas:Vector.<GameAvatarData>):void {
         for (var i:int = 0; i < datas.length; i++) {
             const avatar:DisplayObject = gameLayout.createGameAvatar(i, datas[i]);
             avatars.push(avatar);

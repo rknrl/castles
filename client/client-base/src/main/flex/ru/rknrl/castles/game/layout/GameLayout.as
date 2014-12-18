@@ -1,7 +1,7 @@
 package ru.rknrl.castles.game.layout {
 import flash.display.DisplayObject;
 
-import ru.rknrl.castles.game.ui.avatar.AvatarData;
+import ru.rknrl.castles.game.ui.avatar.GameAvatarData;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.utils.OverrideMe;
@@ -102,7 +102,7 @@ public class GameLayout {
 
     // game avatars size
 
-    public function createGameAvatar(i:int, data:AvatarData):DisplayObject {
+    public function createGameAvatar(i:int, data:GameAvatarData):DisplayObject {
         throw OverrideMe();
     }
 

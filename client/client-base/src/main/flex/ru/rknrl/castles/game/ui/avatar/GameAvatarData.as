@@ -1,12 +1,12 @@
 package ru.rknrl.castles.game.ui.avatar {
 import flash.display.BitmapData;
 
-public class AvatarData {
+public class GameAvatarData {
     private var _bitmapData:BitmapData;
     private var _text:String;
     private var _color:uint;
 
-    public function AvatarData(bitmapData:BitmapData, text:String, color:uint) {
+    public function GameAvatarData(bitmapData:BitmapData, text:String, color:uint) {
         _bitmapData = bitmapData;
         _text = text;
         _color = color;

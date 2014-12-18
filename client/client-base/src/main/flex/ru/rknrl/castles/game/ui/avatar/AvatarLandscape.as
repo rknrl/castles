@@ -11,7 +11,7 @@ public class AvatarLandscape extends Sprite {
     private var avatar:Shape;
     private var nameTextField:Label;
 
-    public function AvatarLandscape(data:AvatarData, layout:GameLayoutLandscape) {
+    public function AvatarLandscape(data:GameAvatarData, layout:GameLayoutLandscape) {
         mouseChildren = false;
 
         addChild(avatar = BitmapUtils.createCircleShape(data.bitmapData));

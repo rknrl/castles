@@ -40,6 +40,7 @@ public class Utils {
 
     public static const BUTTON_PLAY:String = "Play";
     public static const SCREEN_CASTLE:String = "Castle";
+    public static const SCREEN_TOP:String = "Top";
     public static const SCREEN_SKILLS:String = "Skills";
     public static const SCREEN_SHOP:String = "Shop";
     public static const SCREEN_BANK:String = "Bank";

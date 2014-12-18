@@ -17,6 +17,7 @@ import ru.rknrl.castles.menu.screens.shop.ItemsCount;
 import ru.rknrl.castles.menu.screens.shop.ShopScreen;
 import ru.rknrl.castles.menu.screens.skills.SkillLevels;
 import ru.rknrl.castles.menu.screens.skills.SkillsScreen;
+import ru.rknrl.castles.menu.screens.top.TopScreen;
 import ru.rknrl.castles.menu.slider.ScreenSlider;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
@@ -45,6 +46,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private var locale:CastlesLocale;
 
     private var mainScreen:MainScreen;
+    private var topScreen:TopScreen;
     private var skillsScreen:SkillsScreen;
     private var bankScreen:BankScreen;
     private var shopScreen:ShopScreen;
@@ -77,13 +79,15 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
 
         mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(config.buildings), sender, layout, locale, popups);
 
+        topScreen = new TopScreen(Utils.SCREEN_TOP, sender, layout, locale);
+
         skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), new SkillUpgradePrices(config.skillUpgradePrices), sender, layout, locale);
 
         bankScreen = new BankScreen(Utils.SCREEN_BANK, authenticationSuccess.products, sender, layout, social, locale);
 
         shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
 
-        screens = new <MenuScreen>[mainScreen, skillsScreen, bankScreen, shopScreen];
+        screens = new <MenuScreen>[mainScreen, topScreen, skillsScreen, bankScreen, shopScreen];
 
         for each(var screen:Screen in screens) {
             screen.addEventListener(Utils.NOT_ENOUGH_GOLD, onNotEnoughGold);

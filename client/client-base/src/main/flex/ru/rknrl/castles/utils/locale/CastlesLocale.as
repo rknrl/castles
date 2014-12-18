@@ -191,6 +191,8 @@ public class CastlesLocale extends Locale {
                 return translate(BUTTON_SHOP);
             case Utils.SCREEN_BANK:
                 return translate(BUTTON_BANK);
+            case Utils.SCREEN_TOP:
+                return "Top";
         }
         throw new Error("unknown screen " + screen);
     }

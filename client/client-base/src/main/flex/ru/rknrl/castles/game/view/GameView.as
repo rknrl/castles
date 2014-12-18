@@ -31,6 +31,7 @@ public class GameView extends Sprite {
 
     public function GameView(h:int, v:int) {
         addChild(groundLayer = new Sprite());
+
         addChild(volcanoLayer = new Sprite());
         addChild(buildingsLayer = new Sprite());
         addChild(unitsLayer = new Sprite());
@@ -38,6 +39,16 @@ public class GameView extends Sprite {
         addChild(effectsLayer = new Sprite());
         addChild(tornadoPathLayer = new Shape());
         addChild(arrowLayer = new Sprite());
+
+/*
+        volcanoLayer = new Sprite();
+        buildingsLayer = new Sprite();
+        unitsLayer = new Sprite();
+        bulletsLayer = new Sprite();
+        effectsLayer = new Sprite();
+        tornadoPathLayer = new Shape();
+        arrowLayer = new Sprite();
+*/
 
         addGrounds(h, v);
     }

@@ -3,7 +3,7 @@ import flash.display.DisplayObject;
 import flash.geom.Point;
 import flash.text.TextFormat;
 
-import ru.rknrl.castles.game.ui.avatar.AvatarData;
+import ru.rknrl.castles.game.ui.avatar.GameAvatarData;
 import ru.rknrl.castles.game.ui.avatar.AvatarPortrait;
 import ru.rknrl.castles.utils.layout.Layout;
 
@@ -49,7 +49,7 @@ public class GameLayoutPortrait extends GameLayout {
         return _avatarHorGap;
     }
 
-    override public function createGameAvatar(i:int, data:AvatarData):DisplayObject {
+    override public function createGameAvatar(i:int, data:GameAvatarData):DisplayObject {
         const left:Boolean = i == 0;
         const avatar:AvatarPortrait = new AvatarPortrait(data, left, this);
         posAvatar(i, avatar);

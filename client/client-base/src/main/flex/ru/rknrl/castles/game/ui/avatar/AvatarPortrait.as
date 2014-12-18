@@ -14,7 +14,7 @@ public class AvatarPortrait extends Sprite {
     private var avatar:Shape;
     private var nameTextField:Label;
 
-    public function AvatarPortrait(data:AvatarData, left:Boolean, layout:GameLayoutPortrait) {
+    public function AvatarPortrait(data:GameAvatarData, left:Boolean, layout:GameLayoutPortrait) {
         mouseChildren = false;
         this.left = left;
 

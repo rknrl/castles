@@ -3,7 +3,7 @@ import flash.display.DisplayObject;
 import flash.geom.Point;
 import flash.text.TextFormat;
 
-import ru.rknrl.castles.game.ui.avatar.AvatarData;
+import ru.rknrl.castles.game.ui.avatar.GameAvatarData;
 import ru.rknrl.castles.game.ui.avatar.AvatarLandscape;
 import ru.rknrl.castles.utils.layout.Layout;
 
@@ -93,7 +93,7 @@ public class GameLayoutLandscape extends GameLayout {
         return _avatarTextHeight;
     }
 
-    override public function createGameAvatar(i:int, data:AvatarData):DisplayObject {
+    override public function createGameAvatar(i:int, data:GameAvatarData):DisplayObject {
         const avatar:AvatarLandscape = new AvatarLandscape(data, this);
         posAvatar(i, avatar);
         return avatar;

@@ -53,6 +53,9 @@ public class Layout {
         _progressBarSize = 64 * scale;
         _pointsCenterY = stageHeight - 107 * scale;
 
+        _topAvatarBitmapSize = 32 * scale;
+        _topAvatarHeight = 64 * scale;
+
         initTextFormats(scale);
     }
 
@@ -93,6 +96,7 @@ public class Layout {
         _bankCircleTextFormat = lightCenter(18 * scale, 0xffffff);
         _gameOverTitleTextFormat = light(72 * scale);
         _gameOverRewardTextFormat = light(54 * scale);
+        _topAvatarTextFormat = lightCenter(32 * scale, 0);
     }
 
     private var _rectButtonTextFormat:TextFormat;
@@ -197,6 +201,12 @@ public class Layout {
 
     public final function get gameOverRewardTextFormat():TextFormat {
         return _gameOverRewardTextFormat;
+    }
+
+    private var _topAvatarTextFormat:TextFormat;
+
+    public final function get topAvatarTextFormat():TextFormat {
+        return _topAvatarTextFormat;
     }
 
     // stage
@@ -526,6 +536,20 @@ public class Layout {
 
     public function updatePopup(popup:Popup):void {
         throw OverrideMe();
+    }
+
+    // top
+
+    private var _topAvatarBitmapSize:int;
+
+    public function get topAvatarBitmapSize():int {
+        return _topAvatarBitmapSize;
+    }
+
+    private var _topAvatarHeight:int;
+
+    public function get topAvatarHeight():int {
+        return _topAvatarHeight;
     }
 
     // other
