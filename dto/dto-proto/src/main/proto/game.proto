@@ -50,8 +50,10 @@ message GameStateDTO {
 }
 
 enum StartLocationOrientation {
-    TOP = 1;
-    BOTTOM = 2;
+    TOP_LEFT = 1;
+    TOP_RIGHT = 2;
+    BOTTOM_LEFT = 3;
+    BOTTOM_RIGHT = 4;
 }
 
 message StartLocationPosDTO {

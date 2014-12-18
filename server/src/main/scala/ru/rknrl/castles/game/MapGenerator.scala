@@ -1,22 +1,21 @@
 package ru.rknrl.castles.game
 
+import java.util.Random
+
 import ru.rknrl.castles.account.objects.{BuildingPrototype, IJ}
 import ru.rknrl.castles.game.objects.buildings.Building
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 import ru.rknrl.utils.BuildingIdIterator
 
 object MapGenerator {
-  private def exists(newPos: IJ, positions: Iterable[IJ]): Boolean = {
-    for (pos ← positions)
-      if (newPos near pos) return true
-    false
-  }
+  private def exists(newPos: IJ, positions: Iterable[IJ]) =
+    positions.exists(_ near newPos)
 
   private def getAllPositions(positions: Iterable[IJ], h: Int, v: Int) = {
     var newPositions = List.empty[IJ]
 
     for (i ← 0 until h; j ← 0 until v) {
-      val pos = new IJ(i, j)
+      val pos = new IJ(h - 1 - i, v - 1 - j) // начинаем заполнять от центра
       if (!exists(pos, positions) && !exists(pos, newPositions))
         newPositions = newPositions :+ pos
     }
@@ -26,9 +25,10 @@ object MapGenerator {
 
   private def pickRandomFromList[T](list: List[T], count: Int) = {
     var indices = (0 until count).toList
+    val rnd = new Random()
     var randomIndices = List.empty[Int]
     for (_ ← 0 until count) {
-      val i = Math.floor(Math.random() * indices.size).toInt
+      val i = rnd.nextInt(indices.size)
       randomIndices = randomIndices :+ indices(i)
       indices = indices.patch(i, Nil, 1)
     }
@@ -44,20 +44,11 @@ object MapGenerator {
   }
 
   private def randomBuildingPrototype = {
-    val types = Map(
-      0 → BuildingType.HOUSE,
-      1 → BuildingType.TOWER,
-      2 → BuildingType.CHURCH
-    )
+    val types = BuildingType.values()
+    val levels = BuildingLevel.values()
 
-    val levels = Map(
-      0 → BuildingLevel.LEVEL_1,
-      1 → BuildingLevel.LEVEL_2,
-      2 → BuildingLevel.LEVEL_3
-    )
-
-    val typeIndex = Math.floor(Math.random() * BuildingType.values().size).toInt
-    val levelIndex = Math.floor(Math.random() * BuildingLevel.values().size).toInt
+    val typeIndex = Math.floor(Math.random() * types.size).toInt
+    val levelIndex = Math.floor(Math.random() * levels.size).toInt
     val buildingType = types(typeIndex)
     val buildingLevel = levels(levelIndex)
     new BuildingPrototype(buildingType, buildingLevel)

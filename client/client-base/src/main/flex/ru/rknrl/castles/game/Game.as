@@ -138,8 +138,12 @@ public class Game extends Sprite implements IGameFacade {
         for each(var starLocation:StartLocationPosDTO in gameState.startLocations) {
             for each(var slotId:SlotId in SlotId.values) {
                 const pos:Point = Utils.slotsPositions[slotId];
-                const x:Number = starLocation.x + pos.x * CellSize.SIZE.id();
-                const y:Number = starLocation.orientation == StartLocationOrientation.TOP ? starLocation.y - pos.y * CellSize.SIZE.id() : starLocation.y + pos.y * CellSize.SIZE.id();
+                // todo: get slots pos from server
+                const orientation: StartLocationOrientation = starLocation.orientation;
+                const isMirrorH: Boolean =  orientation == StartLocationOrientation.TOP_RIGHT || orientation == StartLocationOrientation.BOTTOM_RIGHT;
+                const isMirrorV: Boolean =  orientation == StartLocationOrientation.TOP_LEFT || orientation == StartLocationOrientation.TOP_RIGHT;
+                const x:Number = isMirrorH ? starLocation.x - pos.x * CellSize.SIZE.id() : starLocation.x + pos.x * CellSize.SIZE.id();
+                const y:Number = isMirrorV ? starLocation.y - pos.y * CellSize.SIZE.id() : starLocation.y + pos.y * CellSize.SIZE.id();
                 view.updateGroundColor(x, y, new BuildingOwner(true, starLocation.playerId.id));
             }
         }

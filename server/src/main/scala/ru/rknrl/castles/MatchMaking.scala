@@ -146,12 +146,21 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   private val botIdIterator = new BotIdIterator
 
   private def createGameWithBot(order: GameOrder) = {
-    val externalAccountId = botIdIterator.next
-    val bot = context.actorOf(Props(classOf[Bot], externalAccountId), externalAccountId.id)
-    accountIdToAccountRef = accountIdToAccountRef.updated(externalAccountId, bot)
-    val botOrder = new GameOrder(externalAccountId, DeviceType.CANVAS, order.startLocation, order.skills, order.items, isBot = true)
-    val orders = List(order, botOrder)
-    createGame(isBigGame(order.deviceType), orders)
+    val bigGame= isBigGame(order.deviceType)
+
+    val botsCount = if(bigGame) 3 else 1
+
+    var orders = List(order)
+
+    for(i ← 0 until botsCount) {
+      val externalAccountId = botIdIterator.next
+      val bot = context.actorOf(Props(classOf[Bot], externalAccountId), externalAccountId.id)
+      accountIdToAccountRef = accountIdToAccountRef.updated(externalAccountId, bot)
+      val botOrder = new GameOrder(externalAccountId, DeviceType.CANVAS, order.startLocation, order.skills, order.items, isBot = true)
+      orders = orders :+ botOrder
+    }
+
+    createGame(bigGame, orders)
   }
 
   private val gameIdIterator = new GameIdIterator

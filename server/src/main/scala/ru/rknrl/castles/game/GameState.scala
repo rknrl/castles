@@ -1,6 +1,7 @@
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.account.objects.{IJ, StartLocation}
+import ru.rknrl.castles.account.objects.IJ
+import ru.rknrl.castles.game.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.objects.Assistance
 import ru.rknrl.castles.game.objects.Moving._
 import ru.rknrl.castles.game.objects.buildings.{Building, BuildingId, Buildings}
@@ -11,74 +12,21 @@ import ru.rknrl.castles.game.objects.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.objects.units.GameUnits
 import ru.rknrl.castles.game.objects.units.GameUnits.{getUpdateMessages, _}
 import ru.rknrl.castles.game.objects.volcanoes.Volcanoes._
-import ru.rknrl.dto.CommonDTO.{ItemType, SlotId}
+import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO._
-import ru.rknrl.utils.{BuildingIdIterator, Point, UnitIdIterator}
+import ru.rknrl.utils.{BuildingIdIterator, UnitIdIterator}
 
 import scala.collection.JavaConverters._
 
-class GameArea(big: Boolean) {
-  val smallH = 8
-  val smallV = 12
-  val bigH = 16
-  val bigV = 16
-
-  val h = if (big) bigH else smallH
-  val v = if (big) bigV else smallV
-
-
-  val width = h * CellSize.SIZE_VALUE
-  val height = v * CellSize.SIZE_VALUE
-
-  val hForRandom = h - 1 - StartLocation.left - StartLocation.right
-  val vForRandom = Math.floor((v - 1) / 2).toInt - StartLocation.top - StartLocation.bottom
-
-  def mirror(pos: Point) = new Point(width - pos.x, height - pos.y)
-
-  def mirror(pos: IJ) = new IJ(h - 1 - pos.i, v - 1 - pos.j)
-
-  def randomStartLocationPositions = {
-    val i = Math.round(Math.random() * hForRandom).toInt + StartLocation.left // [2,5]
-
-    val j = 0; //Math.round(Math.random() * vForRandom).toInt + StartLocation.bottom // [0,4]
-
-    val pos = new IJ(i, j)
-
-    Map(
-      1 → pos,
-      2 → mirror(pos)
-    )
-  }
-}
-
 object GameState {
 
-  def getPlayersSlotPositions(startLocationPositions: Map[Int, IJ]) =
-    for ((id, pos) ← startLocationPositions;
-         slotId ← SlotId.values())
-    yield {
-      val slotPos = StartLocation.positions(slotId)
-      val i = pos.i + slotPos.i
-      val j = if (orientations(id) == StartLocationOrientation.TOP) pos.j - slotPos.j else pos.j + slotPos.j
-      new IJ(i, j)
-    }
-
-  val orientations = Map(
-    1 → StartLocationOrientation.TOP,
-    2 → StartLocationOrientation.BOTTOM
-  )
-
-  def getPlayerBuildings(players: List[Player], startLocationPositions: Map[Int, IJ], buildingIdIterator: BuildingIdIterator, config: GameConfig) =
+  def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
     for (player ← players;
          (slotId, slot) ← player.startLocation.slots
          if slot.buildingPrototype.isDefined)
     yield {
-      val pos = startLocationPositions(player.id.id)
-      val slotPos = StartLocation.positions(slotId)
-
-      val i = pos.i + slotPos.i
-      val j = if (orientations(player.id.id) == StartLocationOrientation.TOP) pos.j - slotPos.j else pos.j + slotPos.j
-      val xy = new IJ(i, j).toXY
+      val ij = playersSlotsPositions(player.id.id)(slotId)
+      val xy = ij.toXY
 
       val prototype = slot.buildingPrototype.get
       new Building(
@@ -93,7 +41,7 @@ object GameState {
         lastShootTime = 0)
     }
 
-  def getStartLocations(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, StartLocationOrientation]) =
+  def startLocationsDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, StartLocationOrientation]) =
     for (player ← players)
     yield {
       val id = player.id.id
@@ -106,33 +54,57 @@ object GameState {
         .build()
     }
 
-  def mirrorBuildings(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
+  def mirrorBuildings2(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
     for (b ← topRandomBuildings)
     yield {
-      val pos = gameArea.mirror(b.pos)
+      val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
+      new Building(buildingIdIterator.next, b.prototype, pos.x, pos.y, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+    }
+
+  def mirrorBuildings4(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
+    for (b ← topRandomBuildings;
+         part ← List(1, 2, 3))
+    yield {
+      val pos = part match {
+        case 1 ⇒ gameArea.mirrorH(b.pos)
+        case 2 ⇒ gameArea.mirrorV(b.pos)
+        case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
+      }
+
       new Building(buildingIdIterator.next, b.prototype, pos.x, pos.y, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
     }
 
   def init(time: Long, players: List[Player], big: Boolean, config: GameConfig) = {
-    assert(players.size == 2)
+    if (big)
+      assert(players.size == 4)
+    else
+      assert(players.size == 2)
 
-    val gameArea = new GameArea(big)
+    val gameArea = GameArea(big)
 
     val startLocationPositions = gameArea.randomStartLocationPositions
 
-    val playersSlotPositions = getPlayersSlotPositions(startLocationPositions)
+    val playersSlotsPositions = gameArea.getPlayersSlotPositions(startLocationPositions)
 
     val buildingIdIterator = new BuildingIdIterator
 
-    val playersBuildings = getPlayerBuildings(players, startLocationPositions, buildingIdIterator, config)
+    val playersBuildings = getPlayerBuildings(players, playersSlotsPositions, buildingIdIterator, config)
 
-    val topRandomBuildings = MapGenerator.getRandomBuildings(playersSlotPositions, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
+    val slotsIJs = GameArea.toIJs(playersSlotsPositions)
 
-    val bottomRandomBuildings = mirrorBuildings(gameArea, topRandomBuildings, buildingIdIterator)
+    val randomBuildings = if (big)
+      MapGenerator.getRandomBuildings(slotsIJs, Math.floor(gameArea.h / 2).toInt, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
+    else
+      MapGenerator.getRandomBuildings(slotsIJs, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
 
-    val buildings = playersBuildings ++ topRandomBuildings ++ bottomRandomBuildings
+    val mirrorRandomBuildings = if (big)
+      mirrorBuildings4(gameArea, randomBuildings, buildingIdIterator)
+    else
+      mirrorBuildings2(gameArea, randomBuildings, buildingIdIterator)
 
-    val startLocations = getStartLocations(players, startLocationPositions, orientations)
+    val buildings = playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
+
+    val startLocations = startLocationsDto(players, startLocationPositions, gameArea.playerIdToOrientation)
 
     val playerStates = for (player ← players) yield player.id → new PlayerState(player.skills.stat, 0)
 

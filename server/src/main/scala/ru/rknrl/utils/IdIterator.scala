@@ -8,9 +8,9 @@ class IdIterator {
   private var id = 0
 
   protected def nextInt: Int = {
-    id += 1
-    if (id > max) id = 0
-    id
+    val result = id
+    id = if (id == max) 0 else id + 1
+    result
   }
 }
 

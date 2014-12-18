@@ -13,6 +13,7 @@ import ru.rknrl.castles.menu.screens.gameOver.GameOverScreen;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
+import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.ItemStateDTO;
 import ru.rknrl.dto.ItemType;
@@ -28,15 +29,16 @@ public class GameUI extends Sprite {
     public function GameUI(layout:Layout, gameLayout:GameLayout, locale:CastlesLocale, itemsState:ItemsStateDTO) {
         this.locale = locale;
 
+        // todo: game avatars hardcode
         const avatarsDatas:Vector.<GameAvatarData> =
                 new <GameAvatarData>[
                     new GameAvatarData(new BitmapData(64, 64, false, 0), "Тамара Григорьевна", Colors.yellow),
                     new GameAvatarData(new BitmapData(64, 64, false, 0), "Alexandra Serova", Colors.cyan),
                     new GameAvatarData(new BitmapData(64, 64, false, 0), "Толя Янот", Colors.magenta),
-                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Наполеон II", Colors.red)
+                    new GameAvatarData(new BitmapData(64, 64, false, 0), "Napoleon1769", Colors.red)
                 ];
 
-        avatarsDatas.length = 2;
+        avatarsDatas.length = layout is LayoutLandscape ? 4 : 2; // todo: game avatars hardcode
 
         addAvatars(gameLayout, avatarsDatas);
         addItems(gameLayout, itemsState);
