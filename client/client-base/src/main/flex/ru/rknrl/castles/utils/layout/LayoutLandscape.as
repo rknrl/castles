@@ -34,14 +34,6 @@ public class LayoutLandscape extends Layout {
         _bankButtonWidth = 450 * scale;
         _bankButtonHeight = 96 * scale;
 
-        _fastAndTrustCircleRadius = 100 * scale;
-        _fastAndTrustCircleX = bodyCenterX + 250 * scale;
-        _fastAndTrustCircleY = bodyCenterY - 80 * scale;
-
-        _saleCircleRadius = 150 * scale;
-        _saleCircleX = bodyCenterX - 250 * scale;
-        _saleCircleY = bodyCenterY - 170 * scale;
-
         _noConnectionTitleY = stageCenterY - 100 * scale;
         _noConnectionButtonCenterY = stageCenterY + 100 * scale;
 
@@ -205,44 +197,6 @@ public class LayoutLandscape extends Layout {
 
     override public function get bankButtonCenterY():int {
         return bodyCenterY;
-    }
-
-    // bank circles
-
-    private var _fastAndTrustCircleRadius:int;
-
-    override public function get fastAndTrustCircleRadius():int {
-        return _fastAndTrustCircleRadius;
-    }
-
-    private var _fastAndTrustCircleX:int;
-
-    override public function get fastAndTrustCircleX():int {
-        return _fastAndTrustCircleX;
-    }
-
-    private var _fastAndTrustCircleY:int;
-
-    override public function get fastAndTrustCircleY():int {
-        return _fastAndTrustCircleY;
-    }
-
-    private var _saleCircleRadius:int;
-
-    override public function get saleCircleRadius():int {
-        return _saleCircleRadius;
-    }
-
-    private var _saleCircleX:int;
-
-    override public function get saleCircleX():int {
-        return _saleCircleX;
-    }
-
-    private var _saleCircleY:int;
-
-    override public function get saleCircleY():int {
-        return _saleCircleY;
     }
 
     // no connection screen

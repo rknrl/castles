@@ -2,6 +2,7 @@ package ru.rknrl.castles.menu.screens.bank {
 import flash.events.MouseEvent;
 
 import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
@@ -10,26 +11,20 @@ import ru.rknrl.core.social.PaymentDialogEvent;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.funnyUi.buttons.RectButton;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
 
 public class BankScreen extends MenuScreen {
     private var sender:AccountFacadeSender;
     private var social:Social;
     private var locale:CastlesLocale;
 
-    private var fastAndTrust:Circle;
-    private var saleCircle:Circle;
     private var buyButton:RectButton;
 
-    public function BankScreen(id:String, products: Vector.<ProductDTO>, sender:AccountFacadeSender, layout:Layout, social:Social, locale:CastlesLocale) {
+    public function BankScreen(id:String, products:Vector.<ProductDTO>, sender:AccountFacadeSender, layout:Layout, social:Social, locale:CastlesLocale) {
         this.sender = sender;
         this.social = social;
         this.locale = locale;
 
-        const goldByDollar: int = products[0].count;
-
-        addChild(fastAndTrust = new Circle(locale.fastAndTrust, layout.bankCircleTextFormat, layout.fastAndTrustCircleRadius, Colors.randomLightColor()));
-        addChild(saleCircle = new Circle(locale.sale, layout.bankCircleTextFormat, layout.saleCircleRadius, Colors.randomLightColor()));
+        const goldByDollar:int = products[0].count;
 
         addChild(buyButton = layout.createRectButton(locale.buyButtonLabel(goldByDollar), Colors.randomColor()));
         buyButton.addEventListener(MouseEvent.CLICK, onClick);
@@ -52,12 +47,6 @@ public class BankScreen extends MenuScreen {
         buyButton.x = layout.bankButtonCenterX;
         buyButton.y = layout.bankButtonCenterY;
 
-        saleCircle.updateLayout(layout.bankCircleTextFormat, layout.saleCircleRadius);
-        saleCircle.x = layout.saleCircleX;
-
-        fastAndTrust.updateLayout(layout.bankCircleTextFormat, layout.fastAndTrustCircleRadius);
-        fastAndTrust.x = layout.fastAndTrustCircleX;
-
         updateTransition(_transition);
     }
 
@@ -69,8 +58,6 @@ public class BankScreen extends MenuScreen {
     }
 
     private function updateTransition(value:Number):void {
-        saleCircle.y = layout.saleCircleY + (layout.stageHeight - layout.saleCircleY) * (1 - value);
-        fastAndTrust.y = layout.fastAndTrustCircleY + (layout.stageHeight - layout.fastAndTrustCircleY) * (1 - value);
     }
 
     public function set goldByDollar(value:int):void {
@@ -86,8 +73,6 @@ public class BankScreen extends MenuScreen {
 
     override public function changeColors():void {
         buyButton.color = Colors.randomColor();
-        fastAndTrust.color = Colors.randomLightColor();
-        saleCircle.color = Colors.randomLightColor();
     }
 
     private function onPaymentDialogClosed(event:PaymentDialogEvent):void {

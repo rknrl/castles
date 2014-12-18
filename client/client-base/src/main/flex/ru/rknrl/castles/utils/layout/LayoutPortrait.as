@@ -31,14 +31,6 @@ public class LayoutPortrait extends Layout {
         _shopItemWidth = 64 * scale;
 
         _menuBuildingScale = 1.6;
-
-        _fastAndTrustCircleRadius = 70 * scale;
-        _fastAndTrustCircleX = stageWidth - 100 * scale;
-        _fastAndTrustCircleY = 350 * scale;
-
-        _saleCircleRadius = 100 * scale;
-        _saleCircleX = 110 * scale;
-        _saleCircleY = 200 * scale;
     }
 
     // fonts
@@ -193,44 +185,6 @@ public class LayoutPortrait extends Layout {
 
     override public function get bankButtonCenterY():int {
         return footerCenterY;
-    }
-
-    // bank circles
-
-    private var _fastAndTrustCircleRadius:int;
-
-    override public function get fastAndTrustCircleRadius():int {
-        return _fastAndTrustCircleRadius;
-    }
-
-    private var _fastAndTrustCircleX:int;
-
-    override public function get fastAndTrustCircleX():int {
-        return _fastAndTrustCircleX;
-    }
-
-    private var _fastAndTrustCircleY:int;
-
-    override public function get fastAndTrustCircleY():int {
-        return _fastAndTrustCircleY;
-    }
-
-    private var _saleCircleRadius:int;
-
-    override public function get saleCircleRadius():int {
-        return _saleCircleRadius;
-    }
-
-    private var _saleCircleX:int;
-
-    override public function get saleCircleX():int {
-        return _saleCircleX;
-    }
-
-    private var _saleCircleY:int;
-
-    override public function get saleCircleY():int {
-        return _saleCircleY;
     }
 
     // no connection screen
