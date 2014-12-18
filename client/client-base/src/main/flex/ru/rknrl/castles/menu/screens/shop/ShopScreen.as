@@ -6,6 +6,7 @@ import flash.events.MouseEvent;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
@@ -13,7 +14,6 @@ import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuyItemDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.funnyUi.GoldTextField;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.utils.centerize;
 
 public class ShopScreen extends MenuScreen {
@@ -37,7 +37,7 @@ public class ShopScreen extends MenuScreen {
 
         for (var i:int = 0; i < Utils.SHOP_ALL_ITEMS.length; i++) {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
-            const item:Item = new Item(itemType, itemsCount.getCount(itemType), Colors.randomColor(), layout, locale);
+            const item:Item = new Item(itemType, itemsCount.getCount(itemType), Colors.randomColor(), layout);
             item.addEventListener(MouseEvent.CLICK, onItemClick);
             typeToItemView[itemType] = item;
             animated.push(item);
@@ -58,24 +58,21 @@ public class ShopScreen extends MenuScreen {
         title.textFormat = layout.shopTitleTextFormat;
         centerize(title);
 
-        for (var i:int = 0; i < Utils.SHOP_ALL_ITEMS.length; i++) {
+        const count:int = Utils.SHOP_ALL_ITEMS.length;
+
+        for (var i:int = 0; i < count; i++) {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
 
             const itemWidth:int = layout.shopItemWidth;
             const itemHeight:int = layout.shopItemHeight;
 
-            const columns:int = layout.shopColumns;
-            const rows:int = layout.shopRows;
-
-            const horizontalGap:int = (layout.bodyWidth - itemWidth * columns) / (columns + 1);
-            const verticalGap:int = (layout.bodyHeight - itemHeight * rows) / (rows + 1);
+            const horizontalGap:int = (layout.bodyWidth - itemWidth * count) / (count + 1);
             const left:int = horizontalGap;
-            const top:int = layout.bodyTop + verticalGap + itemHeight / 2;
 
             const item:Item = typeToItemView[itemType];
             item.updateLayout(layout);
-            item.x = left + (i % columns) * (itemHeight + horizontalGap);
-            item.y = top + (itemHeight + verticalGap) * int(i / columns);
+            item.x = left + i * (itemHeight + horizontalGap);
+            item.y = layout.bodyCenterY;
         }
     }
 

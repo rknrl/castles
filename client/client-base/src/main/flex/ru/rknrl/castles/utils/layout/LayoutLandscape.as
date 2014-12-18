@@ -164,14 +164,6 @@ public class LayoutLandscape extends Layout {
         return _shipItemHeight;
     }
 
-    override public function get shopColumns():int {
-        return 3;
-    }
-
-    override public function get shopRows():int {
-        return 2;
-    }
-
     // skills
 
     private var _skillPlusSize:int;

@@ -4,7 +4,6 @@ import flash.text.TextFormat;
 
 import ru.rknrl.castles.game.layout.GameLayout;
 import ru.rknrl.castles.game.layout.GameLayoutPortrait;
-import ru.rknrl.castles.game.view.GameConstants;
 import ru.rknrl.castles.menu.screens.MenuScreen;
 import ru.rknrl.castles.menu.screens.main.popup.popup.Popup;
 import ru.rknrl.castles.menu.screens.main.popup.popup.PopupPortrait;
@@ -176,14 +175,6 @@ public class LayoutPortrait extends Layout {
 
     override public function get shopItemHeight():int {
         return _shopItemHeight;
-    }
-
-    override public function get shopColumns():int {
-        return 2;
-    }
-
-    override public function get shopRows():int {
-        return 3;
     }
 
     // skills

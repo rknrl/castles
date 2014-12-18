@@ -1,6 +1,5 @@
 package ru.rknrl.castles.menu.screens.shop {
 import flash.display.Sprite;
-import flash.text.TextFormat;
 
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Label;
@@ -29,16 +28,13 @@ public class Item extends Animated {
     private var countTextField:Label;
     private var lockView:Lock;
 
-    private var nameTextField:Label;
-
-    public function Item(itemType:ItemType, count:int, color:uint, layout:Layout, locale:CastlesLocale) {
+    public function Item(itemType:ItemType, count:int, color:uint, layout:Layout) {
         _itemType = itemType;
         mouseChildren = false;
 
         addChild(holder = new Sprite());
         holder.addChild(icon = Utils.getItemIcon(itemType));
 
-        holder.addChild(nameTextField = addNameTextField(itemType, color, layout.shopItemNameTextFormat, locale));
         holder.addChild(countTextField = createTextField(layout.shopItemCountTextFormat));
         holder.addChild(lockView = new Lock());
         lockView.visible = false;
@@ -64,23 +60,12 @@ public class Item extends Animated {
         lockView.y = itemWidth / 2;
         lockView.scaleX = lockView.scaleY = layout.scale;
 
-        changeTextFormat(nameTextField, layout.shopItemNameTextFormat);
-        nameTextField.x = itemWidth / 2 - nameTextField.width / 2;
-        nameTextField.y = layout.shopItemHeight - nameTextField.height;
-
         changeTextFormat(countTextField, layout.shopItemCountTextFormat);
         centerizeCount();
     }
 
-    private static function addNameTextField(itemType:ItemType, color:uint, textFormat:TextFormat, locale:CastlesLocale):Label {
-        const nameTextField:Label = createTextField(textFormat, locale.getItemName(itemType));
-        nameTextField.textColor = color;
-        return nameTextField;
-    }
-
     public function set color(value:uint):void {
         icon.transform.colorTransform = Colors.colorToTransform(value);
-        nameTextField.textColor = value;
     }
 
     private var _count:int;

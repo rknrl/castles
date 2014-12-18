@@ -83,7 +83,6 @@ public class Layout {
         _rectButtonTextFormat = lightCenter(32 * scale, 0xffffff);
         _noConnectionTitleTextFormat = lightCenter(56 * scale);
         _shopItemCountTextFormat = bold(18 * scale, 0xffffff);
-        _shopItemNameTextFormat = light(24 * scale);
         _shopTitleTextFormat = light(40 * scale);
         _skillsTitleTextFormat = light(32 * scale);
         _skillNameTextFormat = light(24 * scale);
@@ -111,12 +110,6 @@ public class Layout {
 
     public final function get shopItemCountTextFormat():TextFormat {
         return _shopItemCountTextFormat;
-    }
-
-    private var _shopItemNameTextFormat:TextFormat;
-
-    public final function get shopItemNameTextFormat():TextFormat {
-        return _shopItemNameTextFormat;
     }
 
     private var _shopTitleTextFormat:TextFormat;
@@ -335,14 +328,6 @@ public class Layout {
     }
 
     public function get shopItemHeight():int {
-        throw OverrideMe();
-    }
-
-    public function get shopColumns():int {
-        throw OverrideMe();
-    }
-
-    public function get shopRows():int {
         throw OverrideMe();
     }
 
