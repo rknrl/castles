@@ -29,7 +29,6 @@ public class LayoutPortrait extends Layout {
         _footerHeight = 96 * scale;
 
         _shopItemWidth = 64 * scale;
-        _shopItemHeight = 100 * scale;
 
         _menuBuildingScale = 1.6;
 
@@ -169,12 +168,6 @@ public class LayoutPortrait extends Layout {
 
     override public function get shopItemWidth():int {
         return _shopItemWidth;
-    }
-
-    private var _shopItemHeight:int;
-
-    override public function get shopItemHeight():int {
-        return _shopItemHeight;
     }
 
     // skills

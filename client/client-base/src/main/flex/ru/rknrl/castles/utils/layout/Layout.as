@@ -39,6 +39,8 @@ public class Layout {
         _headerAvatarSize = 32 * scale;
         rectButtonCorner = 8 * scale;
 
+        _shopItemGap = 8 * scale;
+
         _skillWidth = 32 * scale;
         _skillViewMarkHeight = 10 * scale;
         _skillViewCorner = 8 * scale;
@@ -91,7 +93,6 @@ public class Layout {
         _enterGameTextFormat = light(32 * scale);
         _loadingTextFormat = light(48 * scale);
         _headerTextFormat = light(20 * scale);
-        _panelButtonsTextFormat = light(48 * scale);
         _bankCircleTextFormat = lightCenter(18 * scale, 0xffffff);
         _gameOverTitleTextFormat = light(72 * scale);
         _gameOverRewardTextFormat = light(54 * scale);
@@ -158,24 +159,6 @@ public class Layout {
 
     public final function get headerTextFormat():TextFormat {
         return _headerTextFormat;
-    }
-
-    private var _buildingCounterTextFormat:TextFormat;
-
-    public final function get buildingCounterTextFormat():TextFormat {
-        return _buildingCounterTextFormat;
-    }
-
-    private var _unitCounterTextFormat:TextFormat;
-
-    public final function get unitCounterTextFormat():TextFormat {
-        return _unitCounterTextFormat;
-    }
-
-    private var _panelButtonsTextFormat:TextFormat;
-
-    public final function get panelButtonsTextFormat():TextFormat {
-        return _panelButtonsTextFormat;
     }
 
     private var _bankCircleTextFormat:TextFormat;
@@ -307,6 +290,20 @@ public class Layout {
         throw OverrideMe();
     }
 
+    // points
+
+    public function get pointRadius():int {
+        throw OverrideMe();
+    }
+
+    public function get pointY():int {
+        throw OverrideMe();
+    }
+
+    public function get pointGap():int {
+        throw OverrideMe();
+    }
+
     // menu start location
 
     public function get locationCenterX():int {
@@ -327,8 +324,10 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public function get shopItemHeight():int {
-        throw OverrideMe();
+    private var _shopItemGap: int;
+
+    public function get shopItemGap():int {
+        return _shopItemGap;
     }
 
     // skills

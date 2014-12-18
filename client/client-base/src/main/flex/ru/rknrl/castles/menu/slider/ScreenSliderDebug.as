@@ -18,11 +18,6 @@ public class ScreenSliderDebug {
         body.y = layout.bodyTop;
         sprite.addChild(body);
 
-        const panel:Bitmap = new Bitmap(new BitmapData(layout.panelWidth, layout.panelHeight, true, 0x545f00000));
-        panel.x = layout.panelLeft;
-        panel.y = layout.panelTop;
-        sprite.addChild(panel);
-
         return sprite;
     }
 

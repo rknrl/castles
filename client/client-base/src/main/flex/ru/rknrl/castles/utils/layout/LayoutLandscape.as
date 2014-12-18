@@ -24,11 +24,8 @@ public class LayoutLandscape extends Layout {
         _titleTop = 100 * scale;
         _titleHeight = 64 * scale;
 
-        _shopItemWidth = 64 * 1.5 * scale;
-        _shipItemHeight = 100 * 1.5 * scale;
+        _shopItemWidth = 48 * scale;
         _skillPlusSize = 64 * scale;
-
-        _panelWidth = 250 * scale;
 
         _popupItemNameY = popupIconSize;
         _popupItemInfoY = popupIconSize + 24 * scale;
@@ -48,11 +45,13 @@ public class LayoutLandscape extends Layout {
         _noConnectionTitleY = stageCenterY - 100 * scale;
         _noConnectionButtonCenterY = stageCenterY + 100 * scale;
 
-        _panelButtonsGap = 30 * scale;
-
         _popupItemWidth = 200 * scale;
 
         _menuBuildingScale = 3;
+
+        _pointRadius = 8 * scale;
+        _pointGap = 8 * scale;
+        _pointY = stageHeight - 96 * scale;
     }
 
     // fonts
@@ -97,7 +96,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function get titleWidth():int {
-        return stageWidth - panelWidth;
+        return stageWidth;
     }
 
     private var _titleHeight:int;
@@ -109,26 +108,46 @@ public class LayoutLandscape extends Layout {
     // body
 
     override public function get bodyTop():int {
-        return titleTop + titleHeight;
+        return 0;
     }
 
 
     override public function get bodyWidth():int {
-        return stageWidth - panelWidth;
+        return stageWidth;
     }
 
     override public function get bodyHeight():int {
-        return panelHeight - titleHeight;
+        return stageHeight;
     }
 
     // screen slider
 
     override public function createSlider(screens:Vector.<MenuScreen>, locale:CastlesLocale):ScreenSlider {
-        return new ScreenSliderLandscape(screens, this, locale);
+        return new ScreenSliderLandscape(screens, this);
     }
 
     override public function updateSlider(slider:ScreenSlider):void {
         ScreenSliderLandscape(slider).updateLayout(this);
+    }
+
+    // points
+
+    private var _pointRadius: int;
+
+    override public function get pointRadius():int {
+        return _pointRadius;
+    }
+
+    private var _pointY: int;
+
+    override public function get pointY():int {
+        return _pointY;
+    }
+
+    private var _pointGap: int;
+
+    override public function get pointGap():int {
+        return _pointGap;
     }
 
     // menu start location
@@ -156,12 +175,6 @@ public class LayoutLandscape extends Layout {
 
     override public function get shopItemWidth():int {
         return _shopItemWidth;
-    }
-
-    private var _shipItemHeight:int;
-
-    override public function get shopItemHeight():int {
-        return _shipItemHeight;
     }
 
     // skills
@@ -290,32 +303,6 @@ public class LayoutLandscape extends Layout {
 
     override public function get gameOverAgainButtonCenterY():int {
         return gameOverAgainButtonCenterTop + rectButtonHeight / 2;
-    }
-
-    // panel
-
-    private var _panelButtonsGap:int;
-
-    public function get panelButtonsGap():int {
-        return _panelButtonsGap;
-    }
-
-    public function get panelTop():int {
-        return titleTop;
-    }
-
-    public function get panelLeft():int {
-        return stageWidth - panelWidth;
-    }
-
-    private var _panelWidth:int;
-
-    public function get panelWidth():int {
-        return _panelWidth;
-    }
-
-    public function get panelHeight():int {
-        return stageHeight - bodyTop;
     }
 
     // popup

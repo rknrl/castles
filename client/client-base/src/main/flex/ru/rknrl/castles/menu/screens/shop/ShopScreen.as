@@ -64,14 +64,13 @@ public class ShopScreen extends MenuScreen {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
 
             const itemWidth:int = layout.shopItemWidth;
-            const itemHeight:int = layout.shopItemHeight;
 
-            const horizontalGap:int = (layout.bodyWidth - itemWidth * count) / (count + 1);
-            const left:int = horizontalGap;
+            const horizontalGap:int = layout.shopItemGap;
+            const left:int = layout.bodyCenterX - ((itemWidth + horizontalGap) * count - horizontalGap) / 2;
 
             const item:Item = typeToItemView[itemType];
             item.updateLayout(layout);
-            item.x = left + i * (itemHeight + horizontalGap);
+            item.x = left + i * (itemWidth + horizontalGap);
             item.y = layout.bodyCenterY;
         }
     }

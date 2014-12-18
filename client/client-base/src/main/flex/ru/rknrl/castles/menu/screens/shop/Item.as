@@ -6,7 +6,6 @@ import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
-import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.funnyUi.Animated;
 import ru.rknrl.funnyUi.Lock;
@@ -48,7 +47,7 @@ public class Item extends Animated {
         this.itemWidth = layout.shopItemWidth;
 
         holder.x = -itemWidth / 2;
-        holder.y = -layout.shopItemHeight / 2;
+        holder.y = -itemWidth / 2;
 
         const ratio:Number = icon.width / icon.height;
         icon.x = itemWidth / 2;
