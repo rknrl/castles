@@ -1,42 +1,25 @@
 package ru.rknrl.castles.menu.screens.top {
-import flash.display.BitmapData;
-import flash.display.Sprite;
-
 import ru.rknrl.castles.menu.screens.MenuScreen;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.utils.Label;
-import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
-import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.changeTextFormat;
 
 public class TopScreen extends MenuScreen {
-    private static const count:int = 7;
+    private static const count:int = 5;
 
     private var sender:AccountFacadeSender;
     private var locale:CastlesLocale;
 
-    private var titleHolder:Sprite;
-    private var title:Label;
-    private var info:Label;
-
-    private const avatars:Vector.<TopAvatar> = new <TopAvatar>[];
+    private const rows:Vector.<TopRow> = new <TopRow>[];
 
     public function TopScreen(id:String, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
         this.locale = locale;
 
-        titleHolder = new Sprite();
-        addChild(titleHolder);
-
-        titleHolder.addChild(title = createTextField(layout.shopTitleTextFormat, "Лучшие за неделю. Ваше место: 999"));
-//        titleHolder.addChild(info = createTextField(layout.shopTitleTextFormat, "Ваше место: 9999"));
-
         for (var i:int = 0; i < count; i++) {
-            const avatar:TopAvatar = new TopAvatar(new TopAvatarData(new BitmapData(32, 32, false, 0), "Толя Янот"), layout);
-            avatars.push(avatar);
-            addChild(avatar);
+            const row:TopRow = new TopRow(layout);
+            rows.push(row);
+            addChild(row);
         }
 
         updateLayout(layout);
@@ -48,18 +31,12 @@ public class TopScreen extends MenuScreen {
     public function updateLayout(layout:Layout):void {
         this.layout = layout;
 
-        titleHolder.x = layout.titleCenterX;
-        titleHolder.y = layout.titleCenterY;
+        var y:int = 100;
 
-        changeTextFormat(title, layout.shopTitleTextFormat);
-        centerize(title);
-
-        var y:int = layout.bodyTop;
-
-        for each(var avatar:TopAvatar in avatars) {
-            avatar.updateLayout(layout);
-            avatar.x = layout.bodyCenterX - avatar.width / 2;
-            avatar.y = y + layout.topAvatarHeight / 2 - layout.topAvatarBitmapSize / 2;
+        for each(var row:TopRow in rows) {
+            row.updateLayout(layout);
+            row.x = 100;
+            row.y = y;
             y += layout.topAvatarHeight;
         }
 
@@ -76,4 +53,47 @@ public class TopScreen extends MenuScreen {
     private function updateTransition(value:Number):void {
     }
 }
+}
+
+import flash.display.BitmapData;
+import flash.display.Sprite;
+
+import ru.rknrl.castles.menu.screens.top.TopAvatar;
+import ru.rknrl.castles.menu.screens.top.TopAvatarData;
+import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.createTextField;
+import ru.rknrl.castles.utils.layout.Layout;
+import ru.rknrl.utils.changeTextFormat;
+
+class TopRow extends Sprite {
+    private var placeTextField:Label;
+    private var avatar:TopAvatar;
+    private var winTextField:Label;
+    private var loseTextField:Label;
+
+    public function TopRow(layout:Layout) {
+        placeTextField = createTextField(layout.shopTitleTextFormat, "1");
+        addChild(placeTextField);
+
+        avatar = new TopAvatar(new TopAvatarData(new BitmapData(32, 32, false, 0), "Толя Янот"), layout);
+        addChild(avatar);
+
+        winTextField = createTextField(layout.shopTitleTextFormat, "100");
+        addChild(winTextField);
+
+        loseTextField = createTextField(layout.shopTitleTextFormat, "100");
+        addChild(loseTextField);
+    }
+
+    public function updateLayout(layuot:Layout):void {
+        changeTextFormat(placeTextField, layuot.shopTitleTextFormat);
+        changeTextFormat(winTextField, layuot.shopTitleTextFormat);
+        changeTextFormat(loseTextField, layuot.shopTitleTextFormat);
+        avatar.updateLayout(layuot);
+
+        avatar.x = 100;
+
+        winTextField.x = 400;
+        loseTextField.x = 500;
+    }
 }

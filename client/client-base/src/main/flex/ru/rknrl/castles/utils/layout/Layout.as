@@ -36,14 +36,14 @@ public class Layout {
 
         _gap = 10 * scale;
         _minigap = 4 * scale;
-        _headerAvatarSize = 32 * scale;
         rectButtonCorner = 8 * scale;
+
+        _titleY = 40 * scale;
 
         _shopItemGap = 8 * scale;
 
         _skillWidth = 32 * scale;
         _skillViewMarkHeight = 10 * scale;
-        _skillViewCorner = 8 * scale;
 
         _popupPadding = 10 * scale;
         _popupGap = 20 * scale;
@@ -53,7 +53,6 @@ public class Layout {
         _popupCornerRadius = 20 * scale;
 
         _progressBarSize = 64 * scale;
-        _pointsCenterY = stageHeight - 107 * scale;
 
         _topAvatarBitmapSize = 32 * scale;
         _topAvatarHeight = 64 * scale;
@@ -82,18 +81,16 @@ public class Layout {
     public static const gameItemCounterTextFormat:TextFormat = bold(40, 0xffffff);
 
     private function initTextFormats(scale:Number):void {
-        _rectButtonTextFormat = lightCenter(32 * scale, 0xffffff);
+        _rectButtonTextFormat = lightCenter(18 * scale, 0xffffff);
         _noConnectionTitleTextFormat = lightCenter(56 * scale);
         _shopItemCountTextFormat = bold(18 * scale, 0xffffff);
-        _shopTitleTextFormat = light(40 * scale);
-        _skillsTitleTextFormat = light(32 * scale);
+        _shopTitleTextFormat = light(18 * scale);
+        _skillsTitleTextFormat = light(18 * scale);
         _skillNameTextFormat = light(24 * scale);
-        _mainTitleTextFormat = light(72 * scale);
         _playTextFormat = light(48 * scale);
         _enterGameTextFormat = light(32 * scale);
         _loadingTextFormat = light(48 * scale);
         _headerTextFormat = light(20 * scale);
-        _bankCircleTextFormat = lightCenter(18 * scale, 0xffffff);
         _gameOverTitleTextFormat = light(72 * scale);
         _gameOverRewardTextFormat = light(54 * scale);
         _topAvatarTextFormat = lightCenter(32 * scale, 0);
@@ -131,12 +128,6 @@ public class Layout {
         return _skillNameTextFormat;
     }
 
-    private var _mainTitleTextFormat:TextFormat;
-
-    public final function get mainTitleTextFormat():TextFormat {
-        return _mainTitleTextFormat;
-    }
-
     private var _playTextFormat:TextFormat;
 
     public final function get playTextFormat():TextFormat {
@@ -159,12 +150,6 @@ public class Layout {
 
     public final function get headerTextFormat():TextFormat {
         return _headerTextFormat;
-    }
-
-    private var _bankCircleTextFormat:TextFormat;
-
-    public final function get bankCircleTextFormat():TextFormat {
-        return _bankCircleTextFormat;
     }
 
     private var _gameOverTitleTextFormat:TextFormat;
@@ -226,41 +211,9 @@ public class Layout {
         return _minigap;
     }
 
-    // title
-
-    private var _headerAvatarSize:int;
-
-    public final function get headerAvatarSize():int {
-        return _headerAvatarSize;
-    }
-
-    public function get titleTop():int {
-        throw OverrideMe();
-    }
-
-    public function get titleWidth():int {
-        throw OverrideMe();
-    }
-
-    public function get titleHeight():int {
-        throw OverrideMe();
-    }
-
-    public final function get titleCenterX():int {
-        return titleWidth / 2;
-    }
-
-    public final function get titleCenterY():int {
-        return titleTop + titleHeight / 2;
-    }
-
     // body
 
     public function get bodyTop():int {
-        throw OverrideMe();
-    }
-
-    public function get bodyWidth():int {
         throw OverrideMe();
     }
 
@@ -268,12 +221,30 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public final function get bodyCenterX():int {
-        return bodyWidth / 2;
-    }
-
     public final function get bodyCenterY():int {
         return bodyTop + bodyHeight / 2;
+    }
+
+    // footer
+
+    public final function get footerTop():int {
+        return stageHeight - footerHeight;
+    }
+
+    public function get footerHeight():int {
+        throw OverrideMe;
+    }
+
+    public final function get footerCenterY():int {
+        return footerTop + footerHeight / 2;
+    }
+
+    // info
+
+    private var _titleY:int;
+
+    public final function get titleY():int {
+        return _titleY;
     }
 
     // screen slider
@@ -283,10 +254,6 @@ public class Layout {
     }
 
     public function updateSlider(slider:ScreenSlider):void {
-        throw OverrideMe();
-    }
-
-    public function get onlyStartLocationInMainScreen():Boolean {
         throw OverrideMe();
     }
 
@@ -314,17 +281,13 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public function get playCenterY():int {
-        throw OverrideMe();
-    }
-
     // shop
 
     public function get shopItemWidth():int {
         throw OverrideMe();
     }
 
-    private var _shopItemGap: int;
+    private var _shopItemGap:int;
 
     public function get shopItemGap():int {
         return _shopItemGap;
@@ -350,12 +313,6 @@ public class Layout {
 
     public function get skillViewMarkHeight():int {
         return _skillViewMarkHeight;
-    }
-
-    private var _skillViewCorner:int;
-
-    public function get skillViewCorner():int {
-        return _skillViewCorner;
     }
 
     // rect button
@@ -385,32 +342,6 @@ public class Layout {
     }
 
     public function get bankButtonCenterY():int {
-        throw OverrideMe();
-    }
-
-    // bank circles
-
-    public function get fastAndTrustCircleRadius():int {
-        throw OverrideMe();
-    }
-
-    public function get fastAndTrustCircleX():int {
-        throw OverrideMe();
-    }
-
-    public function get fastAndTrustCircleY():int {
-        throw OverrideMe();
-    }
-
-    public function get saleCircleRadius():int {
-        throw OverrideMe();
-    }
-
-    public function get saleCircleX():int {
-        throw OverrideMe();
-    }
-
-    public function get saleCircleY():int {
         throw OverrideMe();
     }
 
@@ -550,12 +481,6 @@ public class Layout {
 
     public function createGameLayout(w:int, h:int):GameLayout {
         throw OverrideMe();
-    }
-
-    private var _pointsCenterY:int;
-
-    public function get pointsCenterY():int {
-        return _pointsCenterY;
     }
 }
 }

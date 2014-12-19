@@ -19,7 +19,6 @@ import ru.rknrl.utils.centerize;
 public class ShopScreen extends MenuScreen {
     private var sender:AccountFacadeSender;
 
-    private var titleHolder:Sprite;
     private var title:GoldTextField;
 
     private const typeToItemView:Dictionary = new Dictionary();
@@ -29,11 +28,7 @@ public class ShopScreen extends MenuScreen {
     public function ShopScreen(id:String, itemsCount:ItemsCount, itemPrice:int, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
 
-        titleHolder = new Sprite();
-        animated.push(titleHolder);
-        addChild(titleHolder);
-
-        titleHolder.addChild(title = new GoldTextField(locale.shopTitle, layout.shopTitleTextFormat, itemPrice, Colors.randomColor()));
+        addChild(title = new GoldTextField(locale.shopTitle, layout.shopTitleTextFormat, itemPrice, Colors.randomColor()));
 
         for (var i:int = 0; i < Utils.SHOP_ALL_ITEMS.length; i++) {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
@@ -52,11 +47,9 @@ public class ShopScreen extends MenuScreen {
     }
 
     public function updateLayout(layout:Layout):void {
-        titleHolder.x = layout.titleCenterX;
-        titleHolder.y = layout.titleCenterY;
-
         title.textFormat = layout.shopTitleTextFormat;
-        centerize(title);
+        title.x = layout.stageWidth - layout.minigap - title.width;
+        title.y = layout.titleY;
 
         const count:int = Utils.SHOP_ALL_ITEMS.length;
 
@@ -66,7 +59,7 @@ public class ShopScreen extends MenuScreen {
             const itemWidth:int = layout.shopItemWidth;
 
             const horizontalGap:int = layout.shopItemGap;
-            const left:int = layout.bodyCenterX - ((itemWidth + horizontalGap) * count - horizontalGap) / 2;
+            const left:int = layout.stageCenterX - ((itemWidth + horizontalGap) * count - horizontalGap) / 2;
 
             const item:Item = typeToItemView[itemType];
             item.updateLayout(layout);

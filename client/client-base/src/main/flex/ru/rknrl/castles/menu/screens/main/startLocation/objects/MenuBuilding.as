@@ -33,12 +33,14 @@ public class MenuBuilding extends BuildingBase {
 
         const halfCellSize:Number = CellSize.SIZE.id() * buildingScale / 2;
 
-        addChild(upCircle = new UpButton(16, Colors.darkMagenta));
+        upCircle = new UpButton(16, Colors.darkMagenta);
+//        addChild(upCircle); // todo
         upCircle.x = halfCellSize - 4;
         upCircle.y = -halfCellSize + 4;
         upCircle.mouseChildren = upCircle.mouseEnabled = false;
 
-        addChild(plusCircle = new PlusButton(16, Colors.darkMagenta));
+        plusCircle = new PlusButton(16, Colors.darkMagenta);
+//        addChild(plusCircle); // todo
         plusCircle.x = halfCellSize - 4;
         plusCircle.y = -halfCellSize + 4;
         plusCircle.mouseChildren = plusCircle.mouseEnabled = false;

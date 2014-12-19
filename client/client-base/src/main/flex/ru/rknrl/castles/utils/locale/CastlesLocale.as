@@ -6,8 +6,6 @@ import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.SkillType;
 
 public class CastlesLocale extends Locale {
-    private static const SALE:String = "sale";
-    private static const FAST_AND_TRUST:String = "fast_and_trust";
     private static const BUY_BUTTON:String = "buy_button";
     private static const WIN:String = "win";
     private static const DEFEAT:String = "defeat";
@@ -51,12 +49,8 @@ public class CastlesLocale extends Locale {
         super(data);
     }
 
-    public function get sale():String {
-        return translate(SALE);
-    }
-
-    public function get fastAndTrust():String {
-        return translate(FAST_AND_TRUST);
+    public function get goldTitle():String {
+        return "У вас "; // todo
     }
 
     public function buyButtonLabel(goldByDollar:int):String {
@@ -167,34 +161,12 @@ public class CastlesLocale extends Locale {
         throw new Error("unknown building type " + buildingType);
     }
 
-    public function get mainTitle():String {
-        return translate(MAIN_TITLE);
-    }
-
     public function get play():String {
         return translate(PLAY);
     }
 
     public function get enterGame():String {
         return translate(ENTER_GAME);
-    }
-
-    public function screenName(screen:String):String {
-        switch (screen) {
-            case Utils.BUTTON_PLAY:
-                return play;
-            case Utils.SCREEN_CASTLE:
-                return translate(BUTTON_CASTLE);
-            case Utils.SCREEN_SKILLS:
-                return translate(BUTTON_SKILLS);
-            case Utils.SCREEN_SHOP:
-                return translate(BUTTON_SHOP);
-            case Utils.SCREEN_BANK:
-                return translate(BUTTON_BANK);
-            case Utils.SCREEN_TOP:
-                return "Top";
-        }
-        throw new Error("unknown screen " + screen);
     }
 
     public function get loading():String {

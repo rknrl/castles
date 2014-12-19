@@ -3,15 +3,16 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.layout.Layout;
+import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.funnyUi.GoldTextField;
 
 public class Header extends Sprite {
     private var goldTextField:GoldTextField;
     private var layout:Layout;
 
-    public function Header(gold:int, layout:Layout) {
+    public function Header(gold:int, layout:Layout, locale: CastlesLocale) {
         mouseChildren = false;
-        addChild(goldTextField = new GoldTextField("", layout.headerTextFormat, gold, Colors.magenta));
+        addChild(goldTextField = new GoldTextField(locale.goldTitle, layout.headerTextFormat, gold, Colors.magenta));
         updateLayout(layout);
         this.gold = gold;
     }
@@ -34,7 +35,7 @@ public class Header extends Sprite {
 
     private function posGoldTextField():void {
         goldTextField.x = layout.stageWidth - layout.minigap - goldTextField.width;
-        goldTextField.y = layout.minigap + (layout.headerAvatarSize - goldTextField.height) / 2;
+        goldTextField.y = layout.minigap;
     }
 }
 }

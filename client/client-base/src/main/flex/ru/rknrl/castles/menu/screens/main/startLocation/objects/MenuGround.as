@@ -4,6 +4,7 @@ import flash.display.BitmapData;
 import flash.display.Sprite;
 
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.funnyUi.Lock;
 
@@ -22,7 +23,7 @@ public class MenuGround extends Sprite {
 
         mouseChildren = false;
 
-        bitmap = new Bitmap(Colors.groundColor);
+        bitmap = new Bitmap(Utils.transparent);
         bitmap.width = width;
         bitmap.height = height;
         bitmap.x = -width / 2;
@@ -31,10 +32,6 @@ public class MenuGround extends Sprite {
 
         addChild(lockView = new Lock());
         lockView.visible = false
-    }
-
-    public function set bitmapData(value:BitmapData):void {
-        bitmap.bitmapData = value;
     }
 
     public function lock():void {

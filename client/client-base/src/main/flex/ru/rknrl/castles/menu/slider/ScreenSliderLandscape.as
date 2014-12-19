@@ -68,7 +68,7 @@ public class ScreenSliderLandscape extends ScreenSlider {
             point.y = layout.pointY;
         }
 
-        pointsHolder.x = layout.stageCenterX - pointsHolder.width / 2;
+        pointsHolder.x = layout.stageCenterX - pointsHolder.width / 2 + point.width / 2;
 
         posScreens();
         updateScreenHolderPosition();

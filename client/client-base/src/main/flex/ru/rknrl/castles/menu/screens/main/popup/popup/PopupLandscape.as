@@ -29,7 +29,7 @@ public class PopupLandscape extends Popup {
     }
 
     public function updateLayout(layout:LayoutLandscape):void {
-        x = layout.bodyCenterX;
+        x = layout.stageCenterX;
         y = layout.bodyCenterY;
 
         const cornerRadius:int = layout.popupCornerRadius;

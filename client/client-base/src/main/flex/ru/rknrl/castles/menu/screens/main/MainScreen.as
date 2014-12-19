@@ -13,6 +13,7 @@ import ru.rknrl.castles.menu.screens.main.startLocation.StartLocationView;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenBuildPopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenUpgradePopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.SwapEvent;
+import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
@@ -25,7 +26,6 @@ import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.StartLocationDTO;
 import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.utils.changeTextFormat;
 
 public class MainScreen extends MenuScreen {
@@ -34,8 +34,6 @@ public class MainScreen extends MenuScreen {
 
     private var startLocationView:StartLocationView;
 
-    private var title:Label;
-    private var points:Points;
     private var playLabel:Label;
     private var locale:CastlesLocale;
     private var popupManager:PopupManager;
@@ -52,13 +50,8 @@ public class MainScreen extends MenuScreen {
         startLocationView.addEventListener(SwapEvent.SWAP_SLOTS, swapSlots);
         addChild(startLocationView);
 
-        addChild(title = createTextField(layout.mainTitleTextFormat, locale.mainTitle));
-        addChild(points = new Points());
-
         addChild(playLabel = createTextField(layout.playTextFormat, locale.play));
         playLabel.addEventListener(MouseEvent.CLICK, onPlayClick);
-
-        title.visible = points.visible = playLabel.visible = !layout.onlyStartLocationInMainScreen;
 
         updateLayout(layout);
 
@@ -72,17 +65,9 @@ public class MainScreen extends MenuScreen {
         startLocationView.x = layout.locationCenterX;
         startLocationView.y = layout.locationCenterY;
 
-        changeTextFormat(title, layout.mainTitleTextFormat);
-        title.x = (layout.stageWidth - title.width) / 2;
-        title.y = layout.bodyTop - title.height / 2;
-
         changeTextFormat(playLabel, layout.playTextFormat);
-        playLabel.x = (layout.stageWidth - playLabel.width) / 2;
-        playLabel.y = layout.playCenterY - playLabel.height / 2;
-
-        points.scaleX = points.scaleY = layout.scale;
-        points.x = layout.stageCenterX;
-        points.y = layout.pointsCenterY;
+        playLabel.x = layout.stageCenterX - playLabel.width / 2;
+        playLabel.y = layout.footerCenterY - playLabel.height / 2;
 
         if (buildPopup) buildPopup.updateLayout(layout);
         if (upgradePopup) upgradePopup.updateLayout(layout);
@@ -104,7 +89,6 @@ public class MainScreen extends MenuScreen {
 
     override public function changeColors():void {
         startLocationView.color = Colors.randomColor();
-        title.textColor = Colors.randomColor();
         playLabel.textColor = Colors.randomColor();
     }
 

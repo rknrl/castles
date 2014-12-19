@@ -21,8 +21,12 @@ public class LayoutLandscape extends Layout {
 
         initTextFormats(scale);
 
-        _titleTop = 100 * scale;
-        _titleHeight = 64 * scale;
+        _footerHeight = (1536 - 1288) / 2 * scale;
+        _pointRadius = 8 * scale; // В айпаде в 2 раза меньше
+        _pointGap = _pointRadius;
+        _pointY = footerTop - (1288 - 1264) / 2 * scale;
+
+        _gameOverTitleCenterY = 132 * scale;
 
         _shopItemWidth = 48 * scale;
         _skillPlusSize = 64 * scale;
@@ -31,19 +35,16 @@ public class LayoutLandscape extends Layout {
         _popupItemInfoY = popupIconSize + 24 * scale;
         _popupItemPriceY = popupIconSize + 48 * scale;
 
-        _bankButtonWidth = 450 * scale;
-        _bankButtonHeight = 96 * scale;
+        _bankButtonWidth = 200 * scale;
+        _bankButtonHeight = 64 * scale;
 
         _noConnectionTitleY = stageCenterY - 100 * scale;
         _noConnectionButtonCenterY = stageCenterY + 100 * scale;
 
         _popupItemWidth = 200 * scale;
 
-        _menuBuildingScale = 3;
+        _menuBuildingScale = 2;
 
-        _pointRadius = 8 * scale;
-        _pointGap = 8 * scale;
-        _pointY = stageHeight - 96 * scale;
     }
 
     // fonts
@@ -79,37 +80,22 @@ public class LayoutLandscape extends Layout {
         return _popupItemNameTextFormat;
     }
 
-    // title
-
-    private var _titleTop:int;
-
-    override public function get titleTop():int {
-        return _titleTop;
-    }
-
-    override public function get titleWidth():int {
-        return stageWidth;
-    }
-
-    private var _titleHeight:int;
-
-    override public function get titleHeight():int {
-        return _titleHeight;
-    }
-
     // body
 
     override public function get bodyTop():int {
         return 0;
     }
 
-
-    override public function get bodyWidth():int {
-        return stageWidth;
+    override public function get bodyHeight():int {
+        return stageHeight - footerHeight;
     }
 
-    override public function get bodyHeight():int {
-        return stageHeight;
+    // footer
+
+    private var _footerHeight:int;
+
+    override public function get footerHeight():int {
+        return _footerHeight;
     }
 
     // screen slider
@@ -124,19 +110,19 @@ public class LayoutLandscape extends Layout {
 
     // points
 
-    private var _pointRadius: int;
+    private var _pointRadius:int;
 
     override public function get pointRadius():int {
         return _pointRadius;
     }
 
-    private var _pointY: int;
+    private var _pointY:int;
 
     override public function get pointY():int {
         return _pointY;
     }
 
-    private var _pointGap: int;
+    private var _pointGap:int;
 
     override public function get pointGap():int {
         return _pointGap;
@@ -144,21 +130,12 @@ public class LayoutLandscape extends Layout {
 
     // menu start location
 
-
-    override public function get onlyStartLocationInMainScreen():Boolean {
-        return true;
-    }
-
     override public function get locationCenterX():int {
-        return bodyCenterX;
+        return stageCenterX;
     }
 
     override public function get locationCenterY():int {
         return bodyCenterY;
-    }
-
-    override public function get playCenterY():int {
-        return 0; // todo
     }
 
     // shop
@@ -192,7 +169,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function get bankButtonCenterX():int {
-        return bodyCenterX;
+        return stageCenterX;
     }
 
     override public function get bankButtonCenterY():int {
@@ -227,8 +204,10 @@ public class LayoutLandscape extends Layout {
         return stageCenterX;
     }
 
+    private var _gameOverTitleCenterY:int;
+
     override public function get gameOverTitleCenterY():int {
-        return titleCenterY;
+        return _gameOverTitleCenterY;
     }
 
     override public function get gameOverRewardCenterX():int {
@@ -236,7 +215,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function get gameOverRewardCenterY():int {
-        return titleCenterY + (gameOverAgainButtonCenterTop - titleCenterY) / 2;
+        return _gameOverTitleCenterY + (gameOverAgainButtonCenterTop - _gameOverTitleCenterY) / 2;
     }
 
     override public function get gameOverToMenuButtonCenterX():int {

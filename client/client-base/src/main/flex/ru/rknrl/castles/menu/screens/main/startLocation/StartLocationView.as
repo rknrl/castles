@@ -1,5 +1,4 @@
 package ru.rknrl.castles.menu.screens.main.startLocation {
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.geom.Point;
@@ -11,7 +10,6 @@ import ru.rknrl.castles.menu.screens.main.startLocation.events.SwapEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.objects.DragBuilding;
 import ru.rknrl.castles.menu.screens.main.startLocation.objects.MenuBuilding;
 import ru.rknrl.castles.menu.screens.main.startLocation.objects.MenuGround;
-import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.CellSize;
@@ -83,11 +81,6 @@ public class StartLocationView extends Sprite {
     public function set color(value:uint):void {
         for each(var building:MenuBuilding in idToBuilding) {
             building.color = value;
-        }
-        const lightColor:uint = Colors.colorToLight(value);
-        const bitmapData:BitmapData = new BitmapData(1, 1, false, lightColor);
-        for each(var ground:MenuGround in grounds) {
-            ground.bitmapData = bitmapData;
         }
     }
 

@@ -22,9 +22,7 @@ public class LayoutPortrait extends Layout {
 
         initTextFormats(scale);
 
-        _headerHeight = 48 * scale;
-
-        _titleHeight = 64 * scale;
+        _gameOverTitleCenterY = (48+32) * scale;
 
         _footerHeight = 96 * scale;
 
@@ -67,36 +65,10 @@ public class LayoutPortrait extends Layout {
         return _popupItemPriceTextFormat;
     }
 
-    // title
-
-    private var _headerHeight:int;
-
-    public function get headerHeight():int {
-        return _headerHeight;
-    }
-
-    override public function get titleTop():int {
-        return _headerHeight;
-    }
-
-    override public function get titleWidth():int {
-        return stageWidth;
-    }
-
-    private var _titleHeight:int;
-
-    override public function get titleHeight():int {
-        return _titleHeight;
-    }
-
     // body
 
     override public function get bodyTop():int {
-        return _headerHeight + titleHeight;
-    }
-
-    override public function get bodyWidth():int {
-        return stageWidth;
+        return 0;
     }
 
     override public function get bodyHeight():int {
@@ -104,26 +76,11 @@ public class LayoutPortrait extends Layout {
     }
 
     // footer
-    public function get footerTop():int {
-        return stageHeight - footerHeight;
-    }
-
-    public function get footerWidth():int {
-        return stageWidth;
-    }
 
     private var _footerHeight:int;
 
-    public function get footerHeight():int {
+    override public function get footerHeight():int {
         return _footerHeight;
-    }
-
-    public final function get footerCenterX():int {
-        return footerWidth / 2;
-    }
-
-    public final function get footerCenterY():int {
-        return footerTop + footerHeight / 2;
     }
 
     // screen slider
@@ -138,20 +95,12 @@ public class LayoutPortrait extends Layout {
 
     // menu start location
 
-    override public function get onlyStartLocationInMainScreen():Boolean {
-        return false;
-    }
-
     override public function get locationCenterX():int {
         return stageCenterX;
     }
 
     override public function get locationCenterY():int {
         return bodyTop + (bodyHeight - footerHeight) / 2;
-    }
-
-    override public function get playCenterY():int {
-        return footerCenterY;
     }
 
     // shop
@@ -180,7 +129,7 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function get bankButtonCenterX():int {
-        return footerCenterX;
+        return stageCenterX;
     }
 
     override public function get bankButtonCenterY():int {
@@ -208,11 +157,13 @@ public class LayoutPortrait extends Layout {
     // game over screen
 
     override public function get gameOverTitleCenterX():int {
-        return titleCenterX;
+        return stageCenterX;
     }
 
+    private var _gameOverTitleCenterY: int;
+
     override public function get gameOverTitleCenterY():int {
-        return titleCenterY;
+        return _gameOverTitleCenterY;
     }
 
     override public function get gameOverRewardCenterX():int {

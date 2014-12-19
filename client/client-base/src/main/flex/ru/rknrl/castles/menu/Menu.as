@@ -87,13 +87,13 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
 
         shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
 
-        screens = new <MenuScreen>[mainScreen, topScreen, skillsScreen, bankScreen, shopScreen];
+        screens = new <MenuScreen>[mainScreen, topScreen, shopScreen, skillsScreen, bankScreen];
 
         for each(var screen:Screen in screens) {
             screen.addEventListener(Utils.NOT_ENOUGH_GOLD, onNotEnoughGold);
         }
 
-        header = new Header(accountState.gold, layout);
+        header = new Header(accountState.gold, layout, locale);
 
         screenSlider = layout.createSlider(screens, locale);
 
