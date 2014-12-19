@@ -1,4 +1,4 @@
-package ru.rknrl.castles.menu.screens.main {
+package ru.rknrl.castles.menu.screens.skills {
 import ru.rknrl.dto.SkillUpgradePriceDTO;
 
 public class SkillUpgradePrices {

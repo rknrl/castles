@@ -1,20 +1,13 @@
 package ru.rknrl.castles.menu.slider {
 import flash.display.Sprite;
 
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 
 public class ScreenSlider extends Sprite {
-    protected var screens:Vector.<MenuScreen>;
+    protected var screens:Vector.<Screen>;
 
-    public function ScreenSlider(screens:Vector.<MenuScreen>) {
+    public function ScreenSlider(screens:Vector.<Screen>) {
         this.screens = screens;
-    }
-
-    protected function getScreenById(id:String):MenuScreen {
-        for each(var screen:MenuScreen in screens) {
-            if (screen.id == id) return screen;
-        }
-        throw new Error("can't find screen " + id);
     }
 }
 }

@@ -1,6 +1,5 @@
 package ru.rknrl.castles.utils.locale {
 import ru.rknrl.Locale;
-import ru.rknrl.castles.utils.*;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.SkillType;
@@ -53,8 +52,8 @@ public class CastlesLocale extends Locale {
         return "У вас "; // todo
     }
 
-    public function buyButtonLabel(goldByDollar:int):String {
-        return translate(BUY_BUTTON).replace("$1", goldByDollar).replace("$2", 1);
+    public function buyButtonLabel(count:int, price:int):String {
+        return translate(BUY_BUTTON).replace("$1", count).replace("$2", price);
     }
 
     public function gameOverTitle(win:Boolean):String {

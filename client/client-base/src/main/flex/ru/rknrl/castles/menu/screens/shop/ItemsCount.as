@@ -14,7 +14,7 @@ public class ItemsCount {
         for each(var item:ItemDTO in _itemsDto.items) {
             if (item.type == itemType) return item.count;
         }
-        return 0;
+        throw new Error("can't find item " + itemType);
     }
 }
 }

@@ -7,15 +7,15 @@ import flash.system.Security;
 
 import ru.rknrl.castles.game.Game;
 import ru.rknrl.castles.menu.screens.LoadingScreen;
-import ru.rknrl.castles.menu.screens.MenuScreen;
 import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.bank.BankScreen;
+import ru.rknrl.castles.menu.screens.bank.Products;
 import ru.rknrl.castles.menu.screens.main.BuildingPrices;
 import ru.rknrl.castles.menu.screens.main.MainScreen;
-import ru.rknrl.castles.menu.screens.main.SkillUpgradePrices;
 import ru.rknrl.castles.menu.screens.shop.ItemsCount;
 import ru.rknrl.castles.menu.screens.shop.ShopScreen;
 import ru.rknrl.castles.menu.screens.skills.SkillLevels;
+import ru.rknrl.castles.menu.screens.skills.SkillUpgradePrices;
 import ru.rknrl.castles.menu.screens.skills.SkillsScreen;
 import ru.rknrl.castles.menu.screens.top.TopScreen;
 import ru.rknrl.castles.menu.slider.ScreenSlider;
@@ -50,7 +50,7 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
     private var skillsScreen:SkillsScreen;
     private var bankScreen:BankScreen;
     private var shopScreen:ShopScreen;
-    private var screens:Vector.<MenuScreen>;
+    private var screens:Vector.<Screen>;
 
     private var popups:PopupManager;
     private var header:Header;
@@ -77,17 +77,17 @@ public class Menu extends Sprite implements IAccountFacade, IEnterGameFacade {
 
         popups = new PopupManager(layout);
 
-        mainScreen = new MainScreen(Utils.SCREEN_CASTLE, accountState.startLocation, new BuildingPrices(config.buildings), sender, layout, locale, popups);
+        mainScreen = new MainScreen(accountState.startLocation, new BuildingPrices(config.buildings), sender, layout, locale, popups);
 
-        topScreen = new TopScreen(Utils.SCREEN_TOP, sender, layout, locale);
+        topScreen = new TopScreen(sender, layout, locale);
 
-        skillsScreen = new SkillsScreen(Utils.SCREEN_SKILLS, new SkillLevels(accountState.skills), new SkillUpgradePrices(config.skillUpgradePrices), sender, layout, locale);
+        skillsScreen = new SkillsScreen(new SkillLevels(accountState.skills), new SkillUpgradePrices(config.skillUpgradePrices), sender, layout, locale);
 
-        bankScreen = new BankScreen(Utils.SCREEN_BANK, authenticationSuccess.products, sender, layout, social, locale);
+        bankScreen = new BankScreen(new Products(authenticationSuccess.products), sender, layout, social, locale);
 
-        shopScreen = new ShopScreen(Utils.SCREEN_SHOP, new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
+        shopScreen = new ShopScreen(new ItemsCount(accountState.items), config.itemPrice, sender, layout, locale);
 
-        screens = new <MenuScreen>[mainScreen, topScreen, shopScreen, skillsScreen, bankScreen];
+        screens = new <Screen>[mainScreen, topScreen, shopScreen, skillsScreen, bankScreen];
 
         for each(var screen:Screen in screens) {
             screen.addEventListener(Utils.NOT_ENOUGH_GOLD, onNotEnoughGold);

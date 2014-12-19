@@ -4,7 +4,7 @@ import flash.text.TextFormat;
 
 import ru.rknrl.castles.game.layout.GameLayout;
 import ru.rknrl.castles.game.layout.GameLayoutLandscape;
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.main.popup.popup.Popup;
 import ru.rknrl.castles.menu.screens.main.popup.popup.PopupLandscape;
 import ru.rknrl.castles.menu.screens.main.popup.popup.item.PopupItem;
@@ -27,9 +27,6 @@ public class LayoutLandscape extends Layout {
         _pointY = footerTop - (1288 - 1264) / 2 * scale;
 
         _gameOverTitleCenterY = 132 * scale;
-
-        _shopItemWidth = 48 * scale;
-        _skillPlusSize = 64 * scale;
 
         _popupItemNameY = popupIconSize;
         _popupItemInfoY = popupIconSize + 24 * scale;
@@ -100,7 +97,7 @@ public class LayoutLandscape extends Layout {
 
     // screen slider
 
-    override public function createSlider(screens:Vector.<MenuScreen>, locale:CastlesLocale):ScreenSlider {
+    override public function createSlider(screens:Vector.<Screen>, locale:CastlesLocale):ScreenSlider {
         return new ScreenSliderLandscape(screens, this);
     }
 
@@ -136,22 +133,6 @@ public class LayoutLandscape extends Layout {
 
     override public function get locationCenterY():int {
         return bodyCenterY;
-    }
-
-    // shop
-
-    private var _shopItemWidth:int;
-
-    override public function get shopItemWidth():int {
-        return _shopItemWidth;
-    }
-
-    // skills
-
-    private var _skillPlusSize:int;
-
-    override public function get skillPlusSize():int {
-        return _skillPlusSize;
     }
 
     // bank button

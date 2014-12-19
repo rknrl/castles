@@ -5,7 +5,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.LayoutPortrait;
 import ru.rknrl.easers.IEaser;
@@ -16,22 +16,21 @@ public class ScreenSliderPortrait extends ScreenSlider {
     private var mouseHolder:Bitmap;
     private var holder:Sprite;
 
-    public function ScreenSliderPortrait(screens:Vector.<MenuScreen>, layout:LayoutPortrait) {
+    public function ScreenSliderPortrait(screens:Vector.<Screen>, layout:LayoutPortrait) {
         super(screens);
         addChild(mouseHolder = new Bitmap(Utils.transparent));
 
         addChild(holder = new Sprite());
 
-        for each(var screen:MenuScreen in screens) {
+        for each(var screen:Screen in screens) {
             holder.addChild(screen);
-            screen.changeColors()
         }
 
         addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
-        currentScreen = getScreenById(Utils.SCREEN_CASTLE);
+        currentScreen = screens[0];
 
         updateLayout(layout);
     }
@@ -49,9 +48,9 @@ public class ScreenSliderPortrait extends ScreenSlider {
         updatePositions();
     }
 
-    private var currentScreen:MenuScreen;
-    private var leftScreen:MenuScreen;
-    private var rightScreen:MenuScreen;
+    private var currentScreen:Screen;
+    private var leftScreen:Screen;
+    private var rightScreen:Screen;
 
     private function updatePositions():void {
         for each(var screen:Sprite in screens) {
@@ -71,9 +70,6 @@ public class ScreenSliderPortrait extends ScreenSlider {
         currentScreen.visible = true;
         leftScreen.visible = true;
         rightScreen.visible = true;
-
-        leftScreen.changeColors();
-        rightScreen.changeColors();
 
         updateScreensMove();
     }
@@ -127,7 +123,7 @@ public class ScreenSliderPortrait extends ScreenSlider {
     private var easerEndX:int;
     private var easerDuration:int;
     private var easerStartTime:int;
-    private var newScreen:MenuScreen;
+    private var newScreen:Screen;
 
     private function startEaser(screenIndex:int):void {
         inEaser = true;
@@ -153,10 +149,6 @@ public class ScreenSliderPortrait extends ScreenSlider {
     }
 
     private function updateScreensMove():void {
-        var p:Number = Math.abs(holder.x / layout.stageWidth);
-        leftScreen.transition = p;
-        currentScreen.transition = 1 - p;
-        rightScreen.transition = p;
     }
 }
 }

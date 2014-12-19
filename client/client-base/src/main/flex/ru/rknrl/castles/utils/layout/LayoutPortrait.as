@@ -4,7 +4,7 @@ import flash.text.TextFormat;
 
 import ru.rknrl.castles.game.layout.GameLayout;
 import ru.rknrl.castles.game.layout.GameLayoutPortrait;
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.main.popup.popup.Popup;
 import ru.rknrl.castles.menu.screens.main.popup.popup.PopupPortrait;
 import ru.rknrl.castles.menu.screens.main.popup.popup.item.PopupItem;
@@ -22,11 +22,9 @@ public class LayoutPortrait extends Layout {
 
         initTextFormats(scale);
 
-        _gameOverTitleCenterY = (48+32) * scale;
+        _gameOverTitleCenterY = (48 + 32) * scale;
 
         _footerHeight = 96 * scale;
-
-        _shopItemWidth = 64 * scale;
 
         _menuBuildingScale = 1.6;
     }
@@ -85,7 +83,7 @@ public class LayoutPortrait extends Layout {
 
     // screen slider
 
-    override public function createSlider(screens:Vector.<MenuScreen>, locale:CastlesLocale):ScreenSlider {
+    override public function createSlider(screens:Vector.<Screen>, locale:CastlesLocale):ScreenSlider {
         return new ScreenSliderPortrait(screens, this);
     }
 
@@ -101,21 +99,6 @@ public class LayoutPortrait extends Layout {
 
     override public function get locationCenterY():int {
         return bodyTop + (bodyHeight - footerHeight) / 2;
-    }
-
-    // shop
-
-    private var _shopItemWidth:int;
-
-    override public function get shopItemWidth():int {
-        return _shopItemWidth;
-    }
-
-    // skills
-
-
-    override public function get skillPlusSize():int {
-        return footerHeight;
     }
 
     // bank button
@@ -160,7 +143,7 @@ public class LayoutPortrait extends Layout {
         return stageCenterX;
     }
 
-    private var _gameOverTitleCenterY: int;
+    private var _gameOverTitleCenterY:int;
 
     override public function get gameOverTitleCenterY():int {
         return _gameOverTitleCenterY;

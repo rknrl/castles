@@ -58,16 +58,10 @@ public class RectButton extends Animated {
         redrawRect();
     }
 
-    public function lock():void {
-        lockView.visible = true;
-        textField.visible = false;
-        mouseEnabled = false;
-    }
-
-    public function unlock():void {
-        lockView.visible = false;
-        textField.visible = true;
-        mouseEnabled = true;
+    public function set lock(value:Boolean):void {
+        lockView.visible = value;
+        textField.visible = !value;
+        mouseEnabled = !value;
     }
 }
 }

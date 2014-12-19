@@ -1,70 +1,58 @@
 package ru.rknrl.castles.menu.screens.shop {
 import flash.display.Sprite;
+import flash.events.Event;
 
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Label;
+import ru.rknrl.castles.utils.Shadow;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.animation.Fly;
 import ru.rknrl.castles.utils.createTextField;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.funnyUi.Animated;
 import ru.rknrl.funnyUi.Lock;
-import ru.rknrl.utils.changeTextFormat;
+import ru.rknrl.utils.centerize;
 
 public class Item extends Animated {
+    public static const SIZE:int = 48;
+
     private var _itemType:ItemType;
 
     public function get itemType():ItemType {
         return _itemType;
     }
 
-    private var icon:Sprite;
-
-    private var itemWidth:int;
-
-    private var holder:Sprite;
-
     private var countTextField:Label;
     private var lockView:Lock;
 
-    public function Item(itemType:ItemType, count:int, color:uint, layout:Layout) {
+    private var fly:Fly;
+
+    public function Item(itemType:ItemType, count:int, color:uint) {
         _itemType = itemType;
         mouseChildren = false;
 
-        addChild(holder = new Sprite());
-        holder.addChild(icon = Utils.getItemIcon(itemType));
+        const holder:Sprite = new Sprite();
+        addChild(holder);
 
-        holder.addChild(countTextField = createTextField(layout.shopItemCountTextFormat));
+        const icon:Sprite = Utils.getItemIcon(itemType);
+        icon.transform.colorTransform = Colors.colorToTransform(color);
+        holder.addChild(icon);
+
+        holder.addChild(countTextField = createTextField(Layout.shopItemCountTextFormat));
+
         holder.addChild(lockView = new Lock());
         lockView.visible = false;
 
+        const shadow:Shadow = new Shadow();
+        shadow.y = SIZE;
+        addChild(shadow);
+
+        fly = new Fly(holder, shadow);
+
         this.count = count;
 
-        updateLayout(layout);
-    }
-
-    public function updateLayout(layout:Layout):void {
-        this.itemWidth = layout.shopItemWidth;
-
-        holder.x = -itemWidth / 2;
-        holder.y = -itemWidth / 2;
-
-        const ratio:Number = icon.width / icon.height;
-        icon.x = itemWidth / 2;
-        icon.y = itemWidth / 2;
-        icon.width = itemWidth;
-        icon.height = itemWidth / ratio;
-
-        lockView.x = itemWidth / 2;
-        lockView.y = itemWidth / 2;
-        lockView.scaleX = lockView.scaleY = layout.scale;
-
-        changeTextFormat(countTextField, layout.shopItemCountTextFormat);
-        centerizeCount();
-    }
-
-    public function set color(value:uint):void {
-        icon.transform.colorTransform = Colors.colorToTransform(value);
+        addEventListener(Event.ENTER_FRAME, enterFrameHandler);
     }
 
     private var _count:int;
@@ -76,24 +64,17 @@ public class Item extends Animated {
     public function set count(value:int):void {
         _count = value;
         countTextField.text = value.toString();
-        centerizeCount();
+        centerize(countTextField);
     }
 
-    private function centerizeCount():void {
-        countTextField.x = itemWidth / 2 - countTextField.width / 2;
-        countTextField.y = itemWidth / 2 - countTextField.height / 2;
+    public function set lock(value:Boolean):void {
+        lockView.visible = value;
+        countTextField.visible = !value;
+        mouseEnabled = !value;
     }
 
-    public function lock():void {
-        lockView.visible = true;
-        countTextField.visible = false;
-        mouseEnabled = false;
-    }
-
-    public function unlock():void {
-        lockView.visible = false;
-        countTextField.visible = true;
-        mouseEnabled = true;
+    private function enterFrameHandler(e:Event):void {
+        fly.onEnterFrame();
     }
 }
 }

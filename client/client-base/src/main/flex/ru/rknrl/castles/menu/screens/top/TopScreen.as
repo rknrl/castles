@@ -1,10 +1,10 @@
 package ru.rknrl.castles.menu.screens.top {
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 
-public class TopScreen extends MenuScreen {
+public class TopScreen extends Screen {
     private static const count:int = 5;
 
     private var sender:AccountFacadeSender;
@@ -12,7 +12,7 @@ public class TopScreen extends MenuScreen {
 
     private const rows:Vector.<TopRow> = new <TopRow>[];
 
-    public function TopScreen(id:String, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
+    public function TopScreen(sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
         this.locale = locale;
 
@@ -23,7 +23,6 @@ public class TopScreen extends MenuScreen {
         }
 
         updateLayout(layout);
-        super(id);
     }
 
     private var layout:Layout;
@@ -39,18 +38,6 @@ public class TopScreen extends MenuScreen {
             row.y = y;
             y += layout.topAvatarHeight;
         }
-
-        updateTransition(_transition);
-    }
-
-    private var _transition:Number = 0;
-
-    override public function set transition(value:Number):void {
-        _transition = value;
-        updateTransition(_transition);
-    }
-
-    private function updateTransition(value:Number):void {
     }
 }
 }

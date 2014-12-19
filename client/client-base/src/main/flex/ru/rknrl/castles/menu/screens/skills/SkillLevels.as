@@ -6,7 +6,6 @@ import ru.rknrl.dto.SkillsDTO;
 
 public class SkillLevels {
     private var skills:SkillsDTO;
-    private var _totalLevel: int;
 
     public function SkillLevels(skills:SkillsDTO) {
         this.skills = skills;
@@ -17,6 +16,8 @@ public class SkillLevels {
         }
         _totalLevel = totalLevel;
     }
+
+    private var _totalLevel:int;
 
     public function get totalLevel():int {
         return _totalLevel;

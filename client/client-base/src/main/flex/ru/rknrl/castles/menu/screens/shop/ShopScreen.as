@@ -1,11 +1,9 @@
 package ru.rknrl.castles.menu.screens.shop {
-import flash.display.DisplayObject;
-import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
@@ -13,72 +11,44 @@ import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
 import ru.rknrl.dto.BuyItemDTO;
 import ru.rknrl.dto.ItemType;
-import ru.rknrl.funnyUi.GoldTextField;
-import ru.rknrl.utils.centerize;
 
-public class ShopScreen extends MenuScreen {
+public class ShopScreen extends Screen {
     private var sender:AccountFacadeSender;
-
-    private var title:GoldTextField;
+    private var locale:CastlesLocale;
 
     private const typeToItemView:Dictionary = new Dictionary();
 
-    private const animated:Vector.<DisplayObject> = new <DisplayObject>[];
-
-    public function ShopScreen(id:String, itemsCount:ItemsCount, itemPrice:int, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
+    public function ShopScreen(itemsCount:ItemsCount, itemPrice:int, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
-
-        addChild(title = new GoldTextField(locale.shopTitle, layout.shopTitleTextFormat, itemPrice, Colors.randomColor()));
+        this.locale = locale;
 
         for (var i:int = 0; i < Utils.SHOP_ALL_ITEMS.length; i++) {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
-            const item:Item = new Item(itemType, itemsCount.getCount(itemType), Colors.randomColor(), layout);
+            const item:Item = new Item(itemType, itemsCount.getCount(itemType), Colors.randomColor());
             item.addEventListener(MouseEvent.CLICK, onItemClick);
             typeToItemView[itemType] = item;
-            animated.push(item);
             addChild(item);
         }
 
         this.itemPrice = itemPrice;
 
         updateLayout(layout);
+    }
 
-        super(id);
+    override public function get titleText():String {
+        return locale.shopTitle + " " + _itemPrice;
     }
 
     public function updateLayout(layout:Layout):void {
-        title.textFormat = layout.shopTitleTextFormat;
-        title.x = layout.stageWidth - layout.minigap - title.width;
-        title.y = layout.titleY;
-
         const count:int = Utils.SHOP_ALL_ITEMS.length;
+        const horizontalGap:int = layout.shopItemGap;
+        const left:int = layout.stageCenterX - ((Item.SIZE + horizontalGap) * count - horizontalGap) / 2;
 
         for (var i:int = 0; i < count; i++) {
             const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
-
-            const itemWidth:int = layout.shopItemWidth;
-
-            const horizontalGap:int = layout.shopItemGap;
-            const left:int = layout.stageCenterX - ((itemWidth + horizontalGap) * count - horizontalGap) / 2;
-
             const item:Item = typeToItemView[itemType];
-            item.updateLayout(layout);
-            item.x = left + i * (itemWidth + horizontalGap);
+            item.x = left + i * (Item.SIZE + horizontalGap);
             item.y = layout.bodyCenterY;
-        }
-    }
-
-    override public function changeColors():void {
-        title.color = Colors.randomColor();
-
-        for each(var item:Item in typeToItemView) {
-            item.color = Colors.randomColor();
-        }
-    }
-
-    override public function set transition(value:Number):void {
-        for each(var displayObject:DisplayObject in animated) {
-            displayObject.scaleX = displayObject.scaleY = 0.6 + value * 0.4;
         }
     }
 
@@ -95,13 +65,10 @@ public class ShopScreen extends MenuScreen {
 
     public function set itemPrice(value:int):void {
         _itemPrice = value;
-        title.gold = value;
-        centerize(title);
     }
 
     private function onItemClick(event:MouseEvent):void {
         if (gold < _itemPrice) {
-            title.animate();
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {
             const item:Item = Item(event.target);
@@ -119,12 +86,12 @@ public class ShopScreen extends MenuScreen {
     private const lockedItems:Dictionary = new Dictionary();
 
     public function lockItem(item:Item):void {
-        item.lock();
+        item.lock = true;
         lockedItems[item] = item;
     }
 
     public function unlockItem(item:Item):void {
-        item.unlock();
+        item.lock = false;
         delete lockedItems[item];
     }
 }

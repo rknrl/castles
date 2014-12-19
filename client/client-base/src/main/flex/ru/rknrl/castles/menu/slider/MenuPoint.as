@@ -2,17 +2,18 @@ package ru.rknrl.castles.menu.slider {
 
 import flash.display.Sprite;
 
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.utils.drawCircle;
 
 public class MenuPoint extends Sprite {
-    private var _id:String;
+    private var _screen:Screen;
 
-    public function get id():String {
-        return _id;
+    public function get screen():Screen {
+        return _screen;
     }
 
-    public function MenuPoint(id:String, radius:int) {
-        _id = id;
+    public function MenuPoint(screen:Screen, radius:int) {
+        _screen = screen;
         _radius = radius;
         selected = false;
     }

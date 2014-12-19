@@ -5,7 +5,7 @@ import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
 import ru.rknrl.castles.game.layout.GameLayout;
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.main.popup.popup.Popup;
 import ru.rknrl.castles.menu.screens.main.popup.popup.item.PopupItem;
 import ru.rknrl.castles.menu.slider.ScreenSlider;
@@ -42,9 +42,6 @@ public class Layout {
 
         _shopItemGap = 8 * scale;
 
-        _skillWidth = 32 * scale;
-        _skillViewMarkHeight = 10 * scale;
-
         _popupPadding = 10 * scale;
         _popupGap = 20 * scale;
         _popupTitleHeight = 40 * scale;
@@ -60,7 +57,9 @@ public class Layout {
         initTextFormats(scale);
     }
 
+
     // fonts
+
     private static const lightFont:Font = new LightFont();
     private static const boldFont:Font = new BoldFont();
 
@@ -68,7 +67,7 @@ public class Layout {
         return new TextFormat(lightFont.fontName, size, color);
     }
 
-    protected static function bold(size:Number, color:Object = null):TextFormat {
+    public static function bold(size:Number, color:Object = null):TextFormat {
         return new TextFormat(boldFont.fontName, size, color, true);
     }
 
@@ -76,17 +75,21 @@ public class Layout {
         return new TextFormat(lightFont.fontName, size, color, null, null, null, null, null, TextFormatAlign.CENTER);
     }
 
+    // static fonts
+
     public static const unitCounterTextFormat:TextFormat = bold(18);
     public static const buildingCounterTextFormat:TextFormat = bold(18, 0xffffff);
     public static const gameItemCounterTextFormat:TextFormat = bold(40, 0xffffff);
+    public static const shopItemCountTextFormat:TextFormat = bold(18, 0xffffff);
+    public static const skillNameTextFormat:TextFormat = light(24);
+
+    // dynamic fonts
 
     private function initTextFormats(scale:Number):void {
         _rectButtonTextFormat = lightCenter(18 * scale, 0xffffff);
         _noConnectionTitleTextFormat = lightCenter(56 * scale);
-        _shopItemCountTextFormat = bold(18 * scale, 0xffffff);
         _shopTitleTextFormat = light(18 * scale);
         _skillsTitleTextFormat = light(18 * scale);
-        _skillNameTextFormat = light(24 * scale);
         _playTextFormat = light(48 * scale);
         _enterGameTextFormat = light(32 * scale);
         _loadingTextFormat = light(48 * scale);
@@ -104,12 +107,6 @@ public class Layout {
         return _noConnectionTitleTextFormat;
     }
 
-    private var _shopItemCountTextFormat:TextFormat;
-
-    public final function get shopItemCountTextFormat():TextFormat {
-        return _shopItemCountTextFormat;
-    }
-
     private var _shopTitleTextFormat:TextFormat;
 
     public final function get shopTitleTextFormat():TextFormat {
@@ -120,12 +117,6 @@ public class Layout {
 
     public final function get skillsTitleTextFormat():TextFormat {
         return _skillsTitleTextFormat;
-    }
-
-    private var _skillNameTextFormat:TextFormat;
-
-    public final function get skillNameTextFormat():TextFormat {
-        return _skillNameTextFormat;
     }
 
     private var _playTextFormat:TextFormat;
@@ -249,7 +240,7 @@ public class Layout {
 
     // screen slider
 
-    public function createSlider(screens:Vector.<MenuScreen>, locale:CastlesLocale):ScreenSlider {
+    public function createSlider(screens:Vector.<Screen>, locale:CastlesLocale):ScreenSlider {
         throw OverrideMe();
     }
 
@@ -283,36 +274,10 @@ public class Layout {
 
     // shop
 
-    public function get shopItemWidth():int {
-        throw OverrideMe();
-    }
-
     private var _shopItemGap:int;
 
     public function get shopItemGap():int {
         return _shopItemGap;
-    }
-
-    // skills
-
-    public function get skillPlusSize():int {
-        throw OverrideMe();
-    }
-
-    private var _skillWidth:int;
-
-    public final function get skillWidth():int {
-        return _skillWidth;
-    }
-
-    public final function get skillHeight():int {
-        return bodyHeight;
-    }
-
-    private var _skillViewMarkHeight:int;
-
-    public function get skillViewMarkHeight():int {
-        return _skillViewMarkHeight;
     }
 
     // rect button

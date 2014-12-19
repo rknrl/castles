@@ -1,43 +1,28 @@
-package ru.rknrl.castles.menu.screens.skills {
+package ru.rknrl.castles.menu.screens.skills.flask {
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
-import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.utils.layout.Layout;
+import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.easers.interpolate;
 
 public class FlaskFill extends Sprite {
-    private var w:int;
-    private var h:int;
+    public static const WIDTH:int = 34;
+    public static const HEIGHT:int = 93;
+    private static const levelHeight:int = 25;
+
     private var waterLine:FlaskWaterLine;
     private var fill:Bitmap;
 
-    public function FlaskFill(w:int, h:int, color:uint, layout:Layout) {
-        _color = color;
+    public function FlaskFill() {
+        addChild(waterLine = new FlaskWaterLine(WIDTH));
+        addChild(fill = new Bitmap(Utils.flaskFill));
+        fill.x = -WIDTH / 2;
+        fill.width = WIDTH;
 
-        addChild(waterLine = new FlaskWaterLine(w, 10));
-        addChild(fill = new Bitmap(new BitmapData(1, 1, false, 0xcccccc)));
-
-        updateLayout(w, h, layout);
-        addEventListener(Event.ENTER_FRAME, onEnterFrame);
-    }
-
-    public function updateLayout(w:int, h:int, layout:Layout):void {
-        this.w = w;
-        this.h = h;
-
-        redrawFill();
-    }
-
-    private var _color:uint;
-
-    public function set color(value:uint):void {
-        _color = value;
         redrawFill();
     }
 
@@ -59,26 +44,22 @@ public class FlaskFill extends Sprite {
         redrawFill();
     }
 
-    private function onEnterFrame(event:Event):void {
+    public function onEnterFrame(fraction:Number):void {
+        waterLine.onEnterFrame(fraction);
         if (getTimer() <= startTime + levelUpDuration) {
             redrawFill();
         }
     }
 
     public function redrawFill():void {
-        const levelH:int = 25;
-
-        const startFillHeight:int = _oldSkillLevel.id() * levelH;
-        const endFillHeight:int = _skillLevel.id() * levelH;
+        const startFillHeight:int = _oldSkillLevel.id() * levelHeight;
+        const endFillHeight:int = _skillLevel.id() * levelHeight;
 
         const fillHeight:int = interpolate(startFillHeight, endFillHeight, getTimer(), startTime, levelUpDuration, easer);
 
-        fill.x = -w / 2;
-        fill.y = h - fillHeight;
-        fill.width = w;
+        waterLine.y = HEIGHT - fillHeight;
+        fill.y = HEIGHT - fillHeight;
         fill.height = fillHeight;
-
-        waterLine.y = h - fillHeight;
     }
 }
 }

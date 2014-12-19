@@ -14,12 +14,8 @@ public class Screen extends Sprite {
         inTransition = 0;
     }
 
-    public function changeColors():void {
-        // override me
-    }
-
-    public function set transition(value:Number):void {
-        // override me
+    public function get titleText():String {
+        return "";
     }
 
     private var _gold:int;

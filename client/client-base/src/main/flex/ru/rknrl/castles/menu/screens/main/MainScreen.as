@@ -3,7 +3,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 
 import ru.rknrl.castles.menu.PopupManager;
-import ru.rknrl.castles.menu.screens.MenuScreen;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.main.popup.build.BuildEvent;
 import ru.rknrl.castles.menu.screens.main.popup.build.BuildPopup;
 import ru.rknrl.castles.menu.screens.main.popup.upgrade.RemoveEvent;
@@ -14,7 +14,6 @@ import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenBuildPopupEve
 import ru.rknrl.castles.menu.screens.main.startLocation.events.OpenUpgradePopupEvent;
 import ru.rknrl.castles.menu.screens.main.startLocation.events.SwapEvent;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Label;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.createTextField;
@@ -28,7 +27,7 @@ import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.utils.changeTextFormat;
 
-public class MainScreen extends MenuScreen {
+public class MainScreen extends Screen {
     private var sender:AccountFacadeSender;
     private var layout:Layout;
 
@@ -38,7 +37,7 @@ public class MainScreen extends MenuScreen {
     private var locale:CastlesLocale;
     private var popupManager:PopupManager;
 
-    public function MainScreen(id:String, startLocation:StartLocationDTO, buildingsPrices:BuildingPrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale, popupManager:PopupManager) {
+    public function MainScreen(startLocation:StartLocationDTO, buildingsPrices:BuildingPrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale, popupManager:PopupManager) {
         this.buildingsPrices = buildingsPrices;
         this.sender = sender;
         this.locale = locale;
@@ -54,8 +53,6 @@ public class MainScreen extends MenuScreen {
         playLabel.addEventListener(MouseEvent.CLICK, onPlayClick);
 
         updateLayout(layout);
-
-        super(id);
     }
 
     public function updateLayout(layout:Layout):void {
@@ -85,11 +82,6 @@ public class MainScreen extends MenuScreen {
 
     public function set startLocation(value:StartLocationDTO):void {
         startLocationView.startLocation = value;
-    }
-
-    override public function changeColors():void {
-        startLocationView.color = Colors.randomColor();
-        playLabel.textColor = Colors.randomColor();
     }
 
     // build popup

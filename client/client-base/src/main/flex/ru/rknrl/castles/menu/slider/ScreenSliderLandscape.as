@@ -4,8 +4,7 @@ import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.menu.screens.MenuScreen;
-import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
@@ -18,32 +17,27 @@ public class ScreenSliderLandscape extends ScreenSlider {
 
     private var points:Vector.<MenuPoint> = new <MenuPoint>[];
 
-    private function getPointById(id:String):MenuPoint {
+    private function getPointByScreen(screen:Screen):MenuPoint {
         for each(var point:MenuPoint in points) {
-            if (point.id == id) return point;
+            if (point.screen == screen) return point;
         }
-        throw new Error("can't find screen " + id);
+        throw new Error("can't find point " + screen);
     }
 
-    public function ScreenSliderLandscape(screens:Vector.<MenuScreen>, layout:LayoutLandscape) {
+    public function ScreenSliderLandscape(screens:Vector.<Screen>, layout:LayoutLandscape) {
         super(screens);
 
         addChild(screensHolder = new Sprite());
 
-        for each(var screen:MenuScreen in screens) {
+        for each(var screen:Screen in screens) {
             screensHolder.addChild(screen);
-            screen.changeColors();
         }
 
         addChild(pointsHolder = new Sprite());
 
-        const ids:Vector.<String> = new <String>[];
-        for each(var screen:MenuScreen in screens) {
-            ids.push(screen.id);
-        }
 
-        for (var i:int = 0; i < ids.length; i++) {
-            const point:MenuPoint = new MenuPoint(ids[i], layout.pointRadius);
+        for (var i:int = 0; i < screens.length; i++) {
+            const point:MenuPoint = new MenuPoint(screens[i], layout.pointRadius);
             point.addEventListener(MouseEvent.CLICK, onMenuPointClick);
             points.push(point);
             pointsHolder.addChild(point);
@@ -51,7 +45,7 @@ public class ScreenSliderLandscape extends ScreenSlider {
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
 
-        currentScreen = getScreenById(Utils.SCREEN_CASTLE);
+        currentScreen = screens[0];
 
         updateLayout(layout);
     }
@@ -76,11 +70,10 @@ public class ScreenSliderLandscape extends ScreenSlider {
 
     private function onMenuPointClick(event:MouseEvent):void {
         const point:MenuPoint = MenuPoint(event.target);
-        const newScreen:MenuScreen = getScreenById(point.id);
+        const newScreen:Screen = point.screen;
 
         if (newScreen != currentScreen) {
             oldScreen = currentScreen;
-            newScreen.changeColors();
             currentScreen = newScreen;
             startEaser();
         }
@@ -88,27 +81,27 @@ public class ScreenSliderLandscape extends ScreenSlider {
 
     // current screen
 
-    private var oldScreen:MenuScreen;
+    private var oldScreen:Screen;
 
-    private var _currentScreen:MenuScreen;
+    private var _currentScreen:Screen;
 
-    public function get currentScreen():MenuScreen {
+    public function get currentScreen():Screen {
         return _currentScreen;
     }
 
-    public function set currentScreen(value:MenuScreen):void {
+    public function set currentScreen(value:Screen):void {
         if (_currentScreen) {
-            getPointById(_currentScreen.id).selected = false;
+            getPointByScreen(_currentScreen).selected = false;
         }
         _currentScreen = value;
 
-        getPointById(_currentScreen.id).selected = true;
+        getPointByScreen(_currentScreen).selected = true;
     }
 
     // posScreens
 
     private function posScreens():void {
-        for each(var screen:MenuScreen in screens) {
+        for each(var screen:Screen in screens) {
             screen.visible = false;
         }
 
@@ -142,10 +135,6 @@ public class ScreenSliderLandscape extends ScreenSlider {
 
     private function updateScreenHolderPosition():void {
         screensHolder.x = interpolate(0, layout.stageWidth, getTimer(), easerStartTime, duration, easer);
-
-        var p:Number = Math.abs(screensHolder.x / layout.stageWidth);
-        currentScreen.transition = p;
-        if (oldScreen) oldScreen.transition = 1 - p;
     }
 }
 }

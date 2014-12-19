@@ -25,6 +25,8 @@ public class Utils {
 
     public static const popupScreen:BitmapData = new BitmapData(1, 1, true, 0xcccccccc);
 
+    public static const flaskFill:BitmapData = new BitmapData(1, 1, false, 0xcccccc);
+
     public static const PLAY:String = "Play";
     public static const NOT_ENOUGH_GOLD:String = "notEnoughGold";
 
@@ -37,13 +39,6 @@ public class Utils {
     slotsPositions[SlotId.SLOT_3] = new Point(0, 0);
     slotsPositions[SlotId.SLOT_4] = new Point(1, -1);
     slotsPositions[SlotId.SLOT_5] = new Point(2, 0);
-
-    public static const BUTTON_PLAY:String = "Play";
-    public static const SCREEN_CASTLE:String = "Castle";
-    public static const SCREEN_TOP:String = "Top";
-    public static const SCREEN_SKILLS:String = "Skills";
-    public static const SCREEN_SHOP:String = "Shop";
-    public static const SCREEN_BANK:String = "Bank";
 
     public static function getItemIcon(itemType:ItemType):Sprite {
         switch (itemType) {
