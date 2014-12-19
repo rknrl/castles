@@ -30,9 +30,6 @@ public class Utils {
     public static const PLAY:String = "Play";
     public static const NOT_ENOUGH_GOLD:String = "notEnoughGold";
 
-    public static const SHOP_ALL_ITEMS:Array = [ItemType.FIREBALL, ItemType.TORNADO, ItemType.STRENGTHENING, ItemType.VOLCANO, ItemType.ASSISTANCE];
-    public static const ALL_ITEMS:Array = [ItemType.FIREBALL, ItemType.TORNADO, ItemType.ASSISTANCE, ItemType.STRENGTHENING, ItemType.VOLCANO];
-
     public static const slotsPositions:Dictionary = new Dictionary();
     slotsPositions[SlotId.SLOT_1] = new Point(-2, 0);
     slotsPositions[SlotId.SLOT_2] = new Point(-1, -1);

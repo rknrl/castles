@@ -1,10 +1,12 @@
 package ru.rknrl.castles.menu.screens.shop {
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.utils.Align;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
@@ -16,49 +18,25 @@ public class ShopScreen extends Screen {
     private var sender:AccountFacadeSender;
     private var locale:CastlesLocale;
 
+    private var itemsHolder:Sprite;
     private const typeToItemView:Dictionary = new Dictionary();
 
     public function ShopScreen(itemsCount:ItemsCount, itemPrice:int, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
         this.locale = locale;
 
-        for (var i:int = 0; i < Utils.SHOP_ALL_ITEMS.length; i++) {
-            const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
+        addChild(itemsHolder = new Sprite());
+
+        for each(var itemType:ItemType in ItemType.values) {
             const item:Item = new Item(itemType, itemsCount.getCount(itemType), Colors.randomColor());
             item.addEventListener(MouseEvent.CLICK, onItemClick);
             typeToItemView[itemType] = item;
-            addChild(item);
+            itemsHolder.addChild(item);
         }
 
         this.itemPrice = itemPrice;
 
         updateLayout(layout);
-    }
-
-    override public function get titleText():String {
-        return locale.shopTitle + " " + _itemPrice;
-    }
-
-    public function updateLayout(layout:Layout):void {
-        const count:int = Utils.SHOP_ALL_ITEMS.length;
-        const horizontalGap:int = layout.shopItemGap;
-        const left:int = layout.stageCenterX - ((Item.SIZE + horizontalGap) * count - horizontalGap) / 2;
-
-        for (var i:int = 0; i < count; i++) {
-            const itemType:ItemType = Utils.SHOP_ALL_ITEMS[i];
-            const item:Item = typeToItemView[itemType];
-            item.x = left + i * (Item.SIZE + horizontalGap);
-            item.y = layout.bodyCenterY;
-        }
-    }
-
-    public function set itemsCount(value:ItemsCount):void {
-        for each(var itemType:ItemType in Utils.ALL_ITEMS) {
-            const item:Item = typeToItemView[itemType];
-            const newCount:int = value.getCount(itemType);
-            if (newCount > item.count) unlockItem(item);
-            item.count = newCount;
-        }
     }
 
     private var _itemPrice:int;
@@ -67,13 +45,31 @@ public class ShopScreen extends Screen {
         _itemPrice = value;
     }
 
+    override public function get titleText():String {
+        return locale.shopTitle + " " + _itemPrice;
+    }
+
+    public function updateLayout(layout:Layout):void {
+        const itemsWidth:int = Align.horizontal(typeToItemView, Item.SIZE, layout.shopItemGap);
+        itemsHolder.x = layout.stageCenterX - itemsWidth / 2;
+        itemsHolder.y = layout.bodyCenterY;
+    }
+
+    public function set itemsCount(value:ItemsCount):void {
+        for (var itemType:ItemType in typeToItemView) {
+            const item:Item = typeToItemView[itemType];
+            item.count = value.getCount(itemType);
+        }
+        lock = false;
+    }
+
     private function onItemClick(event:MouseEvent):void {
         if (gold < _itemPrice) {
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {
             const item:Item = Item(event.target);
 
-            lockItem(item);
+            lock = true;
 
             const dto:BuyItemDTO = new BuyItemDTO();
             dto.type = item.itemType;
@@ -83,16 +79,10 @@ public class ShopScreen extends Screen {
         }
     }
 
-    private const lockedItems:Dictionary = new Dictionary();
-
-    public function lockItem(item:Item):void {
-        item.lock = true;
-        lockedItems[item] = item;
-    }
-
-    public function unlockItem(item:Item):void {
-        item.lock = false;
-        delete lockedItems[item];
+    public function set lock(value:Boolean):void {
+        for each(var item:Item in typeToItemView) {
+            item.lock = value;
+        }
     }
 }
 }

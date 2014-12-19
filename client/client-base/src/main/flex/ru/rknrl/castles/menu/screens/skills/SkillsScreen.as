@@ -1,10 +1,12 @@
 package ru.rknrl.castles.menu.screens.skills {
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.menu.screens.Screen;
 import ru.rknrl.castles.menu.screens.skills.flask.FlaskView;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
+import ru.rknrl.castles.utils.Align;
 import ru.rknrl.castles.utils.Colors;
 import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
@@ -18,18 +20,20 @@ public class SkillsScreen extends Screen {
     private var skillUpgradePrices:SkillUpgradePrices;
 
     private const typeToFlask:Dictionary = new Dictionary();
+    private var flasksHolder:Sprite;
 
     public function SkillsScreen(skillLevels:SkillLevels, skillUpgradePrices:SkillUpgradePrices, sender:AccountFacadeSender, layout:Layout, locale:CastlesLocale) {
         this.sender = sender;
         this.locale = locale;
         this.skillUpgradePrices = skillUpgradePrices;
 
-        for (var i:int = 0; i < SkillType.values.length; i++) {
-            const skillType:SkillType = SkillType.values[i];
+        addChild(flasksHolder = new Sprite());
+
+        for each(var skillType:SkillType in SkillType.values) {
             const flask:FlaskView = new FlaskView(skillType, Colors.randomColor(), locale);
             flask.addEventListener(FlaskView.UPGRADE, onUpgrade);
             typeToFlask[skillType] = flask;
-            addChild(flask);
+            flasksHolder.addChild(flask);
         }
 
         this.skillLevels = skillLevels;
@@ -38,41 +42,33 @@ public class SkillsScreen extends Screen {
 
 
     override public function get titleText():String {
-        return _skillLevels.isLastTotalLevel ? locale.skillsTitleComplete : locale.skillsTitle + " " + getPrice();
+        return _skillLevels.isLastTotalLevel ? locale.skillsTitleComplete : locale.skillsTitle + " " + price;
     }
 
-    private function getPrice():int {
+    private function get price():int {
         return skillUpgradePrices.getPrice(_skillLevels.getNextTotalLevel());
     }
 
     public function updateLayout(layout:Layout):void {
-        const count:int = SkillType.values.length;
-        const top:int = layout.bodyCenterY - FlaskView.HEIGHT / 2;
-        const gap:int = layout.shopItemGap;
-        const left:int = layout.stageCenterX - ((FlaskView.WIDTH + gap) * count - gap) / 2 + FlaskView.WIDTH / 2;
-
-        for (var i:int = 0; i < count; i++) {
-            const skillType:SkillType = SkillType.values[i];
-
-            const flask:FlaskView = typeToFlask[skillType];
-            flask.x = left + i * (gap + FlaskView.WIDTH);
-            flask.y = top;
-        }
+        const flasksWidth:int = Align.horizontal(typeToFlask, FlaskView.WIDTH, layout.shopItemGap);
+        flasksHolder.x = layout.stageCenterX - flasksWidth / 2;
+        flasksHolder.y = layout.bodyCenterY - FlaskView.HEIGHT / 2
     }
 
     private var _skillLevels:SkillLevels;
 
     public function set skillLevels(value:SkillLevels):void {
         _skillLevels = value;
-        lock = false;
 
         for each(var skillType:SkillType in SkillType.values) {
             FlaskView(typeToFlask[skillType]).skillLevel = value.getLevel(skillType);
         }
+
+        lock = false;
     }
 
     private function onUpgrade(event:Event):void {
-        if (gold < getPrice()) {
+        if (gold < price) {
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {
             const flask:FlaskView = FlaskView(event.target);

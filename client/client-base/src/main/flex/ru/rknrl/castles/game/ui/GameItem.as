@@ -80,7 +80,7 @@ public class GameItem extends Sprite {
     private var endTime:int;
 
     public function update(millisTillCooldownEnd:int, time:int, cooldownDuration:int, count:int):void {
-        if (_count > count) unlock();
+        if (_count > count) lock = false;
         _count = count;
 
         countTextField.text = count.toString();
@@ -121,12 +121,8 @@ public class GameItem extends Sprite {
 
     private var _lock:Boolean;
 
-    public function lock():void {
-        _lock = true;
-    }
-
-    public function unlock():void {
-        _lock = false;
+    public function set lock(value:Boolean):void {
+        _lock = value;
     }
 }
 }

@@ -10,8 +10,8 @@ import flash.utils.getTimer;
 import ru.rknrl.castles.game.layout.GameLayout;
 import ru.rknrl.castles.game.ui.avatar.GameAvatarData;
 import ru.rknrl.castles.menu.screens.gameOver.GameOverScreen;
+import ru.rknrl.castles.utils.Align;
 import ru.rknrl.castles.utils.Colors;
-import ru.rknrl.castles.utils.Utils;
 import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.castles.utils.layout.LayoutLandscape;
 import ru.rknrl.castles.utils.locale.CastlesLocale;
@@ -24,6 +24,7 @@ public class GameUI extends Sprite {
     private var locale:CastlesLocale;
 
     private const typeToItem:Dictionary = new Dictionary();
+    private var itemsHolder:Sprite;
     private const avatars:Vector.<DisplayObject> = new <DisplayObject>[];
 
     public function GameUI(layout:Layout, gameLayout:GameLayout, locale:CastlesLocale, itemsState:ItemsStateDTO) {
@@ -50,13 +51,9 @@ public class GameUI extends Sprite {
 
         if (gameOverScreen) gameOverScreen.updateLayout(layout);
 
-        for (var i:int = 0; i < Utils.ALL_ITEMS.length; i++) {
-            const itemType:ItemType = Utils.ALL_ITEMS[i];
-            const item:GameItem = typeToItem[itemType];
-            item.updateLayout(gameLayout);
-            item.x = gameLayout.gameItemLeft + i * (gameLayout.gameItemSize + gameLayout.gameItemHorGap);
-            item.y = gameLayout.gameItemTop;
-        }
+        const itemsWidth:int = Align.horizontal(typeToItem, gameLayout.gameItemSize, gameLayout.gameItemHorGap);
+        itemsHolder.x = (gameLayout.stageWidth - itemsWidth) / 2;
+        itemsHolder.y = gameLayout.gameItemTop;
 
         for (var i:int = 0; i < avatars.length; i++) {
             gameLayout.updateGameAvatar(i, avatars[i])
@@ -81,13 +78,14 @@ public class GameUI extends Sprite {
             throw new Error("can't find item state " + itemType);
         }
 
-        for (var i:int = 0; i < Utils.ALL_ITEMS.length; i++) {
-            const itemType:ItemType = Utils.ALL_ITEMS[i];
+        itemsHolder = new Sprite();
+        for (var i:int = 0; i < ItemType.values.length; i++) {
+            const itemType:ItemType = ItemType.values[i];
             const itemState:ItemStateDTO = getItemState(itemType);
             const item:GameItem = new GameItem(itemType, layout, itemState.millisTillCooldownEnd, getTimer(), itemState.cooldownDuration, itemState.count);
             item.addEventListener(MouseEvent.CLICK, onItemClick);
             typeToItem[itemType] = item;
-            addChild(item);
+            itemsHolder.addChild(item);
         }
     }
 
