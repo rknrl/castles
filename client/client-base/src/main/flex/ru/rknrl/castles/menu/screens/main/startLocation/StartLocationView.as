@@ -11,39 +11,38 @@ import ru.rknrl.castles.menu.screens.main.startLocation.objects.DragBuilding;
 import ru.rknrl.castles.menu.screens.main.startLocation.objects.MenuBuilding;
 import ru.rknrl.castles.menu.screens.main.startLocation.objects.MenuGround;
 import ru.rknrl.castles.utils.Utils;
-import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.StartLocationDTO;
 
 public class StartLocationView extends Sprite {
-    private var groundLayer:Sprite;
-    private var buildingLayer:Sprite;
+    private const idToBuilding:Dictionary = new Dictionary();
+    private const idToGround:Dictionary = new Dictionary();
+    private const idToPosition:Dictionary = new Dictionary();
 
-    private var grounds:Vector.<MenuGround> = new <MenuGround>[];
+    public function StartLocationView(startLocation:StartLocationDTO) {
+        const groundLayer:Sprite = new Sprite();
+        addChild(groundLayer);
 
-    public function StartLocationView(startLocation:StartLocationDTO, layout:Layout) {
-        addChild(groundLayer = new Sprite());
+        const buildingLayer:Sprite = new Sprite();
+        addChild(buildingLayer);
 
-        addChild(buildingLayer = new Sprite());
-
-        const cellSize:int = CellSize.SIZE.id() * layout.menuBuildingScale;
+        const cellSize:int = CellSize.SIZE.id();
 
         for each(var id:SlotId in SlotId.values) {
             const pos:Point = Utils.slotsPositions[id];
             const x:int = pos.x * cellSize;
-            const y:int = pos.y * cellSize + cellSize / 2;
+            const y:int = pos.y * cellSize;
 
-            const ground:MenuGround = new MenuGround(id, cellSize, cellSize);
+            const ground:MenuGround = new MenuGround(id);
             ground.addEventListener(MouseEvent.MOUSE_DOWN, onGroundMouseDown);
-            grounds.push(ground);
             groundLayer.addChild(ground);
             idToGround[id] = ground;
             ground.x = x;
             ground.y = y;
 
-            const building:MenuBuilding = new MenuBuilding(id, layout.menuBuildingScale);
+            const building:MenuBuilding = new MenuBuilding(id);
             building.addEventListener(MouseEvent.MOUSE_DOWN, onBuildingMouseDown);
             buildingLayer.addChild(building);
 
@@ -57,10 +56,6 @@ public class StartLocationView extends Sprite {
         this.startLocation = startLocation;
     }
 
-    private const idToBuilding:Dictionary = new Dictionary();
-    private const idToGround:Dictionary = new Dictionary();
-    private const idToPosition:Dictionary = new Dictionary();
-
     private var buildingsCount:int;
 
     public function set startLocation(value:StartLocationDTO):void {
@@ -71,17 +66,15 @@ public class StartLocationView extends Sprite {
             const building:MenuBuilding = idToBuilding[id];
             if (!building) throw new Error("no building for id " + id);
 
-            if (building.differentWith(slot)) unlockSlot(id);
+            const ground:MenuGround = idToGround[id];
+            if (!ground) throw new Error("no ground for id " + id);
 
+            ground.hasBuilding = slot.hasBuildingPrototype;
             building.update(slot);
             if (slot.hasBuildingPrototype) buildingsCount++;
         }
-    }
 
-    public function set color(value:uint):void {
-        for each(var building:MenuBuilding in idToBuilding) {
-            building.color = value;
-        }
+        lock = false;
     }
 
     // mouse down
@@ -197,14 +190,11 @@ public class StartLocationView extends Sprite {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    public function lockSlot(slotId:SlotId):void {
-        MenuGround(idToGround[slotId]).lock();
-        MenuBuilding(idToBuilding[slotId]).lock();
-    }
-
-    public function unlockSlot(slotId:SlotId):void {
-        MenuGround(idToGround[slotId]).unlock();
-        MenuBuilding(idToBuilding[slotId]).unlock();
+    public function set lock(value:Boolean):void {
+        for each(var slotId:SlotId in SlotId.values) {
+            MenuGround(idToGround[slotId]).lock = value;
+            MenuBuilding(idToBuilding[slotId]).lock = value;
+        }
     }
 }
 }

@@ -43,7 +43,7 @@ public class MainScreen extends Screen {
         this.locale = locale;
         this.popupManager = popupManager;
 
-        startLocationView = new StartLocationView(startLocation, layout);
+        startLocationView = new StartLocationView(startLocation);
         startLocationView.addEventListener(OpenBuildPopupEvent.OPEN_BUILD_POPUP, openBuildPopup);
         startLocationView.addEventListener(OpenUpgradePopupEvent.OPEN_UPGRADE_POPUP, openUpgradePopup);
         startLocationView.addEventListener(SwapEvent.SWAP_SLOTS, swapSlots);
@@ -58,9 +58,9 @@ public class MainScreen extends Screen {
     public function updateLayout(layout:Layout):void {
         this.layout = layout;
 
-        startLocationView.scaleX = startLocationView.scaleY = layout.scale;
-        startLocationView.x = layout.locationCenterX;
-        startLocationView.y = layout.locationCenterY;
+        startLocationView.scaleX = startLocationView.scaleY = layout.menuBuildingScale * layout.scale;
+        startLocationView.x = layout.stageCenterX;
+        startLocationView.y = layout.bodyCenterY;
 
         changeTextFormat(playLabel, layout.playTextFormat);
         playLabel.x = layout.stageCenterX - playLabel.width / 2;
@@ -106,7 +106,7 @@ public class MainScreen extends Screen {
             buildPopup.animate();
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {
-            startLocationView.lockSlot(event.slotId);
+            startLocationView.lock = true;
 
             const dto:BuyBuildingDTO = new BuyBuildingDTO();
             dto.id = event.slotId;
@@ -148,7 +148,7 @@ public class MainScreen extends Screen {
             upgradePopup.animate();
             dispatchEvent(new Event(Utils.NOT_ENOUGH_GOLD))
         } else {
-            startLocationView.lockSlot(event.slotId);
+            startLocationView.lock = true;
 
             const dto:UpgradeBuildingDTO = new UpgradeBuildingDTO();
             dto.id = event.slotId;
@@ -159,7 +159,7 @@ public class MainScreen extends Screen {
     }
 
     private function onRemove(event:RemoveEvent):void {
-        startLocationView.lockSlot(event.slotId);
+        startLocationView.lock = true;
 
         const dto:RemoveBuildingDTO = new RemoveBuildingDTO();
         dto.id = event.slotId;
@@ -171,8 +171,7 @@ public class MainScreen extends Screen {
     // swap
 
     private function swapSlots(event:SwapEvent):void {
-        startLocationView.lockSlot(event.slotId1);
-        startLocationView.lockSlot(event.slotId2);
+        startLocationView.lock = true;
 
         const dto:SwapSlotsDTO = new SwapSlotsDTO();
         dto.id1 = event.slotId1;

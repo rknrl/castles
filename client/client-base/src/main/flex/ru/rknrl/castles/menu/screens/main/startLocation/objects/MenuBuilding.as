@@ -3,7 +3,9 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.game.view.BuildingBase;
 import ru.rknrl.castles.utils.Colors;
+import ru.rknrl.castles.utils.Shadow;
 import ru.rknrl.castles.utils.Utils;
+import ru.rknrl.castles.utils.layout.Layout;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
@@ -19,19 +21,18 @@ public class MenuBuilding extends BuildingBase {
         return _slotId;
     }
 
-    private var buildingScale:Number;
-
     private var bodyHolder:Sprite;
+    private var shadow:Shadow;
+
     private var upCircle:UpButton;
     private var plusCircle:PlusButton;
 
-    public function MenuBuilding(slotId:SlotId, buildingScale:Number) {
+    public function MenuBuilding(slotId:SlotId) {
         _slotId = slotId;
-        this.buildingScale = buildingScale;
 
         addChild(bodyHolder = new Sprite());
 
-        const halfCellSize:Number = CellSize.SIZE.id() * buildingScale / 2;
+        const halfCellSize:Number = CellSize.SIZE.id() / 2;
 
         upCircle = new UpButton(16, Colors.darkMagenta);
 //        addChild(upCircle); // todo
@@ -48,32 +49,28 @@ public class MenuBuilding extends BuildingBase {
         mouseChildren = false;
     }
 
-    public function differentWith(slot:SlotDTO):Boolean {
-        if (slot.hasBuildingPrototype) {
-            if (hasBuilding) {
-                return buildingType != slot.buildingPrototype.type || buildingLevel != slot.buildingPrototype.level;
-            } else {
-                return true;
-            }
-        }
-        return hasBuilding;
-    }
-
     public function update(slot:SlotDTO):void {
         if (body) {
             bodyHolder.removeChild(body);
             body = null;
+            removeChild(shadow);
         }
 
         _hasBuilding = slot.hasBuildingPrototype;
         if (_hasBuilding) {
             _buildingType = slot.buildingPrototype.type;
             _buildingLevel = slot.buildingPrototype.level;
+            const scale:Number = Utils.getScaleByLevel(_buildingLevel);
 
             body = Utils.getBuildingBody(_buildingType);
-            body.scaleX = body.scaleY = Utils.getScaleByLevel(_buildingLevel) * buildingScale;
+            body.scaleX = body.scaleY = scale;
             body.transform.colorTransform = Colors.colorToTransform(Colors.magenta);
             bodyHolder.addChild(body);
+
+            shadow = new Shadow();
+            shadow.scaleX = shadow.scaleY = scale;
+            shadow.y = Layout.shadowY * scale;
+            addChild(shadow)
         }
 
         upCircle.visible = _hasBuilding && _buildingLevel != BuildingLevel.LEVEL_3;
@@ -106,12 +103,8 @@ public class MenuBuilding extends BuildingBase {
         return _buildingLevel;
     }
 
-    public function lock():void {
-        visible = false;
-    }
-
-    public function unlock():void {
-        visible = true;
+    public function set lock(value:Boolean):void {
+        visible = !value;
     }
 }
 }

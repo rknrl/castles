@@ -38,36 +38,6 @@ public class Colors {
     ];
 
 
-    public static function colorToLight(color:uint):uint {
-        switch (color) {
-            case yellow:
-            case darkYellow:
-                return lightYellow;
-
-            case magenta:
-            case darkMagenta:
-                return lightMagenta;
-
-            case cyan:
-            case darkCyan:
-                return lightCyan;
-
-            case red:
-            case darkRed:
-                return lightRed;
-
-            case grey:
-            case darkGrey:
-                return lightGrey;
-        }
-        throw new Error();
-    }
-
-    public static function randomLightColor():uint {
-        const index:int = Math.random() * lightColors.length;
-        return lightColors[index];
-    }
-
     public static function randomColor():uint {
         const index:int = Math.random() * colors.length;
         return colors[index];

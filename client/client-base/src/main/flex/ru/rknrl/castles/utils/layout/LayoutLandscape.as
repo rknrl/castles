@@ -125,16 +125,6 @@ public class LayoutLandscape extends Layout {
         return _pointGap;
     }
 
-    // menu start location
-
-    override public function get locationCenterX():int {
-        return stageCenterX;
-    }
-
-    override public function get locationCenterY():int {
-        return bodyCenterY;
-    }
-
     // bank button
 
     private var _bankButtonWidth:int;

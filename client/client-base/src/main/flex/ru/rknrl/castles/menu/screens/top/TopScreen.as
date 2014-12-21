@@ -44,6 +44,7 @@ public class TopScreen extends Screen {
 
 import flash.display.BitmapData;
 import flash.display.Sprite;
+import flash.text.TextFormat;
 
 import ru.rknrl.castles.menu.screens.top.TopAvatar;
 import ru.rknrl.castles.menu.screens.top.TopAvatarData;
@@ -58,25 +59,30 @@ class TopRow extends Sprite {
     private var winTextField:Label;
     private var loseTextField:Label;
 
+
     public function TopRow(layout:Layout) {
-        placeTextField = createTextField(layout.shopTitleTextFormat, "1");
+        const textFormat:TextFormat = layout.topAvatarTextFormat; // todo
+
+        placeTextField = createTextField(textFormat, "1");
         addChild(placeTextField);
 
         avatar = new TopAvatar(new TopAvatarData(new BitmapData(32, 32, false, 0), "Толя Янот"), layout);
         addChild(avatar);
 
-        winTextField = createTextField(layout.shopTitleTextFormat, "100");
+        winTextField = createTextField(textFormat, "100");
         addChild(winTextField);
 
-        loseTextField = createTextField(layout.shopTitleTextFormat, "100");
+        loseTextField = createTextField(textFormat, "100");
         addChild(loseTextField);
     }
 
-    public function updateLayout(layuot:Layout):void {
-        changeTextFormat(placeTextField, layuot.shopTitleTextFormat);
-        changeTextFormat(winTextField, layuot.shopTitleTextFormat);
-        changeTextFormat(loseTextField, layuot.shopTitleTextFormat);
-        avatar.updateLayout(layuot);
+    public function updateLayout(layout:Layout):void {
+        const textFormat:TextFormat = layout.topAvatarTextFormat; // todo
+
+        changeTextFormat(placeTextField, textFormat);
+        changeTextFormat(winTextField, textFormat);
+        changeTextFormat(loseTextField, textFormat);
+        avatar.updateLayout(layout);
 
         avatar.x = 100;
 

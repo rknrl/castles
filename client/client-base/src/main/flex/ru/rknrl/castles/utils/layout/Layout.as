@@ -15,6 +15,8 @@ import ru.rknrl.utils.OverrideMe;
 
 // todo Points
 public class Layout {
+    public static const shadowY:int = 30;
+
     protected static function getScale(stageWidth:int, stageHeight:int, originalWidth:int, originalHeight:int):Number {
         const widthScale:Number = stageWidth / originalWidth;
         const heightScale:Number = stageHeight / originalHeight;
@@ -88,9 +90,7 @@ public class Layout {
     private function initTextFormats(scale:Number):void {
         _rectButtonTextFormat = lightCenter(18 * scale, 0xffffff);
         _noConnectionTitleTextFormat = lightCenter(56 * scale);
-        _shopTitleTextFormat = light(18 * scale);
-        _skillsTitleTextFormat = light(18 * scale);
-        _playTextFormat = light(48 * scale);
+        _playTextFormat = light(32 * scale);
         _enterGameTextFormat = light(32 * scale);
         _loadingTextFormat = light(48 * scale);
         _headerTextFormat = light(20 * scale);
@@ -105,18 +105,6 @@ public class Layout {
 
     public final function get noConnectionTitleTextFormat():TextFormat {
         return _noConnectionTitleTextFormat;
-    }
-
-    private var _shopTitleTextFormat:TextFormat;
-
-    public final function get shopTitleTextFormat():TextFormat {
-        return _shopTitleTextFormat;
-    }
-
-    private var _skillsTitleTextFormat:TextFormat;
-
-    public final function get skillsTitleTextFormat():TextFormat {
-        return _skillsTitleTextFormat;
     }
 
     private var _playTextFormat:TextFormat;
@@ -259,16 +247,6 @@ public class Layout {
     }
 
     public function get pointGap():int {
-        throw OverrideMe();
-    }
-
-    // menu start location
-
-    public function get locationCenterX():int {
-        throw OverrideMe();
-    }
-
-    public function get locationCenterY():int {
         throw OverrideMe();
     }
 

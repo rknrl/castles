@@ -91,16 +91,6 @@ public class LayoutPortrait extends Layout {
         ScreenSliderPortrait(slider).updateLayout(this);
     }
 
-    // menu start location
-
-    override public function get locationCenterX():int {
-        return stageCenterX;
-    }
-
-    override public function get locationCenterY():int {
-        return bodyTop + (bodyHeight - footerHeight) / 2;
-    }
-
     // bank button
 
     override protected function get rectButtonWidth():int {

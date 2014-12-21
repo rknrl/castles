@@ -10,9 +10,11 @@ import ru.rknrl.funnyUi.Animated;
 public class BuildingBase extends Animated {
     protected var body:Sprite;
 
-    protected function addBody(buildingType:BuildingType, buildingLevel:BuildingLevel, color:ColorTransform, scale:Number = 1):void {
+    protected function addBody(buildingType:BuildingType, buildingLevel:BuildingLevel, color:ColorTransform):void {
+        const scale:Number = Utils.getScaleByLevel(buildingLevel);
+
         body = Utils.getBuildingBody(buildingType);
-        body.scaleX = body.scaleY = Utils.getScaleByLevel(buildingLevel) * scale;
+        body.scaleX = body.scaleY = scale;
         body.transform.colorTransform = color;
         addChild(body);
     }
