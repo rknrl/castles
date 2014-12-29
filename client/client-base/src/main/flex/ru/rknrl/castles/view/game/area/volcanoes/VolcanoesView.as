@@ -7,20 +7,25 @@ import ru.rknrl.castles.utils.points.Point;
 public class VolcanoesView extends Sprite {
     private const volcanoes:Dictionary = new Dictionary();
 
+    private function byId(id:int):VolcanoView {
+        const volcano:VolcanoView = volcanoes[id];
+        if (!volcano) throw new Error("can't find volcano " + id);
+        return volcano;
+    }
+
     public function addVolcano(id:int, pos:Point, radius:Number):void {
         const volcano:VolcanoView = new VolcanoView(pos, radius);
-        addChild(volcano);
+        if (volcanoes[id]) throw new Error("volcano " + id + " already exists");
         volcanoes[id] = volcano;
+        addChild(volcano);
     }
 
     public function setVolcanoRadius(id:int, radius:Number):void {
-        const volcano:VolcanoView = volcanoes[id];
-        volcano.radius = radius;
+        byId(id).radius = radius;
     }
 
     public function removeVolcano(id:int):void {
-        const volcano:VolcanoView = volcanoes[id];
-        removeChild(volcano);
+        removeChild(byId(id));
         delete volcanoes[id];
     }
 }

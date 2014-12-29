@@ -151,9 +151,9 @@ public class GameController implements IGameFacade {
         const owner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
         buildings.byId(dto.id).owner = owner;
 
-        view.area.buildings.setBuildingCount(dto.id, dto.population);
-        view.area.buildings.setBuildingOwner(dto.id, owner);
-        view.area.buildings.setBuildingStrengthened(dto.id, dto.strengthened);
+        view.area.setBuildingCount(dto.id, dto.population);
+        view.area.setBuildingOwner(dto.id, owner);
+        view.area.setBuildingStrengthened(dto.id, dto.strengthened);
     }
 
     // magic items
@@ -166,6 +166,7 @@ public class GameController implements IGameFacade {
         for each(var itemType:ItemType in ItemType.values) {
             view.ui.magicItems.setItemCount(itemType, magicItemStates.count(itemType))
         }
+        view.ui.magicItems.lock = false;
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {

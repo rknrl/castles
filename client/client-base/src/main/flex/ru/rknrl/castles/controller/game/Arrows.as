@@ -39,11 +39,9 @@ public class Arrows {
     public function addArrow(fromBuilding:Building):void {
         if (exists(fromBuilding.id)) return;
 
-        const pos:Point = fromBuilding.pos;
-
         _fromBuildingIds.push(fromBuilding.id);
 
-        view.addArrow(pos);
+        view.addArrow(fromBuilding.pos);
     }
 
     public function mouseMove(mousePos:Point):void {

@@ -77,15 +77,15 @@ public class Colors {
     public static function itemLightColorTransform(itemType:ItemType):ColorTransform {
         switch (itemType) {
             case ItemType.FIREBALL:
-                return redTransform;
+                return lightRedTransform;
             case ItemType.STRENGTHENING:
-                return yellowTransform;
+                return lightYellowTransform;
             case ItemType.VOLCANO:
-                return greyTransform;
+                return lightGreyTransform;
             case ItemType.TORNADO:
-                return cyanTransform;
+                return lightCyanTransform;
             case ItemType.ASSISTANCE:
-                return magentaTransform;
+                return lightMagentaTransform;
         }
         throw new Error("unknown itemType " + itemType);
     }
@@ -116,6 +116,12 @@ public class Colors {
     public static const lightCyan:uint = 0xc0fae9;
     public static const lightRed:uint = 0xecb9bc;
     public static const lightGrey:uint = 0xeeeeee;
+
+    public static const lightRedTransform:ColorTransform = colorToTransform(lightRed);
+    public static const lightYellowTransform:ColorTransform = colorToTransform(lightYellow);
+    public static const lightGreyTransform:ColorTransform = colorToTransform(lightGrey);
+    public static const lightCyanTransform:ColorTransform = colorToTransform(lightCyan);
+    public static const lightMagentaTransform:ColorTransform = colorToTransform(lightMagenta);
 
     public static const noOwnerGroundColor:BitmapData = new BitmapData(1, 1, false, lightGrey);
 

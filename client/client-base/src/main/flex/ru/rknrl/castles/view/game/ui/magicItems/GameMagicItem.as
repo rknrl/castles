@@ -16,12 +16,12 @@ public class GameMagicItem extends Sprite {
 
         mouseChildren = false;
 
-        magicItem = new GameMagicItemIcon(itemType, count);
-        addChild(magicItem);
-
         const shadow:Shadow = new Shadow();
         shadow.y = Layout.shadowDistance;
         addChild(shadow);
+
+        magicItem = new GameMagicItemIcon(itemType, count);
+        addChild(magicItem);
 
         fly = new Fly(magicItem, shadow);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -50,7 +50,7 @@ public class GameMagicItem extends Sprite {
     }
 
     public function set lock(value:Boolean):void {
-        mouseEnabled = value;
+        mouseEnabled = !value;
     }
 }
 }

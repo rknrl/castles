@@ -24,14 +24,14 @@ public class Tornadoes {
     }
 
     public function update(time:int):void {
-        const tornadoesToRemove:Vector.<Tornado> = new <Tornado>[];
+        const toRemove:Vector.<Tornado> = new <Tornado>[];
 
         for each(var tornado:Tornado in tornadoes) {
             view.setTornadoPos(tornado.id, tornado.pos(time));
-            if (tornado.needRemove(time)) tornadoesToRemove.push(tornado);
+            if (tornado.needRemove(time)) toRemove.push(tornado);
         }
 
-        for each(tornado in tornadoesToRemove) {
+        for each(tornado in toRemove) {
             const index:int = tornadoes.indexOf(tornado);
             tornadoes.splice(index, 1);
             view.removeTornado(tornado.id);

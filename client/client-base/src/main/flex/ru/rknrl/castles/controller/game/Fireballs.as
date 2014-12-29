@@ -38,14 +38,13 @@ public class Fireballs {
     }
 
     public function update(time:int):void {
-        const fireballsToRemove:Vector.<Fireball> = new <Fireball>[];
-
+        const toRemove:Vector.<Fireball> = new <Fireball>[];
         for each(var fireball:Fireball in fireballs) {
             view.setFireballPos(fireball.id, fireball.pos(time));
-            if (fireball.needRemove(time)) fireballsToRemove.push(fireball);
+            if (fireball.needRemove(time)) toRemove.push(fireball);
         }
 
-        for each(fireball in fireballsToRemove) {
+        for each(fireball in toRemove) {
             const index:int = fireballs.indexOf(fireball);
             fireballs.splice(index, 1);
             view.removeFireball(fireball.id);

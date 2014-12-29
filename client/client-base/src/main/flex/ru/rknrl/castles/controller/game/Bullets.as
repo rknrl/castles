@@ -20,14 +20,14 @@ public class Bullets {
     }
 
     public function update(time:int):void {
-        const bulletsToRemove:Vector.<Bullet> = new <Bullet>[];
+        const toRemove:Vector.<Bullet> = new <Bullet>[];
 
         for each(var bullet:Bullet in bullets) {
             view.setBulletPos(bullet.id, bullet.pos(time));
-            if (bullet.needRemove(time)) bulletsToRemove.push(bullet);
+            if (bullet.needRemove(time)) toRemove.push(bullet);
         }
 
-        for each(bullet in bulletsToRemove) {
+        for each(bullet in toRemove) {
             const index:int = bullets.indexOf(bullet);
             bullets.splice(index, 1);
             view.removeBullet(bullet.id);

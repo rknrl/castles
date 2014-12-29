@@ -4,6 +4,7 @@ import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
+import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.Shadow;
@@ -20,8 +21,9 @@ public class BuildingView extends Sprite {
     private var textField:TextField;
     private var scale:Number;
 
-    public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean) {
+    public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
         _id = id;
+        _pos = pos;
         addChild(new Shadow());
         addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
         addChild(textField = createTextField(Fonts.buildingNumber));
@@ -37,6 +39,12 @@ public class BuildingView extends Sprite {
 
     public function get id():BuildingIdDTO {
         return _id;
+    }
+
+    private var _pos:Point;
+
+    public function get pos():Point {
+        return _pos;
     }
 
     private var _owner:BuildingOwner;

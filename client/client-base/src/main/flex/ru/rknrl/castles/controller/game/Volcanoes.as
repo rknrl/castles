@@ -24,14 +24,14 @@ public class Volcanoes {
     }
 
     public function update(time:int):void {
-        const volcanoesToRemove:Vector.<Volcano> = new <Volcano>[];
+        const toRemove:Vector.<Volcano> = new <Volcano>[];
 
         for each(var volcano:Volcano in volcanoes) {
             view.setVolcanoRadius(volcano.id, volcano.radius(time));
-            if (volcano.needRemove(time)) volcanoesToRemove.push(volcano);
+            if (volcano.needRemove(time)) toRemove.push(volcano);
         }
 
-        for each(volcano in volcanoesToRemove) {
+        for each(volcano in toRemove) {
             const index:int = volcanoes.indexOf(volcano);
             volcanoes.splice(index, 1);
             view.removeVolcano(volcano.id);

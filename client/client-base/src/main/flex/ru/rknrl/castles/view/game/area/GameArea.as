@@ -23,7 +23,7 @@ public class GameArea extends Sprite {
     public var ground:Ground;
     public var volcanoes:VolcanoesView;
     public var arrows:ArrowsView;
-    public var buildings:BuildingsView;
+    private var buildings:BuildingsView;
     public var units:UnitsView;
     public var tornadoes:TornadoesView;
     public var bullets:BulletsView;
@@ -45,6 +45,19 @@ public class GameArea extends Sprite {
     public function addBuilding(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {
         ground.updateGroundColor(pos, owner);
         buildings.addBuilding(id, buildingType, buildingLevel, owner, count, strengthened, pos);
+    }
+
+    public function setBuildingCount(id:BuildingIdDTO, count:int):void {
+        buildings.setBuildingCount(id, count);
+    }
+
+    public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
+        buildings.setBuildingOwner(id, owner);
+        ground.updateGroundColor(buildings.byId(id).pos, owner);
+    }
+
+    public function setBuildingStrengthened(id:BuildingIdDTO, strengthened:Boolean):void {
+        buildings.setBuildingStrengthened(id, strengthened);
     }
 
     public function addStartLocation(dto:StartLocationPosDTO):void {

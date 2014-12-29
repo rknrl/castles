@@ -17,16 +17,13 @@ public class GameMagicItemIcon extends Sprite {
     private var textField:TextField;
 
     public function GameMagicItemIcon(itemType:ItemType, count:int) {
-        backIcon = Fla.createItem(itemType);
+        addChild(backIcon = Fla.createItem(itemType));
         backIcon.transform.colorTransform = Colors.itemLightColorTransform(itemType);
-        addChild(backIcon);
 
-        frontIcon = Fla.createItem(itemType);
+        addChild(frontIcon = Fla.createItem(itemType));
         frontIcon.transform.colorTransform = Colors.itemColorTransform(itemType);
-        addChild(frontIcon);
 
-        textField = createTextField(Fonts.magicItemNumber);
-        addChild(textField);
+        addChild(textField = createTextField(Fonts.magicItemNumber));
 
         this.count = count;
     }
@@ -37,8 +34,15 @@ public class GameMagicItemIcon extends Sprite {
     }
 
     public function set cooldownProgress(value:Number):void {
-        frontIcon.scrollRect = new Rectangle(0, 0, frontIcon.width, frontIcon.height * value);
-        backIcon.visible = value == 1;
+        const border:Number = 4;
+        const w:Number = backIcon.width + border;
+        const h:Number = backIcon.height + border;
+        const left:Number = -w / 2;
+        const top:Number = -h / 2 + h * (1 - value);
+        frontIcon.scrollRect = new Rectangle(left, top, w, h * value);
+        frontIcon.x = left;
+        frontIcon.y = top;
+        backIcon.visible = value < 1;
     }
 }
 }
