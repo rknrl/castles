@@ -28,7 +28,8 @@ public class UnitView extends Sprite {
         addChild(shadow);
 
         addChild(unit = Fla.unit(buildingType));
-
+        unit.transform.colorTransform = GameColors.transformById(ownerId);
+        
         addChild(textField = createTextField(Fonts.unitNumber));
         textField.textColor = GameColors.colorById(ownerId);
 

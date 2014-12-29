@@ -24,9 +24,9 @@ public class Arrows {
         return _fromBuildingIds;
     }
 
-    private function exists(id:BuildingIdDTO):Boolean {
+    private function exists(buildingId:BuildingIdDTO):Boolean {
         for each(var id:BuildingIdDTO in _fromBuildingIds) {
-            if (id.id == id.id) return true;
+            if (buildingId.id == id.id) return true;
         }
         return false;
     }

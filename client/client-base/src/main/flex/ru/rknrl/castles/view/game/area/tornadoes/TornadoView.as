@@ -21,7 +21,7 @@ public class TornadoView extends Sprite {
     }
 
     private function onEnterFrame(event:Event):void {
-        rotation = Math.sin(getTimer() / 100) * 20;
+        tornado.rotation = Math.sin(getTimer() / 100) * 20;
     }
 }
 }

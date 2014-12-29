@@ -29,7 +29,7 @@ public class Fireballs {
         const dy:Number = fromTop ? dto.y : areaHeight - dto.y;
         const d:Number = Math.max(dx, dy);
 
-        const startPos:Point = new Point(fromLeft ? -d : d, fromTop ? -d : d);
+        const startPos:Point = new Point(fromLeft ? dto.x - d : dto.x + d, fromTop ? dto.y - d : dto.y + d);
         const endPos:Point = new Point(dto.x, dto.y);
 
         const fireball:Fireball = new Fireball(fireballIterator++, startPos, endPos, time, dto.millisTillSplash);

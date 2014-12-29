@@ -23,7 +23,7 @@ public class VolcanoView extends Sprite {
     }
 
     private function onEnterFrame(event:Event):void {
-        scaleX = scaleY = 1 + Math.sin(getTimer() / 100) * 0.1;
+        volcano.scaleX = volcano.scaleY = 1 + Math.sin(getTimer() / 100) * 0.1;
     }
 }
 }

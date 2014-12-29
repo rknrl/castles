@@ -1,7 +1,9 @@
 package ru.rknrl.castles.view.game.ui.magicItems {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
+import flash.events.MouseEvent;
 
+import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.Align;
 import ru.rknrl.dto.ItemType;
@@ -23,6 +25,7 @@ public class MagicItemsView extends Sprite {
 
         for each(var itemType:ItemType in ItemType.values) {
             const item:GameMagicItem = new GameMagicItem(itemType, 1);
+            item.addEventListener(MouseEvent.CLICK, onClick);
             holder.addChild(item);
             magicItems.push(item);
         }
@@ -50,11 +53,16 @@ public class MagicItemsView extends Sprite {
     public function set selected(value:ItemType):void {
         if (selectedItem) selectedItem.selected = false;
         selectedItem = value ? getMagicItem(value) : null;
-        if (selectedItem) selectedItem.selected = false;
+        if (selectedItem) selectedItem.selected = true;
     }
 
     public function set lock(value:Boolean):void {
         for each(var item:GameMagicItem in magicItems) item.lock = value;
+    }
+
+    private function onClick(event:MouseEvent):void {
+        const item:GameMagicItem = GameMagicItem(event.target);
+        dispatchEvent(new MagicItemClickEvent(item.itemType));
     }
 }
 }

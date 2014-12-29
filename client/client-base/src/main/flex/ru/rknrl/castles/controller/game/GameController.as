@@ -59,6 +59,8 @@ public class GameController implements IGameFacade {
         tornadoes = new Tornadoes(view.area.tornadoes);
         volcanoes = new Volcanoes(view.area.volcanoes);
         units = new Units(view.area.units);
+        arrows = new Arrows(view.area.arrows);
+        tornadoPath = new TornadoPath(view.area.tornadoPath);
         magicItems = new MagicItems(view.ui.magicItems);
 
         onUpdateItemStates(gameState.itemsState);
@@ -82,7 +84,7 @@ public class GameController implements IGameFacade {
 
         view.addEventListener(GameViewEvents.SURRENDER, onSurrender);
         view.addEventListener(GameViewEvents.LEAVE_BUTTON_CLICK, onLeaveButtonClick);
-        view.addEventListener(MagicItemClickEvent.MAGIC_ITEM_CLICK, onUseMagicItem);
+        view.addEventListener(MagicItemClickEvent.MAGIC_ITEM_CLICK, onMagicItemClick);
 
         view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
@@ -166,7 +168,7 @@ public class GameController implements IGameFacade {
         }
     }
 
-    private function onUseMagicItem(event:MagicItemClickEvent):void {
+    private function onMagicItemClick(event:MagicItemClickEvent):void {
         if (magicItemStates.canUse(event.itemType, getTimer())) {
             if (magicItems.selected == event.itemType) {
                 magicItems.selected = null;

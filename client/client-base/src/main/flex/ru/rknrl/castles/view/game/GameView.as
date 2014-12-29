@@ -41,7 +41,19 @@ public class GameView extends Sprite {
     }
 
     private function onMouseEvent(event:MouseEvent):void {
-        dispatchEvent(new GameMouseEvent(event.type, new Point(area.mouseX, area.mouseY)))
+        dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(area.mouseX, area.mouseY)))
+    }
+
+    private static function getMouseEventType(type:String):String {
+        switch (type) {
+            case MouseEvent.MOUSE_DOWN:
+                return GameMouseEvent.MOUSE_DOWN;
+            case MouseEvent.MOUSE_MOVE:
+                return GameMouseEvent.MOUSE_MOVE;
+            case MouseEvent.MOUSE_UP:
+                return GameMouseEvent.MOUSE_UP;
+        }
+        throw new Error("unknown mouse event type " + type);
     }
 
     public function set layout(value:Layout):void {

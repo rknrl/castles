@@ -17,7 +17,7 @@ public class ArrowsView extends Sprite {
     }
 
     public function removeArrows():void {
-        for each(var arrow:ArrowsView in arrows) removeChild(arrow);
+        for each(var arrow:ArrowView in arrows) removeChild(arrow);
         arrows.length = 0;
     }
 }

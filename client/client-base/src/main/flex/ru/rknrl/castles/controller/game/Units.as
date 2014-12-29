@@ -25,7 +25,7 @@ public class Units {
         throw new Error("can't find unit " + id);
     }
 
-    public function add(endPos: Point, dto:UnitDTO):void {
+    public function add(endPos:Point, dto:UnitDTO):void {
         const startPos:Point = new Point(dto.x, dto.y);
 
         units.push(new Unit(dto.id, startPos, endPos, getTimer(), dto.speed));
@@ -41,6 +41,8 @@ public class Units {
     }
 
     public function remove(id:UnitIdDTO):void {
+        const index:int = units.indexOf(getUnit(id));
+        units.splice(index, 1);
         view.removeUnit(id);
     }
 
