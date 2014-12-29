@@ -6,6 +6,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.LockView;
 import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
@@ -43,7 +44,7 @@ public class SlotView extends Sprite {
             building.transform.colorTransform = Colors.slotIdToColorTransforms(id);
             buildingLayer.addChild(building);
         }
-        shadow.scaleX = shadow.scaleY = value.hasBuildingPrototype ? Fla.buildingLevelToScale(value.buildingPrototype.level) : 1;
+        shadow.scaleX = shadow.scaleY = value.hasBuildingPrototype ? Fla.buildingLevelToScale(value.buildingPrototype.level) : Fla.buildingLevelToScale(BuildingLevel.LEVEL_1);
     }
 
     public function set lock(value:Boolean):void {

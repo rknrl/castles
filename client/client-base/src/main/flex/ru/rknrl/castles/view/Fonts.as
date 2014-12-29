@@ -27,7 +27,7 @@ public class Fonts {
     public static const loading:TextFormat = regularCenter(30);
     public static const gameAvatar:TextFormat = regular(18);
 
-    public static const buildingNumber:TextFormat = bold(18, 0xfffffff);
+    public static const buildingNumber:TextFormat = bold(20, 0xfffffff);
     public static const unitNumber:TextFormat = regular(18);
 
     public static const popupCancel:TextFormat = regular(20);

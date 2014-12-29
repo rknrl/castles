@@ -7,10 +7,9 @@ import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.CellSize;
 
 public class BuildingsView extends Sprite {
-    private static const buildingY:Number = CellSize.SIZE.id() / 2 - 4;
+    private static const buildingY:Number = 37 / 2 - 4;
 
     private const buildings:Dictionary = new Dictionary();
 
@@ -27,7 +26,7 @@ public class BuildingsView extends Sprite {
         building.count = count;
     }
 
-    public function setBuildingOnwer(id:BuildingIdDTO, owner:BuildingOwner):void {
+    public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
         const building:BuildingView = buildings[id.id];
         building.owner = owner;
     }

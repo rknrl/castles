@@ -107,37 +107,39 @@ public class Colors {
     }
 
     // game
+
+    public static const grass:uint = 0xc3ffa7;
+    public static const groundColor:BitmapData = new BitmapData(1, 1, false, grass);
+
     public static const lightYellow:uint = 0xfcf3d4;
     public static const lightMagenta:uint = 0xe8ddff;
     public static const lightCyan:uint = 0xc0fae9;
     public static const lightRed:uint = 0xecb9bc;
     public static const lightGrey:uint = 0xeeeeee;
 
-    public static const grass:uint = 0xc3ffa7;
-    public static const groundColor:BitmapData = new BitmapData(1, 1, false, grass);
     public static const noOwnerGroundColor:BitmapData = new BitmapData(1, 1, false, lightGrey);
 
     public static const groundColors:Vector.<BitmapData> = new <BitmapData>[
-        new BitmapData(1, 1, false, lightRed),
-        new BitmapData(1, 1, false, lightMagenta),
         new BitmapData(1, 1, false, lightYellow),
-        new BitmapData(1, 1, false, lightCyan)
+        new BitmapData(1, 1, false, lightCyan),
+        new BitmapData(1, 1, false, lightMagenta),
+        new BitmapData(1, 1, false, lightRed)
     ];
 
     public static const noOwnerTransform:ColorTransform = greyTransform;
 
     public static const playerTransforms:Vector.<ColorTransform> = new <ColorTransform>[
-        redTransform,
-        magentaTransform,
         yellowTransform,
-        cyanTransform
+        cyanTransform,
+        magentaTransform,
+        redTransform
     ];
 
     public static const playerColors:Vector.<uint> = new <uint>[
-        red,
-        magenta,
         yellow,
-        cyan
+        cyan,
+        magenta,
+        red
     ];
 }
 }

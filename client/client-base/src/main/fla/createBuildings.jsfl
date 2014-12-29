@@ -54,7 +54,7 @@ for (var colorIndex = 0; colorIndex < colors.length; colorIndex++) {
             var element = numbersLayer.elements[i];
             element.width *= s;
             element.height *= s;
-            element.x = x - 1 * s - element.width / 2;
+            element.x = x - element.width / 2;
             element.y = y - 2 * s - element.height;
 
             // building

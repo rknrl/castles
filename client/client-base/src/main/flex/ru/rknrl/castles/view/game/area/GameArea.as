@@ -2,6 +2,7 @@ package ru.rknrl.castles.view.game.area {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
+import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
@@ -56,22 +57,6 @@ public class GameArea extends Sprite {
             const y:Number = isMirrorV ? dto.y - pos.y * CellSize.SIZE.id() : dto.y + pos.y * CellSize.SIZE.id();
             ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
         }
-    }
-
-    private static function getSlotPos(slotId:SlotId):Point {
-        switch (slotId) {
-            case SlotId.SLOT_1:
-                return new Point(0, 0);
-            case SlotId.SLOT_2:
-                return new Point(-2, 0);
-            case SlotId.SLOT_3:
-                return new Point(2, 0);
-            case SlotId.SLOT_4:
-                return new Point(-1, -1);
-            case SlotId.SLOT_5:
-                return new Point(1, -1);
-        }
-        throw new Error("unknown slotId " + slotId);
     }
 }
 }

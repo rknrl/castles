@@ -1,17 +1,17 @@
 package ru.rknrl.castles.view.menu.main {
 import flash.display.Sprite;
 import flash.events.MouseEvent;
-import flash.geom.Point;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.SlotClickEvent;
+import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
 public class StartLocationView extends Sprite {
-    private static const topGapX:Number = 21;
-    private static const bottomGapX:Number = 42;
+    private static const gapX:Number = 21;
     private static const gapY:Number = 40;
 
     private const idToSlot:Dictionary = new Dictionary();
@@ -21,8 +21,10 @@ public class StartLocationView extends Sprite {
             const slotDto:SlotDTO = startLocation.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
             slot.addEventListener(MouseEvent.CLICK, onClick);
-            slot.x = slotIdToPos(slotId).x;
-            slot.y = slotIdToPos(slotId).y;
+
+            const pos:Point = getSlotPos(slotId);
+            slot.x = pos.x * gapX;
+            slot.y = pos.y * gapY;
             idToSlot[slotId] = slot;
             addChild(slot);
         }
@@ -34,23 +36,6 @@ public class StartLocationView extends Sprite {
             const slot:SlotView = idToSlot[slotId];
             slot.dto = slotDto;
         }
-    }
-
-    private static function slotIdToPos(slotId:SlotId):Point {
-        switch (slotId) {
-            case SlotId.SLOT_1:
-                return new Point(-topGapX, -gapY);
-            case SlotId.SLOT_2:
-                return new Point(topGapX, -gapY);
-            case SlotId.SLOT_3:
-                return new Point(-bottomGapX, 0);
-            case SlotId.SLOT_4:
-                return new Point(0, 0);
-            case SlotId.SLOT_5:
-                return new Point(bottomGapX, 0);
-
-        }
-        throw new Error("unknown slotId " + slotId);
     }
 
     public function set lock(value:Boolean):void {

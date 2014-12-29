@@ -150,7 +150,7 @@ public class GameController implements IGameFacade {
         buildings.byId(dto.id).owner = owner;
 
         view.area.buildings.setBuildingCount(dto.id, dto.population);
-        view.area.buildings.setBuildingOnwer(dto.id, owner);
+        view.area.buildings.setBuildingOwner(dto.id, owner);
         view.area.buildings.setBuildingStrengthened(dto.id, dto.strengthened);
     }
 
