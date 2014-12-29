@@ -38,11 +38,6 @@ public class MainWeb extends MainWebBase {
         authenticationSecret.body = social.flashVars.authenticationSecret;
         authenticationSecret.params = social.flashVars.authenticationParams;
 
-        const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.accountId = accountId;
-        authenticate.deviceType = DeviceType.CANVAS;
-        authenticate.secret = authenticationSecret;
-
         super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
     }
 

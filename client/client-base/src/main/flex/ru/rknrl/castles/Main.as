@@ -50,12 +50,11 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var localeLoader:TextLoader;
     private var locale:CastlesLocale;
-    private var _layout:Layout;
 
     private var view:View;
     private var loadImageManager:LoadImageManager;
 
-    private var menu:Controller;
+    private var controller:Controller;
 
     public function Main(host:String, gamePort:int, policyPort:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
         this.host = host;
@@ -66,8 +65,14 @@ public class Main extends Sprite implements IAuthFacade {
         this.defaultLocale = defaultLocale;
         this.log = log;
         this.social = social;
-        this._layout = layout;
+        _layout = layout;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    private var _layout:Layout;
+
+    public function set layout(value:Layout):void {
+        if (view) view.layout = value;
     }
 
     private function onAddedToStage(event:Event):void {
@@ -156,9 +161,10 @@ public class Main extends Sprite implements IAuthFacade {
 
         connection.unregisterReceiver(authFacadeReceiver);
 
-        menu = new Controller(view, authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, social);
+        view.removeLoadingScreen();
+        controller = new Controller(view, authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, social);
 
-        accountFacadeReceiver = new AccountFacadeReceiver(menu);
+        accountFacadeReceiver = new AccountFacadeReceiver(controller);
         connection.registerReceiver(accountFacadeReceiver);
     }
 
@@ -169,12 +175,11 @@ public class Main extends Sprite implements IAuthFacade {
         connection.removeEventListener(Event.CLOSE, onConnectionError);
         connection = null;
 
-//        view.destroy(); todo
-
-//        if (menu) {
-//            menu.destroy();
-//            menu = null;
-//        }
+        if (controller) {
+            view.removeMenu();
+            controller.destroy();
+            controller = null;
+        }
     }
 
     private function onConnectionError(event:Event):void {
@@ -182,6 +187,7 @@ public class Main extends Sprite implements IAuthFacade {
 
         destroyConnection();
 
+        view.removeLoadingScreenIfExists();
         view.addNoConnectionScreen();
     }
 
@@ -189,10 +195,6 @@ public class Main extends Sprite implements IAuthFacade {
         view.removeNoConnectionScreen();
         view.addLoadingScreen();
         tryConnect();
-    }
-
-    public function set layout(value:Layout):void {
-        if(view) view.layout = value;
     }
 }
 }

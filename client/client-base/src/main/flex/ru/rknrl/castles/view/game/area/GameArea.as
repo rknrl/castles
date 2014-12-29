@@ -63,13 +63,13 @@ public class GameArea extends Sprite {
             case SlotId.SLOT_1:
                 return new Point(0, 0);
             case SlotId.SLOT_2:
-                return new Point(-3, 0);
+                return new Point(-2, 0);
             case SlotId.SLOT_3:
-                return new Point(3, 0);
+                return new Point(2, 0);
             case SlotId.SLOT_4:
-                return new Point(-1, 1);
+                return new Point(-1, -1);
             case SlotId.SLOT_5:
-                return new Point(1, 1);
+                return new Point(1, -1);
         }
         throw new Error("unknown slotId " + slotId);
     }

@@ -147,7 +147,6 @@ public class DtoMock {
         const dto:AccountConfigDTO = new AccountConfigDTO();
         dto.buildings = buildingPrices();
         dto.skillUpgradePrices = skillUpgradePrices();
-        dto.top = top();
         dto.itemPrice = 1;
         return dto;
     }
@@ -156,6 +155,7 @@ public class DtoMock {
         const dto:AuthenticationSuccessDTO = new AuthenticationSuccessDTO();
         dto.accountState = accountState();
         dto.config = config();
+        dto.top = top();
         dto.products = new <ProductDTO>[product()];
         dto.enterGame = false;
         return dto;

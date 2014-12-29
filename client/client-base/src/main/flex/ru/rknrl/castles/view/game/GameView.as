@@ -16,8 +16,8 @@ public class GameView extends Sprite {
     public var area:GameArea;
     public var ui:GameUI;
 
-    public function GameView(layout:Layout) {
-        addChild(area = new GameArea(8, 11));
+    public function GameView(layout:Layout, h:int, v:int) {
+        addChild(area = new GameArea(h, v));
         addChild(ui = new GameUI(layout));
 
         this.layout = layout;
@@ -53,6 +53,7 @@ public class GameView extends Sprite {
 
     private function onKeyDown(event:KeyboardEvent):void {
         if (event.keyCode == Keyboard.ESCAPE) {
+            stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
             dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
         }
     }

@@ -44,13 +44,15 @@ message AuthenticationSuccessDTO {
 
     required AccountConfigDTO config = 2;
 
-    repeated ProductDTO products = 3;
+    repeated TopUserInfoDTO top = 3;
+
+    repeated ProductDTO products = 4;
 
     // Клиент находится в процессе поиска противников для игры
-    required bool enterGame = 4;
+    required bool enterGame = 5;
 
     // Клиент находится в игре
-    optional NodeLocator game = 5;
+    optional NodeLocator game = 6;
 }
 
 message ProductDTO {

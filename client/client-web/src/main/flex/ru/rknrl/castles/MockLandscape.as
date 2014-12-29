@@ -9,20 +9,20 @@ import flash.events.Event;
 import ru.rknrl.castles.controllerMock.ControllerMock;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.layout.LayoutPortrait;
+import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.utils.LoadImageManager;
 
-[SWF(width="320", height="568", frameRate="60", backgroundColor="#ffffff")]
-public class MainPortrait extends Sprite {
+[SWF(width="1024", height="768", frameRate="60", backgroundColor="#ffffff")]
+public class MockLandscape extends Sprite {
     private var view:View;
 
-    public function MainPortrait() {
+    public function MockLandscape() {
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
         stage.quality = StageQuality.BEST;
 
-        const layout:Layout = new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
+        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
 
         addChild(view = new View(layout, new CastlesLocale(""), new LoadImageManager()));
 
@@ -32,7 +32,7 @@ public class MainPortrait extends Sprite {
     }
 
     private function onResize(event:Event):void {
-        view.layout = new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
+        view.layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
     }
 }
 }

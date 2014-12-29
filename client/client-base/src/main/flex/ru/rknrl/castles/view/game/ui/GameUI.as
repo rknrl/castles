@@ -9,8 +9,8 @@ public class GameUI extends Sprite {
     public var magicItems:MagicItemsView;
 
     public function GameUI(layout:Layout) {
-        this.layout = layout;
         addChild(magicItems = new MagicItemsView(layout));
+        this.layout = layout;
     }
 
     public function set layout(value:Layout):void {

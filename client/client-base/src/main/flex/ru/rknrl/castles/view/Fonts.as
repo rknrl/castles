@@ -1,5 +1,6 @@
 package ru.rknrl.castles.view {
 import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 
 public class Fonts {
     private static const regularFont:LightFont = new LightFont();
@@ -7,6 +8,10 @@ public class Fonts {
 
     private static function regular(size:Number, color:Object = null):TextFormat {
         return new TextFormat(regularFont.fontName, size, color);
+    }
+
+    private static function regularCenter(size:Number):TextFormat {
+        return new TextFormat(regularFont.fontName, size, null, null, null, null, null, null, TextFormatAlign.CENTER);
     }
 
     private static function bold(size:Number, color:Object = null):TextFormat {
@@ -19,7 +24,7 @@ public class Fonts {
     public static const title:TextFormat = regular(18, 0xaaaaaa);
     public static const button:TextFormat = regular(18, 0xffffff);
     public static const play:TextFormat = regular(20, 0xaaaaaa);
-    public static const loading:TextFormat = regular(30);
+    public static const loading:TextFormat = regularCenter(30);
     public static const gameAvatar:TextFormat = regular(18);
 
     public static const buildingNumber:TextFormat = bold(18, 0xfffffff);

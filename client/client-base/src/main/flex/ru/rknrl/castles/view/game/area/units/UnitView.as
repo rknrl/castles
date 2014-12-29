@@ -6,10 +6,10 @@ import flash.text.TextField;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.utils.points.Point;
-import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
@@ -30,7 +30,7 @@ public class UnitView extends Sprite {
         addChild(unit = Fla.unit(buildingType));
 
         addChild(textField = createTextField(Fonts.unitNumber));
-        textField.textColor = Colors.playerColors[ownerId.id];
+        textField.textColor = GameColors.colorById(ownerId);
 
         const scale:Number = Fla.buildingLevelToScale(buildingLevel);
         scaleX = scaleY = stengthened ? scale * Fla.strengtheningScale : scale;

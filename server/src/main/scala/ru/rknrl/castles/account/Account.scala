@@ -14,9 +14,9 @@ import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, DeviceType}
 import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.collection.JavaConverters._
 
 case object GetAccountState
 
@@ -126,6 +126,7 @@ class Account(accountId: AccountId,
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
           .setConfig(config.account.dto)
+          .addAllTop(topMock.asJava)
           .addAllProducts(config.productsDto(accountId.accountType).asJava)
           .setEnterGame(enterGame)
           .build
@@ -215,6 +216,7 @@ class Account(accountId: AccountId,
         auth ! AuthenticationSuccessDTO.newBuilder()
           .setAccountState(state.dto)
           .setConfig(config.account.dto)
+          .addAllTop(topMock.asJava)
           .addAllProducts(config.productsDto(accountId.accountType).asJava)
           .setEnterGame(false)
           .setGame(gameAddress)
@@ -224,6 +226,15 @@ class Account(accountId: AccountId,
       } else
         accountRmi ! EnteredGameMsg(gameAddress)
     }
+
+  private def topMock =
+    for (i ← 1 to 5)
+    yield TopUserInfoDTO.newBuilder()
+      .setPlace(i)
+      .setName("name" + i)
+      .setPhotoUrl(i.toString)
+      .build()
+
 
   override def preStart(): Unit = println("AccountService start " + name)
 

@@ -1,4 +1,4 @@
-package ru.rknrl.castles.model {
+package ru.rknrl.castles.model.menu {
 import ru.rknrl.castles.model.menu.bank.Products;
 import ru.rknrl.castles.model.menu.main.BuildingPrices;
 import ru.rknrl.castles.model.menu.main.StartLocation;
@@ -11,7 +11,7 @@ import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.ProductDTO;
 
-public class Model {
+public class MenuModel {
     private var _startLocation:StartLocation;
 
     public function get startLocation():StartLocation {
@@ -66,10 +66,11 @@ public class Model {
         return _products;
     }
 
-    public function Model(authenticationSuccess:AuthenticationSuccessDTO) {
+    public function MenuModel(authenticationSuccess:AuthenticationSuccessDTO) {
         accountStateDto = authenticationSuccess.accountState;
         configDto = authenticationSuccess.config;
         productsDto = authenticationSuccess.products;
+        _top = new Top(authenticationSuccess.top);
     }
 
     public function set accountStateDto(dto:AccountStateDTO):void {
@@ -80,7 +81,6 @@ public class Model {
     }
 
     public function set configDto(dto:AccountConfigDTO):void {
-        _top = new Top(dto.top);
         _itemPrice = dto.itemPrice;
         _upgradePrices = new SkillUpgradePrices(dto.skillUpgradePrices);
         _buildingPrices = new BuildingPrices(dto.buildings);

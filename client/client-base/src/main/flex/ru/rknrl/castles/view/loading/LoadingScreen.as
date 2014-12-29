@@ -8,7 +8,6 @@ import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.Shadow;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 
@@ -24,9 +23,14 @@ public class LoadingScreen extends Sprite {
         tower.transform.colorTransform = Colors.yellowTransform;
         holder.addChild(tower);
 
-        const textField:TextField = createTextField(Fonts.loading);
+        const textField:TextField = new TextField();
+        textField.selectable = false;
+        textField.embedFonts = true;
+        textField.defaultTextFormat = Fonts.loading;
         textField.textColor = Colors.yellow;
         textField.text = text;
+        textField.width = 200;
+        textField.wordWrap = true;
         textField.x = -textField.width / 2;
         textField.y = 10;
         holder.addChild(textField);

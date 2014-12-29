@@ -52,7 +52,6 @@ message AccountConfigDTO {
     repeated BuildingPriceDTO buildings = 1;
     repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
     required int32 itemPrice = 3;
-    repeated TopUserInfoDTO top = 4;
 }
 
 message SkillUpgradePriceDTO {

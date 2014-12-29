@@ -1,12 +1,12 @@
 package ru.rknrl.castles.view.game.area {
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.castles.view.Colors;
+import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.dto.CellSize;
 
 public class Ground extends Sprite {
@@ -15,7 +15,9 @@ public class Ground extends Sprite {
     private const grounds:Dictionary = new Dictionary();
 
     private function getGround(i:int, j:int):Bitmap {
-        return grounds[i + "_" + j];
+        const bitmap:Bitmap = grounds[i + "_" + j];
+        if (!bitmap) throw new Error("can't find ground " + i + " " + j);
+        return bitmap;
     }
 
     public function Ground(h:int, v:int) {
@@ -37,8 +39,7 @@ public class Ground extends Sprite {
     public function updateGroundColor(pos:Point, owner:BuildingOwner):void {
         const i:int = pos.x / cellSize;
         const j:int = pos.y / cellSize;
-        const color:BitmapData = owner.hasOwner ? Colors.groundColors[owner.ownerId] : Colors.noOwnerGroundColor;
-        getGround(i, j).bitmapData = color;
+        getGround(i, j).bitmapData = GameColors.bitmapData(owner);
     }
 }
 }

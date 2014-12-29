@@ -31,11 +31,6 @@ public class MainWebStandalone extends MainWebBase {
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = "body";
 
-        const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.accountId = accountId;
-        authenticate.deviceType = DeviceType.CANVAS;
-        authenticate.secret = authenticationSecret;
-
         super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
     }
 }
