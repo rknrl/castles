@@ -61,6 +61,7 @@ public class MenuController {
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;
         view.skillLevels = model.skillLevels;
+        view.lock = false;
     }
 
     private function onSlotClick(event:SlotClickEvent):void {

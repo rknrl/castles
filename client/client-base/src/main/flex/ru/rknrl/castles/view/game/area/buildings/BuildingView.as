@@ -12,7 +12,6 @@ import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.CellSize;
 
 public class BuildingView extends Sprite {
     private static const textFieldBottom:int = -2;
