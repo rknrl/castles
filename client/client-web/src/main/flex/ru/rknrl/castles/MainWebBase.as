@@ -3,8 +3,8 @@ import flash.events.Event;
 import flash.system.Security;
 import flash.utils.ByteArray;
 
-import ru.rknrl.castles.utils.layout.Layout;
-import ru.rknrl.castles.utils.layout.LayoutLandscape;
+import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
@@ -19,7 +19,7 @@ public class MainWebBase extends Main {
 
     private var log:Log;
 
-    public function MainWebBase(log:Log, host:String, gamePort:int, policyPort: int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
+    public function MainWebBase(log:Log, host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
         this.log = log;
 
         Security.allowDomain("*");
@@ -32,7 +32,7 @@ public class MainWebBase extends Main {
         authenticate.deviceType = DeviceType.CANVAS;
         authenticate.secret = authenticationSecret;
 
-        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight);
+        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
@@ -44,7 +44,7 @@ public class MainWebBase extends Main {
 
     private function onResize(event:Event):void {
         log.add("resize " + stage.stageWidth + "x" + stage.stageHeight);
-        updateLayout(new LayoutLandscape(stage.stageWidth, stage.stageHeight));
+        layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
     }
 }
 }

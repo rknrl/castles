@@ -47,7 +47,7 @@ class Config(val host: String,
       .setId(p.id)
       .setTitle(p.title)
       .setDescription(p.description)
-      .setPhotoUlr(p.photoUrl)
+      .setPhotoUrl(p.photoUrl)
       .setCount(productInfo.count)
       .setPrice(productInfo.price)
       .build()

@@ -31,6 +31,12 @@ message PointDTO {
     required float y = 2;
 }
 
+message PlayerInfoDTO {
+    required PlayerIdDTO id = 1;
+    required string name = 2;
+    required string photoUrl = 3;
+}
+
 // server -> client
 
 message GameStateDTO {
@@ -47,6 +53,7 @@ message GameStateDTO {
     repeated BulletDTO bullets = 11;
     required ItemsStateDTO itemsState = 12;
     repeated GameOverDTO gameOvers = 13;
+    repeated PlayerInfoDTO playerInfos = 14;
 }
 
 enum StartLocationOrientation {
@@ -127,7 +134,6 @@ message BulletDTO {
 
 message GameOverDTO {
     required PlayerIdDTO playerId = 1;
-    required bool win = 2;
     required int32 place = 3;
     required int32 reward = 4;
 }
@@ -140,7 +146,7 @@ message ItemStateDTO {
     required ItemType itemType = 1;
     required int32 count = 2;
     required int32 millisTillCooldownEnd = 3;
-    required int32 cooldownDuration= 4; // todo можно не посылать каждый раз
+    required int32 cooldownDuration = 4; // todo можно не посылать каждый раз
 }
 
 // client -> server

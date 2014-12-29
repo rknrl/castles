@@ -347,7 +347,6 @@ class Game(players: Map[PlayerId, Player],
   private def getWinDto(playerId: PlayerId) =
     GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
-      .setWin(true)
       .setPlace(1)
       .setReward(config.winReward)
       .build()
@@ -355,7 +354,6 @@ class Game(players: Map[PlayerId, Player],
   private def getLoseDto(playerId: PlayerId, place: Int) =
     GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
-      .setWin(false)
       .setPlace(place)
       .setReward(0)
       .build()

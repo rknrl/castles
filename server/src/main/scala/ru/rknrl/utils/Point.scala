@@ -2,6 +2,9 @@ package ru.rknrl.utils
 
 import ru.rknrl.dto.GameDTO.PointDTO
 
+/**
+ * todo equals with Point.as
+ */
 class Point(val x: Double, val y: Double) {
   def distance(endPos: Point) = {
     val dx = endPos.x - x

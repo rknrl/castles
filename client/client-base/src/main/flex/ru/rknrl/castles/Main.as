@@ -8,21 +8,21 @@ import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
 import flash.system.Security;
 
-import ru.rknrl.castles.menu.Menu;
-import ru.rknrl.castles.menu.screens.LoadingScreen;
-import ru.rknrl.castles.menu.screens.noConnection.NoConnectionScreen;
+import ru.rknrl.castles.controller.Controller;
+import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.rmi.AccountFacadeReceiver;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.rmi.AuthFacadeReceiver;
 import ru.rknrl.castles.rmi.AuthFacadeSender;
 import ru.rknrl.castles.rmi.IAuthFacade;
-import ru.rknrl.castles.utils.layout.Layout;
-import ru.rknrl.castles.utils.locale.CastlesLocale;
+import ru.rknrl.castles.view.View;
+import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.locale.CastlesLocale;
+import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Sex;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
-import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.loaders.TextLoader;
@@ -47,13 +47,15 @@ public class Main extends Sprite implements IAuthFacade {
     private var authFacadeReceiver:AuthFacadeReceiver;
     private var authFacadeSender:AuthFacadeSender;
     private var accountFacadeReceiver:AccountFacadeReceiver;
-    private var menu:Menu;
-    private var noConnectionScreen:NoConnectionScreen;
-    private var loadingScreen:LoadingScreen;
 
     private var localeLoader:TextLoader;
     private var locale:CastlesLocale;
-    private var layout:Layout;
+    private var _layout:Layout;
+
+    private var view:View;
+    private var loadImageManager:LoadImageManager;
+
+    private var menu:Controller;
 
     public function Main(host:String, gamePort:int, policyPort:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
         this.host = host;
@@ -64,7 +66,7 @@ public class Main extends Sprite implements IAuthFacade {
         this.defaultLocale = defaultLocale;
         this.log = log;
         this.social = social;
-        this.layout = layout;
+        this._layout = layout;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -74,8 +76,6 @@ public class Main extends Sprite implements IAuthFacade {
         stage.scaleMode = StageScaleMode.NO_SCALE;
         stage.align = StageAlign.TOP_LEFT;
         stage.quality = StageQuality.BEST;
-
-        addLoadingScreen();
 
         localeLoader = new TextLoader(localesUrl + "castles - EN.tsv");
         localeLoader.addEventListener(Event.COMPLETE, onLocaleComplete);
@@ -100,6 +100,11 @@ public class Main extends Sprite implements IAuthFacade {
         localeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLocaleError);
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
         locale = new CastlesLocale(data);
+
+        loadImageManager = new LoadImageManager();
+        addChild(view = new View(_layout, locale, loadImageManager));
+        view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
+        view.addLoadingScreen();
 
         social.getMyUserInfo(onGetMyUserInfo);
     }
@@ -151,10 +156,8 @@ public class Main extends Sprite implements IAuthFacade {
 
         connection.unregisterReceiver(authFacadeReceiver);
 
-        removeLoadingScreen();
+        menu = new Controller(view, authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, social);
 
-        menu = new Menu(authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, layout, social, locale);
-        addChild(menu);
         accountFacadeReceiver = new AccountFacadeReceiver(menu);
         connection.registerReceiver(accountFacadeReceiver);
     }
@@ -166,13 +169,12 @@ public class Main extends Sprite implements IAuthFacade {
         connection.removeEventListener(Event.CLOSE, onConnectionError);
         connection = null;
 
-        if (loadingScreen) removeLoadingScreen();
+//        view.destroy(); todo
 
-        if (menu) {
-            menu.removeListeners();
-            removeChild(menu);
-            menu = null;
-        }
+//        if (menu) {
+//            menu.destroy();
+//            menu = null;
+//        }
     }
 
     private function onConnectionError(event:Event):void {
@@ -180,34 +182,17 @@ public class Main extends Sprite implements IAuthFacade {
 
         destroyConnection();
 
-        noConnectionScreen = new NoConnectionScreen(layout, locale);
-        noConnectionScreen.addEventListener(NoConnectionScreen.TRY_CONNECT, onTryConnect);
-        addChild(noConnectionScreen);
+        view.addNoConnectionScreen();
     }
 
     private function onTryConnect(event:Event = null):void {
-        noConnectionScreen.removeEventListener(NoConnectionScreen.TRY_CONNECT, onTryConnect);
-        removeChild(noConnectionScreen);
-
-        addLoadingScreen();
+        view.removeNoConnectionScreen();
+        view.addLoadingScreen();
         tryConnect();
     }
 
-    public function addLoadingScreen():void {
-        if (loadingScreen) throw new Error("loading screen already created");
-        addChild(loadingScreen = new LoadingScreen("Loading..", layout.loadingTextFormat, layout));
-    }
-
-    public function removeLoadingScreen():void {
-        removeChild(loadingScreen);
-        loadingScreen = null;
-    }
-
-    public function updateLayout(layout:Layout):void {
-        this.layout = layout;
-        if (menu) menu.updateLayout(layout);
-        if (loadingScreen) loadingScreen.updateLayout(layout, layout.loadingTextFormat);
-        if (noConnectionScreen) noConnectionScreen.updateLayout(layout);
+    public function set layout(value:Layout):void {
+        if(view) view.layout = value;
     }
 }
 }

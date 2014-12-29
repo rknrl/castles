@@ -2,6 +2,9 @@ package ru.rknrl.utils
 
 import ru.rknrl.dto.GameDTO.PointDTO
 
+/**
+ * todo equals with Points.as
+ */
 class Points(val points: Vector[Point]) {
   def this(dto: Iterable[PointDTO]) = this(Points.dtoToPoints(dto))
 

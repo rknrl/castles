@@ -37,8 +37,8 @@ enum SkillLevel {
 enum ItemType {
     FIREBALL = 1;
     STRENGTHENING = 2;
-    TORNADO = 3;
-    VOLCANO = 4;
+    VOLCANO = 3;
+    TORNADO = 4;
     ASSISTANCE = 5;
 }
 

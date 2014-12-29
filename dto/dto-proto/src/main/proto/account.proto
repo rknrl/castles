@@ -52,6 +52,7 @@ message AccountConfigDTO {
     repeated BuildingPriceDTO buildings = 1;
     repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
     required int32 itemPrice = 3;
+    repeated TopUserInfoDTO top = 4;
 }
 
 message SkillUpgradePriceDTO {
@@ -62,6 +63,12 @@ message SkillUpgradePriceDTO {
 message BuildingPriceDTO {
     required BuildingLevel level = 1;
     required int32 price = 2;
+}
+
+message TopUserInfoDTO {
+    required int32 place = 1;
+    required string name = 2;
+    required string photoUrl = 3;
 }
 
 // client->server actions
