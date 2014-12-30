@@ -14,7 +14,9 @@ public class VolcanoesView extends Sprite {
     }
 
     public function addVolcano(id:int, pos:Point, radius:Number):void {
-        const volcano:VolcanoView = new VolcanoView(pos, radius);
+        const volcano:VolcanoView = new VolcanoView(radius);
+        volcano.x = pos.x;
+        volcano.y = pos.y;
         if (volcanoes[id]) throw new Error("volcano " + id + " already exists");
         volcanoes[id] = volcano;
         addChild(volcano);

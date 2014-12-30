@@ -1,18 +1,22 @@
 package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.model.game.Explosion;
 import ru.rknrl.castles.model.game.Fireball;
 import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.view.game.area.explosions.ExplosionsView;
 import ru.rknrl.castles.view.game.area.fireballs.FireballsView;
 import ru.rknrl.dto.FireballDTO;
 
 public class Fireballs {
     private var view:FireballsView;
+    private var explosionsView:ExplosionsView;
     private var areaWidth:int;
     private var areaHeight:int;
 
-    public function Fireballs(view:FireballsView, areaWidth:int, areaHeight:int) {
+    public function Fireballs(view:FireballsView, explosionsView:ExplosionsView, areaWidth:int, areaHeight:int) {
         this.view = view;
+        this.explosionsView = explosionsView;
         this.areaWidth = areaWidth;
         this.areaHeight = areaHeight;
     }
@@ -38,17 +42,37 @@ public class Fireballs {
     }
 
     public function update(time:int):void {
-        const toRemove:Vector.<Fireball> = new <Fireball>[];
+        const fireballsToRemove:Vector.<Fireball> = new <Fireball>[];
         for each(var fireball:Fireball in fireballs) {
             view.setFireballPos(fireball.id, fireball.pos(time));
-            if (fireball.needRemove(time)) toRemove.push(fireball);
+            if (fireball.needRemove(time)) fireballsToRemove.push(fireball);
         }
 
-        for each(fireball in toRemove) {
+        for each(fireball in fireballsToRemove) {
             const index:int = fireballs.indexOf(fireball);
             fireballs.splice(index, 1);
             view.removeFireball(fireball.id);
+            addExplosion(fireball.pos(time), time);
         }
+
+        const explosionsToRemove:Vector.<Explosion> = new <Explosion>[];
+        for each(var explosion:Explosion in explosions) {
+            if (explosion.needRemove(time)) explosionsToRemove.push(explosion);
+        }
+
+        for each(explosion in explosionsToRemove) {
+            explosions.splice(explosions.indexOf(explosion), 1);
+            explosionsView.removeExplosion(explosion.id);
+        }
+    }
+
+    private const explosions:Vector.<Explosion> = new <Explosion>[];
+    private var explosionIterator:int;
+
+    private function addExplosion(point:Point, time:int):void {
+        const explosion:Explosion = new Explosion(explosionIterator++, time);
+        explosions.push(explosion);
+        explosionsView.addExplosion(explosion.id, point);
     }
 }
 }

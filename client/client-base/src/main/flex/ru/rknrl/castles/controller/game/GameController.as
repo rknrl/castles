@@ -55,7 +55,7 @@ public class GameController implements IGameFacade {
         selfId = gameState.selfId;
 
         bullets = new Bullets(view.area.bullets);
-        fireballs = new Fireballs(view.area.fireballs, gameState.width, gameState.height);
+        fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
         tornadoes = new Tornadoes(view.area.tornadoes);
         volcanoes = new Volcanoes(view.area.volcanoes);
         units = new Units(view.area.units);

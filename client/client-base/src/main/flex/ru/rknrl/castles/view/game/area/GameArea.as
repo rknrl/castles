@@ -7,6 +7,7 @@ import ru.rknrl.castles.utils.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
 import ru.rknrl.castles.view.game.area.bullets.BulletsView;
+import ru.rknrl.castles.view.game.area.explosions.ExplosionsView;
 import ru.rknrl.castles.view.game.area.fireballs.FireballsView;
 import ru.rknrl.castles.view.game.area.tornadoes.TornadoesView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
@@ -28,6 +29,7 @@ public class GameArea extends Sprite {
     public var tornadoes:TornadoesView;
     public var bullets:BulletsView;
     public var fireballs:FireballsView;
+    public var explosions:ExplosionsView;
     public var tornadoPath:TornadoPathView;
 
     public function GameArea(h:int, v:int) {
@@ -39,6 +41,7 @@ public class GameArea extends Sprite {
         addChild(tornadoes = new TornadoesView());
         addChild(bullets = new BulletsView());
         addChild(fireballs = new FireballsView());
+        addChild(explosions = new ExplosionsView());
         addChild(tornadoPath = new TornadoPathView());
     }
 
