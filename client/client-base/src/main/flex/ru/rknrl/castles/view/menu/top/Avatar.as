@@ -8,31 +8,25 @@ import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.castles.view.utils.centerize;
 
 public class Avatar extends Sprite {
+    private var url:String;
     private var loadImageManager:LoadImageManager;
     private var size:int;
 
     private var shape:Shape;
 
     public function Avatar(url:String, size:int, bitmapDataScale:Number, loadImageManager:LoadImageManager) {
+        this.url = url;
         this.loadImageManager = loadImageManager;
         this.size = size;
         _bitmapDataScale = bitmapDataScale;
-
-        this.url = url;
+        loadImageManager.load(url, onBitmapDataLoad);
     }
 
-    private var _url:String;
-
-    public function set url(value:String):void {
-        _url = value;
-        loadImageManager.load(value, onBitmapDataLoad);
-    }
-
-    private var _bitmapData:BitmapData;
+    private var bitmapData:BitmapData;
 
     private function onBitmapDataLoad(url:String, bitmapData:BitmapData):void {
-        if (_url == url) {
-            _bitmapData = bitmapData;
+        if (this.url == url) {
+            this.bitmapData = bitmapData;
             updateShape();
         }
     }
@@ -45,10 +39,10 @@ public class Avatar extends Sprite {
     }
 
     private function updateShape():void {
-        if (!_bitmapData) return;
+        if (!bitmapData) return;
 
         if (shape) removeChild(shape);
-        shape = BitmapUtils.createCircleShape(BitmapUtils.square(_bitmapData, size * _bitmapDataScale));
+        shape = BitmapUtils.createCircleShape(BitmapUtils.square(bitmapData, size * _bitmapDataScale));
         shape.width = shape.height = size;
         addChild(shape);
         centerize(shape);

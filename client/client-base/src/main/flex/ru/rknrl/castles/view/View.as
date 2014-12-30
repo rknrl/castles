@@ -55,7 +55,7 @@ public class View extends Sprite {
 
     public function addGame(h:int, v:int):GameView {
         if (game) throw new Error("game already exists");
-        addChild(game = new GameView(_layout, h, v));
+        addChild(game = new GameView(_layout, locale, loadImageManager, h, v));
         return game;
     }
 

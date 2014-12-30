@@ -16,8 +16,9 @@ import scala.io.Source
 object Main {
 
   def main(args: Array[String]): Unit = {
+    println("Version 0.02")
+
     val configPath = "/Users/tolyayanot/dev/rknrl/castles/server/src/main/resources/dev.json"
-    //    val configPath = "/var/castles-server/dev.json"
 
     val configString = Source.fromFile(configPath).mkString
 

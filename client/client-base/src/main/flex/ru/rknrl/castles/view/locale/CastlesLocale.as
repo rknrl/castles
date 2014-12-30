@@ -73,5 +73,13 @@ public class CastlesLocale {
     public function get remove():String {
         return "Удалить";
     }
+
+    public function win(reward:int):String {
+        return "Победа! Награда " + reward + "★";
+    }
+
+    public function lose(reward:int):String {
+        return "Поражение! Награда " + reward + "★";
+    }
 }
 }

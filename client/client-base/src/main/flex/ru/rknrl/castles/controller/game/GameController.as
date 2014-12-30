@@ -9,9 +9,9 @@ import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.rmi.GameFacadeSender;
 import ru.rknrl.castles.rmi.IGameFacade;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -25,6 +25,7 @@ import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.ItemsStateDTO;
 import ru.rknrl.dto.MoveDTO;
 import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
@@ -178,7 +179,14 @@ public class GameController implements IGameFacade {
 
     public function onGameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
-            view.openGameOverScreen();
+            const winner:PlayerInfoDTO = new PlayerInfoDTO(); // todo: mock
+            winner.photoUrl = "1";
+
+            const loser:PlayerInfoDTO = new PlayerInfoDTO();
+            loser.photoUrl = "2";
+
+            const losers:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[loser];
+            view.openGameOverScreen(winner, losers, dto.place == 1, dto.reward);
         }
     }
 

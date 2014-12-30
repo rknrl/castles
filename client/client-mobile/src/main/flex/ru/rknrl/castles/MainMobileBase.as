@@ -3,7 +3,7 @@ import flash.display.StageAspectRatio;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
-import ru.rknrl.castles.utils.layout.LayoutPortrait;
+import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
@@ -55,7 +55,7 @@ public class MainMobileBase extends Main {
         authenticate.deviceType = DeviceType.PHONE;
         authenticate.secret = authenticationSecret;
 
-        const layout:LayoutPortrait = new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight);
+        const layout:LayoutPortrait = new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
