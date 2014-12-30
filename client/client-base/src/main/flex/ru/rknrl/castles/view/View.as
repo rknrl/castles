@@ -38,7 +38,7 @@ public class View extends Sprite {
     }
 
     public function showMenu():void {
-        menu.visible = false;
+        menu.visible = true;
     }
 
     public function hideMenu():void {

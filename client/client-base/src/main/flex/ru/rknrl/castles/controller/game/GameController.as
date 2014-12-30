@@ -82,6 +82,7 @@ public class GameController implements IGameFacade {
         for each(var tornado:TornadoDTO in gameState.tornadoes) onAddTornado(tornado);
         for each(var volcano:VolcanoDTO in gameState.volcanoes) onAddVolcano(volcano);
         for each(var bullet:BulletDTO in gameState.bullets) onAddBullet(bullet);
+        for each(var gameOver:GameOverDTO in gameState.gameOvers) onGameOver(gameOver);
 
         view.addEventListener(GameViewEvents.SURRENDER, onSurrender);
         view.addEventListener(GameViewEvents.LEAVE_BUTTON_CLICK, onLeaveButtonClick);

@@ -1,10 +1,13 @@
 package ru.rknrl.castles.view.game.gameOver {
 import flash.display.BitmapData;
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.TextField;
 import flash.utils.Dictionary;
 
+import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
@@ -44,6 +47,7 @@ public class GameOverScreen extends Sprite {
         }
 
         this.layout = layout;
+        addEventListener(MouseEvent.CLICK, onClick);
     }
 
     private function onBitmapDataLoaded(url:String, bitmapData:BitmapData):void {
@@ -63,6 +67,10 @@ public class GameOverScreen extends Sprite {
         holder.scaleX = holder.scaleY = value.scale;
         holder.x = value.screenCenterX - holder.width / 2;
         holder.y = value.contentCenterY;
+    }
+
+    private function onClick(event:MouseEvent):void {
+        dispatchEvent(new Event(GameViewEvents.LEAVE_BUTTON_CLICK, true));
     }
 }
 }
