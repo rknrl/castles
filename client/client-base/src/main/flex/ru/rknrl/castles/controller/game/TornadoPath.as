@@ -1,7 +1,7 @@
 package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.TornadoPathView;
 
 public class TornadoPath {

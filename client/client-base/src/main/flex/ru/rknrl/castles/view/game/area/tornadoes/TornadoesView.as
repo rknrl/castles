@@ -2,7 +2,7 @@ package ru.rknrl.castles.view.game.area.tornadoes {
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 
 public class TornadoesView extends Sprite {
     private const tornadoes:Dictionary = new Dictionary();

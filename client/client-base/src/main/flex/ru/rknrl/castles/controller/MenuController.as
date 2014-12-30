@@ -11,7 +11,7 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.view.MenuView;
+import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.core.social.PaymentDialogData;
 import ru.rknrl.core.social.PaymentDialogEvent;
 import ru.rknrl.core.social.Social;

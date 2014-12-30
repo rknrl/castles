@@ -1,7 +1,7 @@
 package ru.rknrl.castles.controller.game {
 
 import ru.rknrl.castles.model.game.Building;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.dto.BuildingIdDTO;
 

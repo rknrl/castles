@@ -3,7 +3,7 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.getSlotPos;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
 import ru.rknrl.castles.view.game.area.bullets.BulletsView;
@@ -64,13 +64,14 @@ public class GameArea extends Sprite {
     }
 
     public function addStartLocation(dto:StartLocationPosDTO):void {
+        const cellSize:int = CellSize.SIZE.id();
         for each(var slotId:SlotId in SlotId.values) {
             const pos:Point = getSlotPos(slotId);
             const orientation:StartLocationOrientation = dto.orientation;
             const isMirrorH:Boolean = orientation == StartLocationOrientation.TOP_RIGHT || orientation == StartLocationOrientation.BOTTOM_RIGHT;
             const isMirrorV:Boolean = orientation == StartLocationOrientation.TOP_LEFT || orientation == StartLocationOrientation.TOP_RIGHT;
-            const x:Number = isMirrorH ? dto.x - pos.x * CellSize.SIZE.id() : dto.x + pos.x * CellSize.SIZE.id();
-            const y:Number = isMirrorV ? dto.y - pos.y * CellSize.SIZE.id() : dto.y + pos.y * CellSize.SIZE.id();
+            const x:Number = isMirrorH ? dto.x - pos.x * cellSize : dto.x + pos.x * cellSize;
+            const y:Number = isMirrorV ? dto.y - pos.y * cellSize : dto.y + pos.y * cellSize;
             ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
         }
     }

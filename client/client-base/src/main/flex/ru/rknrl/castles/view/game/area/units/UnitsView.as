@@ -2,7 +2,7 @@ package ru.rknrl.castles.view.game.area.units {
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.PlayerIdDTO;

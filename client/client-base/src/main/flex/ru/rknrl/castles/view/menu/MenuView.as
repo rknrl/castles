@@ -1,4 +1,4 @@
-package ru.rknrl.castles.view {
+package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.events.BuildEvent;

@@ -2,7 +2,7 @@ package ru.rknrl.castles.view.game.area.arrows {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 
 public class ArrowView extends Sprite {
     private var head:DisplayObject;

@@ -7,6 +7,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
+import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.utils.LoadImageManager;
 
 public class View extends Sprite {
@@ -60,6 +61,7 @@ public class View extends Sprite {
 
     public function removeGame():void {
         if (!game) throw new Error("game don't exists");
+        game.removeListeners();
         removeChild(game);
         game = null;
     }
@@ -84,9 +86,9 @@ public class View extends Sprite {
     public function removeLoadingScreen():void {
         _removeLoadingScreen();
     }
-    
+
     public function removeLoadingScreenIfExists():void {
-        if(loadingScreen) _removeLoadingScreen();
+        if (loadingScreen) _removeLoadingScreen();
     }
 
     public function addSearchOpponentScreen():void {

@@ -1,7 +1,7 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 
 public class GameMouseEvent extends Event {
     public static const MOUSE_DOWN:String = "gameMouseDown";

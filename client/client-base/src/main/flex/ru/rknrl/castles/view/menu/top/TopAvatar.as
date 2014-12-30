@@ -2,8 +2,8 @@ package ru.rknrl.castles.view.menu.top {
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.castles.view.Fly;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Fly;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.dto.TopUserInfoDTO;

@@ -1,4 +1,4 @@
-package ru.rknrl.castles.view {
+package ru.rknrl.castles.view.utils {
 import flash.display.Shape;
 
 public class Shadow extends Shape {

@@ -5,7 +5,7 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingLevel;

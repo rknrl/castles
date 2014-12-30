@@ -1,25 +1,31 @@
 package ru.rknrl.castles.view.menu.navigate.navigator {
+import flash.display.Bitmap;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 
 public class ScreenNavigatorMobile extends ScreenNavigator {
+    private var mouseHolder:Bitmap;
+
     public function ScreenNavigatorMobile(screens:Vector.<Screen>, gold:int, layout:Layout, locale:CastlesLocale) {
+        addChild(mouseHolder = new Bitmap(Colors.transparent));
+
         super(screens, gold, layout, locale);
 
-        addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+        addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+        addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    private function onAddedToStage(event:Event):void {
-        removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-
-        stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+    override public function set layout(value:Layout):void {
+        super.layout = value;
+        mouseHolder.width = value.screenWidth;
+        mouseHolder.height = value.screenHeight;
     }
 
     // mouse

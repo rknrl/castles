@@ -3,7 +3,7 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.game.Explosion;
 import ru.rknrl.castles.model.game.Fireball;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.explosions.ExplosionsView;
 import ru.rknrl.castles.view.game.area.fireballs.FireballsView;
 import ru.rknrl.dto.FireballDTO;
@@ -41,6 +41,15 @@ public class Fireballs {
         view.addFireball(fireball.id, fireball.pos(time))
     }
 
+    private const explosions:Vector.<Explosion> = new <Explosion>[];
+    private var explosionIterator:int;
+
+    private function addExplosion(point:Point, time:int):void {
+        const explosion:Explosion = new Explosion(explosionIterator++, time);
+        explosions.push(explosion);
+        explosionsView.addExplosion(explosion.id, point);
+    }
+
     public function update(time:int):void {
         const fireballsToRemove:Vector.<Fireball> = new <Fireball>[];
         for each(var fireball:Fireball in fireballs) {
@@ -64,15 +73,6 @@ public class Fireballs {
             explosions.splice(explosions.indexOf(explosion), 1);
             explosionsView.removeExplosion(explosion.id);
         }
-    }
-
-    private const explosions:Vector.<Explosion> = new <Explosion>[];
-    private var explosionIterator:int;
-
-    private function addExplosion(point:Point, time:int):void {
-        const explosion:Explosion = new Explosion(explosionIterator++, time);
-        explosions.push(explosion);
-        explosionsView.addExplosion(explosion.id, point);
     }
 }
 }

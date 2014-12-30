@@ -7,7 +7,7 @@ import flash.ui.Keyboard;
 
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.GameArea;
 import ru.rknrl.castles.view.game.ui.GameUI;
 import ru.rknrl.castles.view.layout.Layout;
@@ -44,8 +44,8 @@ public class GameView extends Sprite {
         dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(area.mouseX, area.mouseY)))
     }
 
-    private static function getMouseEventType(type:String):String {
-        switch (type) {
+    private static function getMouseEventType(eventType:String):String {
+        switch (eventType) {
             case MouseEvent.MOUSE_DOWN:
                 return GameMouseEvent.MOUSE_DOWN;
             case MouseEvent.MOUSE_MOVE:
@@ -53,7 +53,7 @@ public class GameView extends Sprite {
             case MouseEvent.MOUSE_UP:
                 return GameMouseEvent.MOUSE_UP;
         }
-        throw new Error("unknown mouse event type " + type);
+        throw new Error("unknown mouse event type " + eventType);
     }
 
     public function set layout(value:Layout):void {

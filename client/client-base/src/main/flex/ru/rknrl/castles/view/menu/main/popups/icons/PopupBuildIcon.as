@@ -5,7 +5,7 @@ import flash.geom.ColorTransform;
 
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 

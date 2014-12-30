@@ -6,7 +6,7 @@ import flash.utils.Dictionary;
 import ru.rknrl.castles.model.events.SlotClickEvent;
 import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.menu.main.StartLocation;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 

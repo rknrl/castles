@@ -2,7 +2,7 @@ package ru.rknrl.castles.view.game.area.bullets {
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 
 public class BulletsView extends Sprite {
     private const bullets:Dictionary = new Dictionary();

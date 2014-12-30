@@ -3,8 +3,8 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.castles.view.Fly;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Fly;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.layout.Layout;
 
 public class FlyIcon extends Sprite {

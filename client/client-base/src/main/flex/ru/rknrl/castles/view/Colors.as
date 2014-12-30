@@ -10,6 +10,8 @@ public class Colors {
     public static const navigationPoint:uint = 0xdddddd;
     public static const navigationPointSelected:uint = 0xaaaaaa;
 
+    public static const transparent:BitmapData = new BitmapData(1, 1, true, 0);
+
     public static const flaskFillColor:uint = 0xcccccc;
 
     public static const red:uint = 0xfa6755;

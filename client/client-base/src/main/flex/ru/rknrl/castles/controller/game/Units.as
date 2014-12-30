@@ -2,7 +2,7 @@ package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.game.Unit;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.UnitDTO;

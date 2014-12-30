@@ -14,9 +14,9 @@ import ru.rknrl.castles.rmi.GameFacadeReceiver;
 import ru.rknrl.castles.rmi.GameFacadeSender;
 import ru.rknrl.castles.rmi.IAccountFacade;
 import ru.rknrl.castles.rmi.IEnterGameFacade;
-import ru.rknrl.castles.view.MenuView;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
+import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountStateDTO;
@@ -131,7 +131,6 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         view.removeGame();
         view.showMenu();
 
-        game.destroy();
         game = null;
 
         gameConnection.unregisterReceiver(gameFacadeReceiver);
@@ -156,7 +155,6 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
     public function destroy():void {
         if (game) {
             view.removeGame();
-            game.destroy();
             game = null;
         }
     }

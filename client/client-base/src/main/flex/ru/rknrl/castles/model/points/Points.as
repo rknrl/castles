@@ -1,4 +1,4 @@
-package ru.rknrl.castles.utils.points {
+package ru.rknrl.castles.model.points {
 
 import ru.rknrl.dto.PointDTO;
 

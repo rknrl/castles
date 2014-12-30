@@ -1,5 +1,5 @@
 package ru.rknrl.castles.model.game {
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.PlayerIdDTO;

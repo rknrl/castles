@@ -11,7 +11,7 @@ import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.rmi.GameFacadeSender;
 import ru.rknrl.castles.rmi.IGameFacade;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -90,11 +90,6 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(GameMouseEvent.MOUSE_MOVE, onMouseMove);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
-    }
-
-    public function destroy():void {
-
-// todo
     }
 
     private function onEnterFrame(event:Event):void {

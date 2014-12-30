@@ -2,9 +2,9 @@ package ru.rknrl.castles.view.menu.shop {
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.castles.view.Fly;
-import ru.rknrl.castles.view.LockView;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Fly;
+import ru.rknrl.castles.view.utils.LockView;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.game.ui.magicItems.GameMagicItemIcon;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.dto.ItemType;

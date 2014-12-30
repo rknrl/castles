@@ -2,7 +2,7 @@ package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.game.Tornado;
-import ru.rknrl.castles.utils.points.Points;
+import ru.rknrl.castles.model.points.Points;
 import ru.rknrl.castles.view.game.area.tornadoes.TornadoesView;
 import ru.rknrl.dto.TornadoDTO;
 

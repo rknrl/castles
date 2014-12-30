@@ -2,7 +2,7 @@ package ru.rknrl.castles.view.game.area.explosions {
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 
 public class ExplosionsView extends Sprite {
     private const explosions:Dictionary = new Dictionary();

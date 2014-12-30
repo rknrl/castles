@@ -1,4 +1,4 @@
-package ru.rknrl.castles.utils {
+package ru.rknrl.castles.view.utils {
 import flash.text.TextField;
 import flash.text.TextFormat;
 

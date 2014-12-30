@@ -1,8 +1,8 @@
 package ru.rknrl.castles.view.utils {
 import flash.display.Graphics;
 
-import ru.rknrl.castles.utils.points.Point;
-import ru.rknrl.castles.utils.points.Points;
+import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.points.Points;
 
 public class DashLine {
     public static function drawPath(g:Graphics, points:Points, dashLength:int = 10, gap:int = 10):void {

@@ -4,10 +4,10 @@ import flash.events.Event;
 import flash.text.TextField;
 
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.castles.view.Fly;
+import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.LockView;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.LockView;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillLevel;

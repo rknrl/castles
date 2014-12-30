@@ -5,7 +5,7 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.LockView;
+import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.castles.view.utils.createTextField;

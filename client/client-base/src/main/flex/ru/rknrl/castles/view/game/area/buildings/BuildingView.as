@@ -4,10 +4,10 @@ import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.Shadow;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingIdDTO;

@@ -1,6 +1,6 @@
 package ru.rknrl.castles.model.game {
-import ru.rknrl.castles.utils.points.Point;
-import ru.rknrl.castles.utils.points.Points;
+import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.points.Points;
 
 public class Tornado {
     private var startTime:int;

@@ -1,5 +1,5 @@
 package ru.rknrl.castles.model {
-import ru.rknrl.castles.utils.points.Point;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.Slot1Pos;
 import ru.rknrl.dto.Slot2Pos;
 import ru.rknrl.dto.Slot3Pos;
