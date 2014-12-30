@@ -13,6 +13,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.utils.Align;
+import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillType;
 
@@ -40,6 +41,7 @@ public class SkillsScreen extends Screen {
         titleTextField = createTextField(Fonts.title);
 
         _skillLevels = skillLevels;
+        _layout = layout;
         this.upgradePrices = upgradePrices;
         this.layout = layout;
     }
@@ -58,20 +60,38 @@ public class SkillsScreen extends Screen {
         for each(var skillType:SkillType in SkillType.values) {
             getFlask(skillType).skillLevel = value.getLevel(skillType);
         }
+        updateTitleText();
     }
+
+    private var _prices:SkillUpgradePrices;
 
     public function set upgradePrices(value:SkillUpgradePrices):void {
-        titleTextField.text = _skillLevels.isLastTotalLevel ? locale.upgradesComplete : locale.upgradesTitle(value.getPrice(_skillLevels.nextTotalLevel));
+        _prices = value;
+        updateTitleText();
     }
 
+    private function updateTitleText():void {
+        titleTextField.text = _skillLevels.isLastTotalLevel ? locale.upgradesComplete : locale.upgradesTitle(_prices.getPrice(_skillLevels.nextTotalLevel));
+        applyStarTextFormat(titleTextField);
+        alignTitle();
+    }
+
+    private var _layout:Layout;
+
     override public function set layout(value:Layout):void {
+        _layout = value;
+
         flasksHolder.scaleX = flasksHolder.scaleY = value.scale;
         const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(flasks), flaskWidth, flaskGap) * value.scale;
         flasksHolder.x = value.screenCenterX - totalWidth / 2;
         flasksHolder.y = value.contentCenterY;
 
-        titleTextField.scaleX = titleTextField.scaleY = value.scale;
-        const titlePos:Point = value.title(titleTextField.width, titleTextField.height);
+        alignTitle();
+    }
+
+    private function alignTitle():void {
+        titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
+        const titlePos:Point = _layout.title(titleTextField.width, titleTextField.height);
         titleTextField.x = titlePos.x;
         titleTextField.y = titlePos.y;
     }

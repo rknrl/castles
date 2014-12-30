@@ -9,6 +9,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
+import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 
 public class ScreenNavigator extends Sprite {
@@ -47,6 +48,7 @@ public class ScreenNavigator extends Sprite {
     public function ScreenNavigator(screens:Vector.<Screen>, gold:int, layout:Layout, locale:CastlesLocale) {
         this._screens = screens;
         this.locale = locale;
+        _layout = layout;
 
         addChild(_holder = new Sprite());
 
@@ -59,13 +61,14 @@ public class ScreenNavigator extends Sprite {
 
         addChild(_navigationPoints = new NavigationPoints(screens));
 
-        _layout = layout;
         currentScreenIndex = 0;
         this.layout = layout;
     }
 
     public function set gold(value:int):void {
         _balanceTextField.text = locale.balance(value);
+        applyStarTextFormat(balanceTextField);
+        alignBalance();
     }
 
     private var _layout:Layout;
@@ -81,16 +84,20 @@ public class ScreenNavigator extends Sprite {
         _navigationPoints.x = (value.screenWidth - _navigationPoints.width) / 2;
         _navigationPoints.y = value.navigationPointsY;
 
-        _balanceTextField.scaleX = _balanceTextField.scaleY = value.scale;
-        const balancePos:Point = value.balance(_balanceTextField.width);
-        _balanceTextField.x = balancePos.x;
-        _balanceTextField.y = balancePos.y;
+        alignBalance();
 
         for each(var screen:Screen in _screens) {
             screen.layout = value;
         }
 
         updateScreensPos();
+    }
+
+    private function alignBalance():void {
+        _balanceTextField.scaleX = _balanceTextField.scaleY = _layout.scale;
+        const balancePos:Point = _layout.balance(_balanceTextField.width);
+        _balanceTextField.x = balancePos.x;
+        _balanceTextField.y = balancePos.y;
     }
 
     private var _currentScreenIndex:int;

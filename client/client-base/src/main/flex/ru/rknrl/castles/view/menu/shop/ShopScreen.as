@@ -12,6 +12,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.utils.Align;
+import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.ItemType;
 
@@ -35,6 +36,7 @@ public class ShopScreen extends Screen {
 
         titleTextField = createTextField(Fonts.title);
 
+        _layout = layout;
         this.itemPrice = itemPrice;
         this.layout = layout;
     }
@@ -54,16 +56,26 @@ public class ShopScreen extends Screen {
 
     public function set itemPrice(value:int):void {
         titleTextField.text = locale.shopTitle(value);
+        applyStarTextFormat(titleTextField);
+        alignTitle();
     }
 
+    private var _layout:Layout;
+
     override public function set layout(value:Layout):void {
+        _layout = value;
+
         magicItemsHolder.scaleX = magicItemsHolder.scaleY = value.scale;
         const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(magicItems), Layout.itemSize, Layout.itemGap) * value.scale;
         magicItemsHolder.x = value.screenCenterX - totalWidth / 2;
         magicItemsHolder.y = value.contentCenterY;
 
-        titleTextField.scaleX = titleTextField.scaleY = value.scale;
-        const titlePos:Point = value.title(titleTextField.width, titleTextField.height);
+        alignTitle();
+    }
+
+    private function alignTitle():void {
+        titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
+        const titlePos:Point = _layout.title(titleTextField.width, titleTextField.height);
         titleTextField.x = titlePos.x;
         titleTextField.y = titlePos.y;
     }

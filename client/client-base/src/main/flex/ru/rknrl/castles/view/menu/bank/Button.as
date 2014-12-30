@@ -7,6 +7,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.castles.view.utils.createTextField;
 
@@ -34,6 +35,7 @@ public class Button extends Sprite {
 
     public function set text(value:String):void {
         textField.text = value;
+        applyStarTextFormat(textField);
         centerize(textField);
     }
 

@@ -1,4 +1,6 @@
-package ru.rknrl.castles.controllerMock {
+package ru.rknrl.castles.controller.mock {
+import ru.rknrl.castles.controllerMock.*;
+
 import flash.events.Event;
 import flash.utils.setTimeout;
 

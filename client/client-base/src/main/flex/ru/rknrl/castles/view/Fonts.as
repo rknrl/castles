@@ -35,6 +35,7 @@ public class Fonts {
     public static const popupText:TextFormat = regular(20);
     public static const popupPrice:TextFormat = regular(20, 0xaaaaaa);
 
-
+    private static const starFont:StarFont = new StarFont();
+    public static const starTextFormat:TextFormat = new TextFormat(starFont.fontName);
 }
 }

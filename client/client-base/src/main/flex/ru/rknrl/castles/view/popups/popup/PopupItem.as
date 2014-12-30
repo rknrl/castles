@@ -6,6 +6,7 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 
 public class PopupItem extends Sprite {
@@ -22,7 +23,8 @@ public class PopupItem extends Sprite {
         textField.text = text;
 
         addChild(priceTextField = createTextField(Fonts.popupPrice));
-        priceTextField.text = price.toString();
+        priceTextField.text = price + "★";
+        applyStarTextFormat(priceTextField);
 
         this.layout = layout;
     }

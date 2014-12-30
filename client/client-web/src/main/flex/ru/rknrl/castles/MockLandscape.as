@@ -6,7 +6,7 @@ import flash.display.StageQuality;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 
-import ru.rknrl.castles.controllerMock.ControllerMock;
+import ru.rknrl.castles.controller.mock.ControllerMock;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;

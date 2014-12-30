@@ -11,15 +11,15 @@ public class CastlesLocale {
     }
 
     public function bankButton(count:int, price:int):String {
-        return "Купить " + count + " за " + price;
+        return "Купить " + count + " за " + price + "★";
     }
 
     public function balance(value:int):String {
-        return "У вас " + value;
+        return "У вас " + value + "★";
     }
 
     public function shopTitle(price:int):String {
-        return "Любой предмет за " + price;
+        return "Любой предмет за " + price + "★";
     }
 
     public function get upgradesComplete():String {
@@ -27,7 +27,7 @@ public class CastlesLocale {
     }
 
     public function upgradesTitle(price:int):String {
-        return "Любое улучшение за " + price;
+        return "Любое улучшение за " + price + "★";
     }
 
     public function get topTitle():String {
