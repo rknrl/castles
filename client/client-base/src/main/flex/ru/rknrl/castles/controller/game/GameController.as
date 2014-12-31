@@ -62,7 +62,7 @@ public class GameController implements IGameFacade {
         units = new Units(view.area.units);
         arrows = new Arrows(view.area.arrows);
         tornadoPath = new TornadoPath(view.area.tornadoPath);
-        magicItems = new MagicItems(view.ui.magicItems);
+        magicItems = new MagicItems(view.magicItems);
 
         onUpdateItemStates(gameState.itemsState);
 
@@ -106,7 +106,7 @@ public class GameController implements IGameFacade {
         bullets.update(time);
 
         for each(var itemType:ItemType in ItemType.values) {
-            view.ui.magicItems.setItemCooldown(itemType, magicItemStates.cooldownProgress(itemType, time))
+            view.magicItems.setItemCooldown(itemType, magicItemStates.cooldownProgress(itemType, time))
         }
     }
 
@@ -161,9 +161,9 @@ public class GameController implements IGameFacade {
         magicItemStates = new GameMagicItems(dto);
 
         for each(var itemType:ItemType in ItemType.values) {
-            view.ui.magicItems.setItemCount(itemType, magicItemStates.count(itemType))
+            view.magicItems.setItemCount(itemType, magicItemStates.count(itemType))
         }
-        view.ui.magicItems.lock = false;
+        view.magicItems.lock = false;
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {

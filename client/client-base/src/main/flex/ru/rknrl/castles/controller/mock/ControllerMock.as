@@ -1,6 +1,4 @@
 package ru.rknrl.castles.controller.mock {
-import ru.rknrl.castles.controllerMock.*;
-
 import flash.events.Event;
 import flash.utils.setTimeout;
 
@@ -17,10 +15,11 @@ import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.main.StartLocation;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
-import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.View;
+import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.ItemDTO;
+import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillLevelDTO;
 import ru.rknrl.dto.SlotId;
@@ -61,7 +60,7 @@ public class ControllerMock {
         view.addSearchOpponentScreen();
 
         setTimeout(function () {
-            view.addGame(8, 11);
+            view.addGame(new <PlayerInfoDTO>[], 8, 11);
             view.addEventListener(GameViewEvents.SURRENDER, onSurrender);
         }, 2000)
     }

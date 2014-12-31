@@ -10,7 +10,8 @@ import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.GameArea;
 import ru.rknrl.castles.view.game.gameOver.GameOverScreen;
-import ru.rknrl.castles.view.game.ui.GameUI;
+import ru.rknrl.castles.view.game.ui.GameAvatar;
+import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.utils.LoadImageManager;
@@ -21,13 +22,23 @@ public class GameView extends Sprite {
     private var loadImageManager:LoadImageManager;
 
     public var area:GameArea;
-    public var ui:GameUI;
+    private var ui:Sprite;
 
-    public function GameView(layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager, h:int, v:int) {
+    private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
+    public var magicItems:MagicItemsView;
+
+    public function GameView(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
         addChild(area = new GameArea(h, v));
-        addChild(ui = new GameUI(layout));
+        addChild(ui = new Sprite());
+        ui.addChild(magicItems = new MagicItemsView(layout));
+
+        for (var i:int = 0; i < playerInfos.length; i++) {
+            const avatar:GameAvatar = new GameAvatar(i, playerInfos[i], layout, loadImageManager);
+            ui.addChild(avatar);
+            avatars.push(avatar);
+        }
 
         this.layout = layout;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
@@ -71,9 +82,20 @@ public class GameView extends Sprite {
         _layout = value;
 
         area.scaleX = area.scaleY = value.scale;
-        area.x = value.screenCenterX - area.width / 2;
+        const areaPos:Point = value.gameAreaPos(area.width, area.height);
+        area.x = areaPos.x;
+        area.y = areaPos.y;
 
-        ui.layout = value;
+        magicItems.layout = value;
+
+        for (var i:int = 0; i < avatars.length; i++) {
+            const avatar:GameAvatar = avatars[i];
+            avatar.bitmapDataScale = value.bitmapDataScale;
+            avatar.scaleX = avatar.scaleY = value.scale;
+            const avatarPos:Point = value.gameAvatarPos(i, area.width, area.height, avatar.width, avatar.height);
+            avatar.x = avatarPos.x;
+            avatar.y = avatarPos.y;
+        }
     }
 
     private function onKeyDown(event:KeyboardEvent):void {

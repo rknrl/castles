@@ -1,6 +1,6 @@
 package ru.rknrl.castles.view.layout {
-import flash.geom.Point;
 
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupPortrait;
@@ -53,8 +53,27 @@ public class LayoutPortrait extends Layout {
         return footerHeight - padding * 2;
     }
 
-    override public function get gameAvatarSize():Number {
-        throw 32 * scale;
+    override public function gameAreaPos(width:Number, height:Number):Point {
+        return new Point(screenCenterX - width / 2, 32 * scale);
+    }
+
+    override public function get notScaledGameAvatarSize():Number {
+        return 32;
+    }
+
+    override public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number, avatarWidth:Number, avatarHeight:Number):Point {
+        const areaLeft:Number = gameAreaPos(areaWidth, areaHeight).x;
+        const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
+        const areaRight:Number = areaLeft + areaWidth;
+        const areaBottom:Number = areaTop + areaHeight;
+
+        switch (number) {
+            case 0:
+                return new Point(areaRight - avatarWidth / 2, areaTop - avatarHeight / 2);
+            case 1:
+                return new Point(areaLeft + avatarWidth / 2, areaBottom + avatarHeight / 2);
+        }
+        throw new Error("invalid avatar number " + number);
     }
 
     // popup

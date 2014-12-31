@@ -1,9 +1,9 @@
 package ru.rknrl.castles.view.popups.popup {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.geom.Point;
 import flash.text.TextField;
 
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;

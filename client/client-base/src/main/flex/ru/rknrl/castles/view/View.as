@@ -9,6 +9,7 @@ import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.utils.LoadImageManager;
+import ru.rknrl.dto.PlayerInfoDTO;
 
 public class View extends Sprite {
     private var locale:CastlesLocale;
@@ -53,9 +54,9 @@ public class View extends Sprite {
 
     private var game:GameView;
 
-    public function addGame(h:int, v:int):GameView {
+    public function addGame(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int):GameView {
         if (game) throw new Error("game already exists");
-        addChild(game = new GameView(_layout, locale, loadImageManager, h, v));
+        addChild(game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager));
         return game;
     }
 

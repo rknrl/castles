@@ -118,7 +118,8 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         const h:int = Math.round(gameState.width / CellSize.SIZE.id());
         const v:int = Math.round(gameState.height / CellSize.SIZE.id());
-        const gameView:GameView = view.addGame(h, v);
+
+        const gameView:GameView = view.addGame(gameState.playerInfos, h, v);
         game = new GameController(gameView, new GameFacadeSender(connection), gameState);
 
         gameFacadeReceiver = new GameFacadeReceiver(game);

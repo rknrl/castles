@@ -1,6 +1,6 @@
 package ru.rknrl.castles.view.layout {
-import flash.geom.Point;
 
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 
@@ -113,7 +113,15 @@ public class Layout {
         return contentCenterY + shadowDistance * scale;
     }
 
-    public function get gameAvatarSize():Number {
+    public function gameAreaPos(width:Number, height:Number):Point {
+        throw new Error();
+    }
+
+    public function get notScaledGameAvatarSize():Number {
+        throw new Error()
+    }
+
+    public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number, avatarWidth: Number, avatarHeight: Number):Point {
         throw new Error()
     }
 

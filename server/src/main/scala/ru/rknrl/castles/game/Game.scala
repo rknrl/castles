@@ -10,8 +10,8 @@ import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.GameDTO._
 
-import scala.concurrent.duration._
 import scala.collection.JavaConverters._
+import scala.concurrent.duration._
 
 object Game {
 
@@ -68,6 +68,14 @@ class Game(players: Map[PlayerId, Player],
            matchmaking: ActorRef) extends Actor {
 
   private val playersList = for ((id, player) ← players) yield player
+
+  private def playerInfosMock =
+    for ((id, player) ← players)
+    yield PlayerInfoDTO.newBuilder()
+      .setId(id.dto)
+      .setName((id.id + 1).toString)
+      .setPhotoUrl((id.id + 1).toString)
+      .build
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -244,7 +252,11 @@ class Game(players: Map[PlayerId, Player],
       val playerId = `enterGameRmi→playerId`(sender)
       online = online + playerId
       val builder = gameState.dtoBuilder(playerId)
-      sender ! JoinGameMsg(builder.addAllGameOvers(gameOvers.asJava).build)
+      val dto = builder
+        .addAllPlayerInfos(playerInfosMock.asJava)
+        .addAllGameOvers(gameOvers.asJava)
+        .build
+      sender ! JoinGameMsg(dto)
 
     /**
      * Игрок сдается

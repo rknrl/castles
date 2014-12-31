@@ -12,16 +12,18 @@ import ru.rknrl.dto.PlayerInfoDTO;
 public class GameAvatar extends Sprite {
     private var avatar:Avatar;
     private var textField:TextField;
+    private var number:int;
 
-    public function GameAvatar(playerInfo:PlayerInfoDTO, layout:Layout, loadImageManager:LoadImageManager) {
-        addChild(new Avatar(playerInfo.photoUrl, layout.gameAvatarSize, layout.bitmapDataScale, loadImageManager));
+    public function GameAvatar(number:int, playerInfo:PlayerInfoDTO, layout:Layout, loadImageManager:LoadImageManager) {
+        this.number = number;
+        addChild(avatar = new Avatar(playerInfo.photoUrl, layout.notScaledGameAvatarSize, layout.bitmapDataScale, loadImageManager));
 
         addChild(textField = createTextField(Fonts.gameAvatar));
         textField.text = playerInfo.name;
     }
 
-    public function set layout(value:Layout):void {
-        avatar.bitmapDataScale = value.bitmapDataScale;
+    public function set bitmapDataScale(value:Number):void {
+        avatar.bitmapDataScale = value;
     }
 }
 }

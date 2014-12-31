@@ -3,11 +3,11 @@ import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.geom.Point;
 import flash.text.TextField;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;

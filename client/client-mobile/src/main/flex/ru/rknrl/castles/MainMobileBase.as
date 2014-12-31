@@ -20,7 +20,7 @@ public class MainMobileBase extends Main {
         const dpi:Number = Capabilities.screenDPI;
         const max:int = Math.max(fullScreenWidth, fullScreenHeight);
         const inch:Number = max / dpi;
-        const maxPhoneInch:Number = 5.1; // todo
+        const maxPhoneInch:Number = 50.1; // todo
         return inch > maxPhoneInch;
     }
 
