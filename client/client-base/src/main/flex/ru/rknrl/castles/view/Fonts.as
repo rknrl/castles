@@ -30,7 +30,7 @@ public class Fonts {
     public static const gameAvatarLandscape:TextFormat = regularCenter(30);
 
     public static const buildingNumber:TextFormat = bold(20, 0xfffffff);
-    public static const unitNumber:TextFormat = regular(18);
+    public static const unitNumber:TextFormat = regular(20);
 
     public static const popupCancel:TextFormat = regular(20);
     public static const popupTitle:TextFormat = regular(20);

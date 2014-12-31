@@ -73,7 +73,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     )
 
   def `killed→removeMessages` =
-    for (unit ← units if unit.count <= 0) yield new RemoveUnitMsg(unit.id.dto)
+    for (unit ← units if unit.floorCount <= 0) yield new RemoveUnitMsg(unit.id.dto)
 }
 
 object GameUnits {

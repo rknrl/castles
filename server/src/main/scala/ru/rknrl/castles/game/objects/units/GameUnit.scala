@@ -31,6 +31,8 @@ class GameUnit(val id: UnitId,
 
   // todo count может быть и не положительным, в ситуации после получения юнитами дамага
 
+  def floorCount = GameConfig.truncatePopulation(count)
+
   def setCount(value: Double) = copy(newCount = value)
 
   def getPos(time: Long) = startPos.lerp(endPos, startTime, time, speed)
