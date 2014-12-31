@@ -60,7 +60,7 @@ trait GameArea {
  */
 class GameAreaSmall extends GameArea {
   val h = 8
-  val v = 12
+  val v = 11
 
   private val hForRandom = h - 1 - StartLocation.left - StartLocation.right
   private val vForRandom = Math.floor((v - 1) / 2).toInt - StartLocation.top - StartLocation.bottom
@@ -87,8 +87,8 @@ class GameAreaSmall extends GameArea {
  * 4 players, tables and canvas
  */
 class GameAreaBig extends GameArea {
-  val h = 17
-  val v = 17
+  val h = 15
+  val v = 15
 
   def randomStartLocationPositions = {
     val pos = new IJ(

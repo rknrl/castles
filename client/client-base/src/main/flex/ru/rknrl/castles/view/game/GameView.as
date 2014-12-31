@@ -92,7 +92,7 @@ public class GameView extends Sprite {
             const avatar:GameAvatar = avatars[i];
             avatar.bitmapDataScale = value.bitmapDataScale;
             avatar.scaleX = avatar.scaleY = value.scale;
-            const avatarPos:Point = value.gameAvatarPos(i, area.width, area.height, avatar.width, avatar.height);
+            const avatarPos:Point = value.gameAvatarPos(i, area.width, area.height);
             avatar.x = avatarPos.x;
             avatar.y = avatarPos.y;
         }

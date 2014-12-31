@@ -1,6 +1,9 @@
 package ru.rknrl.castles.view.layout {
 
+import flash.text.TextField;
+
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupLandscape;
@@ -51,31 +54,58 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function gameAreaPos(width:Number, height:Number):Point {
-        return new Point(screenCenterX - width / 2, 32 * scale);
+        return new Point(screenCenterX - width / 2, 24 * scale);
     }
 
     override public function get notScaledGameAvatarSize():Number {
         return 128;
     }
 
-    override public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number, avatarWidth:Number, avatarHeight:Number):Point {
+    override public function get gameMagicItemsY():Number {
+        return screenHeight - 96 * scale;
+    }
+
+    override public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
         const areaLeft:Number = gameAreaPos(areaWidth, areaHeight).x;
         const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
-        const paddingX:Number = avatarWidth / 2;
-        const paddingY:Number = avatarHeight;
+        const paddingX:Number = 46 + notScaledGameAvatarSize / 2;
+        const paddingTop:Number = 24 + notScaledGameAvatarSize / 2;
+        const paddingBottom:Number = gameAvatarTextHeight + notScaledGameAvatarSize / 2;
         switch (number) {
             case 0:
-                return new Point(areaLeft - paddingX, areaTop + paddingY);
+                return new Point(areaLeft - paddingX, areaTop + paddingTop);
             case 1:
-                return new Point(areaRight + paddingX, areaTop + paddingY);
+                return new Point(areaRight + paddingX, areaTop + paddingTop);
             case 2:
-                return new Point(areaLeft - paddingX, areaBottom - paddingY);
+                return new Point(areaLeft - paddingX, areaBottom - paddingBottom);
             case 3:
-                return new Point(areaRight + paddingX, areaBottom - paddingY);
+                return new Point(areaRight + paddingX, areaBottom - paddingBottom);
         }
         throw new Error("invalid avatar number " + number);
+    }
+
+    override public function gameAvatarBitmapPos(number:int):Point {
+        return new Point(0, 0);
+    }
+
+    override public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
+        const gap:Number = 8;
+        return new Point(-width / 2, notScaledGameAvatarSize / 2 + gap)
+    }
+
+    private static const gameAvatarTextWidth:int = 210;
+    private static const gameAvatarTextHeight:int = 66;
+
+    override public function createGameAvatarTextField():TextField {
+        const textField:TextField = new TextField();
+        textField.selectable = true;
+        textField.embedFonts = true;
+        textField.defaultTextFormat = Fonts.gameAvatarLandscape;
+        textField.width = gameAvatarTextWidth;
+        textField.height = gameAvatarTextHeight;
+        return textField;
     }
 
     // popup

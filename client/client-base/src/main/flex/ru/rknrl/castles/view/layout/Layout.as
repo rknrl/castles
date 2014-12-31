@@ -1,5 +1,7 @@
 package ru.rknrl.castles.view.layout {
 
+import flash.text.TextField;
+
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
@@ -117,16 +119,30 @@ public class Layout {
         throw new Error();
     }
 
+    public function get gameMagicItemsY():Number {
+        throw new Error();
+    }
+
+    // game avatar
+
     public function get notScaledGameAvatarSize():Number {
         throw new Error()
     }
 
-    public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number, avatarWidth: Number, avatarHeight: Number):Point {
+    public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
         throw new Error()
     }
 
-    public function get gameMagicItemsY():Number {
-        return screenHeight - itemSize / 2 * scale;
+    public function gameAvatarBitmapPos(number:int):Point {
+        throw new Error()
+    }
+
+    public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
+        throw new Error()
+    }
+
+    public function createGameAvatarTextField():TextField {
+        throw new Error()
     }
 
     // popup
