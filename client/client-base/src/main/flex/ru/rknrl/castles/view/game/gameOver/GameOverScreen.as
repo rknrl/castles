@@ -25,7 +25,7 @@ public class GameOverScreen extends Sprite {
     private var winnerAvatar:FlyAvatar;
     private const urlToLoserAvatar:Dictionary = new Dictionary();
 
-    public function GameOverScreen(layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager, winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int) {
+    public function GameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
         addChild(title = createTextField(Fonts.title));
         title.text = win ? locale.win(reward) : locale.lose(reward);
         applyStarTextFormat(title);

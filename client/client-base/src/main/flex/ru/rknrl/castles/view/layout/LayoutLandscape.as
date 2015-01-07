@@ -70,9 +70,9 @@ public class LayoutLandscape extends Layout {
         const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
-        const paddingX:Number = 46 + notScaledGameAvatarSize / 2;
-        const paddingTop:Number = 24 + notScaledGameAvatarSize / 2;
-        const paddingBottom:Number = gameAvatarTextHeight + notScaledGameAvatarSize / 2;
+        const paddingX:Number = 46 + gameAvatarSize / 2;
+        const paddingTop:Number = 24 + gameAvatarSize / 2;
+        const paddingBottom:Number = gameAvatarTextHeight + gameAvatarSize / 2;
         switch (number) {
             case 0:
                 return new Point(areaLeft - paddingX, areaTop + paddingTop);
@@ -100,10 +100,11 @@ public class LayoutLandscape extends Layout {
 
     override public function createGameAvatarTextField():TextField {
         const textField:TextField = new TextField();
-        textField.selectable = true;
+        textField.selectable = false;
         textField.embedFonts = true;
         textField.defaultTextFormat = Fonts.gameAvatarLandscape;
         textField.width = gameAvatarTextWidth;
+        textField.wordWrap = true;
         textField.height = gameAvatarTextHeight;
         return textField;
     }

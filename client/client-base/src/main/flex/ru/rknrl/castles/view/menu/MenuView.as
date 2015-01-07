@@ -1,6 +1,8 @@
 package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
 
+import ru.rknrl.castles.castlesTest;
+
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
 import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
@@ -113,6 +115,24 @@ public class MenuView extends Sprite {
 
     public function openUpgradePopup(slotId:SlotId, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int):void {
         popupManager.open(new UpgradePopup(slotId, canUpgrade, canRemove, upgradePrice, _layout, locale));
+    }
+
+    castlesTest function setScreen(index:int):void {
+        screenNavigator.currentScreenIndex = index;
+    }
+
+    castlesTest function closePopup():void {
+        popupManager.close();
+    }
+
+    castlesTest function closePopupImmediate():void {
+        use namespace castlesTest;
+        popupManager.closeImmediate();
+    }
+
+    castlesTest function openPopupImmediate():void {
+        use namespace castlesTest;
+        popupManager.openImmediate();
     }
 }
 }

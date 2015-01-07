@@ -108,7 +108,7 @@ public class GameView extends Sprite {
     public function openGameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int):void {
         area.visible = false;
         ui.visible = false;
-        addChild(new GameOverScreen(_layout, locale, loadImageManager, winner, losers, win, reward))
+        addChild(new GameOverScreen(winner, losers, win, reward, _layout, locale, loadImageManager))
     }
 }
 }

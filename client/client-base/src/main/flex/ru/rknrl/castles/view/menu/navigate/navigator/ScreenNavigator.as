@@ -103,11 +103,11 @@ public class ScreenNavigator extends Sprite {
 
     private var _currentScreenIndex:int;
 
-    protected function get currentScreenIndex():int {
+    public function get currentScreenIndex():int {
         return _currentScreenIndex;
     }
 
-    protected function set currentScreenIndex(index:int):void {
+    public function set currentScreenIndex(index:int):void {
         _currentScreenIndex = index;
 
         for (var i:int = 0; i < _screens.length; i++) {

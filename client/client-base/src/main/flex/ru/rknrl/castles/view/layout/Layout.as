@@ -129,6 +129,10 @@ public class Layout {
         throw new Error()
     }
 
+    public function get gameAvatarSize():Number {
+        return notScaledGameAvatarSize * scale;
+    }
+
     public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
         throw new Error()
     }

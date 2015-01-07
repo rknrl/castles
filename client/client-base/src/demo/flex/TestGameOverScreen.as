@@ -23,13 +23,14 @@ public class TestGameOverScreen extends Sprite {
         }
 
         gameOverScreen = new GameOverScreen(
-                new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor),
-                new CastlesLocale(""),
-                new LoadImageManager(),
                 winner,
                 losers,
                 true,
-                2);
+                2,
+                new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor),
+                new CastlesLocale(""),
+                new LoadImageManager()
+        );
         addChild(gameOverScreen);
     }
 }

@@ -24,6 +24,7 @@ public class FlaskFill extends Sprite {
         addChild(waterLine = new FlaskWaterLine(fillWidth));
 
         this.skillLevel = skillLevel;
+        onEnterFrame(0);
     }
 
     public function set skillLevel(value:SkillLevel):void {
@@ -39,7 +40,7 @@ public class FlaskFill extends Sprite {
         lastTime = time;
 
         const deltaHeight:Number = nextHeight - bitmap.height;
-        bitmap.height += deltaHeight * (deltaTime / speed);
+        bitmap.height += deltaHeight * Math.min(1, deltaTime / speed);
         bitmap.y = waterLine.y = fillBottom - bitmap.height;
 
         waterLine.onEnterFrame(fraction);

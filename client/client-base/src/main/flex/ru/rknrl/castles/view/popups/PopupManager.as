@@ -3,6 +3,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.Popup;
 
@@ -39,6 +40,15 @@ public class PopupManager extends Sprite {
     public function close(event:Event = null):void {
         mouseChildren = false;
         nextTransition = 0;
+    }
+
+    castlesTest function openImmediate():void {
+        transition = nextTransition = 1;
+        updateTransition();
+    }
+
+    castlesTest function closeImmediate(): void {
+        removePopup();
     }
 
     private function removePopup():void {

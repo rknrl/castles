@@ -95,9 +95,9 @@ public class LayoutPortrait extends Layout {
 
         switch (number) {
             case 0:
-                return new Point(areaRight - notScaledGameAvatarSize / 2, areaTop - 4 - notScaledGameAvatarSize / 2);
+                return new Point(areaRight - gameAvatarSize / 2, areaTop - 4 - gameAvatarSize / 2);
             case 1:
-                return new Point(areaLeft + notScaledGameAvatarSize / 2, areaBottom + 4 + notScaledGameAvatarSize / 2);
+                return new Point(areaLeft + gameAvatarSize / 2, areaBottom + 4 + gameAvatarSize / 2);
         }
         throw new Error("invalid avatar number " + number);
     }
@@ -153,7 +153,8 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function popupPricePos(priceWidth:Number, priceHeight:Number):Point {
-        return new Point(popupWidthImpl - 16 * scale - priceHeight, (popupItemSize - priceHeight) / 2);
+        const gap:Number = 16 * scale;
+        return new Point(popupWidthImpl - gap - priceWidth, (popupItemSize - priceHeight) / 2);
     }
 
     override public function popupTitleTextY(height:Number):Number {
