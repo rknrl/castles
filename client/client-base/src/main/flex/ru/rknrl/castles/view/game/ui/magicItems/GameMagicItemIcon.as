@@ -18,10 +18,10 @@ public class GameMagicItemIcon extends Sprite {
 
     public function GameMagicItemIcon(itemType:ItemType, count:int) {
         addChild(backIcon = Fla.createItem(itemType));
-        backIcon.transform.colorTransform = Colors.itemLightColorTransform(itemType);
+        backIcon.transform.colorTransform = Colors.transform(Colors.light(Colors.item(itemType)));
 
         addChild(frontIcon = Fla.createItem(itemType));
-        frontIcon.transform.colorTransform = Colors.itemColorTransform(itemType);
+        frontIcon.transform.colorTransform = Colors.transform(Colors.item(itemType));
 
         addChild(textField = createTextField(Fonts.magicItemNumber));
 

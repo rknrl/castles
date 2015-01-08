@@ -2,57 +2,73 @@ package ru.rknrl.castles.view {
 import flash.display.BitmapData;
 import flash.geom.ColorTransform;
 
+import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.dto.ItemType;
+import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 
 public class Colors {
-    public static const navigationPoint:uint = 0xdddddd;
-    public static const navigationPointSelected:uint = 0xaaaaaa;
-
     public static const transparent:BitmapData = new BitmapData(1, 1, true, 0);
 
     public static const flaskFillColor:uint = 0xcccccc;
 
-    public static const red:uint = 0xfa6755;
-    public static const yellow:uint = 0xfdbd15;
+    public static const red:uint = 0xfa6654;
+    public static const lightRed:uint = 0xecb8bb;
+
+    public static const yellow:uint = 0xfdbc14;
+    public static const lightYellow:uint = 0xfcf3d4;
+
     public static const grey:uint = 0x999999;
-    public static const cyan:uint = 0x2ad9dc;
-    public static const magenta:uint = 0x9d6dff;
-    public static const colors:Vector.<uint> = new <uint>[red, yellow, grey, cyan, magenta];
+    public static const lightGrey:uint = 0xeeeeee;
+    public static const darkGrey:uint = 0x767676;
 
-    public static const redTransform:ColorTransform = colorToTransform(red);
-    public static const yellowTransform:ColorTransform = colorToTransform(yellow);
-    public static const greyTransform:ColorTransform = colorToTransform(grey);
-    public static const cyanTransform:ColorTransform = colorToTransform(cyan);
-    public static const magentaTransform:ColorTransform = colorToTransform(magenta);
+    public static const cyan:uint = 0x29d9dc;
+    public static const lightCyan:uint = 0xbffae9;
 
-    public static const colorTransforms:Vector.<ColorTransform> = new <ColorTransform>[redTransform, yellowTransform, greyTransform, cyanTransform, magentaTransform];
+    public static const magenta:uint = 0x9c6cff;
+    public static const lightMagenta:uint = 0xe8ddff;
 
-    public static function colorToTransform(color:uint):ColorTransform {
+    public static function light(color:uint):uint {
+        switch (color) {
+            case red:
+                return lightRed;
+            case yellow:
+                return lightYellow;
+            case grey:
+                return lightGrey;
+            case cyan:
+                return lightCyan;
+            case magenta:
+                return lightMagenta;
+        }
+        throw new Error("unknown color " + color)
+    }
+
+    public static function transform(color:uint):ColorTransform {
         const r:Number = ((color >> 16) & 0xFF) / 0xFF;
         const g:Number = ((color >> 8) & 0xFF) / 0xFF;
         const b:Number = (color & 0xFF) / 0xFF;
         return new ColorTransform(r, g, b, 1)
     }
 
-    public static function slotIdToColorTransforms(slotId:SlotId):ColorTransform {
+    public static function slot(slotId:SlotId):uint {
         switch (slotId) {
             case SlotId.SLOT_1:
-                return Colors.redTransform;
+                return red;
             case SlotId.SLOT_2:
-                return Colors.greyTransform;
+                return grey;
             case SlotId.SLOT_3:
-                return Colors.yellowTransform;
+                return yellow;
             case SlotId.SLOT_4:
-                return Colors.magentaTransform;
+                return magenta;
             case SlotId.SLOT_5:
-                return Colors.cyanTransform;
+                return cyan;
         }
         throw new Error("unknown slotId " + slotId);
     }
 
-    public static function skillTypeToColor(skillType:SkillType):uint {
+    public static function skill(skillType:SkillType):uint {
         switch (skillType) {
             case SkillType.ATTACK:
                 return red;
@@ -64,90 +80,66 @@ public class Colors {
         throw new Error("unknown skillType " + skillType);
     }
 
-    public static function skillTypeToColorTransform(skillType:SkillType):ColorTransform {
-        switch (skillType) {
-            case SkillType.ATTACK:
-                return redTransform;
-            case SkillType.DEFENCE:
-                return magentaTransform;
-            case SkillType.SPEED:
-                return yellowTransform;
-        }
-        throw new Error("unknown skillType " + skillType);
-    }
-
-    public static function itemLightColorTransform(itemType:ItemType):ColorTransform {
+    public static function item(itemType:ItemType):uint {
         switch (itemType) {
             case ItemType.FIREBALL:
-                return lightRedTransform;
+                return red;
             case ItemType.STRENGTHENING:
-                return lightYellowTransform;
+                return yellow;
             case ItemType.VOLCANO:
-                return lightGreyTransform;
+                return grey;
             case ItemType.TORNADO:
-                return lightCyanTransform;
+                return cyan;
             case ItemType.ASSISTANCE:
-                return lightMagentaTransform;
-        }
-        throw new Error("unknown itemType " + itemType);
-    }
-
-    public static function itemColorTransform(itemType:ItemType):ColorTransform {
-        switch (itemType) {
-            case ItemType.FIREBALL:
-                return redTransform;
-            case ItemType.STRENGTHENING:
-                return yellowTransform;
-            case ItemType.VOLCANO:
-                return greyTransform;
-            case ItemType.TORNADO:
-                return cyanTransform;
-            case ItemType.ASSISTANCE:
-                return magentaTransform;
+                return magenta;
         }
         throw new Error("unknown itemType " + itemType);
     }
 
     // game
 
-    public static const grass:uint = 0xc3ffa7;
-    public static const groundColor:BitmapData = new BitmapData(1, 1, false, grass);
+    private static const grass:uint = 0xc2ffa6;
+    public static const grassBitmapData:BitmapData = new BitmapData(1, 1, false, grass);
 
-    public static const lightYellow:uint = 0xfcf3d4;
-    public static const lightMagenta:uint = 0xe8ddff;
-    public static const lightCyan:uint = 0xc0fae9;
-    public static const lightRed:uint = 0xecb9bc;
-    public static const lightGrey:uint = 0xeeeeee;
+    private static const noOwnerColor:uint = grey;
 
-    public static const lightRedTransform:ColorTransform = colorToTransform(lightRed);
-    public static const lightYellowTransform:ColorTransform = colorToTransform(lightYellow);
-    public static const lightGreyTransform:ColorTransform = colorToTransform(lightGrey);
-    public static const lightCyanTransform:ColorTransform = colorToTransform(lightCyan);
-    public static const lightMagentaTransform:ColorTransform = colorToTransform(lightMagenta);
-
-    public static const noOwnerGroundColor:BitmapData = new BitmapData(1, 1, false, lightGrey);
-
-    public static const groundColors:Vector.<BitmapData> = new <BitmapData>[
-        new BitmapData(1, 1, false, lightYellow),
-        new BitmapData(1, 1, false, lightCyan),
-        new BitmapData(1, 1, false, lightMagenta),
-        new BitmapData(1, 1, false, lightRed)
-    ];
-
-    public static const noOwnerTransform:ColorTransform = greyTransform;
-
-    public static const playerTransforms:Vector.<ColorTransform> = new <ColorTransform>[
-        yellowTransform,
-        cyanTransform,
-        magentaTransform,
-        redTransform
-    ];
-
-    public static const playerColors:Vector.<uint> = new <uint>[
+    private static const playerColors:Vector.<uint> = new <uint>[
         yellow,
         cyan,
         magenta,
         red
     ];
+
+    public static function buildingTransform(owner:BuildingOwner):ColorTransform {
+        return owner.hasOwner ? playerTransform(owner.ownerId) : transform(noOwnerColor);
+    }
+
+    public static function playerTransform(playerId:PlayerIdDTO):ColorTransform {
+        return transform(playerColor(playerId));
+    }
+
+    public static function playerColor(playerId:PlayerIdDTO):uint {
+        return playerColors[playerId.id];
+    }
+
+    private static const noOwnerGroundBitmapData:BitmapData = new BitmapData(1, 1, false, lightGrey);
+
+    private static const groundBitmapDatas:Vector.<BitmapData> = createGroundBitmapDatas(playerColors);
+
+    private static function createGroundBitmapDatas(playerColors:Vector.<uint>):Vector.<BitmapData> {
+        const result:Vector.<BitmapData> = new <BitmapData>[];
+        for each(var color:uint in playerColors) {
+            result.push(new BitmapData(1, 1, false, light(color)));
+        }
+        return result;
+    }
+
+    public static function groundBitmapData(owner:BuildingOwner):BitmapData {
+        return owner.hasOwner ? groundBitmapDataById(owner.ownerId) : noOwnerGroundBitmapData;
+    }
+
+    public static function groundBitmapDataById(playerId:PlayerIdDTO):BitmapData {
+        return groundBitmapDatas[playerId.id];
+    }
 }
 }

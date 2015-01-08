@@ -41,7 +41,7 @@ public class SlotView extends Sprite {
 
         if (value.hasBuildingPrototype) {
             building = Fla.createBuilding(value.buildingPrototype.type, value.buildingPrototype.level);
-            building.transform.colorTransform = Colors.slotIdToColorTransforms(id);
+            building.transform.colorTransform = Colors.transform(Colors.slot(id));
             buildingLayer.addChild(building);
         }
         shadow.scaleX = shadow.scaleY = value.hasBuildingPrototype ? Fla.buildingLevelToScale(value.buildingPrototype.level) : Fla.buildingLevelToScale(BuildingLevel.LEVEL_1);

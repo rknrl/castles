@@ -5,10 +5,10 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
@@ -55,7 +55,7 @@ public class BuildingView extends Sprite {
 
     public function set owner(value:BuildingOwner):void {
         _owner = value;
-        building.transform.colorTransform = GameColors.transform(owner);
+        building.transform.colorTransform = Colors.buildingTransform(owner);
     }
 
     public function set count(value:int):void {

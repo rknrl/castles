@@ -4,11 +4,11 @@ import flash.events.Event;
 import flash.text.TextField;
 
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.Fonts;
+import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
@@ -39,7 +39,7 @@ public class FlaskView extends Sprite {
         mouseChildren = false;
 
         const textField:TextField = createTextField(Fonts.skillName);
-        textField.textColor = Colors.skillTypeToColor(skillType);
+        textField.textColor = Colors.skill(skillType);
         textField.text = name;
         textField.x = skillTypeToTextFieldX(skillType, textField.width);
         textField.y = textFieldY;
@@ -49,11 +49,11 @@ public class FlaskView extends Sprite {
         addChild(flaskHolder);
 
         const flask:Flask = new Flask();
-        flask.transform.colorTransform = Colors.skillTypeToColorTransform(skillType);
+        flask.transform.colorTransform = Colors.transform(Colors.skill(skillType));
         flaskHolder.addChild(flask);
 
         flaskHolder.addChild(fill = new FlaskFill(skillLevel));
-        fill.transform.colorTransform = Colors.skillTypeToColorTransform(skillType);
+        fill.transform.colorTransform = Colors.transform(Colors.skill(skillType));
 
         flaskHolder.addChild(lockView = new LockView());
 

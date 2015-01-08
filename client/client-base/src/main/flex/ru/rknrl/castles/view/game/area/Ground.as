@@ -6,7 +6,6 @@ import flash.utils.Dictionary;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.castles.view.game.GameColors;
 import ru.rknrl.dto.CellSize;
 
 public class Ground extends Sprite {
@@ -25,7 +24,7 @@ public class Ground extends Sprite {
 
         for (var i:int = 0; i < h; i++) {
             for (var j:int = 0; j < v; j++) {
-                const bitmap:Bitmap = new Bitmap(Colors.groundColor);
+                const bitmap:Bitmap = new Bitmap(Colors.grassBitmapData);
                 bitmap.width = cellSize - gap;
                 bitmap.height = cellSize - gap;
                 bitmap.x = i * cellSize + gap / 2;
@@ -39,7 +38,7 @@ public class Ground extends Sprite {
     public function updateGroundColor(pos:Point, owner:BuildingOwner):void {
         const i:int = pos.x / cellSize;
         const j:int = pos.y / cellSize;
-        getGround(i, j).bitmapData = GameColors.bitmapData(owner);
+        getGround(i, j).bitmapData = Colors.groundBitmapData(owner);
     }
 }
 }

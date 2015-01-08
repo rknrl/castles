@@ -9,7 +9,7 @@ public function applyStarTextFormat(textField:TextField):void {
     const indices:Vector.<int> = getCharIndices(textField.text, "★");
 
     for each(var index:int in indices) {
-        textField.setTextFormat(Fonts.starTextFormat, index, index + 1);
+        textField.setTextFormat(Fonts.star, index, index + 1);
     }
 }
 }

@@ -28,7 +28,7 @@ public class NavigationPoint extends Sprite {
 
     private function redraw():void {
         graphics.clear();
-        graphics.beginFill(_selected ? Colors.navigationPointSelected : Colors.navigationPoint);
+        graphics.beginFill(_selected ? Colors.darkGrey : Colors.grey);
         graphics.drawCircle(0, 0, Layout.navigationPointSize / 2);
         graphics.endFill();
     }

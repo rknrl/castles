@@ -20,7 +20,7 @@ public class LoadingScreen extends Sprite {
         holder.addChild(new Shadow());
 
         const tower:DisplayObject = Fla.createBuilding(BuildingType.TOWER, BuildingLevel.LEVEL_3);
-        tower.transform.colorTransform = Colors.yellowTransform;
+        tower.transform.colorTransform = Colors.transform(Colors.yellow);
         holder.addChild(tower);
 
         const textField:TextField = new TextField();

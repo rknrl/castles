@@ -3,7 +3,7 @@ import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.view.game.GameColors;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.top.Avatar;
 import ru.rknrl.castles.view.utils.LoadImageManager;
@@ -23,7 +23,7 @@ public class GameAvatar extends Sprite {
         avatar.y = bitmapPos.y;
 
         addChild(textField = layout.createGameAvatarTextField());
-        textField.textColor = GameColors.colorById(playerInfo.id);
+        textField.textColor = Colors.playerColor(playerInfo.id);
         textField.text = playerInfo.name;
 
         const textPos:Point = layout.gameAvatarTextPos(number, textField.width, textField.height);

@@ -15,11 +15,10 @@ public class ShopMagicItemIcon extends Sprite {
 
     public function ShopMagicItemIcon(itemType:ItemType, count:int) {
         const icon:DisplayObject = Fla.createItem(itemType);
-        icon.transform.colorTransform = Colors.itemColorTransform(itemType);
+        icon.transform.colorTransform = Colors.transform(Colors.item(itemType));
         addChild(icon);
 
-        textField = createTextField(Fonts.magicItemNumber);
-        addChild(textField);
+        addChild(textField = createTextField(Fonts.magicItemNumber));
 
         this.count = count;
     }
