@@ -11,7 +11,7 @@ public class CastlesLocale {
     }
 
     public function bankButton(count:int, price:int):String {
-        return "Купить " + count + " за " + price + "★";
+        return "Купить " + count + "★ за " + price + "$";
     }
 
     public function balance(value:int):String {

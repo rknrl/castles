@@ -1,4 +1,4 @@
-package ru.rknrl.castles {
+package ru.rknrl.castles.tools {
 import flash.display.BitmapData;
 import flash.display.Sprite;
 

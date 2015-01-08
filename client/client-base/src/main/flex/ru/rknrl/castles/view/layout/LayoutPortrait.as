@@ -16,13 +16,14 @@ public class LayoutPortrait extends Layout {
     public function LayoutPortrait(stageWidth:int, stageHeight:int, contentsScaleFactor:Number) {
         const scale:Number = getScale(stageWidth, stageHeight, iPhone5Width, iPhone5Height);
         super(stageWidth, stageHeight, scale, contentsScaleFactor);
-        _footerHeight = 96 * scale;
     }
 
-    private var _footerHeight:Number;
-
     override public function get footerHeight():Number {
-        return _footerHeight;
+        return 96 * scale;
+    }
+
+    override public function get contentCenterY():Number {
+        return (screenHeight - footerHeight) / 2;
     }
 
     override public function balance(width:int):Point {

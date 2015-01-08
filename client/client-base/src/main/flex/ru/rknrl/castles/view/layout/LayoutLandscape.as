@@ -21,6 +21,10 @@ public class LayoutLandscape extends Layout {
         return 124 * scale;
     }
 
+    override public function get contentCenterY():Number {
+        return titleTop + (screenHeight - titleTop - footerHeight) / 2;
+    }
+
     override public function get needShield():Boolean {
         return false;
     }
@@ -41,16 +45,22 @@ public class LayoutLandscape extends Layout {
         return 64 * scale;
     }
 
+    private function get balancePadding():Number {
+        return 16 * scale;
+    }
+
     override public function balance(width:int):Point {
-        const padding:Number = 16 * scale;
-        return new Point(screenWidth - width - padding, padding);
+        return new Point(screenWidth - width - balancePadding, balancePadding);
+    }
+
+    private function get titleTop():Number {
+        const balanceHeight:Number = 24 * scale;
+        const gap:Number = 8 * scale;
+        return balancePadding + balanceHeight + gap;
     }
 
     override public function title(width:int, height:int):Point {
-        const padding:Number = 16 * scale;
-        const balanceHeight:Number = 24 * scale;
-        const gap:Number = 8 * scale;
-        return new Point(screenWidth - padding - width, padding + balanceHeight + gap);
+        return new Point(screenWidth - balancePadding - width, titleTop);
     }
 
     override public function gameAreaPos(width:Number, height:Number):Point {

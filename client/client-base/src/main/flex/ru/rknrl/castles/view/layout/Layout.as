@@ -72,7 +72,7 @@ public class Layout {
     }
 
     public function get contentCenterY():Number {
-        return (screenHeight - footerHeight) / 2;
+        throw new Error();
     }
 
     public function balance(width:int):Point {

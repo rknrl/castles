@@ -16,7 +16,7 @@ public class Colors {
 
     public static const red:uint = 0xfa6755;
     public static const yellow:uint = 0xfdbd15;
-    public static const grey:uint = 0x777777;
+    public static const grey:uint = 0x999999;
     public static const cyan:uint = 0x2ad9dc;
     public static const magenta:uint = 0x9d6dff;
     public static const colors:Vector.<uint> = new <uint>[red, yellow, grey, cyan, magenta];
