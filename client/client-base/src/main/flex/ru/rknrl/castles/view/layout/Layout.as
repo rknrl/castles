@@ -12,7 +12,7 @@ public class Layout {
     public static const itemSize:int = 48;
     public static const itemGap:int = 12;
     public static const shadowDistance:int = 36;
-    public static const popupShadowY:Number = 8;
+    public static const popupIconShadowY:Number = 8; // todo
 
     protected static function getScale(stageWidth:int, stageHeight:int, originalWidth:int, originalHeight:int):Number {
         const widthScale:Number = stageWidth / originalWidth;

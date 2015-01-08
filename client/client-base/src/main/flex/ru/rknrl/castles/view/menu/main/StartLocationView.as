@@ -11,7 +11,7 @@ import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
 public class StartLocationView extends Sprite {
-    private static const gapX:Number = 21;
+    private static const gapX:Number = 20;
     private static const gapY:Number = 40;
 
     private const idToSlot:Dictionary = new Dictionary();

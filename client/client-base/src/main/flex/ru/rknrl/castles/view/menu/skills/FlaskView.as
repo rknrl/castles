@@ -14,7 +14,7 @@ import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
 
 public class FlaskView extends Sprite {
-    private static const textFieldY:int = -55 - 22 - 18;
+    private static const textFieldY:int = -104/2 - 16 - 24;
 
     private static function skillTypeToTextFieldX(skillType:SkillType, width:Number):Number {
         switch (skillType) {

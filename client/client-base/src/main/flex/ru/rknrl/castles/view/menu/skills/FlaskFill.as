@@ -8,8 +8,8 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.dto.SkillLevel;
 
 public class FlaskFill extends Sprite {
-    private static const fillWidth:int = 34;
-    private static const fillBottom:int = 39;
+    private static const fillWidth:int = 32;
+    private static const fillBottom:int = 36;
     private static const levelHeight:int = 24;
     private static const speed:int = 200;
 

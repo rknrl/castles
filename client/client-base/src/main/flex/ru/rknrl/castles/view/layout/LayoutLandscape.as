@@ -38,7 +38,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function get buttonWidth():Number {
-        return 220 * scale;
+        return 220 * scale; // todo
     }
 
     override public function get buttonHeight():Number {
@@ -80,8 +80,8 @@ public class LayoutLandscape extends Layout {
         const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
-        const paddingX:Number = 46 + gameAvatarSize / 2;
-        const paddingTop:Number = 24 + gameAvatarSize / 2;
+        const paddingX:Number = 110 * scale;
+        const paddingTop:Number = 24 * scale + gameAvatarSize / 2;
         const paddingBottom:Number = gameAvatarTextHeight + gameAvatarSize / 2;
         switch (number) {
             case 0:
@@ -105,7 +105,7 @@ public class LayoutLandscape extends Layout {
         return new Point(-width / 2, notScaledGameAvatarSize / 2 + gap)
     }
 
-    private static const gameAvatarTextWidth:int = 210;
+    private static const gameAvatarTextWidth:int = 200;
     private static const gameAvatarTextHeight:int = 66;
 
     override public function createGameAvatarTextField():TextField {

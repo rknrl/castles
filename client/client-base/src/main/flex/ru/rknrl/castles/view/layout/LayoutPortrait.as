@@ -27,7 +27,7 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function balance(width:int):Point {
-        const padding:Number = 8 * scale;
+        const padding:Number = 4 * scale;
         return new Point(screenWidth - width - padding, padding);
     }
 
@@ -108,7 +108,7 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function get gameMagicItemsY():Number {
-        return screenHeight - 4 * scale - itemSize / 2 * scale;
+        return screenHeight - 32 * scale;
     }
 
     // popup
@@ -146,11 +146,11 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function get popupIconPos():Point {
-        return new Point(48 * scale, 64 * scale);
+        return new Point(40 * scale, 64 * scale);
     }
 
     override public function popupTextPos(textWidth:Number, textHeight:Number):Point {
-        return new Point(88 * scale, (popupItemSize - textHeight) / 2);
+        return new Point(80 * scale, (popupItemSize - textHeight) / 2);
     }
 
     override public function popupPricePos(priceWidth:Number, priceHeight:Number):Point {
