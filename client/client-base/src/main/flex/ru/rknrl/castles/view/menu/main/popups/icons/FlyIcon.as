@@ -12,10 +12,10 @@ public class FlyIcon extends Sprite {
 
     public function FlyIcon(icon:DisplayObject) {
         const shadow:Shadow = new Shadow();
-        shadow.y = Layout.popupIconShadowY;
+        shadow.y = Layout.popupFlyIconShadowY;
         addChild(shadow);
 
-        icon.y = -Layout.shadowDistance + Layout.popupIconShadowY;
+        icon.y = -Layout.shadowDistance + Layout.popupFlyIconShadowY;
         addChild(icon);
 
         fly = new Fly(icon, shadow);

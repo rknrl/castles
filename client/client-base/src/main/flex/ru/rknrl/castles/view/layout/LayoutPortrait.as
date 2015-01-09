@@ -48,7 +48,7 @@ public class LayoutPortrait extends Layout {
         return footerCenterY;
     }
 
-    override public function get buttonWidth():Number {
+    override public function buttonWidth(textWidth: Number):Number {
         const padding:int = 8 * scale;
         return screenWidth - padding * 2;
     }

@@ -24,13 +24,15 @@ public class Button extends Sprite {
     }
 
     public function set layout(value:Layout):void {
-        rect.graphics.clear();
-        rect.graphics.beginFill(Colors.magenta);
-        rect.graphics.drawRoundRect(-value.buttonWidth / 2, -value.buttonHeight / 2, value.buttonWidth, value.buttonHeight, value.corner, value.corner);
-        rect.graphics.endFill();
-
         textField.scaleX = textField.scaleY = value.scale;
         centerize(textField);
+
+        rect.graphics.clear();
+        rect.graphics.beginFill(Colors.magenta);
+        const buttonWidth:Number = value.buttonWidth(textField.width);
+        const buttonHeight:Number = value.buttonHeight;
+        rect.graphics.drawRoundRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, value.corner, value.corner);
+        rect.graphics.endFill();
     }
 
     public function set text(value:String):void {

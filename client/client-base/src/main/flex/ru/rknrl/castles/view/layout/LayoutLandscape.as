@@ -37,8 +37,9 @@ public class LayoutLandscape extends Layout {
         return contentCenterY;
     }
 
-    override public function get buttonWidth():Number {
-        return 220 * scale; // todo
+    override public function buttonWidth(textWidth: Number):Number {
+        const padding: int = 16 * scale;
+        return textWidth + padding * 2;
     }
 
     override public function get buttonHeight():Number {
