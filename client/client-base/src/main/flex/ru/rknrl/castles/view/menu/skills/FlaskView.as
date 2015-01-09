@@ -14,7 +14,10 @@ import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
 
 public class FlaskView extends Sprite {
-    private static const textFieldY:int = -104/2 - 16 - 24;
+    private static const flaskHeight:Number = 104;
+    private static const textFlaskGap:Number = 16;
+    private static const textHeight:Number = 22;
+    private static const textY:Number = -flaskHeight / 2 - textFlaskGap - textHeight;
 
     private static function skillTypeToTextFieldX(skillType:SkillType, width:Number):Number {
         switch (skillType) {
@@ -42,7 +45,7 @@ public class FlaskView extends Sprite {
         textField.textColor = Colors.skill(skillType);
         textField.text = name;
         textField.x = skillTypeToTextFieldX(skillType, textField.width);
-        textField.y = textFieldY;
+        textField.y = textY;
         addChild(textField);
 
         const flaskHolder:Sprite = new Sprite();
@@ -58,7 +61,7 @@ public class FlaskView extends Sprite {
         flaskHolder.addChild(lockView = new LockView());
 
         const shadow:Shadow = new Shadow();
-        shadow.y = flask.height / 2 + Layout.shadowDistance;
+        shadow.y = flaskHeight / 2 + Layout.shadowDistance;
         addChild(shadow);
 
         fly = new Fly(flaskHolder, shadow);

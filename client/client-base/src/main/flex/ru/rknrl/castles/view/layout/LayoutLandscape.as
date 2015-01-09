@@ -7,6 +7,7 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupLandscape;
+import ru.rknrl.dto.CellSize;
 
 public class LayoutLandscape extends Layout {
     public static const iPadWidth:int = 1024;
@@ -64,7 +65,8 @@ public class LayoutLandscape extends Layout {
         return new Point(screenWidth - balancePadding - width, titleTop);
     }
 
-    override public function gameAreaPos(width:Number, height:Number):Point {
+    override public function gameAreaPos(areaH:int, areaV:int):Point {
+        const width: Number = areaH * CellSize.SIZE.id() * scale;
         return new Point(screenCenterX - width / 2, 24 * scale);
     }
 
@@ -76,14 +78,17 @@ public class LayoutLandscape extends Layout {
         return screenHeight - 96 * scale;
     }
 
-    override public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
-        const areaLeft:Number = gameAreaPos(areaWidth, areaHeight).x;
-        const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
+    override public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
+        const areaWidth: Number = areaH * CellSize.SIZE.id() * scale;
+        const areaHeight: Number = areaV * CellSize.SIZE.id() * scale;
+
+        const areaLeft:Number = gameAreaPos(areaH, areaV).x;
+        const areaTop:Number = gameAreaPos(areaH, areaV).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
         const paddingX:Number = 110 * scale;
         const paddingTop:Number = 24 * scale + gameAvatarSize / 2;
-        const paddingBottom:Number = gameAvatarTextHeight + gameAvatarSize / 2;
+        const paddingBottom:Number = gameAvatarTextHeight * scale + gameAvatarSize / 2;
         switch (number) {
             case 0:
                 return new Point(areaLeft - paddingX, areaTop + paddingTop);

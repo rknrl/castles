@@ -32,7 +32,21 @@ public class GameArea extends Sprite {
     public var explosions:ExplosionsView;
     public var tornadoPath:TornadoPathView;
 
+    private var _h: int;
+
+    public function get h():int {
+        return _h;
+    }
+
+    private var _v: int;
+
+    public function get v():int {
+        return _v;
+    }
+
     public function GameArea(h:int, v:int) {
+        _h = h;
+        _v = v;
         addChild(ground = new Ground(h, v));
         addChild(volcanoes = new VolcanoesView());
         addChild(arrows = new ArrowsView());

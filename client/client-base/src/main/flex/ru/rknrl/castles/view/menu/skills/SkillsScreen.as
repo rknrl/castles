@@ -18,8 +18,8 @@ import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillType;
 
 public class SkillsScreen extends Screen {
-    private static const flaskWidth:int = 40;
-    private static const flaskGap:int = 16;
+    private static const flaskWidth:Number = 38;
+    private static const flaskGap:Number = 16;
 
     private var locale:CastlesLocale;
 

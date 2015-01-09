@@ -8,6 +8,7 @@ import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupPortrait;
 import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.dto.CellSize;
 
 public class LayoutPortrait extends Layout {
     public static const iPhone5Width:int = 320;
@@ -58,7 +59,8 @@ public class LayoutPortrait extends Layout {
         return footerHeight - padding * 2;
     }
 
-    override public function gameAreaPos(width:Number, height:Number):Point {
+    override public function gameAreaPos(areaH:int, areaV:int):Point {
+        const width: Number = areaH * CellSize.SIZE.id() * scale;
         return new Point(screenCenterX - width / 2, 40 * scale);
     }
 
@@ -88,17 +90,21 @@ public class LayoutPortrait extends Layout {
         throw new Error("invalid avatar number " + number);
     }
 
-    override public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
-        const areaLeft:Number = gameAreaPos(areaWidth, areaHeight).x;
-        const areaTop:Number = gameAreaPos(areaWidth, areaHeight).y;
+    override public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
+        const areaWidth: Number = areaH * CellSize.SIZE.id() * scale;
+        const areaHeight: Number = areaV * CellSize.SIZE.id() * scale;
+
+        const areaLeft:Number = gameAreaPos(areaH, areaV).x;
+        const areaTop:Number = gameAreaPos(areaH, areaV).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
+        const gap: Number = 4 * scale;
 
         switch (number) {
             case 0:
-                return new Point(areaRight - gameAvatarSize / 2, areaTop - 4 - gameAvatarSize / 2);
+                return new Point(areaRight - gameAvatarSize / 2, areaTop - gap - gameAvatarSize / 2);
             case 1:
-                return new Point(areaLeft + gameAvatarSize / 2, areaBottom + 4 + gameAvatarSize / 2);
+                return new Point(areaLeft + gameAvatarSize / 2, areaBottom + gap + gameAvatarSize / 2);
         }
         throw new Error("invalid avatar number " + number);
     }

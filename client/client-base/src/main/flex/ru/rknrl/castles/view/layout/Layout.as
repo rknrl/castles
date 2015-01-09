@@ -115,7 +115,7 @@ public class Layout {
         return contentCenterY + shadowDistance * scale;
     }
 
-    public function gameAreaPos(width:Number, height:Number):Point {
+    public function gameAreaPos(areaH:int, areaV:int):Point {
         throw new Error();
     }
 
@@ -133,7 +133,7 @@ public class Layout {
         return notScaledGameAvatarSize * scale;
     }
 
-    public function gameAvatarPos(number:int, areaWidth:Number, areaHeight:Number):Point {
+    public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
         throw new Error()
     }
 
