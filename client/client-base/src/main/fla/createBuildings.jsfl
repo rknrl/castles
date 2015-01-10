@@ -1,17 +1,17 @@
 var lightYellow = 0xfcf3d4;
-var yellow = 0xfdbd15;
+var yellow = 0xfdbc14;
 
 var lightMagenta = 0xe8ddff;
-var magenta = 0x9d6dff;
+var magenta = 0x9c6cff;
 
-var lightCyan = 0xc0fae9;
-var cyan = 0x2ad9dc;
+var lightCyan = 0xbffae9;
+var cyan = 0x29d9dc;
 
-var lightRed = 0xecb9bc;
-var red = 0xfa6755;
+var lightRed = 0xecb8bb;
+var red = 0xfa6654;
 
 var lightGrey = 0xeeeeee;
-var grey = 0x777777;
+var grey = 0x999999;
 
 var colors = [yellow, magenta, cyan, red, grey];
 var lightColors = [lightYellow, lightMagenta, lightCyan, lightRed, lightGrey];
