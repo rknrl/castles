@@ -43,10 +43,13 @@ public class PopupLandscape extends Popup {
         title.setLayout(width, value);
         title.y = value.popupPadding;
 
+        const itemsWidth: Number = (value.popupItemSize + value.popupPadding) * items.length - value.popupPadding;
+        const itemsLeft: Number = (width - itemsWidth) / 2;
+
         for (var i:int = 0; i < items.length; i++) {
             const item:PopupItem = items[i];
             item.layout = value;
-            item.x = value.popupPadding + (value.popupItemSize + value.popupPadding) * i;
+            item.x = itemsLeft + (value.popupItemSize + value.popupPadding) * i;
             item.y = value.popupPadding + value.popupTitleHeight + value.popupPadding;
         }
 

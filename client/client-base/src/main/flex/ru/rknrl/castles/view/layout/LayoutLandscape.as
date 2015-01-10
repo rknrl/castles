@@ -149,6 +149,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function popupWidth(itemsCount:int):Number {
+        if(itemsCount == 1) return 220 * scale;
         const itemsWidth:Number = (popupItemSize + popupPadding) * itemsCount - popupPadding;
         return itemsWidth + popupPadding * 2;
     }

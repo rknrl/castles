@@ -71,6 +71,7 @@ public class ViewReport extends Sprite {
         "SearchOpponentsScreen",
         "SkillsScreen",
         "TopScreen",
+        "Upgrade1Popup",
         "UpgradePopup"
     ];
 
@@ -158,6 +159,13 @@ public class ViewReport extends Sprite {
         menuView.openUpgradePopup(SlotId.SLOT_1, true, true, 16);
         menuView.openPopupImmediate();
         screenshot(folder, device, "UpgradePopup", mainBg);
+
+        menuView.closePopup();
+        menuView.closePopupImmediate();
+
+        menuView.openUpgradePopup(SlotId.SLOT_1, true, false, 16);
+        menuView.openPopupImmediate();
+        screenshot(folder, device, "Upgrade1Popup", mainBg);
 
         menuView.closePopup();
         menuView.closePopupImmediate();
