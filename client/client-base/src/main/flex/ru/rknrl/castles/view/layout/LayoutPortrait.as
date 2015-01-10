@@ -117,6 +117,10 @@ public class LayoutPortrait extends Layout {
         return screenHeight - 32 * scale;
     }
 
+    override public function rewardText(textWidth:Number, textHeight:Number):Point {
+        return title(textWidth, textHeight);
+    }
+
     // popup
 
     override public function createPopup(titleText:String, cancelText:String, items:Vector.<PopupItem>, layout:Layout):Popup {

@@ -123,6 +123,10 @@ public class Layout {
         throw new Error();
     }
 
+    public function rewardText(textWidth:Number, textHeight:Number):Point {
+        throw new Error();
+    }
+
     // game avatar
 
     public function get notScaledGameAvatarSize():Number {

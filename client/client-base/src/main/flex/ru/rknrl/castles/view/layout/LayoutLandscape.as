@@ -38,8 +38,8 @@ public class LayoutLandscape extends Layout {
         return contentCenterY;
     }
 
-    override public function buttonWidth(textWidth: Number):Number {
-        const padding: int = 16 * scale;
+    override public function buttonWidth(textWidth:Number):Number {
+        const padding:int = 16 * scale;
         return textWidth + padding * 2;
     }
 
@@ -66,7 +66,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function gameAreaPos(areaH:int, areaV:int):Point {
-        const width: Number = areaH * CellSize.SIZE.id() * scale;
+        const width:Number = areaH * CellSize.SIZE.id() * scale;
         return new Point(screenCenterX - width / 2, 24 * scale);
     }
 
@@ -75,12 +75,12 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function get gameMagicItemsY():Number {
-        return screenHeight - 96 * scale;
+        return screenHeight - (96 + 24) * scale;
     }
 
     override public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
-        const areaWidth: Number = areaH * CellSize.SIZE.id() * scale;
-        const areaHeight: Number = areaV * CellSize.SIZE.id() * scale;
+        const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
+        const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
 
         const areaLeft:Number = gameAreaPos(areaH, areaV).x;
         const areaTop:Number = gameAreaPos(areaH, areaV).y;
@@ -88,7 +88,7 @@ public class LayoutLandscape extends Layout {
         const areaBottom:Number = areaTop + areaHeight;
         const paddingX:Number = 110 * scale;
         const paddingTop:Number = 24 * scale + gameAvatarSize / 2;
-        const paddingBottom:Number = gameAvatarTextHeight * scale + gameAvatarSize / 2;
+        const paddingBottom:Number = (gameAvatarTextHeight + gameAvatarTextGap) * scale + gameAvatarSize / 2;
         switch (number) {
             case 0:
                 return new Point(areaLeft - paddingX, areaTop + paddingTop);
@@ -106,9 +106,10 @@ public class LayoutLandscape extends Layout {
         return new Point(0, 0);
     }
 
+    private static const gameAvatarTextGap: Number = 8;
+
     override public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
-        const gap:Number = 8;
-        return new Point(-width / 2, notScaledGameAvatarSize / 2 + gap)
+        return new Point(-width / 2, notScaledGameAvatarSize / 2 + gameAvatarTextGap)
     }
 
     private static const gameAvatarTextWidth:int = 200;
@@ -123,6 +124,10 @@ public class LayoutLandscape extends Layout {
         textField.wordWrap = true;
         textField.height = gameAvatarTextHeight;
         return textField;
+    }
+
+    override public function rewardText(textWidth:Number, textHeight:Number):Point {
+        return balance(textWidth);
     }
 
     // popup

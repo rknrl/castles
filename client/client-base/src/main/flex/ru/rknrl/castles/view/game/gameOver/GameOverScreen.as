@@ -18,10 +18,12 @@ import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.PlayerInfoDTO;
 
 public class GameOverScreen extends Sprite {
-    private static const winnerLooserGap:int = 48;
+    private static const winnerLooserGap:int = 24;
+    private static const animationOffset:int = 24;
 
     private var title:TextField;
     private var holder:Sprite;
+    private var holderWidth:Number;
     private var winnerAvatar:FlyAvatar;
     private const urlToLoserAvatar:Dictionary = new Dictionary();
 
@@ -31,6 +33,7 @@ public class GameOverScreen extends Sprite {
         applyStarTextFormat(title);
 
         addChild(holder = new Sprite());
+        holderWidth = Layout.itemSize * (losers.length + 1) + Layout.itemGap * (losers.length - 1) + winnerLooserGap + animationOffset;
 
         winnerAvatar = new FlyAvatar(winner.photoUrl, layout.bitmapDataScale, loadImageManager);
         winnerAvatar.x = Layout.itemSize / 2;
@@ -56,7 +59,7 @@ public class GameOverScreen extends Sprite {
 
     public function set layout(value:Layout):void {
         title.scaleX = title.scaleY = value.scale;
-        const pos:Point = value.title(title.width, title.height);
+        const pos:Point = value.rewardText(title.width, title.height);
         title.x = pos.x;
         title.y = pos.y;
 
@@ -65,7 +68,7 @@ public class GameOverScreen extends Sprite {
         // todo: change loserAvatar bitmapDataScale
 
         holder.scaleX = holder.scaleY = value.scale;
-        holder.x = value.screenCenterX - holder.width / 2;
+        holder.x = value.screenCenterX - holderWidth * value.scale / 2;
         holder.y = value.contentCenterY;
     }
 
