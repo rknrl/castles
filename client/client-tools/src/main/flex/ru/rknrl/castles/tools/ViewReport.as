@@ -11,7 +11,9 @@ import flash.utils.Dictionary;
 
 import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.controller.mock.DtoMock;
+import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
+import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.layout.Layout;
@@ -20,8 +22,10 @@ import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.utils.LoadImageManager;
+import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SlotId;
+import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.loaders.BitmapLoader;
 import ru.rknrl.loaders.ILoader;
 import ru.rknrl.loaders.ParallelLoader;
@@ -193,6 +197,15 @@ public class ViewReport extends Sprite {
 
         view.removeSearchOpponentsScreen();
         const gameView:GameView = view.addGame(playerInfos, w, h);
+        const buildings:Vector.<BuildingDTO> = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
+        for each(var b:BuildingDTO in  buildings) {
+            gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.x, b.y));
+        }
+        const startLocations:Vector.<StartLocationPosDTO> = layout is LayoutPortrait ? DtoMock.startLocationsPosPortrait() : DtoMock.startLocationsPosLandscape();
+        for each(var s:StartLocationPosDTO in startLocations) {
+            gameView.area.addStartLocation(s);
+        }
+
         screenshot(folder, device, "GameScreen", bg);
 
         gameView.openGameOverScreen(DtoMock.winner(), losers, true, 2);

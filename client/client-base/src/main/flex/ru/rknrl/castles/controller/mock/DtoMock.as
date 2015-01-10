@@ -2,10 +2,13 @@ package ru.rknrl.castles.controller.mock {
 import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.BuildingDTO;
+import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingPriceDTO;
 import ru.rknrl.dto.BuildingPrototypeDTO;
 import ru.rknrl.dto.BuildingType;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.ItemsDTO;
@@ -20,6 +23,8 @@ import ru.rknrl.dto.SkillsDTO;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.StartLocationDTO;
+import ru.rknrl.dto.StartLocationOrientation;
+import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
 
 public class DtoMock {
@@ -233,6 +238,158 @@ public class DtoMock {
             playerInfo2,
             playerInfo3,
             playerInfo4
+        ];
+    }
+
+    public static function playerIdDto(id:int):PlayerIdDTO {
+        const dto:PlayerIdDTO = new PlayerIdDTO();
+        dto.id = id;
+        return dto;
+    }
+
+    public static function startLocationPos(playerId:int, orientation:StartLocationOrientation, i:int, j:int):StartLocationPosDTO {
+        const dto:StartLocationPosDTO = new StartLocationPosDTO();
+        dto.playerId = playerIdDto(playerId);
+        dto.orientation = orientation;
+        dto.x = i * CellSize.SIZE.id();
+        dto.y = j * CellSize.SIZE.id();
+        return dto;
+    }
+
+    public static function startLocationsPosLandscape():Vector.<StartLocationPosDTO> {
+        return new <StartLocationPosDTO>[
+            startLocationPos(3, StartLocationOrientation.BOTTOM_RIGHT, 12, 14)
+        ];
+    }
+
+    public static function startLocationsPosPortrait():Vector.<StartLocationPosDTO> {
+        return new <StartLocationPosDTO>[
+            startLocationPos(1, StartLocationOrientation.BOTTOM_LEFT, 2, 10)
+        ];
+    }
+
+    private static var buildingId:int = 0;
+
+    public static function building(buildingType:BuildingType, level:BuildingLevel, ownerId:int, i:int, j:int):BuildingDTO {
+        const dto:BuildingDTO = new BuildingDTO();
+        dto.id = new BuildingIdDTO();
+        dto.id.id = buildingId++;
+        dto.building = new BuildingPrototypeDTO();
+        dto.building.type = buildingType;
+        dto.building.level = level;
+        if (ownerId > -1) dto.owner = playerIdDto(ownerId);
+        dto.population = 47;
+        dto.strengthened = false;
+        dto.x = i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
+        dto.y = j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
+        return dto;
+    }
+
+    public static function buildingsLandscape():Vector.<BuildingDTO> {
+        return new <BuildingDTO>[
+            // player 0
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, 0, 0, 0),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, 0, 2, 0),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, 0, 4, 0),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, 0, 1, 1),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_2, 0, 3, 1),
+
+            // player 1
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, 1, 10, 0),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, 1, 12, 0),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_2, 1, 14, 0),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, 1, 11, 1),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, 1, 13, 1),
+
+            // player 2
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, 2, 0, 14),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, 2, 2, 14),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, 2, 4, 14),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, 2, 1, 13),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, 2, 3, 13),
+
+            // player 3
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, 3, 11, 13),
+
+            // no owner
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 6, 6),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 6, 8),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 8, 6),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 8, 8),
+
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 4, 6),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 4, 8),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 10, 6),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 10, 8),
+
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 2, 6),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 2, 8),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 12, 6),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 12, 8),
+
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 0, 7),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 14, 7),
+
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, -1, 6, 4),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, -1, 8, 4),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, -1, 6, 10),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, -1, 8, 10),
+
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 6, 2),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 8, 2),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 6, 12),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 8, 12),
+
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 7, 0),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 7, 14),
+
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 4, 4),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 10, 4),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 4, 10),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 10, 10),
+
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_2, -1, 1, 3),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_2, -1, 13, 3),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_2, -1, 1, 11),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_2, -1, 13, 11)
+        ];
+    }
+
+    public static function buildingsPortrait():Vector.<BuildingDTO> {
+        return new <BuildingDTO>[
+            // player 0
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, 0, 3, 0),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, 0, 5, 0),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, 0, 7, 0),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, 0, 4, 1),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, 0, 6, 1),
+
+            // player 1
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, 1, 0, 10),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, 1, 2, 10),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, 1, 4, 10),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, 1, 1, 9),
+
+            // no owner
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 0, 5),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 2, 5),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_3, -1, 5, 5),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_2, -1, 7, 5),
+
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 0, 7),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_2, -1, 2, 7),
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 4, 7),
+
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 6, 8),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 7, 10),
+
+            building(BuildingType.TOWER, BuildingLevel.LEVEL_1, -1, 3, 3),
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_2, -1, 5, 3),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, -1, 7, 3),
+
+            building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 1, 2),
+            building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 0, 0)
+
         ];
     }
 }
