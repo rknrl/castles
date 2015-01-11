@@ -20,11 +20,7 @@ public class TornadoPath {
         return _drawing;
     }
 
-    private const _points:Vector.<Point> = new <Point>[];
-
-    public function get points():Vector.<Point> {
-        return _points;
-    }
+    public const points:Vector.<Point> = new <Point>[];
 
     public function startDraw(mousePos:Point):void {
         _drawing = true;
@@ -37,12 +33,12 @@ public class TornadoPath {
         if (_drawing) {
             const time:int = getTimer();
             if (time - lastTime > tornadoInterval) {
-                _points.push(mousePos);
-                if (_points.length > tornadoMaxPoints) {
-                    _points.shift();
+                points.push(mousePos);
+                if (points.length > tornadoMaxPoints) {
+                    points.shift();
                 }
                 lastTime = time;
-                view.drawPath(_points);
+                view.drawPath(points);
             }
         }
     }
@@ -50,7 +46,7 @@ public class TornadoPath {
     public function endDraw():void {
         _drawing = false;
         view.clear();
-        _points.length = 0;
+        points.length = 0;
     }
 }
 }

@@ -223,11 +223,12 @@ public class GameController implements IGameFacade {
     private function onMouseUp(event:GameMouseEvent):void {
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
-                const gameState:CastTorandoDTO = new CastTorandoDTO();
-                gameState.points = Point.pointsToDto(tornadoPath.points);
-                sender.castTornado(gameState);
-
-                magicItems.useItem();
+                if (tornadoPath.points.length >= 2) {
+                    const gameState:CastTorandoDTO = new CastTorandoDTO();
+                    gameState.points = Point.pointsToDto(tornadoPath.points);
+                    sender.castTornado(gameState);
+                    magicItems.useItem();
+                }
                 tornadoPath.endDraw()
             }
         } else {
