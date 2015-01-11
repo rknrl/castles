@@ -11,8 +11,8 @@ import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO._
-import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, DeviceType}
-import ru.rknrl.dto.CommonDTO.{ItemType, NodeLocator}
+import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
+import ru.rknrl.dto.CommonDTO._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Await
@@ -231,9 +231,18 @@ class Account(accountId: AccountId,
     for (i ← 1 to 5)
     yield TopUserInfoDTO.newBuilder()
       .setPlace(i)
-      .setName("name" + i)
-      .setPhotoUrl(i.toString)
-      .build()
+      .setInfo(
+        UserInfoDTO.newBuilder()
+          .setAccountId(
+            AccountIdDTO.newBuilder()
+              .setId("1")
+              .setType(AccountType.DEV)
+              .build()
+          )
+          .setFirstName("name" + i)
+          .setPhoto256(i.toString)
+          .build()
+      ).build()
 
 
   override def preStart(): Unit = println("AccountService start " + name)

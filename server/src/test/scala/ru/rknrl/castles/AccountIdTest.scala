@@ -1,7 +1,7 @@
 package ru.rknrl.castles
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.dto.AuthDTO.{AccountIdDTO, AccountType}
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 
 class AccountIdTest extends FlatSpec with Matchers {
   "AccountId" should "correct initialize by dto" in {

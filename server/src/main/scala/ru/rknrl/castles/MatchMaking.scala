@@ -7,7 +7,7 @@ import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.game.Game.StopGame
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
-import ru.rknrl.dto.AuthDTO.{AccountType, DeviceType}
+import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType}
 import ru.rknrl.utils.IdIterator
 
 import scala.concurrent.duration._
@@ -146,13 +146,13 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
   private val botIdIterator = new BotIdIterator
 
   private def createGameWithBot(order: GameOrder) = {
-    val bigGame= isBigGame(order.deviceType)
+    val bigGame = isBigGame(order.deviceType)
 
-    val botsCount = if(bigGame) 3 else 1
+    val botsCount = if (bigGame) 3 else 1
 
     var orders = List(order)
 
-    for(i ← 0 until botsCount) {
+    for (i ← 0 until botsCount) {
       val externalAccountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], externalAccountId), externalAccountId.id)
       accountIdToAccountRef = accountIdToAccountRef.updated(externalAccountId, bot)

@@ -8,33 +8,13 @@ import "common.proto";
 
 import "account.proto";
 
-enum AccountType {
-    DEV = 1;
-    VKONTAKTE = 2;
-    ODNOKLASSNIKI = 3;
-    MOIMIR = 4;
-    FOTOSTRANA = 5;
-    FACEBOOK = 6;
-}
-
-enum DeviceType {
-    CANVAS = 1;
-    PHONE = 2;
-    TABLET = 3;
-}
-
-message AccountIdDTO {
-    required AccountType type = 1;
-    required string id = 2;
-}
-
 message AuthenticationSecretDTO {
     required string body = 1;
     optional string params = 2;
 }
 
 message AuthenticateDTO {
-    required AccountIdDTO accountId = 1;
+    required UserInfoDTO userInfo = 1;
     required DeviceType deviceType = 2;
     required AuthenticationSecretDTO secret = 3;
 }
@@ -53,6 +33,11 @@ message AuthenticationSuccessDTO {
 
     // Клиент находится в игре
     optional NodeLocator game = 6;
+}
+
+message TopUserInfoDTO {
+    required int32 place = 1;
+    required UserInfoDTO info = 2;
 }
 
 message ProductDTO {

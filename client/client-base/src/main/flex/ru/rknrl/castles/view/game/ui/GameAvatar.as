@@ -3,30 +3,37 @@ import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.top.Avatar;
-import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameAvatar extends Sprite {
     private var avatar:Avatar;
     private var textField:TextField;
-    private var number:int;
 
-    public function GameAvatar(number:int, playerInfo:PlayerInfoDTO, layout:Layout, loadImageManager:ILoadImageManager) {
-        this.number = number;
+    private var _playerId:PlayerIdDTO;
 
-        addChild(avatar = new Avatar(playerInfo.photoUrl, layout.notScaledGameAvatarSize, layout.bitmapDataScale, loadImageManager));
-        const bitmapPos:Point = layout.gameAvatarBitmapPos(number);
+    public function get playerId():PlayerIdDTO {
+        return _playerId;
+    }
+
+    public function GameAvatar(playerInfo:PlayerInfo, layout:Layout, loadImageManager:ILoadImageManager) {
+        _playerId = playerInfo.playerId;
+
+        const photoUrl:String = playerInfo.info.getPhotoUrl(layout.gameAvatarSize, layout.gameAvatarSize); // todo: scale
+        addChild(avatar = new Avatar(photoUrl, layout.notScaledGameAvatarSize, layout.bitmapDataScale, loadImageManager));
+        const bitmapPos:Point = layout.gameAvatarBitmapPos(playerInfo.playerId);
         avatar.x = bitmapPos.x;
         avatar.y = bitmapPos.y;
 
         addChild(textField = layout.createGameAvatarTextField());
-        textField.textColor = Colors.playerColor(playerInfo.id);
-        textField.text = playerInfo.name;
+        textField.textColor = Colors.playerColor(playerInfo.playerId);
+        textField.text = playerInfo.info.fullName;
 
-        const textPos:Point = layout.gameAvatarTextPos(number, textField.width, textField.height);
+        const textPos:Point = layout.gameAvatarTextPos(playerInfo.playerId, textField.width, textField.height);
         textField.x = textPos.x;
         textField.y = textPos.y;
     }

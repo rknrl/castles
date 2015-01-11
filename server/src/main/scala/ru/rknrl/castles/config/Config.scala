@@ -4,8 +4,8 @@ import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.Products.Products
 import ru.rknrl.core.social.SocialConfigs
-import ru.rknrl.dto.AuthDTO.{AccountType, ProductDTO}
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
+import ru.rknrl.dto.AuthDTO.ProductDTO
+import ru.rknrl.dto.CommonDTO.{AccountType, BuildingLevel, BuildingType}
 
 
 object Config {

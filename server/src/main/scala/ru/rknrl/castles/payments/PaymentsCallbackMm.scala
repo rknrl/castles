@@ -4,7 +4,7 @@ import akka.util.Crypt
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.AuthDTO.AccountType
+import ru.rknrl.dto.CommonDTO.AccountType
 import spray.http.{HttpResponse, Uri}
 
 object MmErrorCode {
@@ -100,7 +100,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       else
         PaymentResponse(
           orderId = transactionId,
-          accountId = new AccountId(AccountType.ODNOKLASSNIKI, uid),
+          accountId = new AccountId(AccountType.MOIMIR, uid),
           productId = serviceId,
           price = mailikiPrice,
           httpResponse = HttpResponse(entity = successResponse())

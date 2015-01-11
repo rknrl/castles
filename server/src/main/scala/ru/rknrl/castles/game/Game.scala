@@ -8,6 +8,7 @@ import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
+import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO._
 
 import scala.collection.JavaConverters._
@@ -73,9 +74,13 @@ class Game(players: Map[PlayerId, Player],
     for ((id, player) ← players)
     yield PlayerInfoDTO.newBuilder()
       .setId(id.dto)
-      .setName((id.id + 1).toString)
-      .setPhotoUrl((id.id + 1).toString)
-      .build
+      .setInfo(
+        UserInfoDTO.newBuilder()
+          .setAccountId(player.accountId.dto)
+          .setFirstName((id.id + 1).toString)
+          .setPhoto256((id.id + 1).toString)
+          .build
+      ).build
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)

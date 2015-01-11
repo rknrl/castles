@@ -13,7 +13,7 @@ import ru.rknrl.core.rmi.testkit.{ClientConnected, ServerBounded, TcpClientMock,
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO._
-import ru.rknrl.dto.CommonDTO.{BuildingType, ItemType, SkillType, SlotId}
+import ru.rknrl.dto.CommonDTO._
 
 import scala.concurrent.duration._
 
@@ -89,8 +89,11 @@ class ActorsTest
         .build()
 
       val authenticate = AuthenticateDTO.newBuilder()
-        .setAccountId(accountId)
-        .setSecret(secret)
+        .setUserInfo(
+          UserInfoDTO.newBuilder()
+            .setAccountId(accountId)
+            .build()
+        ).setSecret(secret)
         .setDeviceType(DeviceType.CANVAS)
         .build()
 
@@ -200,7 +203,7 @@ class ActorsTest
 
       gameRmiClientMock ! SurrenderMsg()
 
-      ignoreMsg{
+      ignoreMsg {
         case msg: GameOverMsg ⇒ false
         case _ ⇒ true
       }
@@ -213,7 +216,7 @@ class ActorsTest
 
       gameRmiClientMock ! LeaveMsg()
 
-      ignoreMsg{
+      ignoreMsg {
         case msg: LeaveGameMsg ⇒ false
         case _ ⇒ true
       }

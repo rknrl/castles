@@ -9,6 +9,7 @@ import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupPortrait;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.CellSize;
+import ru.rknrl.dto.PlayerIdDTO;
 
 public class LayoutPortrait extends Layout {
     public static const iPhone5Width:int = 320;
@@ -49,7 +50,7 @@ public class LayoutPortrait extends Layout {
         return footerCenterY;
     }
 
-    override public function buttonWidth(textWidth: Number):Number {
+    override public function buttonWidth(textWidth:Number):Number {
         const padding:int = 8 * scale;
         return screenWidth - padding * 2;
     }
@@ -60,7 +61,7 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function gameAreaPos(areaH:int, areaV:int):Point {
-        const width: Number = areaH * CellSize.SIZE.id() * scale;
+        const width:Number = areaH * CellSize.SIZE.id() * scale;
         return new Point(screenCenterX - width / 2, 40 * scale);
     }
 
@@ -68,45 +69,45 @@ public class LayoutPortrait extends Layout {
         return 32;
     }
 
-    override public function gameAvatarBitmapPos(number:int):Point {
-        switch (number) {
+    override public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
+        switch (playerId.id) {
             case 0:
                 return new Point(0, 0);
             case 1:
                 return new Point(0, 0);
         }
-        throw new Error("invalid avatar number " + number);
+        throw new Error("invalid avatar playerId " + playerId.id);
     }
 
-    override public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
+    override public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
         const gap:Number = 4;
         const y:Number = -height / 2;
-        switch (number) {
+        switch (playerId.id) {
             case 0:
                 return new Point(-notScaledGameAvatarSize / 2 - gap - width, y);
             case 1:
                 return new Point(notScaledGameAvatarSize / 2 + gap, y);
         }
-        throw new Error("invalid avatar number " + number);
+        throw new Error("invalid avatar playerId " + playerId.id);
     }
 
-    override public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
-        const areaWidth: Number = areaH * CellSize.SIZE.id() * scale;
-        const areaHeight: Number = areaV * CellSize.SIZE.id() * scale;
+    override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
+        const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
+        const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
 
         const areaLeft:Number = gameAreaPos(areaH, areaV).x;
         const areaTop:Number = gameAreaPos(areaH, areaV).y;
         const areaRight:Number = areaLeft + areaWidth;
         const areaBottom:Number = areaTop + areaHeight;
-        const gap: Number = 4 * scale;
+        const gap:Number = 4 * scale;
 
-        switch (number) {
+        switch (playerId) {
             case 0:
                 return new Point(areaRight - gameAvatarSize / 2, areaTop - gap - gameAvatarSize / 2);
             case 1:
                 return new Point(areaLeft + gameAvatarSize / 2, areaBottom + gap + gameAvatarSize / 2);
         }
-        throw new Error("invalid avatar number " + number);
+        throw new Error("invalid avatar number " + playerId.id);
     }
 
     override public function createGameAvatarTextField():TextField {

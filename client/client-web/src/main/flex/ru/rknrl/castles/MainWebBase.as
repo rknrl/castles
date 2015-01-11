@@ -7,7 +7,6 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountIdDTO;
-import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
@@ -27,17 +26,12 @@ public class MainWebBase extends Main {
         log.add("authenticationSecret=" + authenticationSecret.body);
         log.add("authenticationParams=" + authenticationSecret.params);
 
-        const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.accountId = accountId;
-        authenticate.deviceType = DeviceType.CANVAS;
-        authenticate.secret = authenticationSecret;
-
         const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        super(host, gamePort, policyPort, authenticate, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, accountId, authenticationSecret, DeviceType.CANVAS, localesUrl, defaultLocale, log, social, layout);
 
         stage.addEventListener(Event.RESIZE, onResize);
     }

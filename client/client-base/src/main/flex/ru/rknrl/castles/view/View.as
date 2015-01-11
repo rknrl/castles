@@ -2,13 +2,13 @@ package ru.rknrl.castles.view {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.menu.MenuModel;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
@@ -54,7 +54,7 @@ public class View extends Sprite {
 
     private var game:GameView;
 
-    public function addGame(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int):GameView {
+    public function addGame(playerInfos:Vector.<PlayerInfo>, h:int, v:int):GameView {
         if (game) throw new Error("game already exists");
         addChild(game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager));
         return game;

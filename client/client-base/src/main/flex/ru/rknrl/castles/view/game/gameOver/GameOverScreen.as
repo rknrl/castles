@@ -8,13 +8,13 @@ import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.top.FlyAvatar;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
-import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameOverScreen extends Sprite {
@@ -27,7 +27,7 @@ public class GameOverScreen extends Sprite {
     private var winnerAvatar:FlyAvatar;
     private const urlToLoserAvatar:Dictionary = new Dictionary();
 
-    public function GameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function GameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(title = createTextField(Fonts.title));
         title.text = win ? locale.win(reward) : locale.lose(reward);
         applyStarTextFormat(title);
@@ -35,7 +35,8 @@ public class GameOverScreen extends Sprite {
         addChild(holder = new Sprite());
         holderWidth = Layout.itemSize * (losers.length + 1) + Layout.itemGap * (losers.length - 1) + winnerLooserGap + animationOffset;
 
-        winnerAvatar = new FlyAvatar(winner.photoUrl, layout.bitmapDataScale, loadImageManager);
+        const winnerPhotoUrl:String = winner.info.getPhotoUrl(Layout.itemSize, Layout.itemSize); // todo: scale
+        winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager);
         winnerAvatar.x = Layout.itemSize / 2;
         holder.addChild(winnerAvatar);
 
@@ -44,7 +45,7 @@ public class GameOverScreen extends Sprite {
             loserAvatar.x = Layout.itemSize + winnerLooserGap + Layout.itemSize / 2 + i * (Layout.itemSize + Layout.itemGap);
             holder.addChild(loserAvatar);
 
-            const url:String = losers[i].photoUrl;
+            const url:String = losers[i].info.getPhotoUrl(Layout.itemSize, Layout.itemSize); // todo: scale
             urlToLoserAvatar[url] = loserAvatar;
             loadImageManager.load(url, onBitmapDataLoaded);
         }

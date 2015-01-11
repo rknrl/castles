@@ -7,7 +7,6 @@ import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
@@ -30,11 +29,9 @@ public class MainMobileBase extends Main {
 
         stage.autoOrients = false;
 
-        if (isTablet(stage.fullScreenWidth, stage.fullScreenHeight)) {
-            stage.setAspectRatio(StageAspectRatio.LANDSCAPE);
-        } else {
-            stage.setAspectRatio(StageAspectRatio.PORTRAIT);
-        }
+        const tablet:Boolean = isTablet(stage.fullScreenWidth, stage.fullScreenHeight);
+        stage.setAspectRatio(tablet ? StageAspectRatio.LANDSCAPE : StageAspectRatio.PORTRAIT);
+        const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
 
         const accountType:AccountType = AccountType.DEV;
         const social:SocialMobile = new SocialMobile(log);
@@ -50,11 +47,6 @@ public class MainMobileBase extends Main {
         log.add("authenticationSecret=" + authenticationSecret.body);
         log.add("authenticationParams=" + authenticationSecret.params);
 
-        const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.accountId = accountId;
-        authenticate.deviceType = DeviceType.PHONE;
-        authenticate.secret = authenticationSecret;
-
         const layout:LayoutPortrait = new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
@@ -66,7 +58,7 @@ public class MainMobileBase extends Main {
          trace("deviceLocale:" + deviceLocale);
          */
 
-        super(host, gamePort, policyPort, authenticate, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout);
     }
 }
 }

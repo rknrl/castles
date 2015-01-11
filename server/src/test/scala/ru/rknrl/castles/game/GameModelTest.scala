@@ -8,7 +8,7 @@ import ru.rknrl.castles.account.objects.startLocation.StartLocationTest
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.game.objects.units.UnitId
-import ru.rknrl.dto.AuthDTO.AccountType
+import ru.rknrl.dto.CommonDTO.AccountType
 
 class GameModelTest extends FlatSpec with Matchers {
 

@@ -8,6 +8,7 @@ import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupLandscape;
 import ru.rknrl.dto.CellSize;
+import ru.rknrl.dto.PlayerIdDTO;
 
 public class LayoutLandscape extends Layout {
     public static const iPadWidth:int = 1024;
@@ -78,7 +79,7 @@ public class LayoutLandscape extends Layout {
         return screenHeight - (96 + 24) * scale;
     }
 
-    override public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
+    override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
         const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
         const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
 
@@ -89,7 +90,7 @@ public class LayoutLandscape extends Layout {
         const paddingX:Number = 110 * scale;
         const paddingTop:Number = 24 * scale + gameAvatarSize / 2;
         const paddingBottom:Number = (gameAvatarTextHeight + gameAvatarTextGap) * scale + gameAvatarSize / 2;
-        switch (number) {
+        switch (playerId.id) {
             case 0:
                 return new Point(areaLeft - paddingX, areaTop + paddingTop);
             case 1:
@@ -99,16 +100,16 @@ public class LayoutLandscape extends Layout {
             case 3:
                 return new Point(areaRight + paddingX, areaBottom - paddingBottom);
         }
-        throw new Error("invalid avatar number " + number);
+        throw new Error("invalid avatar playerId " + playerId.id);
     }
 
-    override public function gameAvatarBitmapPos(number:int):Point {
+    override public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
         return new Point(0, 0);
     }
 
-    private static const gameAvatarTextGap: Number = 8;
+    private static const gameAvatarTextGap:Number = 8;
 
-    override public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
+    override public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
         return new Point(-width / 2, notScaledGameAvatarSize / 2 + gameAvatarTextGap)
     }
 
@@ -149,7 +150,7 @@ public class LayoutLandscape extends Layout {
     }
 
     override public function popupWidth(itemsCount:int):Number {
-        if(itemsCount == 1) return 220 * scale;
+        if (itemsCount == 1) return 220 * scale;
         const itemsWidth:Number = (popupItemSize + popupPadding) * itemsCount - popupPadding;
         return itemsWidth + popupPadding * 2;
     }

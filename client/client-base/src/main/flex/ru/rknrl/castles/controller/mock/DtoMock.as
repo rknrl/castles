@@ -1,6 +1,8 @@
 package ru.rknrl.castles.controller.mock {
 import ru.rknrl.dto.AccountConfigDTO;
+import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountStateDTO;
+import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -26,6 +28,7 @@ import ru.rknrl.dto.StartLocationDTO;
 import ru.rknrl.dto.StartLocationOrientation;
 import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
+import ru.rknrl.dto.UserInfoDTO;
 
 public class DtoMock {
     public static function product():ProductDTO {
@@ -132,11 +135,21 @@ public class DtoMock {
         return dto;
     }
 
+    public static function userInfo(firstName:String, lastName:String, photoUrl:String):UserInfoDTO {
+        const dto:UserInfoDTO = new UserInfoDTO();
+        dto.accountId = new AccountIdDTO();
+        dto.accountId.id = "1";
+        dto.accountId.type = AccountType.DEV;
+        dto.firstName = firstName;
+        dto.lastName = lastName;
+        dto.photo256 = photoUrl;
+        return dto;
+    }
+
     public static function topUserInfo(place:int, name:String, photoUrl:String):TopUserInfoDTO {
         const dto:TopUserInfoDTO = new TopUserInfoDTO();
         dto.place = place;
-        dto.name = name;
-        dto.photoUrl = photoUrl;
+        dto.info = userInfo(name, null, photoUrl);
         return dto;
     }
 
@@ -195,14 +208,13 @@ public class DtoMock {
         const dto:PlayerInfoDTO = new PlayerInfoDTO();
         dto.id = new PlayerIdDTO();
         dto.id.id = id;
-        dto.name = name;
-        dto.photoUrl = photoUrl;
+        dto.info = userInfo(name, null, photoUrl);
         return dto;
     }
 
 
-    private static const playerInfo1:PlayerInfoDTO = playerInfo(0, "Толя Янот", "1");
-    private static const playerInfo2:PlayerInfoDTO = playerInfo(1, "Sasha Serova", "2");
+    public static const playerInfo1:PlayerInfoDTO = playerInfo(0, "Толя Янот", "1");
+    public static const playerInfo2:PlayerInfoDTO = playerInfo(1, "Sasha Serova", "2");
     private static const playerInfo3:PlayerInfoDTO = playerInfo(2, "Napoleon1769", "3");
     private static const playerInfo4:PlayerInfoDTO = playerInfo(3, "Виктория Викторовна", "4");
 

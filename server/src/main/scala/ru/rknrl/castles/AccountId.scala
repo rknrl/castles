@@ -1,6 +1,6 @@
 package ru.rknrl.castles
 
-import ru.rknrl.dto.AuthDTO.{AccountIdDTO, AccountType}
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 
 class AccountId(val accountType: AccountType,
                 val id: String) {
@@ -15,4 +15,9 @@ class AccountId(val accountType: AccountType,
   }
 
   override def hashCode = (accountType.getNumber + id).hashCode
+
+  def dto = AccountIdDTO.newBuilder()
+    .setId(id)
+    .setType(accountType)
+    .build()
 }

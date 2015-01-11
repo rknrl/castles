@@ -4,14 +4,17 @@ import java.net.InetSocketAddress
 
 import _root_.ru.rknrl.castles.config.ConfigTest
 import _root_.ru.rknrl.castles.rmi._
-import ru.rknrl.castles.database.InMemoryDb
-import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import _root_.ru.rknrl.dto.AuthDTO._
 import akka.actor.{ActorSystem, Props}
 import akka.io.Tcp.{Connect, PeerClosed}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import ru.rknrl.castles.database.InMemoryDb
+import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
 import ru.rknrl.core.rmi.testkit._
+import _root_.ru.rknrl.dto.AccountDTO._
+import _root_.ru.rknrl.dto.AuthDTO._
+import _root_.ru.rknrl.dto.CommonDTO._
 
 import scala.concurrent.duration._
 
@@ -86,7 +89,11 @@ class ReEnterGameTest
         .build()
 
       val authenticate = AuthenticateDTO.newBuilder()
-        .setAccountId(accountId)
+        .setUserInfo(
+          UserInfoDTO.newBuilder()
+            .setAccountId(accountId)
+            .build()
+        )
         .setSecret(secret)
         .setDeviceType(DeviceType.CANVAS)
         .build()

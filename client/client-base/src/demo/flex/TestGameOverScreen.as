@@ -1,10 +1,12 @@
 package {
 import flash.display.Sprite;
 
+import ru.rknrl.castles.controller.mock.DtoMock;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.gameOver.GameOverScreen;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.dto.PlayerInfoDTO;
 
 [SWF(width="1024", height="768", frameRate="60")]
@@ -12,19 +14,12 @@ public class TestGameOverScreen extends Sprite {
     private var gameOverScreen:GameOverScreen;
 
     public function TestGameOverScreen() {
-        const winner:PlayerInfoDTO = new PlayerInfoDTO();
-        winner.photoUrl = "1";
-
-        const losers:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[];
-        for (var i:int = 1; i <= 3; i++) {
-            const loser:PlayerInfoDTO = new PlayerInfoDTO();
-            loser.photoUrl = i.toString();
-            losers.push(loser);
-        }
+        const winner:PlayerInfoDTO = DtoMock.playerInfo1;
+        const losers:Vector.<PlayerInfoDTO> = DtoMock.playerInfosLandscape();
 
         gameOverScreen = new GameOverScreen(
-                winner,
-                losers,
+                PlayerInfo.fromDto(winner),
+                PlayerInfo.fromDtoVector(losers),
                 true,
                 2,
                 new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor),

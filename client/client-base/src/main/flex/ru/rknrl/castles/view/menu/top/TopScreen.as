@@ -24,7 +24,8 @@ public class TopScreen extends Screen {
         addChild(avatarsHolder = new Sprite());
 
         for (var i:int = 1; i <= topSize; i++) {
-            const avatar:FlyAvatar = new FlyAvatar(top.getPlace(i).photoUrl, layout.bitmapDataScale, loadImageManager);
+            const photoUrl:String = top.getPlace(i).info.getPhotoUrl(Layout.itemSize, Layout.itemSize); // todo: scale
+            const avatar:FlyAvatar = new FlyAvatar(photoUrl, layout.bitmapDataScale, loadImageManager);
             avatars.push(avatar);
             avatarsHolder.addChild(avatar);
         }

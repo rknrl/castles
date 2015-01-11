@@ -7,6 +7,7 @@ import flash.system.Security;
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
 import ru.rknrl.castles.rmi.EnterGameFacadeSender;
@@ -119,7 +120,8 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         const h:int = Math.round(gameState.width / CellSize.SIZE.id());
         const v:int = Math.round(gameState.height / CellSize.SIZE.id());
 
-        const gameView:GameView = view.addGame(gameState.playerInfos, h, v);
+        const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.playerInfos);
+        const gameView:GameView = view.addGame(playerInfos, h, v);
         game = new GameController(gameView, new GameFacadeSender(connection), gameState);
 
         gameFacadeReceiver = new GameFacadeReceiver(game);

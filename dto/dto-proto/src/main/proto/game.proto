@@ -33,8 +33,7 @@ message PointDTO {
 
 message PlayerInfoDTO {
     required PlayerIdDTO id = 1;
-    required string name = 2;
-    required string photoUrl = 3;
+    required UserInfoDTO info = 2;
 }
 
 // server -> client

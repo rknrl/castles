@@ -2,6 +2,7 @@ package ru.rknrl.castles.controller.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.controller.mock.DtoMock;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -10,6 +11,7 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.rmi.GameFacadeSender;
 import ru.rknrl.castles.rmi.IGameFacade;
 import ru.rknrl.castles.view.game.GameView;
@@ -180,14 +182,10 @@ public class GameController implements IGameFacade {
 
     public function onGameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
-            const winner:PlayerInfoDTO = new PlayerInfoDTO(); // todo: mock
-            winner.photoUrl = "1";
-
-            const loser:PlayerInfoDTO = new PlayerInfoDTO();
-            loser.photoUrl = "2";
-
+            const winner:PlayerInfoDTO = DtoMock.playerInfo1;
+            const loser:PlayerInfoDTO = DtoMock.playerInfo2;
             const losers:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[loser];
-            view.openGameOverScreen(winner, losers, dto.place == 1, dto.reward);
+            view.openGameOverScreen(PlayerInfo.fromDto(winner), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         }
     }
 

@@ -10,6 +10,7 @@ import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
+import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.rmi.AccountFacadeReceiver;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
@@ -23,20 +24,24 @@ import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Sex;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
+import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
+import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.DeviceType;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
-    private static const defaultName:String = "Гость";
-
     private var host:String;
     private var gamePort:int;
     private var policyPort:int;
 
-    private var authenticate:AuthenticateDTO;
+    private var accountId:AccountIdDTO;
+    private var secret:AuthenticationSecretDTO;
+    private var deviceType:DeviceType;
+
     private var localesUrl:String;
     private var defaultLocale:String;
     private var log:Log;
@@ -57,11 +62,13 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, authenticate:AuthenticateDTO, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
-        this.authenticate = authenticate;
+        this.accountId = accountId;
+        this.secret = secret;
+        this.deviceType = deviceType;
         this.localesUrl = localesUrl;
         this.defaultLocale = defaultLocale;
         this.log = log;
@@ -120,7 +127,7 @@ public class Main extends Sprite implements IAuthFacade {
             myUserInfo = userInfo;
             log.add("myUserInfo: " + myUserInfo)
         } else {
-            myUserInfo = new UserInfo(authenticate.accountId.id, defaultName, "", Sex.UNDEFINED);
+            myUserInfo = new UserInfo(accountId.id, CastlesUserInfo.defaultName, null, Sex.UNDEFINED);
             log.add("myUserInfo fail");
         }
 
@@ -154,6 +161,10 @@ public class Main extends Sprite implements IAuthFacade {
     }
 
     public function onAuthReady():void {
+        const authenticate:AuthenticateDTO = new AuthenticateDTO();
+        authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
+        authenticate.secret = secret;
+        authenticate.deviceType = deviceType;
         authFacadeSender.authenticate(authenticate);
     }
 

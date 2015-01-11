@@ -9,6 +9,36 @@ message NodeLocator {
     required int32 port = 2;
 }
 
+enum AccountType {
+    DEV = 1;
+    VKONTAKTE = 2;
+    ODNOKLASSNIKI = 3;
+    MOIMIR = 4;
+    FOTOSTRANA = 5;
+    FACEBOOK = 6;
+}
+
+enum DeviceType {
+    CANVAS = 1;
+    PHONE = 2;
+    TABLET = 3;
+}
+
+message AccountIdDTO {
+    required AccountType type = 1;
+    required string id = 2;
+}
+
+message UserInfoDTO {
+    required AccountIdDTO accountId = 1;
+    optional string firstName = 2;
+    optional string lastName = 3;
+    optional string photo48 = 4;
+    optional string photo96 = 5;
+    optional string photo128 = 6;
+    optional string photo256 = 7;
+}
+
 enum BuildingType {
     HOUSE = 1;
     TOWER = 2;

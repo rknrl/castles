@@ -8,13 +8,13 @@ import flash.ui.Keyboard;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.area.GameArea;
 import ru.rknrl.castles.view.game.gameOver.GameOverScreen;
 import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {
@@ -27,7 +27,7 @@ public class GameView extends Sprite {
     private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
     public var magicItems:MagicItemsView;
 
-    public function GameView(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function GameView(playerInfos:Vector.<PlayerInfo>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
         addChild(area = new GameArea(h, v));
@@ -35,7 +35,8 @@ public class GameView extends Sprite {
         ui.addChild(magicItems = new MagicItemsView(layout));
 
         for (var i:int = 0; i < playerInfos.length; i++) {
-            const avatar:GameAvatar = new GameAvatar(i, playerInfos[i], layout, loadImageManager);
+            const playerInfo:PlayerInfo = playerInfos[i];
+            const avatar:GameAvatar = new GameAvatar(playerInfo, layout, loadImageManager);
             ui.addChild(avatar);
             avatars.push(avatar);
         }
@@ -88,11 +89,10 @@ public class GameView extends Sprite {
 
         magicItems.layout = value;
 
-        for (var i:int = 0; i < avatars.length; i++) {
-            const avatar:GameAvatar = avatars[i];
+        for each(var avatar:GameAvatar in avatars) {
             avatar.bitmapDataScale = value.bitmapDataScale;
             avatar.scaleX = avatar.scaleY = value.scale;
-            const avatarPos:Point = value.gameAvatarPos(i, area.h, area.v);
+            const avatarPos:Point = value.gameAvatarPos(avatar.playerId, area.h, area.v);
             avatar.x = avatarPos.x;
             avatar.y = avatarPos.y;
         }
@@ -105,7 +105,7 @@ public class GameView extends Sprite {
         }
     }
 
-    public function openGameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int):void {
+    public function openGameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int):void {
         area.visible = false;
         ui.visible = false;
         addChild(new GameOverScreen(winner, losers, win, reward, _layout, locale, loadImageManager))

@@ -12,6 +12,9 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.core.rmi.{RegisterReceiver, ReceiverRegistered, TcpReceiver}
 import ru.rknrl.core.rmi.testkit._
+import _root_.ru.rknrl.dto.AccountDTO._
+import _root_.ru.rknrl.dto.AuthDTO._
+import _root_.ru.rknrl.dto.CommonDTO._
 
 import scala.concurrent.duration._
 
@@ -86,7 +89,11 @@ class ReEnterSearchOpponentsTest
         .build()
 
       val authenticate = AuthenticateDTO.newBuilder()
-        .setAccountId(accountId)
+        .setUserInfo(
+          UserInfoDTO.newBuilder()
+            .setAccountId(accountId)
+            .build()
+        )
         .setSecret(secret)
         .setDeviceType(DeviceType.CANVAS)
         .build()

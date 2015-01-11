@@ -64,12 +64,6 @@ message BuildingPriceDTO {
     required int32 price = 2;
 }
 
-message TopUserInfoDTO {
-    required int32 place = 1;
-    required string name = 2;
-    required string photoUrl = 3;
-}
-
 // client->server actions
 
 message SwapSlotsDTO {

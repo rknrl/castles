@@ -5,6 +5,7 @@ import flash.text.TextField;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
+import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.utils.OverrideMe;
 
 public class Layout {
@@ -96,7 +97,7 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public function buttonWidth(textWidth: Number):Number {
+    public function buttonWidth(textWidth:Number):Number {
         throw OverrideMe();
     }
 
@@ -138,15 +139,15 @@ public class Layout {
         return notScaledGameAvatarSize * scale;
     }
 
-    public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
+    public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
         throw OverrideMe()
     }
 
-    public function gameAvatarBitmapPos(number:int):Point {
+    public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
         throw OverrideMe()
     }
 
-    public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
+    public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
         throw OverrideMe()
     }
 

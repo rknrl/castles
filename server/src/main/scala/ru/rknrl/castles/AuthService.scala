@@ -8,7 +8,8 @@ import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AuthDTO.{AccountType, AuthenticateDTO, AuthenticationSuccessDTO, DeviceType}
+import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
+import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType}
 
 class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
@@ -24,14 +25,14 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
   tcpReceiver ! RegisterReceiver(authRmi)
 
   def checkSecret(authenticate: AuthenticateDTO) =
-    authenticate.getAccountId.getType match {
+    authenticate.getUserInfo.getAccountId.getType match {
       case AccountType.DEV ⇒
         true
       case AccountType.VKONTAKTE ⇒
-        SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getAccountId.getId, config.social.vk.get)
+        SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.vk.get)
 
       case AccountType.ODNOKLASSNIKI ⇒
-        SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getAccountId.getId, config.social.ok.get)
+        SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getUserInfo.getAccountId.getId, config.social.ok.get)
 
       case AccountType.MOIMIR ⇒
         SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
@@ -54,7 +55,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
      */
     case AuthenticateMsg(authenticate) ⇒
       if (checkSecret(authenticate)) {
-        accountId = Some(new AccountId(authenticate.getAccountId))
+        accountId = Some(new AccountId(authenticate.getUserInfo.getAccountId))
         deviceType = Some(authenticate.getDeviceType)
         accountStateDb ! Get(accountId.get)
       } else
