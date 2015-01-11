@@ -26,7 +26,8 @@ public class MainWebBase extends Main {
         log.add("authenticationSecret=" + authenticationSecret.body);
         log.add("authenticationParams=" + authenticationSecret.params);
 
-        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
+        const contentsScaleFactor:Number = stage.hasOwnProperty("contentsScaleFactor") ? stage["contentsScaleFactor"] : 1;
+        const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
