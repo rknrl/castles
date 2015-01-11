@@ -8,14 +8,14 @@ import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
     private var locale:CastlesLocale;
-    private var loadImageManager:LoadImageManager;
+    private var loadImageManager:ILoadImageManager;
 
-    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
+    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         _layout = layout;
         this.locale = locale;
         this.loadImageManager = loadImageManager;

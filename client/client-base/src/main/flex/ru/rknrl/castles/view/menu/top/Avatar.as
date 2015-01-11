@@ -4,17 +4,17 @@ import flash.display.Shape;
 import flash.display.Sprite;
 
 import ru.rknrl.castles.view.utils.BitmapUtils;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.castles.view.utils.centerize;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class Avatar extends Sprite {
     private var url:String;
-    private var loadImageManager:LoadImageManager;
+    private var loadImageManager:ILoadImageManager;
     private var size:int;
 
     private var shape:Shape;
 
-    public function Avatar(url:String, size:int, bitmapDataScale:Number, loadImageManager:LoadImageManager) {
+    public function Avatar(url:String, size:int, bitmapDataScale:Number, loadImageManager:ILoadImageManager) {
         this.url = url;
         this.loadImageManager = loadImageManager;
         this.size = size;

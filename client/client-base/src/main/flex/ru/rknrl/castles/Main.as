@@ -9,6 +9,7 @@ import flash.events.SecurityErrorEvent;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.rmi.AccountFacadeReceiver;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
@@ -18,13 +19,13 @@ import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Sex;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
@@ -52,7 +53,7 @@ public class Main extends Sprite implements IAuthFacade {
     private var locale:CastlesLocale;
 
     private var view:View;
-    private var loadImageManager:LoadImageManager;
+    private var loadImageManager:ILoadImageManager;
 
     private var controller:Controller;
 
@@ -106,7 +107,7 @@ public class Main extends Sprite implements IAuthFacade {
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
         locale = new CastlesLocale(data);
 
-        loadImageManager = new LoadImageManager();
+        loadImageManager = new LoadImageManagerMock(1000);
         addChild(view = new View(_layout, locale, loadImageManager));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();

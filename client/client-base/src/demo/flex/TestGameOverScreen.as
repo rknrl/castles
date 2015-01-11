@@ -4,7 +4,7 @@ import flash.display.Sprite;
 import ru.rknrl.castles.view.game.gameOver.GameOverScreen;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.utils.LoadImageManager;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.dto.PlayerInfoDTO;
 
 [SWF(width="1024", height="768", frameRate="60")]
@@ -29,7 +29,7 @@ public class TestGameOverScreen extends Sprite {
                 2,
                 new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor),
                 new CastlesLocale(""),
-                new LoadImageManager()
+                new LoadImageManagerMock(1000)
         );
         addChild(gameOverScreen);
     }

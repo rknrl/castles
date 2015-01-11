@@ -21,7 +21,7 @@ import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.castles.view.utils.LoadImageManager;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SlotId;
@@ -139,7 +139,7 @@ public class ViewReport extends Sprite {
     private function render(folder:String, device:String, layout:Layout, locale:CastlesLocale, merge:Boolean):void {
         use namespace castlesTest;
 
-        const loadImageManager:LoadImageManager = new LoadImageManager();
+        const loadImageManager:LoadImageManagerMock = new LoadImageManagerMock(0);
         const bg:BitmapData = new BitmapData(layout.screenWidth, layout.screenHeight, false, 0xffffff);
 
         const view:View = new View(layout, locale, loadImageManager);

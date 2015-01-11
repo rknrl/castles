@@ -12,10 +12,10 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.top.FlyAvatar;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameOverScreen extends Sprite {
     private static const winnerLooserGap:int = 24;
@@ -27,7 +27,7 @@ public class GameOverScreen extends Sprite {
     private var winnerAvatar:FlyAvatar;
     private const urlToLoserAvatar:Dictionary = new Dictionary();
 
-    public function GameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
+    public function GameOverScreen(winner:PlayerInfoDTO, losers:Vector.<PlayerInfoDTO>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(title = createTextField(Fonts.title));
         title.text = win ? locale.win(reward) : locale.lose(reward);
         applyStarTextFormat(title);

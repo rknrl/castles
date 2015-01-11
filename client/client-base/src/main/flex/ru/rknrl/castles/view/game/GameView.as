@@ -14,12 +14,12 @@ import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {
     private var locale:CastlesLocale;
-    private var loadImageManager:LoadImageManager;
+    private var loadImageManager:ILoadImageManager;
 
     public var area:GameArea;
     private var ui:Sprite;
@@ -27,7 +27,7 @@ public class GameView extends Sprite {
     private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
     public var magicItems:MagicItemsView;
 
-    public function GameView(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
+    public function GameView(playerInfos:Vector.<PlayerInfoDTO>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
         addChild(area = new GameArea(h, v));

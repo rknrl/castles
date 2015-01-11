@@ -2,7 +2,6 @@ package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.castlesTest;
-
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
 import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
@@ -26,8 +25,8 @@ import ru.rknrl.castles.view.menu.skills.SkillsScreen;
 import ru.rknrl.castles.view.menu.top.TopScreen;
 import ru.rknrl.castles.view.popups.PopupEvent;
 import ru.rknrl.castles.view.popups.PopupManager;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.dto.SlotId;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class MenuView extends Sprite {
     private var locale:CastlesLocale;
@@ -42,7 +41,7 @@ public class MenuView extends Sprite {
 
     public function MenuView(layout:Layout,
                              locale:CastlesLocale,
-                             loadImageManager:LoadImageManager,
+                             loadImageManager:ILoadImageManager,
                              model:MenuModel) {
 
         _layout = layout;
@@ -127,11 +126,13 @@ public class MenuView extends Sprite {
 
     castlesTest function closePopupImmediate():void {
         use namespace castlesTest;
+
         popupManager.closeImmediate();
     }
 
     castlesTest function openPopupImmediate():void {
         use namespace castlesTest;
+
         popupManager.openImmediate();
     }
 }

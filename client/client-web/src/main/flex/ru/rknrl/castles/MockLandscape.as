@@ -11,7 +11,7 @@ import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.utils.LoadImageManager;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 
 [SWF(width="1024", height="768", frameRate="60", backgroundColor="#ffffff")]
 public class MockLandscape extends Sprite {
@@ -24,7 +24,7 @@ public class MockLandscape extends Sprite {
 
         const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
 
-        addChild(view = new View(layout, new CastlesLocale(""), new LoadImageManager()));
+        addChild(view = new View(layout, new CastlesLocale(""), new LoadImageManagerMock(1000)));
 
         new ControllerMock(view);
 

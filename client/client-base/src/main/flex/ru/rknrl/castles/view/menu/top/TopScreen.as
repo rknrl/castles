@@ -10,8 +10,8 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.utils.Align;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.loaders.ILoadImageManager;
 
 public class TopScreen extends Screen {
     private static const topSize:int = 5;
@@ -20,7 +20,7 @@ public class TopScreen extends Screen {
     private const avatars:Vector.<FlyAvatar> = new <FlyAvatar>[];
     private var titleTextField:TextField;
 
-    public function TopScreen(top:Top, layout:Layout, locale:CastlesLocale, loadImageManager:LoadImageManager) {
+    public function TopScreen(top:Top, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(avatarsHolder = new Sprite());
 
         for (var i:int = 1; i <= topSize; i++) {

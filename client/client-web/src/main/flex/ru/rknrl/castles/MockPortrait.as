@@ -7,11 +7,11 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 
 import ru.rknrl.castles.controller.mock.ControllerMock;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.utils.LoadImageManager;
 
 [SWF(width="320", height="568", frameRate="60", backgroundColor="#ffffff")]
 public class MockPortrait extends Sprite {
@@ -24,7 +24,7 @@ public class MockPortrait extends Sprite {
 
         const layout:Layout = new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
 
-        addChild(view = new View(layout, new CastlesLocale(""), new LoadImageManager()));
+        addChild(view = new View(layout, new CastlesLocale(""), new LoadImageManagerMock(1000)));
 
         new ControllerMock(view);
 
