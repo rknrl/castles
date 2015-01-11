@@ -5,6 +5,7 @@ import flash.text.TextField;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
+import ru.rknrl.utils.OverrideMe;
 
 public class Layout {
     public static const navigationPointSize:int = 8;
@@ -60,7 +61,7 @@ public class Layout {
     }
 
     public function get footerHeight():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get navigationPointsY():Number {
@@ -72,35 +73,35 @@ public class Layout {
     }
 
     public function get contentCenterY():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function balance(width:int):Point {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function title(width:int, height:int):Point {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get needShield():Boolean {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get buttonX():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get buttonY():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function buttonWidth(textWidth: Number):Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get buttonHeight():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get corner():Number {
@@ -116,21 +117,21 @@ public class Layout {
     }
 
     public function gameAreaPos(areaH:int, areaV:int):Point {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get gameMagicItemsY():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function rewardText(textWidth:Number, textHeight:Number):Point {
-        throw new Error();
+        throw OverrideMe();
     }
 
     // game avatar
 
     public function get notScaledGameAvatarSize():Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function get gameAvatarSize():Number {
@@ -138,65 +139,65 @@ public class Layout {
     }
 
     public function gameAvatarPos(number:int, areaH:int, areaV:int):Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function gameAvatarBitmapPos(number:int):Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function gameAvatarTextPos(number:int, width:Number, height:Number):Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function createGameAvatarTextField():TextField {
-        throw new Error()
+        throw OverrideMe()
     }
 
     // popup
 
     public function createPopup(titleText:String, cancelText:String, items:Vector.<PopupItem>, layout:Layout):Popup {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get popupPadding():Number {
-        throw new Error();
+        throw OverrideMe();
     }
 
     public function get popupItemSize():Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function get popupCancelHeight():Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function get popupTitleHeight():Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function popupWidth(itemsCount:int):Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function get popupCancelButtonGap():Number {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function get popupIconPos():Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function popupTextPos(textWidth:Number, textHeight:Number):Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function popupPricePos(priceWidth:Number, priceHeight:Number):Point {
-        throw new Error()
+        throw OverrideMe()
     }
 
     public function popupTitleTextY(height:Number):Number {
-        throw new Error();
+        throw OverrideMe();
     }
 }
 }
