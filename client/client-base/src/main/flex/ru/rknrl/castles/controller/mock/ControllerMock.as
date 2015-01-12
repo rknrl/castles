@@ -19,6 +19,7 @@ import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.ItemDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillLevelDTO;
@@ -89,7 +90,7 @@ public class ControllerMock {
         if (event.slotId == SlotId.SLOT_1) {
             menuView.openBuildPopup(event.slotId, 4);
         } else {
-            menuView.openUpgradePopup(event.slotId, true, true, 4);
+            menuView.openUpgradePopup(event.slotId, BuildingType.CHURCH, true, true, 4);
         }
     }
 

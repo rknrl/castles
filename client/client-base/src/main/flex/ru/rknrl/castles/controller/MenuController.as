@@ -72,7 +72,7 @@ public class MenuController {
             const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
             const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
             if (canUpgrade || canRemove) {
-                view.openUpgradePopup(event.slotId, canUpgrade, canRemove, upgradePrice);
+                view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
             }
 
         } else {

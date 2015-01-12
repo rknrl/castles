@@ -26,6 +26,7 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.dto.BuildingDTO;
+import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.StartLocationPosDTO;
@@ -164,14 +165,14 @@ public class ViewReport extends Sprite {
         menuView.closePopup();
         menuView.closePopupImmediate();
 
-        menuView.openUpgradePopup(SlotId.SLOT_1, true, true, 16);
+        menuView.openUpgradePopup(SlotId.SLOT_1, BuildingType.CHURCH, true, true, 16);
         menuView.openPopupImmediate();
         screenshot(folder, device, "UpgradePopup", mainBg);
 
         menuView.closePopup();
         menuView.closePopupImmediate();
 
-        menuView.openUpgradePopup(SlotId.SLOT_1, true, false, 16);
+        menuView.openUpgradePopup(SlotId.SLOT_1, BuildingType.CHURCH, true, false, 16);
         menuView.openPopupImmediate();
         screenshot(folder, device, "Upgrade1Popup", mainBg);
 

@@ -9,13 +9,14 @@ import ru.rknrl.castles.view.menu.main.popups.icons.RemoveIcon;
 import ru.rknrl.castles.view.menu.main.popups.icons.UpgradeIcon;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
+import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SlotId;
 
 public class UpgradePopup extends Popup {
     private var slotId:SlotId;
     private var popup:Popup;
 
-    public function UpgradePopup(slotId:SlotId, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int, layout:Layout, locale:CastlesLocale) {
+    public function UpgradePopup(slotId:SlotId, buildingType:BuildingType, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int, layout:Layout, locale:CastlesLocale) {
         this.slotId = slotId;
         const items:Vector.<PopupItem> = new <PopupItem>[];
 
@@ -31,7 +32,7 @@ public class UpgradePopup extends Popup {
             items.push(deleteItem);
         }
 
-        addChild(popup = layout.createPopup(locale.build, locale.cancel, items, layout));
+        addChild(popup = layout.createPopup(locale.buildingName(buildingType), locale.cancel, items, layout));
     }
 
     override public function set layout(value:Layout):void {

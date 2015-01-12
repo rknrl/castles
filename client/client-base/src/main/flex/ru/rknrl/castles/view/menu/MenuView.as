@@ -25,6 +25,7 @@ import ru.rknrl.castles.view.menu.skills.SkillsScreen;
 import ru.rknrl.castles.view.menu.top.TopScreen;
 import ru.rknrl.castles.view.popups.PopupEvent;
 import ru.rknrl.castles.view.popups.PopupManager;
+import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.loaders.ILoadImageManager;
 
@@ -112,8 +113,8 @@ public class MenuView extends Sprite {
         popupManager.open(new BuildPopup(slotId, price, _layout, locale));
     }
 
-    public function openUpgradePopup(slotId:SlotId, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int):void {
-        popupManager.open(new UpgradePopup(slotId, canUpgrade, canRemove, upgradePrice, _layout, locale));
+    public function openUpgradePopup(slotId:SlotId, buildingType: BuildingType, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int):void {
+        popupManager.open(new UpgradePopup(slotId, buildingType, canUpgrade, canRemove, upgradePrice, _layout, locale));
     }
 
     castlesTest function setScreen(index:int):void {
