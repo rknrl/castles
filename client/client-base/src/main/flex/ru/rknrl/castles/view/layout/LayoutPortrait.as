@@ -101,7 +101,7 @@ public class LayoutPortrait extends Layout {
         const areaBottom:Number = areaTop + areaHeight;
         const gap:Number = 4 * scale;
 
-        switch (playerId) {
+        switch (playerId.id) {
             case 0:
                 return new Point(areaRight - gameAvatarSize / 2, areaTop - gap - gameAvatarSize / 2);
             case 1:

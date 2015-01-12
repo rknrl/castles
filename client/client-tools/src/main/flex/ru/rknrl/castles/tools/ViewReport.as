@@ -14,6 +14,9 @@ import ru.rknrl.castles.controller.mock.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
+import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.layout.Layout;
@@ -48,6 +51,7 @@ public class ViewReport extends Sprite {
 
         html += "</head>";
         html += "<body>";
+        html += "<p>" + new Date().toDateString() + "</p>";
         return html;
     }
 
@@ -196,7 +200,7 @@ public class ViewReport extends Sprite {
         const losers:Vector.<PlayerInfoDTO> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
 
         view.removeSearchOpponentsScreen();
-        const gameView:GameView = view.addGame(playerInfos, w, h);
+        const gameView:GameView = view.addGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
         const buildings:Vector.<BuildingDTO> = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
         for each(var b:BuildingDTO in  buildings) {
             gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.x, b.y));
@@ -208,7 +212,7 @@ public class ViewReport extends Sprite {
 
         screenshot(folder, device, "GameScreen", bg);
 
-        gameView.openGameOverScreen(DtoMock.winner(), losers, true, 2);
+        gameView.openGameOverScreen(PlayerInfo.fromDto(DtoMock.winner()), PlayerInfo.fromDtoVector(losers), true, 2);
         screenshot(folder, device, "GameOverScreen", bg);
 
         view.removeGame();
