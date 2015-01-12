@@ -33,10 +33,8 @@ message UserInfoDTO {
     required AccountIdDTO accountId = 1;
     optional string firstName = 2;
     optional string lastName = 3;
-    optional string photo48 = 4;
-    optional string photo96 = 5;
-    optional string photo128 = 6;
-    optional string photo256 = 7;
+    optional string photo96 = 4; // for phones
+    optional string photo256 = 5; // for tablet and canvas
 }
 
 enum BuildingType {

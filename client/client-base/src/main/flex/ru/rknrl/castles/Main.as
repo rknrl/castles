@@ -10,8 +10,8 @@ import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
-import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.model.events.ViewEvents;
+import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.rmi.AccountFacadeReceiver;
 import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.rmi.AuthFacadeReceiver;
@@ -34,6 +34,8 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
+    private static const avatarsLimit:int = 10;
+
     private var host:String;
     private var gamePort:int;
     private var policyPort:int;
@@ -114,7 +116,7 @@ public class Main extends Sprite implements IAuthFacade {
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
         locale = new CastlesLocale(data);
 
-        loadImageManager = new LoadImageManagerMock(1000);
+        loadImageManager = new LoadImageManagerMock(6000, true);
         addChild(view = new View(_layout, locale, loadImageManager));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();

@@ -1,14 +1,13 @@
 package ru.rknrl.castles.view.game.gameOver {
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
-import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
@@ -25,7 +24,6 @@ public class GameOverScreen extends Sprite {
     private var holder:Sprite;
     private var holderWidth:Number;
     private var winnerAvatar:FlyAvatar;
-    private const urlToLoserAvatar:Dictionary = new Dictionary();
 
     public function GameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(title = createTextField(Fonts.title));
@@ -35,27 +33,23 @@ public class GameOverScreen extends Sprite {
         addChild(holder = new Sprite());
         holderWidth = Layout.itemSize * (losers.length + 1) + Layout.itemGap * (losers.length - 1) + winnerLooserGap + animationOffset;
 
-        const winnerPhotoUrl:String = winner.info.getPhotoUrl(Layout.itemSize, Layout.itemSize); // todo: scale
-        winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager);
+        const avatarBitmapSize:Number = Layout.itemSize * layout.bitmapDataScale;
+        const winnerPhotoUrl:String = winner.info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
+        const winnerColor:uint = Colors.playerColor(winner.playerId);
+        winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager, winnerColor);
         winnerAvatar.x = Layout.itemSize / 2;
         holder.addChild(winnerAvatar);
 
         for (var i:int = 0; i < losers.length; i++) {
-            const loserAvatar:LoserAvatar = new LoserAvatar();
+            const url:String = losers[i].info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
+            const color:uint = Colors.playerColor(losers[i].playerId);
+            const loserAvatar:LoserAvatar = new LoserAvatar(url, loadImageManager, color);
             loserAvatar.x = Layout.itemSize + winnerLooserGap + Layout.itemSize / 2 + i * (Layout.itemSize + Layout.itemGap);
             holder.addChild(loserAvatar);
-
-            const url:String = losers[i].info.getPhotoUrl(Layout.itemSize, Layout.itemSize); // todo: scale
-            urlToLoserAvatar[url] = loserAvatar;
-            loadImageManager.load(url, onBitmapDataLoaded);
         }
 
         this.layout = layout;
         addEventListener(MouseEvent.CLICK, onClick);
-    }
-
-    private function onBitmapDataLoaded(url:String, bitmapData:BitmapData):void {
-        LoserAvatar(urlToLoserAvatar[url]).bitmapData = bitmapData;
     }
 
     public function set layout(value:Layout):void {
@@ -65,8 +59,6 @@ public class GameOverScreen extends Sprite {
         title.y = pos.y;
 
         winnerAvatar.bitmapDataScale = value.bitmapDataScale;
-
-        // todo: change loserAvatar bitmapDataScale
 
         holder.scaleX = holder.scaleY = value.scale;
         holder.x = value.screenCenterX - holderWidth * value.scale / 2;

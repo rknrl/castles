@@ -13,6 +13,11 @@ public class LoadImageManagerMock implements ILoadImageManager {
     }
 
     public function load(url:String, callback:Function):void {
+        if (url == null) {
+            callback(url, null);
+            return;
+        }
+
         if (error) {
             if (delay) {
                 setTimeout(function ():void {

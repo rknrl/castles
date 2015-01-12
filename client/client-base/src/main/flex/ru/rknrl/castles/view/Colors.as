@@ -96,6 +96,22 @@ public class Colors {
         throw new Error("unknown itemType " + itemType);
     }
 
+    public static function top(place:uint):uint {
+        switch (place) {
+            case 1:
+                return yellow;
+            case 2:
+                return magenta;
+            case 3:
+                return red;
+            case 4:
+                return grey;
+            case 5:
+                return cyan;
+        }
+        throw new Error("unknown place " + place);
+    }
+
     // game
 
     private static const grass:uint = 0xc2ffa6;

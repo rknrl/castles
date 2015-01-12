@@ -23,14 +23,17 @@ public class GameAvatar extends Sprite {
     public function GameAvatar(playerInfo:PlayerInfo, layout:Layout, loadImageManager:ILoadImageManager) {
         _playerId = playerInfo.playerId;
 
-        const photoUrl:String = playerInfo.info.getPhotoUrl(layout.gameAvatarSize, layout.gameAvatarSize); // todo: scale
-        addChild(avatar = new Avatar(photoUrl, layout.notScaledGameAvatarSize, layout.bitmapDataScale, loadImageManager));
+        const color:uint = Colors.playerColor(playerInfo.playerId);
+
+        const avatarBitmapSize:Number = layout.notScaledGameAvatarSize * layout.bitmapDataScale;
+        const photoUrl:String = playerInfo.info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
+        addChild(avatar = new Avatar(photoUrl, layout.notScaledGameAvatarSize, layout.bitmapDataScale, loadImageManager, color));
         const bitmapPos:Point = layout.gameAvatarBitmapPos(playerInfo.playerId);
         avatar.x = bitmapPos.x;
         avatar.y = bitmapPos.y;
 
         addChild(textField = layout.createGameAvatarTextField());
-        textField.textColor = Colors.playerColor(playerInfo.playerId);
+        textField.textColor = color;
         textField.text = playerInfo.info.fullName;
 
         const textPos:Point = layout.gameAvatarTextPos(playerInfo.playerId, textField.width, textField.height);

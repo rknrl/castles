@@ -3,30 +3,43 @@ import flash.display.BitmapData;
 import flash.display.Shape;
 import flash.display.Sprite;
 
-import ru.rknrl.castles.view.utils.BitmapUtils;
+import ru.rknrl.BitmapUtils;
+import ru.rknrl.castles.view.Colors;
+import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class Avatar extends Sprite {
-    private var url:String;
     private var loadImageManager:ILoadImageManager;
     private var size:int;
-
+    private var loading:LockView;
+    private var defaultAvatar:DefaultAvatarMC;
     private var shape:Shape;
 
-    public function Avatar(url:String, size:int, bitmapDataScale:Number, loadImageManager:ILoadImageManager) {
-        this.url = url;
+    public function Avatar(url:String, size:int, bitmapDataScale:Number, loadImageManager:ILoadImageManager, color:uint) {
         this.loadImageManager = loadImageManager;
         this.size = size;
         _bitmapDataScale = bitmapDataScale;
+
+        addChild(defaultAvatar = new DefaultAvatarMC());
+        defaultAvatar.width = defaultAvatar.height = size;
+        defaultAvatar.transform.colorTransform = Colors.transform(color);
+
+        addChild(loading = new LockView());
+        loading.scaleX = loading.scaleY = size / Layout.itemSize;
+        loading.visible = true;
+
         loadImageManager.load(url, onBitmapDataLoad);
     }
 
     private var bitmapData:BitmapData;
 
     private function onBitmapDataLoad(url:String, bitmapData:BitmapData):void {
-        if (this.url == url) {
-            this.bitmapData = bitmapData;
+        this.bitmapData = bitmapData;
+        loading.visible = false;
+        if (bitmapData) {
+            defaultAvatar.visible = false;
             updateShape();
         }
     }
@@ -35,12 +48,10 @@ public class Avatar extends Sprite {
 
     public function set bitmapDataScale(value:Number):void {
         _bitmapDataScale = value;
-        updateShape();
+        if (!defaultAvatar.visible) updateShape();
     }
 
     private function updateShape():void {
-        if (!bitmapData) return;
-
         if (shape) removeChild(shape);
         shape = BitmapUtils.createCircleShape(BitmapUtils.square(bitmapData, size * _bitmapDataScale));
         shape.width = shape.height = size;

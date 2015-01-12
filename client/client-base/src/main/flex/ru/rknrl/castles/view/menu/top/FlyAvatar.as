@@ -11,12 +11,12 @@ public class FlyAvatar extends Sprite {
     private var avatar:Avatar;
     private var fly:Fly;
 
-    public function FlyAvatar(photoUrl:String, bitmapDataScale:Number, loadImageManager:ILoadImageManager) {
+    public function FlyAvatar(photoUrl:String, bitmapDataScale:Number, loadImageManager:ILoadImageManager, color:uint) {
         const shadow:Shadow = new Shadow();
         shadow.y = Layout.shadowDistance;
         addChild(shadow);
 
-        addChild(avatar = new Avatar(photoUrl, Layout.itemSize, bitmapDataScale, loadImageManager));
+        addChild(avatar = new Avatar(photoUrl, Layout.itemSize, bitmapDataScale, loadImageManager, color));
 
         fly = new Fly(avatar, shadow);
 
