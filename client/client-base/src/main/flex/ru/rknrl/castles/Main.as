@@ -116,7 +116,7 @@ public class Main extends Sprite implements IAuthFacade {
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
         locale = new CastlesLocale(data);
 
-        loadImageManager = new LoadImageManagerMock(6000, true);
+        loadImageManager = new LoadImageManagerMock(0, false);
         addChild(view = new View(_layout, locale, loadImageManager));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
