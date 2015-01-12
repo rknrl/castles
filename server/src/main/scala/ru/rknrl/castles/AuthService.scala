@@ -9,7 +9,7 @@ import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver,
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
-import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType}
+import ru.rknrl.dto.CommonDTO.{UserInfoDTO, AccountType, DeviceType}
 
 class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
@@ -21,6 +21,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
 
   private var accountId: Option[AccountId] = None
   private var deviceType: Option[DeviceType] = None
+  private var userInfo: Option[UserInfoDTO] = None
 
   tcpReceiver ! RegisterReceiver(authRmi)
 
@@ -57,6 +58,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
       if (checkSecret(authenticate)) {
         accountId = Some(new AccountId(authenticate.getUserInfo.getAccountId))
         deviceType = Some(authenticate.getDeviceType)
+        userInfo = Some(authenticate.getUserInfo)
         accountStateDb ! Get(accountId.get)
       } else
         reject()
@@ -84,7 +86,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
   }
 
   private def startAccount(state: AccountState) = {
-    val accountRef = context.actorOf(Props(classOf[Account], accountId.get, state, deviceType.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
+    val accountRef = context.actorOf(Props(classOf[Account], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
     accountRef ! GetAccountState
   }
 

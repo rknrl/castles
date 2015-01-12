@@ -8,7 +8,7 @@ import ru.rknrl.castles.account.objects.startLocation.StartLocationTest
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.game.objects.units.UnitId
-import ru.rknrl.dto.CommonDTO.AccountType
+import ru.rknrl.dto.CommonDTO.{AccountType, UserInfoDTO}
 
 class GameModelTest extends FlatSpec with Matchers {
 
@@ -46,9 +46,14 @@ class GameModelTest extends FlatSpec with Matchers {
   // Player
 
   "Player.dto" should "be correct" in {
+    val accountId = new AccountId(AccountType.VKONTAKTE, "accountId")
+
     val player = new Player(
       new PlayerId(7),
-      new AccountId(AccountType.VKONTAKTE, "accountId"),
+      accountId,
+      UserInfoDTO.newBuilder
+        .setAccountId(accountId.dto)
+        .build(),
       StartLocationTest.startLocation1,
       SkillsTest.skills,
       ItemsTest.items,

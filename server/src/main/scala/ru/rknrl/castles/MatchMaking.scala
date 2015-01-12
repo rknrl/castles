@@ -7,7 +7,7 @@ import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.game.Game.StopGame
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
-import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType}
+import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
 
 import scala.concurrent.duration._
@@ -16,6 +16,7 @@ object MatchMaking {
 
   class GameOrder(val accountId: AccountId,
                   val deviceType: DeviceType,
+                  val userInfo: UserInfoDTO,
                   val startLocation: StartLocation,
                   val skills: Skills,
                   val items: Items,
@@ -153,15 +154,24 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
     var orders = List(order)
 
     for (i ← 0 until botsCount) {
-      val externalAccountId = botIdIterator.next
-      val bot = context.actorOf(Props(classOf[Bot], externalAccountId), externalAccountId.id)
-      accountIdToAccountRef = accountIdToAccountRef.updated(externalAccountId, bot)
-      val botOrder = new GameOrder(externalAccountId, DeviceType.CANVAS, order.startLocation, order.skills, order.items, isBot = true)
+      val accountId = botIdIterator.next
+      val bot = context.actorOf(Props(classOf[Bot], accountId), accountId.id)
+      accountIdToAccountRef = accountIdToAccountRef.updated(accountId, bot)
+      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, order.items, isBot = true)
       orders = orders :+ botOrder
     }
 
     createGame(bigGame, orders)
   }
+
+  private def botUserInfo(accountId: AccountId, number: Int) =
+    UserInfoDTO.newBuilder()
+      .setAccountId(accountId.dto)
+      .setFirstName("Бот")
+      .setLastName(number.toString)
+      .setPhoto96("1")
+      .setPhoto256("1")
+      .build()
 
   private val gameIdIterator = new GameIdIterator
 
@@ -171,7 +181,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      playerId → new Player(playerId, order.accountId, order.startLocation, order.skills, order.items, isBot = order.isBot)
+      playerId → new Player(playerId, order.accountId, order.userInfo, order.startLocation, order.skills, order.items, isBot = order.isBot)
     }
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, gameConfig, self), gameIdIterator.next)

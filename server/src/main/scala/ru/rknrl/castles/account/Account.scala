@@ -25,6 +25,7 @@ case class LeaveGame(usedItems: Map[ItemType, Int])
 class Account(accountId: AccountId,
               accountState: AccountState,
               deviceType: DeviceType,
+              userInfo: UserInfoDTO,
               tcpSender: ActorRef, tcpReceiver: ActorRef,
               matchmaking: ActorRef,
               accountStateDb: ActorRef,
@@ -53,7 +54,7 @@ class Account(accountId: AccountId,
 
   def receive = {
     case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, state.startLocation, state.skills, state.items, isBot = false))
+      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, isBot = false))
 
     /**
      * from accountStateDb

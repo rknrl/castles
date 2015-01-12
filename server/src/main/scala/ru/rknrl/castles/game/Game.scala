@@ -74,13 +74,8 @@ class Game(players: Map[PlayerId, Player],
     for ((id, player) ← players)
     yield PlayerInfoDTO.newBuilder()
       .setId(id.dto)
-      .setInfo(
-        UserInfoDTO.newBuilder()
-          .setAccountId(player.accountId.dto)
-          .setFirstName((id.id + 1).toString)
-          .setPhoto256((id.id + 1).toString)
-          .build
-      ).build
+      .setInfo(player.userInfo)
+      .build
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)
