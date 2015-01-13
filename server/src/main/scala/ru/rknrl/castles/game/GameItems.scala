@@ -10,10 +10,11 @@ import scala.collection.JavaConverters._
 
 class GameItemState(val itemType: ItemType,
                     val count: Int,
-                    val lastUseTime: Long) {
+                    val lastUseTime: Long,
+                    val useCount: Int) {
   assert(count >= 0)
 
-  def use(time: Long) = new GameItemState(itemType, count - 1, lastUseTime = time)
+  def use(time: Long) = new GameItemState(itemType, count - 1, lastUseTime = time, useCount + 1)
 
   def differentWith(state: GameItemState) =
     lastUseTime != state.lastUseTime || count != state.count
@@ -44,6 +45,10 @@ class GameItemsState(val playerId: PlayerId,
     false
   }
 
+  def usedItems =
+    for ((itemType, state) ← items)
+    yield itemType → state.useCount
+
   private def itemsDto(time: Long, config: GameConfig) =
     for ((itemType, state) ← items)
     yield state.dto(time, config)
@@ -52,15 +57,12 @@ class GameItemsState(val playerId: PlayerId,
     ItemsStateDTO.newBuilder()
       .addAllItems(itemsDto(time, config).asJava)
       .build()
-
-  def usedItems =
-    for ((itemType, state) ← items) yield itemType → 0
 }
 
 object GameItems {
   private def initMap(items: Items) =
     for ((itemType, item) ← items.items)
-    yield itemType → new GameItemState(itemType, item.count, 0)
+    yield itemType → new GameItemState(itemType, item.count, lastUseTime = 0, useCount = 0)
 
   def init(playerId: PlayerId, items: Items) =
     new GameItemsState(playerId, initMap(items))

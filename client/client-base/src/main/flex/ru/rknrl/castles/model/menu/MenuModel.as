@@ -67,26 +67,26 @@ public class MenuModel {
     }
 
     public function MenuModel(authenticationSuccess:AuthenticationSuccessDTO) {
-        accountStateDto = authenticationSuccess.accountState;
-        configDto = authenticationSuccess.config;
-        productsDto = authenticationSuccess.products;
+        mergeAccountStateDto(authenticationSuccess.accountState);
+        mergeConfigDto(authenticationSuccess.config);
+        mergeProductsDto(authenticationSuccess.products);
         _top = new Top(authenticationSuccess.top);
     }
 
-    public function set accountStateDto(dto:AccountStateDTO):void {
+    public function mergeAccountStateDto(dto:AccountStateDTO):void {
         _startLocation = new StartLocation(dto.startLocation);
         _gold = dto.gold;
         _itemsCount = new ItemsCount(dto.items);
         _skillLevels = new SkillLevels(dto.skills);
     }
 
-    public function set configDto(dto:AccountConfigDTO):void {
+    public function mergeConfigDto(dto:AccountConfigDTO):void {
         _itemPrice = dto.itemPrice;
         _upgradePrices = new SkillUpgradePrices(dto.skillUpgradePrices);
         _buildingPrices = new BuildingPrices(dto.buildings);
     }
 
-    public function set productsDto(dto:Vector.<ProductDTO>):void {
+    public function mergeProductsDto(dto:Vector.<ProductDTO>):void {
         _products = new Products(dto);
     }
 }

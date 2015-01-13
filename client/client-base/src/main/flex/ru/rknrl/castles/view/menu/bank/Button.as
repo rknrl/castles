@@ -42,6 +42,7 @@ public class Button extends Sprite {
     }
 
     public function set lock(value:Boolean):void {
+        textField.visible = !value;
         lockView.visible = value;
         mouseEnabled = !value;
     }

@@ -2,6 +2,7 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
+import flash.net.Socket;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.game.GameController;
@@ -90,7 +91,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         } else {
             Security.loadPolicyFile("xmlsocket://" + connection.host + ":" + policyPort);
 
-            gameConnection = new Connection();
+            gameConnection = new Connection(new Socket());
             gameConnection.addEventListener(Event.CONNECT, onGameConnect);
             gameConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onGameConnectionError);
             gameConnection.addEventListener(IOErrorEvent.IO_ERROR, onGameConnectionError);
@@ -132,7 +133,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         log.add("onLeaveGame");
 
         view.removeGame();
-        view.showMenu();
+        view.showMenuAndLock();
 
         game = null;
 

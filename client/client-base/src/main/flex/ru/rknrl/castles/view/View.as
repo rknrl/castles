@@ -38,8 +38,9 @@ public class View extends Sprite {
         return menu;
     }
 
-    public function showMenu():void {
+    public function showMenuAndLock():void {
         menu.visible = true;
+        menu.lock = true;
     }
 
     public function hideMenu():void {

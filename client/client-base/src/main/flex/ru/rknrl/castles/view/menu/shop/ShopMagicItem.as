@@ -2,27 +2,21 @@ package ru.rknrl.castles.view.menu.shop {
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.castles.view.utils.Fly;
-import ru.rknrl.castles.view.utils.LockView;
-import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.castles.view.game.ui.magicItems.GameMagicItemIcon;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.Fly;
+import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.ItemType;
 
 public class ShopMagicItem extends Sprite {
     private var fly:Fly;
-    private var magicItem:GameMagicItemIcon;
-    private var lockView:LockView;
+    private var magicItem:ShopMagicItemIcon;
 
     public function ShopMagicItem(itemType:ItemType, count:int) {
         _itemType = itemType;
 
         mouseChildren = false;
 
-        magicItem = new GameMagicItemIcon(itemType, count);
-        addChild(magicItem);
-
-        addChild(lockView = new LockView());
+        addChild(magicItem = new ShopMagicItemIcon(itemType, count));
 
         const shadow:Shadow = new Shadow();
         shadow.y = Layout.shadowDistance;
@@ -47,7 +41,7 @@ public class ShopMagicItem extends Sprite {
     }
 
     public function set lock(value:Boolean):void {
-        lockView.visible = value;
+        magicItem.lock = value;
         mouseEnabled = !value;
     }
 }

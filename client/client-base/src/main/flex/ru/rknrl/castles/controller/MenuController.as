@@ -56,7 +56,7 @@ public class MenuController {
     }
 
     public function onAccountStateUpdated(accountState:AccountStateDTO):void {
-        model.accountStateDto = accountState;
+        model.mergeAccountStateDto(accountState);
         view.startLocation = model.startLocation;
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;

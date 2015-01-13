@@ -112,12 +112,6 @@ class Game(players: Map[PlayerId, Player],
   private var `gameRmi→playerId` = Map[ActorRef, PlayerId]()
 
   /**
-   * Кол-во игроков завершивших игру
-   */
-  private def gameOverCount =
-    playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.GAME}
-
-  /**
    * Игроки еще не завершившие игру
    */
   private def playersInGame =

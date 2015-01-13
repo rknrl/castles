@@ -6,6 +6,7 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
+import flash.net.Socket;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
@@ -145,7 +146,7 @@ public class Main extends Sprite implements IAuthFacade {
 
         Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
 
-        connection = new Connection();
+        connection = new Connection(new Socket());
         connection.addEventListener(Event.CONNECT, onConnect);
         connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
         connection.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);

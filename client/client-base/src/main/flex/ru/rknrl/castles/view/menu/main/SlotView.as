@@ -11,6 +11,8 @@ import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
 public class SlotView extends Sprite {
+    private static const lockViewY: Number = -8;
+
     private var shadow:Shadow;
     private var buildingLayer:Sprite;
     private var lockView:LockView;
@@ -21,6 +23,7 @@ public class SlotView extends Sprite {
         addChild(shadow = new Shadow());
         addChild(buildingLayer = new Sprite());
         addChild(lockView = new LockView());
+        lockView.y = lockViewY;
 
         this.dto = dto;
     }
