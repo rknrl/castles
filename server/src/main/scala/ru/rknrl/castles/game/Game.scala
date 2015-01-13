@@ -8,7 +8,7 @@ import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.objects.buildings.BuildingId
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
-import ru.rknrl.dto.CommonDTO.UserInfoDTO
+import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._
 
 import scala.collection.JavaConverters._
@@ -184,22 +184,12 @@ class Game(players: Map[PlayerId, Player],
       (playerStates(playerId) != PlayerState.LEAVED) &&
       !players(playerId).isBot
 
-  /**
-   * Отправить онлайн игрокам общие сообщения одинаковые для всех
-   */
-  private def sendMessagesToPlayers(messages: Iterable[Any]) =
-    for ((playerId, gameRmi) ← `playerId→gameRmi`
-         if canSendMessage(playerId))
-      for (message ← messages) gameRmi ! message
-
-  /**
-   * Отправить онлайн игрокам персональные сообщения
-   */
-  private def sendPersonalMessagesToPlayers(personalMessages: Iterable[PersonalMessage]) =
-    for (personalMessage ← personalMessages;
-         playerId = personalMessage.playerId
-         if canSendMessage(playerId))
-      `playerId→gameRmi`(playerId) ! personalMessage.msg
+  private def sendToPlayers(messages: Iterable[Msg], personalMessages: Iterable[PersonalMessage]): Unit =
+      for((playerId, gameRmi) ← `playerId→gameRmi`
+          if canSendMessage(playerId)) {
+        val all = messages ++ personalMessages.filter(_.playerId == playerId).map(_.msg)
+        gameRmi ! all
+      }
 
   /**
    * Отправить игрокам-ботам геймстейт
@@ -279,8 +269,7 @@ class Game(players: Map[PlayerId, Player],
       val (newGameState, messages, personalMessages) = updateGameState
       gameState = newGameState
 
-      sendMessagesToPlayers(messages)
-      sendPersonalMessagesToPlayers(personalMessages)
+      sendToPlayers(messages, personalMessages)
       sendGameStateToBots()
 
       val newLosers = getNewLosers
@@ -335,7 +324,7 @@ class Game(players: Map[PlayerId, Player],
 
     val dto = getLoseDto(playerId, place)
     gameOvers = gameOvers :+ dto
-    sendMessagesToPlayers(List(GameOverMsg(dto)))
+    sendToPlayers(List(GameOverMsg(dto)), List.empty)
 
     // Если в бою остался один игрок - объявляем его победителем
 
@@ -345,7 +334,7 @@ class Game(players: Map[PlayerId, Player],
       playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
       gameOvers = gameOvers :+ winDto
-      sendMessagesToPlayers(List(GameOverMsg(winDto)))
+      sendToPlayers(List(GameOverMsg(winDto)), List.empty)
       scheduler.cancel()
     }
   }

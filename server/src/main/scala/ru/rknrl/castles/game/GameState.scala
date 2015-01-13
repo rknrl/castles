@@ -12,6 +12,7 @@ import ru.rknrl.castles.game.objects.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.objects.units.GameUnits
 import ru.rknrl.castles.game.objects.units.GameUnits.{getUpdateMessages, _}
 import ru.rknrl.castles.game.objects.volcanoes.Volcanoes._
+import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO._
 import ru.rknrl.utils.{BuildingIdIterator, UnitIdIterator}
@@ -251,7 +252,7 @@ class GameState(val time: Long,
       config
     )
 
-    val messages = addUnitMessages ++ updateUnitMessages ++ removeUnitMessages ++
+    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ removeUnitMessages ++
       updateBuildingMessages ++
       addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages
 
