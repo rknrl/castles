@@ -29,7 +29,7 @@ public class ShopScreen extends Screen {
 
         for each(var itemType:ItemType in ItemType.values) {
             const item:ShopMagicItem = new ShopMagicItem(itemType, itemsCount.getCount(itemType));
-            item.addEventListener(MouseEvent.CLICK, onClick);
+            item.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
             magicItems.push(item);
             magicItemsHolder.addChild(item);
         }
@@ -81,6 +81,7 @@ public class ShopScreen extends Screen {
     }
 
     private function onClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
         const item:ShopMagicItem = ShopMagicItem(event.target);
         item.bounce();
         dispatchEvent(new MagicItemClickEvent(item.itemType));

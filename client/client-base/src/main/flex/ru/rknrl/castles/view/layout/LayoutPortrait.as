@@ -136,6 +136,10 @@ public class LayoutPortrait extends Layout {
         return 88 * scale;
     }
 
+    override public function get popupItemWidth():Number {
+        return popupWidthImpl;
+    }
+
     override public function get popupCancelHeight():Number {
         return 44 * scale;
     }

@@ -22,13 +22,13 @@ public class UpgradePopup extends Popup {
 
         if (canUpgrade) {
             const upgradeItem:PopupItem = new PopupItem(layout, new UpgradeIcon(), locale.upgrade, upgradePrice);
-            upgradeItem.addEventListener(MouseEvent.CLICK, onUpgradeClick);
+            upgradeItem.addEventListener(MouseEvent.MOUSE_DOWN, onUpgradeClick);
             items.push(upgradeItem);
         }
 
         if (canRemove) {
             const deleteItem:PopupItem = new PopupItem(layout, new RemoveIcon(), locale.remove, 0);
-            deleteItem.addEventListener(MouseEvent.CLICK, onRemoveClick);
+            deleteItem.addEventListener(MouseEvent.MOUSE_DOWN, onRemoveClick);
             items.push(deleteItem);
         }
 

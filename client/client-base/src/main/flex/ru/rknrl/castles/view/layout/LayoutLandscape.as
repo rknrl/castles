@@ -145,6 +145,10 @@ public class LayoutLandscape extends Layout {
         return 128 * scale;
     }
 
+    override public function get popupItemWidth():Number {
+        return popupItemSize;
+    }
+
     override public function get popupTitleHeight():Number {
         return 44 * scale;
     }

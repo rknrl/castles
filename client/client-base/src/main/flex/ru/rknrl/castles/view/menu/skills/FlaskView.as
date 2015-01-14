@@ -1,4 +1,5 @@
 package ru.rknrl.castles.view.menu.skills {
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.text.TextField;
@@ -19,6 +20,9 @@ public class FlaskView extends Animated {
     private static const textFlaskGap:Number = 16;
     private static const textHeight:Number = 22;
     private static const textY:Number = -flaskHeight / 2 - textFlaskGap - textHeight;
+
+    private static const mouseHolderW:Number = 38 + 16;
+    private static const mouseHolderH:Number = 200;
 
     private static function skillTypeToTextFieldX(skillType:SkillType, width:Number):Number {
         switch (skillType) {
@@ -41,6 +45,13 @@ public class FlaskView extends Animated {
         _skillType = skillType;
 
         mouseChildren = false;
+
+        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
+        mouseHolder.width = mouseHolderW;
+        mouseHolder.height = mouseHolderH;
+        mouseHolder.x = -mouseHolderW / 2;
+        mouseHolder.y = -mouseHolderH / 2;
+        addChild(mouseHolder);
 
         const textField:TextField = createTextField(Fonts.skillName);
         textField.textColor = Colors.skill(skillType);

@@ -20,7 +20,7 @@ public class BuildPopup extends Popup {
 
         for each(var buildingType:BuildingType in BuildingType.values) {
             const item:BuildItem = new BuildItem(buildingType, layout, new PopupBuildIcon(buildingType), locale.buildingName(buildingType), price);
-            item.addEventListener(MouseEvent.CLICK, onClick);
+            item.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
             items.push(item)
         }
 

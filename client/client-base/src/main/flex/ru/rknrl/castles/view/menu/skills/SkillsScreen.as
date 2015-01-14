@@ -33,7 +33,7 @@ public class SkillsScreen extends Screen {
 
         for each(var skillType:SkillType in [SkillType.ATTACK, SkillType.SPEED, SkillType.DEFENCE]) {
             const flask:FlaskView = new FlaskView(skillType, skillLevels.getLevel(skillType), locale.skillName(skillType));
-            flask.addEventListener(MouseEvent.CLICK, onClick);
+            flask.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
             flasks.push(flask);
             flasksHolder.addChild(flask);
         }
@@ -105,6 +105,7 @@ public class SkillsScreen extends Screen {
     }
 
     private function onClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
         const flask:FlaskView = FlaskView(event.target);
         flask.bounce();
         dispatchEvent(new UpgradeClickEvent(flask.skillType));

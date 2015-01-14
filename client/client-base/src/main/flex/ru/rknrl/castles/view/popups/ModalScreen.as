@@ -13,7 +13,7 @@ public class ModalScreen extends Sprite {
     public function ModalScreen(layout:Layout) {
         addChild(bitmap = new Bitmap(new BitmapData(1, 1, true, 0x22000000)));
         this.layout = layout;
-        addEventListener(MouseEvent.CLICK, onClick);
+        addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
     public function set layout(value:Layout):void {

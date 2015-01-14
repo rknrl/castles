@@ -21,7 +21,7 @@ public class BankScreen extends Screen {
         if (layout.needShield) addChild(shield = new ShieldView());
 
         button = new Button(layout);
-        button.addEventListener(MouseEvent.CLICK, onClick);
+        button.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 
         this.products = products;
         this.layout = layout;
@@ -56,6 +56,7 @@ public class BankScreen extends Screen {
     }
 
     private function onClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
         button.animate();
         dispatchEvent(new Event(ViewEvents.BUY, true));
     }

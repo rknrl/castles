@@ -25,7 +25,7 @@ public class MagicItemsView extends Sprite {
 
         for each(var itemType:ItemType in ItemType.values) {
             const item:GameMagicItem = new GameMagicItem(itemType, 1);
-            item.addEventListener(MouseEvent.CLICK, onClick);
+            item.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
             holder.addChild(item);
             magicItems.push(item);
         }

@@ -41,7 +41,7 @@ public class FlaskFill extends Sprite {
 
         const deltaHeight:Number = nextHeight - bitmap.height;
         bitmap.height += deltaHeight * Math.min(1, deltaTime / speed);
-        bitmap.y = waterLine.y = fillBottom - bitmap.height;
+        bitmap.y = waterLine.y = fillBottom - bitmap.height + 1;
 
         waterLine.onEnterFrame(fraction);
     }

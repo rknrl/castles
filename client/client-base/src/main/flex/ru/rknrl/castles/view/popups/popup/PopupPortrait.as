@@ -22,7 +22,7 @@ public class PopupPortrait extends Popup {
         for each(var item:PopupItem in items) addChild(item);
 
         addChild(cancelButton = new PopupCancelButton(layout, layout.popupWidth(items.length), cancelText));
-        cancelButton.addEventListener(MouseEvent.CLICK, onClick);
+        cancelButton.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 
         this.layout = layout;
     }

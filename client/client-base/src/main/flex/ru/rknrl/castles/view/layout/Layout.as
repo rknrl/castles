@@ -169,6 +169,10 @@ public class Layout {
         throw OverrideMe()
     }
 
+    public function get popupItemWidth():Number {
+        throw OverrideMe();
+    }
+
     public function get popupCancelHeight():Number {
         throw OverrideMe()
     }

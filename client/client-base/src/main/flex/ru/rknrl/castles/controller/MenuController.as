@@ -69,8 +69,10 @@ public class MenuController {
         if (slot.hasBuildingPrototype) {
             const canUpgrade:Boolean = slot.buildingPrototype.level != BuildingLevel.LEVEL_3;
             const canRemove:Boolean = model.startLocation.buildingsCount > 1;
-            const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
-            const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
+            if (canUpgrade) {
+                const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
+                const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
+            }
             if (canUpgrade || canRemove) {
                 view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
             }

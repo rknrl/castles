@@ -96,6 +96,8 @@ public class GameView extends Sprite {
             avatar.x = avatarPos.x;
             avatar.y = avatarPos.y;
         }
+
+        if (gameOverScreen) gameOverScreen.layout = value;
     }
 
     private function onKeyDown(event:KeyboardEvent):void {
@@ -105,10 +107,13 @@ public class GameView extends Sprite {
         }
     }
 
+    private var gameOverScreen:GameOverScreen;
+
     public function openGameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int):void {
+        if (gameOverScreen) throw new Error("gameOverScreen already open");
         area.visible = false;
         ui.visible = false;
-        addChild(new GameOverScreen(winner, losers, win, reward, _layout, locale, loadImageManager))
+        addChild(gameOverScreen = new GameOverScreen(winner, losers, win, reward, _layout, locale, loadImageManager))
     }
 }
 }

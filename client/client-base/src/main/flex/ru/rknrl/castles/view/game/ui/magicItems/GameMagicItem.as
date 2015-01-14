@@ -1,6 +1,9 @@
 package ru.rknrl.castles.view.game.ui.magicItems {
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
+
+import ru.rknrl.castles.view.Colors;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.Animated;
@@ -9,6 +12,9 @@ import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.ItemType;
 
 public class GameMagicItem extends Sprite {
+    private static const mouseHolderW:Number = Layout.itemSize + Layout.itemGap;
+    private static const mouseHolderH:Number = 96;
+
     private var fly:Fly;
     private var holder:Animated;
     private var magicItem:GameMagicItemIcon;
@@ -17,6 +23,13 @@ public class GameMagicItem extends Sprite {
         _itemType = itemType;
 
         mouseChildren = false;
+
+        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
+        mouseHolder.width = mouseHolderW;
+        mouseHolder.height = mouseHolderH;
+        mouseHolder.x = -mouseHolderW / 2;
+        mouseHolder.y = -40;
+        addChild(mouseHolder);
 
         addChild(holder = new Animated());
 

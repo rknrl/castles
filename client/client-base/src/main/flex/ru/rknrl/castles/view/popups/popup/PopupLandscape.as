@@ -1,18 +1,22 @@
 package ru.rknrl.castles.view.popups.popup {
+import flash.display.Bitmap;
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.PopupEvent;
 
 public class PopupLandscape extends Popup {
+    public static const cancelMouseHolderSize:int = 48;
+
     private var content:Sprite;
     private var bg:Shape;
     private var items:Vector.<PopupItem>;
     private var title:PopupTitle;
-    private var cancelButton:CloseMC;
+    private var cancelButton:Sprite;
 
     public function PopupLandscape(titleText:String, items:Vector.<PopupItem>, layout:Layout) {
         this.items = items;
@@ -25,8 +29,13 @@ public class PopupLandscape extends Popup {
 
         for each(var item:PopupItem in items) content.addChild(item);
 
-        content.addChild(cancelButton = new CloseMC());
-        cancelButton.addEventListener(MouseEvent.CLICK, onClick);
+        content.addChild(cancelButton = new Sprite());
+        const cancelMouseHolder:Bitmap = new Bitmap(Colors.transparent);
+        cancelMouseHolder.width = cancelMouseHolder.height = cancelMouseHolderSize;
+        cancelMouseHolder.x = cancelMouseHolder.y = -cancelMouseHolderSize / 2;
+        cancelButton.addChild(cancelMouseHolder);
+        cancelButton.addChild(new CloseMC());
+        cancelButton.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 
         this.layout = layout;
     }
@@ -43,8 +52,8 @@ public class PopupLandscape extends Popup {
         title.setLayout(width, value);
         title.y = value.popupPadding;
 
-        const itemsWidth: Number = (value.popupItemSize + value.popupPadding) * items.length - value.popupPadding;
-        const itemsLeft: Number = (width - itemsWidth) / 2;
+        const itemsWidth:Number = (value.popupItemSize + value.popupPadding) * items.length - value.popupPadding;
+        const itemsLeft:Number = (width - itemsWidth) / 2;
 
         for (var i:int = 0; i < items.length; i++) {
             const item:PopupItem = items[i];

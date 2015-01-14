@@ -31,6 +31,8 @@ public class BuildingView extends Sprite {
         _id = id;
         _pos = pos;
 
+        mouseChildren = false;
+
         addChild(buildingHolder = new Animated());
         buildingHolder.addChild(new Shadow());
         buildingHolder.addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));

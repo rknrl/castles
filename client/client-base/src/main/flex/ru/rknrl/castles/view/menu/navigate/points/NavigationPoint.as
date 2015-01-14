@@ -1,4 +1,5 @@
 package ru.rknrl.castles.view.menu.navigate.points {
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 
@@ -7,10 +8,19 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.navigate.*;
 
 public class NavigationPoint extends Sprite {
+    private static const mouseHolderSize:Number = Layout.navigationPointSize + Layout.navigationPointGap;
+
     public function NavigationPoint(screen:Screen) {
+        mouseChildren = false;
+
+        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
+        mouseHolder.width = mouseHolder.height = mouseHolderSize;
+        mouseHolder.x = mouseHolder.y = -mouseHolderSize / 2;
+        addChild(mouseHolder);
+
         _screen = screen;
         redraw();
-        addEventListener(MouseEvent.CLICK, onClick);
+        addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
     private var _screen:Screen;

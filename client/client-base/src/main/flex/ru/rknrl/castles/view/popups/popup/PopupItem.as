@@ -1,9 +1,11 @@
 package ru.rknrl.castles.view.popups.popup {
+import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
@@ -16,6 +18,11 @@ public class PopupItem extends Sprite {
 
     public function PopupItem(layout:Layout, icon:DisplayObject, text:String, price:int) {
         mouseChildren = false;
+
+        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
+        mouseHolder.width = layout.popupItemWidth;
+        mouseHolder.height = layout.popupItemSize;
+        addChild(mouseHolder);
 
         addChild(this.icon = icon);
 

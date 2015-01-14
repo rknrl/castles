@@ -1,4 +1,5 @@
 package ru.rknrl.castles.view.game.gameOver {
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -20,12 +21,15 @@ public class GameOverScreen extends Sprite {
     private static const winnerLooserGap:int = 24;
     private static const animationOffset:int = 24;
 
+    private var mouseHolder:Bitmap;
     private var title:TextField;
     private var holder:Sprite;
     private var holderWidth:Number;
     private var winnerAvatar:FlyAvatar;
 
     public function GameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+        addChild(mouseHolder = new Bitmap(Colors.transparent));
+
         addChild(title = createTextField(Fonts.title));
         title.text = win ? locale.win(reward) : locale.lose(reward);
         applyStarTextFormat(title);
@@ -49,10 +53,13 @@ public class GameOverScreen extends Sprite {
         }
 
         this.layout = layout;
-        addEventListener(MouseEvent.CLICK, onClick);
+        addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
     public function set layout(value:Layout):void {
+        mouseHolder.width = value.screenWidth;
+        mouseHolder.height = value.screenHeight;
+
         title.scaleX = title.scaleY = value.scale;
         const pos:Point = value.rewardText(title.width, title.height);
         title.x = pos.x;

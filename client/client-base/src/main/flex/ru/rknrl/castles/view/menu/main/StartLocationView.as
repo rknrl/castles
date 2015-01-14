@@ -20,7 +20,7 @@ public class StartLocationView extends Sprite {
         for each(var slotId:SlotId in SlotId.values) {
             const slotDto:SlotDTO = startLocation.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
-            slot.addEventListener(MouseEvent.CLICK, onClick);
+            slot.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 
             const pos:Point = getSlotPos(slotId);
             slot.x = pos.x * gapX;
@@ -43,6 +43,7 @@ public class StartLocationView extends Sprite {
     }
 
     private function onClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
         const slot:SlotView = SlotView(event.target);
         dispatchEvent(new SlotClickEvent(slot.id));
     }

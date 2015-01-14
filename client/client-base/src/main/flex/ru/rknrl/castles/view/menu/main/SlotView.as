@@ -1,4 +1,5 @@
 package ru.rknrl.castles.view.menu.main {
+import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 
@@ -14,6 +15,7 @@ import ru.rknrl.dto.SlotId;
 
 public class SlotView extends Animated {
     private static const lockViewY:Number = -8;
+    private static const mouseHolderSize: Number = 40;
 
     private var shadow:Shadow;
     private var buildingLayer:Sprite;
@@ -22,6 +24,12 @@ public class SlotView extends Animated {
     public function SlotView(slotId:SlotId, dto:SlotDTO) {
         _id = slotId;
         mouseChildren = false;
+
+        const mouseHolder: Bitmap = new Bitmap(Colors.transparent);
+        mouseHolder.width = mouseHolder.height = mouseHolderSize;
+        mouseHolder.x = mouseHolder.y = -mouseHolderSize/2;
+        addChild(mouseHolder);
+
         addChild(shadow = new Shadow());
         addChild(buildingLayer = new Sprite());
         addChild(lockView = new LockView());

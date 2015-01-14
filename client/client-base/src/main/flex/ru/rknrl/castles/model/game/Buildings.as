@@ -19,7 +19,7 @@ public class Buildings {
     }
 
     public function inXy(pos:Point):Building {
-        const area:Number = CellSize.SIZE.id() / 2;
+        const area:Number = CellSize.SIZE.id() * 2 / 3;
 
         for each(var building:Building in buildings) {
             if (building.pos.distance(pos) < area) return building;
