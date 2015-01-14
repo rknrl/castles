@@ -22,6 +22,7 @@ public class MagicItems {
 
     public function useItem():void {
         view.lock = true;
+        view.useItem(_selected);
         selected = null;
     }
 }

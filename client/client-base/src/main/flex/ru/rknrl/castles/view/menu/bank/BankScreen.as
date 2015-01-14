@@ -56,6 +56,7 @@ public class BankScreen extends Screen {
     }
 
     private function onClick(event:MouseEvent):void {
+        button.animate();
         dispatchEvent(new Event(ViewEvents.BUY, true));
     }
 }

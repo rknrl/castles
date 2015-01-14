@@ -106,6 +106,7 @@ public class SkillsScreen extends Screen {
 
     private function onClick(event:MouseEvent):void {
         const flask:FlaskView = FlaskView(event.target);
+        flask.bounce();
         dispatchEvent(new UpgradeClickEvent(flask.skillType));
     }
 }

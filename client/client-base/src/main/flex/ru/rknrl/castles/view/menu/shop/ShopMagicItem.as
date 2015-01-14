@@ -1,13 +1,13 @@
 package ru.rknrl.castles.view.menu.shop {
-import flash.display.Sprite;
 import flash.events.Event;
 
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.ItemType;
 
-public class ShopMagicItem extends Sprite {
+public class ShopMagicItem extends Animated {
     private var fly:Fly;
     private var magicItem:ShopMagicItemIcon;
 

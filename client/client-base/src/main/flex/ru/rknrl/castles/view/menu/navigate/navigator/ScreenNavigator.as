@@ -4,12 +4,12 @@ import flash.display.Sprite;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.points.Point;
-
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
+import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
 import ru.rknrl.castles.view.utils.createTextField;
 
@@ -21,6 +21,8 @@ public class ScreenNavigator extends Sprite {
     protected function get holder():Sprite {
         return _holder;
     }
+
+    private var _balanceHolder:Animated;
 
     private var _balanceTextField:TextField;
 
@@ -57,7 +59,8 @@ public class ScreenNavigator extends Sprite {
             _holder.addChild(screen);
         }
 
-        addChild(_balanceTextField = createTextField(Fonts.balance));
+        addChild(_balanceHolder = new Animated());
+        _balanceHolder.addChild(_balanceTextField = createTextField(Fonts.balance));
         this.gold = gold;
 
         addChild(_navigationPoints = new NavigationPoints(screens));
@@ -67,9 +70,13 @@ public class ScreenNavigator extends Sprite {
     }
 
     public function set gold(value:int):void {
-        _balanceTextField.text = locale.balance(value);
-        applyStarTextFormat(balanceTextField);
-        alignBalance();
+        const newText:String = locale.balance(value);
+        if (_balanceTextField.text != newText) {
+            _balanceTextField.text = newText;
+            applyStarTextFormat(balanceTextField);
+            alignBalance();
+            _balanceHolder.bounce();
+        }
     }
 
     private var _layout:Layout;
@@ -97,8 +104,8 @@ public class ScreenNavigator extends Sprite {
     private function alignBalance():void {
         _balanceTextField.scaleX = _balanceTextField.scaleY = _layout.scale;
         const balancePos:Point = _layout.balance(_balanceTextField.width);
-        _balanceTextField.x = balancePos.x;
-        _balanceTextField.y = balancePos.y;
+        _balanceHolder.x = balancePos.x;
+        _balanceHolder.y = balancePos.y;
     }
 
     private var _currentScreenIndex:int;

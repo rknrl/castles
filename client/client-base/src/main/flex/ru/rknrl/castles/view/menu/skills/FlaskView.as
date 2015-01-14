@@ -6,6 +6,7 @@ import flash.text.TextField;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.Shadow;
@@ -13,7 +14,7 @@ import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
 
-public class FlaskView extends Sprite {
+public class FlaskView extends Animated {
     private static const flaskHeight:Number = 104;
     private static const textFlaskGap:Number = 16;
     private static const textHeight:Number = 22;

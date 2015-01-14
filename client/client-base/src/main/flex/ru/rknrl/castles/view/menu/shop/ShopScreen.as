@@ -82,6 +82,7 @@ public class ShopScreen extends Screen {
 
     private function onClick(event:MouseEvent):void {
         const item:ShopMagicItem = ShopMagicItem(event.target);
+        item.bounce();
         dispatchEvent(new MagicItemClickEvent(item.itemType));
     }
 

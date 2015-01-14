@@ -5,21 +5,25 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.utils.Animated;
+import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.utils.centerize;
 
 public class Button extends Sprite {
+    private var holder:Animated;
     private var rect:Shape;
     private var textField:TextField;
     private var lockView:LockView;
 
     public function Button(layout:Layout) {
-        addChild(rect = new Shape());
-        addChild(textField = createTextField(Fonts.button));
-        addChild(lockView = new LockView());
+        mouseChildren = false;
+        addChild(holder = new Animated());
+        holder.addChild(rect = new Shape());
+        holder.addChild(textField = createTextField(Fonts.button));
+        holder.addChild(lockView = new LockView());
         this.layout = layout;
     }
 
@@ -45,6 +49,10 @@ public class Button extends Sprite {
         textField.visible = !value;
         lockView.visible = value;
         mouseEnabled = !value;
+    }
+
+    public function animate():void {
+        holder.bounce();
     }
 }
 }

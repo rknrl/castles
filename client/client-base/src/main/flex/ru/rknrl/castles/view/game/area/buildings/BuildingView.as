@@ -8,25 +8,36 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
+import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
+import ru.rknrl.utils.centerize;
 
 public class BuildingView extends Sprite {
+    private static const textFieldHeight:int = 24;
     private static const textFieldBottom:int = -2;
+    private static const textFieldCenterY:int = textFieldBottom - textFieldHeight / 2;
 
+    private var buildingHolder:Animated;
     private var building:DisplayObject;
+    private var textFieldHolder:Animated;
     private var textField:TextField;
     private var scale:Number;
 
     public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
         _id = id;
         _pos = pos;
-        addChild(new Shadow());
-        addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
-        addChild(textField = createTextField(Fonts.buildingNumber));
+
+        addChild(buildingHolder = new Animated());
+        buildingHolder.addChild(new Shadow());
+        buildingHolder.addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
+
+        addChild(textFieldHolder = new Animated());
+        textFieldHolder.y = textFieldCenterY;
+        textFieldHolder.addChild(textField = createTextField(Fonts.buildingNumber));
 
         scale = Fla.buildingLevelToScale(buildingLevel);
 
@@ -54,14 +65,19 @@ public class BuildingView extends Sprite {
     }
 
     public function set owner(value:BuildingOwner):void {
+        if (_owner && _owner.equals(value)) return;
         _owner = value;
         building.transform.colorTransform = Colors.buildingTransform(owner);
+        buildingHolder.bounce();
     }
 
     public function set count(value:int):void {
-        textField.text = value.toString();
-        textField.x = -textField.width / 2;
-        textField.y = textFieldBottom - textField.height;
+        const newText:String = value.toString();
+        if (textField.text != newText) {
+            textField.text = newText;
+            centerize(textField);
+            textFieldHolder.bounce();
+        }
     }
 
     public function set strengthened(value:Boolean):void {

@@ -64,5 +64,9 @@ public class MagicItemsView extends Sprite {
         const item:GameMagicItem = GameMagicItem(event.target);
         dispatchEvent(new MagicItemClickEvent(item.itemType));
     }
+
+    public function useItem(itemType:ItemType):void {
+        getMagicItem(itemType).animate();
+    }
 }
 }

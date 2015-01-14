@@ -24,8 +24,8 @@ public class GameArea extends Sprite {
     public var ground:Ground;
     public var volcanoes:VolcanoesView;
     public var arrows:ArrowsView;
-    private var buildings:BuildingsView;
     public var units:UnitsView;
+    private var buildings:BuildingsView;
     public var tornadoes:TornadoesView;
     public var bullets:BulletsView;
     public var fireballs:FireballsView;
@@ -50,8 +50,8 @@ public class GameArea extends Sprite {
         addChild(ground = new Ground(h, v));
         addChild(volcanoes = new VolcanoesView());
         addChild(arrows = new ArrowsView());
-        addChild(buildings = new BuildingsView());
         addChild(units = new UnitsView());
+        addChild(buildings = new BuildingsView());
         addChild(tornadoes = new TornadoesView());
         addChild(bullets = new BulletsView());
         addChild(fireballs = new FireballsView());

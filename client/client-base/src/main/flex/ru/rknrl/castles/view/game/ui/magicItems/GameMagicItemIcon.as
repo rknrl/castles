@@ -7,9 +7,9 @@ import flash.text.TextField;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
-import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.ItemType;
+import ru.rknrl.utils.centerize;
 
 public class GameMagicItemIcon extends Sprite {
     private var backIcon:DisplayObject;

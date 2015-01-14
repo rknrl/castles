@@ -7,8 +7,8 @@ import ru.rknrl.BitmapUtils;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.LockView;
-import ru.rknrl.castles.view.utils.centerize;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.utils.centerize;
 
 public class Avatar extends Sprite {
     private var loadImageManager:ILoadImageManager;
