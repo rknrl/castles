@@ -28,21 +28,28 @@ public class GameMagicItemIcon extends Sprite {
         this.count = count;
     }
 
+    private var _count:int;
+
     public function set count(value:int):void {
+        _count = value;
         textField.text = value.toString();
         centerize(textField);
+        frontIcon.visible = _count > 0;
+        backIcon.visible = _count == 0;
     }
 
     public function set cooldownProgress(value:Number):void {
-        const border:Number = 4;
-        const w:Number = backIcon.width + border;
-        const h:Number = backIcon.height + border;
-        const left:Number = -w / 2;
-        const top:Number = -h / 2 + h * (1 - value);
-        frontIcon.scrollRect = new Rectangle(left, top, w, h * value);
-        frontIcon.x = left;
-        frontIcon.y = top;
-        backIcon.visible = value < 1;
+        if (_count > 0) {
+            const border:Number = 4;
+            const w:Number = backIcon.width + border;
+            const h:Number = backIcon.height + border;
+            const left:Number = -w / 2;
+            const top:Number = -h / 2 + h * (1 - value);
+            frontIcon.scrollRect = new Rectangle(left, top, w, h * value);
+            frontIcon.x = left;
+            frontIcon.y = top;
+            backIcon.visible = value < 1;
+        }
     }
 }
 }
