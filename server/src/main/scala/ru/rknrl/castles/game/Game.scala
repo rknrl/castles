@@ -101,6 +101,9 @@ class Game(players: Map[PlayerId, Player],
    */
   private var gameOvers = List[GameOverDTO]()
 
+  private def getReward(playerId: PlayerId) =
+    gameOvers.find(_.getPlayerId.getId == playerId.id).get.getReward
+
   private var `playerId→account` = Map[PlayerId, ActorRef]()
 
   private var `playerId→enterGameRmi` = Map[PlayerId, ActorRef]()
@@ -367,7 +370,7 @@ class Game(players: Map[PlayerId, Player],
 
     // Говорим аккаунту
 
-    `playerId→account`(playerId) ! LeaveGame(gameState.gameItems.states(playerId).usedItems)
+    `playerId→account`(playerId) ! LeaveGame(gameState.gameItems.states(playerId).usedItems, getReward(playerId))
 
     // Если вышли все - завершаем игру
 

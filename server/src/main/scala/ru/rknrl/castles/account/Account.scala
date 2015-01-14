@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 
 case object GetAccountState
 
-case class LeaveGame(usedItems: Map[ItemType, Int])
+case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int)
 
 class Account(accountId: AccountId,
               accountState: AccountState,
@@ -163,11 +163,12 @@ class Account(accountId: AccountId,
     /**
      * Game говорит, что для этого игрока бой завершен
      */
-    case LeaveGame(usedItems) ⇒
+    case LeaveGame(usedItems, reward) ⇒
       assert(game.isDefined)
       assert(enterGameRmi.isDefined)
       assert(gameRmi.isDefined)
 
+      state = state.addGold(reward)
       for ((itemType, count) ← usedItems)
         state = state.addItem(itemType, -count)
 
