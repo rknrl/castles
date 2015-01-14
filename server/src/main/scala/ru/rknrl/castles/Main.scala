@@ -16,11 +16,12 @@ import scala.io.Source
 object Main {
 
   def main(args: Array[String]): Unit = {
-    println("Version 0.02")
+    val configPath = args(0)
 
-    val configPath = "/Users/tolyayanot/dev/rknrl/castles/server/src/main/resources/dev.json"
+    println(s"ver 0.05")
+    println(s"configPath='$configPath'")
 
-    val configString = Source.fromFile(configPath).mkString
+    val configString = Source.fromFile(configPath, "UTF-8").mkString
 
     val config = configString.parseJson.convertTo[Config]
 
