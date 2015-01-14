@@ -15,7 +15,7 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
   def updatePopulation(deltaTime: Long, config: GameConfig) = {
     def updateBuilding(b: Building) = {
       val add = config.getRegeneration(b.prototype) * deltaTime
-      b.setPopulation(b.population + add)
+      b.setPopulation(Math.min(b.population + add, config.maxPopulation))
     }
 
     new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))

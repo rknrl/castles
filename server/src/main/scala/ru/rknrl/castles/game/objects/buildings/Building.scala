@@ -27,15 +27,13 @@ class Building(val id: BuildingId,
                val strengtheningStartTime: Long,
                val lastShootTime: Long) {
 
-  assert(population >= 0)
+  assert(population >= 0, population)
 
   def pos = new Point(x, y)
 
   def floorPopulation = GameConfig.truncatePopulation(population)
 
   def setPopulation(value: Double) = copy(newPopulation = value)
-
-  def addPopulation(amount: Double) = setPopulation(population + amount)
 
   def setOwner(value: Option[PlayerId]) = copy(newOwner = value)
 

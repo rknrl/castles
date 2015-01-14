@@ -48,6 +48,8 @@ class GameConfig(val constants: Constants,
                  shooting: ShootingConfig,
                  assistance: AssistanceConfig) {
 
+  val maxPopulation = 99
+
   def buildingConfig(buildingType: BuildingType, buildingLevel: BuildingLevel) =
     buildingsConfig(buildingType) * levelToFactor(buildingLevel)
 
@@ -127,7 +129,7 @@ class GameConfig(val constants: Constants,
    * Сколько юнитов будет в здании после входа в него дружественного отряда
    */
   def populationAfterFriendlyUnitEnter(buildingPopulation: Double, unitCount: Double) =
-    buildingPopulation + unitCount
+    Math.min(buildingPopulation + unitCount, maxPopulation)
 
   /**
    * Сколько юнитов будет в здании после входа в него вражеского отряда

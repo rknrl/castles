@@ -351,7 +351,7 @@ class BuildingsTest extends FlatSpec with Matchers {
   "getUpdateMessages" should "update changed buildings" in {
     val list = Buildings.getUpdateMessages(
       Map(id0 → b0, id1 → b1, id2 → b2),
-      Map(id0 → b0.addPopulation(1), id1 → b1, id2 → b2.addPopulation(1))).toList
+      Map(id0 → b0.setPopulation(b0.population + 1), id1 → b1, id2 → b2.setPopulation(b2.population + 1))).toList
     list.size should be(2)
     list(0).buildingUpdateDTO.getId.getId should be(b0.id.id)
     list(1).buildingUpdateDTO.getId.getId should be(b2.id.id)

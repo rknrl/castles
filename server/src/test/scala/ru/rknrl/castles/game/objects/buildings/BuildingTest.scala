@@ -73,12 +73,6 @@ class BuildingTest extends FlatSpec with Matchers {
     b.lastShootTime should be(a.lastShootTime)
   }
 
-  "addPopulation" should "add double value" in {
-    building(population = 1.0).addPopulation(4.0).population should be(5.0)
-    building(population = 10.1).addPopulation(13.33).population should be(23.43)
-    building(population = 10.0).addPopulation(-3.33).population should be(6.67)
-  }
-
   "setOwner" should "change owner" in {
     building(owner = None).setOwner(owner0).owner should be(owner0)
     building(owner = owner0).setOwner(None).owner should be(None)
