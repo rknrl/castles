@@ -11,7 +11,6 @@ import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
 
-[SWF(width="1024", height="768", frameRate="60", quality="high")]
 public class MainWebBase extends Main {
     [Embed(source="/castles - EN.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
@@ -26,7 +25,6 @@ public class MainWebBase extends Main {
         log.add("authenticationSecret=" + authenticationSecret.body);
         log.add("authenticationParams=" + authenticationSecret.params);
 
-        const contentsScaleFactor:Number = stage.hasOwnProperty("contentsScaleFactor") ? stage["contentsScaleFactor"] : 1;
         const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, contentsScaleFactor);
 
         const localesUrl:String = "";
@@ -39,7 +37,11 @@ public class MainWebBase extends Main {
 
     private function onResize(event:Event):void {
         log.add("resize " + stage.stageWidth + "x" + stage.stageHeight);
-        layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor);
+        layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, contentsScaleFactor);
+    }
+
+    private function get contentsScaleFactor():Number {
+        return stage.hasOwnProperty("contentsScaleFactor") ? stage["contentsScaleFactor"] : 1;
     }
 }
 }

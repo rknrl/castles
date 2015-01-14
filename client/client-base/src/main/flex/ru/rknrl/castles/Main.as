@@ -83,6 +83,7 @@ public class Main extends Sprite implements IAuthFacade {
     private var _layout:Layout;
 
     public function set layout(value:Layout):void {
+        _layout = value;
         if (view) view.layout = value;
     }
 

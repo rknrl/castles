@@ -7,13 +7,11 @@ import ru.rknrl.core.social.SocialWeb;
 import ru.rknrl.core.social.VK;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
 import ru.rknrl.utils.print;
 
-[SWF(width="1024", height="768", frameRate="60", quality="high")]
+[SWF(frameRate="60", quality="high")]
 public class MainWeb extends MainWebBase {
     public function MainWeb() {
         Security.allowDomain("*");
