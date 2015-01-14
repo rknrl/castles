@@ -8,13 +8,13 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.utils.applyStarTextFormat;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.createTextField;
 
 public class PopupItem extends Sprite {
     private var icon:DisplayObject;
     private var textField:TextField;
-    private var priceTextField:TextField;
+    private var priceTextField:AnimatedTextField;
 
     public function PopupItem(layout:Layout, icon:DisplayObject, text:String, price:int) {
         mouseChildren = false;
@@ -29,9 +29,8 @@ public class PopupItem extends Sprite {
         addChild(textField = createTextField(Fonts.popupText));
         textField.text = text;
 
-        addChild(priceTextField = createTextField(Fonts.popupPrice));
+        addChild(priceTextField = new AnimatedTextField(Fonts.popupPrice));
         priceTextField.text = price + "★";
-        applyStarTextFormat(priceTextField);
 
         this.layout = layout;
     }
@@ -48,10 +47,14 @@ public class PopupItem extends Sprite {
         textField.x = textPos.x;
         textField.y = textPos.y;
 
-        priceTextField.scaleX = priceTextField.scaleY = value.scale;
-        const pricePos:Point = value.popupPricePos(priceTextField.width, priceTextField.height);
-        priceTextField.x = pricePos.x;
-        priceTextField.y = pricePos.y;
+        priceTextField.textScale = value.scale;
+        const pricePos:Point = value.popupPricePos(priceTextField.textWidth, priceTextField.textHeight);
+        priceTextField.x = pricePos.x + priceTextField.textWidth / 2;
+        priceTextField.y = pricePos.y + priceTextField.textHeight / 2;
+    }
+
+    public function animatePrices():void {
+        priceTextField.elastic();
     }
 }
 }

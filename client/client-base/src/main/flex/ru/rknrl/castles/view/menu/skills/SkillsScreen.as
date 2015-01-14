@@ -2,7 +2,6 @@ package ru.rknrl.castles.view.menu.skills {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
 import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
@@ -13,8 +12,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.utils.Align;
-import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.dto.SkillType;
 
 public class SkillsScreen extends Screen {
@@ -25,7 +23,7 @@ public class SkillsScreen extends Screen {
 
     private var flasksHolder:Sprite;
     private const flasks:Vector.<FlaskView> = new <FlaskView>[];
-    private var titleTextField:TextField;
+    private var titleTextField:AnimatedTextField;
 
     public function SkillsScreen(skillLevels:SkillLevels, upgradePrices:SkillUpgradePrices, layout:Layout, locale:CastlesLocale) {
         this.locale = locale;
@@ -38,7 +36,7 @@ public class SkillsScreen extends Screen {
             flasksHolder.addChild(flask);
         }
 
-        titleTextField = createTextField(Fonts.title);
+        titleTextField = new AnimatedTextField(Fonts.title);
 
         _skillLevels = skillLevels;
         _layout = layout;
@@ -72,7 +70,6 @@ public class SkillsScreen extends Screen {
 
     private function updateTitleText():void {
         titleTextField.text = _skillLevels.isLastTotalLevel ? locale.upgradesComplete : locale.upgradesTitle(_prices.getPrice(_skillLevels.nextTotalLevel));
-        applyStarTextFormat(titleTextField);
         alignTitle();
     }
 
@@ -90,10 +87,10 @@ public class SkillsScreen extends Screen {
     }
 
     private function alignTitle():void {
-        titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
-        const titlePos:Point = _layout.title(titleTextField.width, titleTextField.height);
-        titleTextField.x = titlePos.x;
-        titleTextField.y = titlePos.y;
+        titleTextField.textScale = _layout.scale;
+        const titlePos:Point = _layout.title(titleTextField.textWidth, titleTextField.textHeight);
+        titleTextField.x = titlePos.x + titleTextField.textWidth / 2;
+        titleTextField.y = titlePos.y + titleTextField.textHeight / 2;
     }
 
     override public function get titleContent():DisplayObject {
@@ -107,8 +104,15 @@ public class SkillsScreen extends Screen {
     private function onClick(event:MouseEvent):void {
         event.stopImmediatePropagation();
         const flask:FlaskView = FlaskView(event.target);
-        flask.bounce();
         dispatchEvent(new UpgradeClickEvent(flask.skillType));
+    }
+
+    public function animate(skillType:SkillType):void {
+        getFlask(skillType).bounce();
+    }
+
+    override public function animatePrices():void {
+        titleTextField.elastic();
     }
 }
 }

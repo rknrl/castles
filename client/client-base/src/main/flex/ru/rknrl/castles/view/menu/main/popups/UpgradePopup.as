@@ -16,12 +16,14 @@ public class UpgradePopup extends Popup {
     private var slotId:SlotId;
     private var popup:Popup;
 
+    private var upgradeItem:PopupItem;
+
     public function UpgradePopup(slotId:SlotId, buildingType:BuildingType, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int, layout:Layout, locale:CastlesLocale) {
         this.slotId = slotId;
         const items:Vector.<PopupItem> = new <PopupItem>[];
 
         if (canUpgrade) {
-            const upgradeItem:PopupItem = new PopupItem(layout, new UpgradeIcon(), locale.upgrade, upgradePrice);
+            upgradeItem = new PopupItem(layout, new UpgradeIcon(), locale.upgrade, upgradePrice);
             upgradeItem.addEventListener(MouseEvent.MOUSE_DOWN, onUpgradeClick);
             items.push(upgradeItem);
         }
@@ -49,6 +51,10 @@ public class UpgradePopup extends Popup {
 
     private function onRemoveClick(event:MouseEvent):void {
         dispatchEvent(new RemoveBuildingEvent(slotId));
+    }
+
+    override public function animatePrices():void {
+        if (upgradeItem) upgradeItem.animatePrices();
     }
 }
 }

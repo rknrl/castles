@@ -11,10 +11,12 @@ import ru.rknrl.easers.interpolate;
 public class Animated extends Sprite {
     private static const bounceEaser:IEaser = new Bounce();
     private static const elasticEaser:IEaser = new Elastic();
-    private static const duration:int = 500;
+    private static const bounceDuration:int = 500;
+    private static const elasticDuration:int = 1500;
 
     private var startTime:int;
     private var easer:IEaser = bounceEaser;
+    private var duration:int = bounceDuration;
 
     public function Animated() {
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -22,11 +24,13 @@ public class Animated extends Sprite {
 
     public function bounce():void {
         easer = bounceEaser;
+        duration = bounceDuration;
         startTime = getTimer();
     }
 
     public function elastic():void {
         easer = elasticEaser;
+        duration = elasticDuration;
         startTime = getTimer();
     }
 

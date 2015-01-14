@@ -93,13 +93,14 @@ public class MenuController {
 
     private function onBuild(event:BuildEvent):void {
         if (model.gold < model.buildingPrices.buildPrice) {
-            // no money
+            view.animatePrices();
         } else {
             const dto:BuyBuildingDTO = new BuyBuildingDTO();
             dto.id = event.slotId;
             dto.buildingType = event.buildingType;
             sender.buyBuilding(dto);
 
+            view.closePopup();
             view.lock = true;
         }
     }
@@ -111,12 +112,13 @@ public class MenuController {
         const price:int = model.buildingPrices.getPrice(nextLevel);
 
         if (model.gold < price) {
-            // no money
+            view.animatePrices();
         } else {
             const dto:UpgradeBuildingDTO = new UpgradeBuildingDTO();
             dto.id = event.slotId;
             sender.upgradeBuilding(dto);
 
+            view.closePopup();
             view.lock = true;
         }
     }
@@ -136,29 +138,32 @@ public class MenuController {
         dto.id = event.slotId;
         sender.removeBuilding(dto);
 
+        view.closePopup();
         view.lock = true;
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {
         if (model.gold < model.itemPrice) {
-            // no money
+            view.animatePrices();
         } else {
             const dto:BuyItemDTO = new BuyItemDTO();
             dto.type = event.itemType;
             sender.buyItem(dto);
 
+            view.animateMagicItem(event.itemType);
             view.lock = true;
         }
     }
 
     private function onUpgradeClick(event:UpgradeClickEvent):void {
         if (model.gold < model.upgradePrices.getPrice(model.skillLevels.totalLevel + 1)) {
-            // no money
+            view.animatePrices();
         } else {
             const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
             dto.type = event.skillType;
             sender.upgradeSkill(dto);
 
+            view.animateFlask(event.skillType);
             view.lock = true;
         }
     }

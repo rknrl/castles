@@ -1,7 +1,6 @@
 package ru.rknrl.castles.view.menu.navigate.navigator {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Fonts;
@@ -9,9 +8,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
-import ru.rknrl.castles.view.utils.Animated;
-import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 
 public class ScreenNavigator extends Sprite {
     private var locale:CastlesLocale;
@@ -22,11 +19,9 @@ public class ScreenNavigator extends Sprite {
         return _holder;
     }
 
-    private var _balanceHolder:Animated;
+    private var _balanceTextField:AnimatedTextField;
 
-    private var _balanceTextField:TextField;
-
-    protected function get balanceTextField():TextField {
+    protected function get balanceTextField():AnimatedTextField {
         return _balanceTextField;
     }
 
@@ -59,8 +54,7 @@ public class ScreenNavigator extends Sprite {
             _holder.addChild(screen);
         }
 
-        addChild(_balanceHolder = new Animated());
-        _balanceHolder.addChild(_balanceTextField = createTextField(Fonts.balance));
+        addChild(_balanceTextField = new AnimatedTextField(Fonts.balance));
         this.gold = gold;
 
         addChild(_navigationPoints = new NavigationPoints(screens));
@@ -73,10 +67,14 @@ public class ScreenNavigator extends Sprite {
         const newText:String = locale.balance(value);
         if (_balanceTextField.text != newText) {
             _balanceTextField.text = newText;
-            applyStarTextFormat(balanceTextField);
             alignBalance();
-            _balanceHolder.bounce();
+            _balanceTextField.bounce();
         }
+    }
+
+    public function animatePrices():void {
+        screens[currentScreenIndex].animatePrices();
+        _balanceTextField.elastic();
     }
 
     private var _layout:Layout;
@@ -102,10 +100,10 @@ public class ScreenNavigator extends Sprite {
     }
 
     private function alignBalance():void {
-        _balanceTextField.scaleX = _balanceTextField.scaleY = _layout.scale;
-        const balancePos:Point = _layout.balance(_balanceTextField.width);
-        _balanceHolder.x = balancePos.x;
-        _balanceHolder.y = balancePos.y;
+        _balanceTextField.textScale = _layout.scale;
+        const balancePos:Point = _layout.balance(_balanceTextField.textWidth);
+        _balanceTextField.x = balancePos.x + _balanceTextField.textWidth / 2;
+        _balanceTextField.y = balancePos.y + _balanceTextField.textHeight / 2;
     }
 
     private var _currentScreenIndex:int;

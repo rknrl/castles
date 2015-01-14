@@ -90,5 +90,9 @@ public class PopupManager extends Sprite {
 
         if (nextTransition == 0 && transition == 0 && popup) removePopup();
     }
+
+    public function animatePrices():void {
+        if(popup) popup.animatePrices();
+    }
 }
 }

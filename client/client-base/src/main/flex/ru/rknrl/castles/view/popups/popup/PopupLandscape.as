@@ -30,11 +30,18 @@ public class PopupLandscape extends Popup {
         for each(var item:PopupItem in items) content.addChild(item);
 
         content.addChild(cancelButton = new Sprite());
+
+        const icon:CloseMC = new CloseMC();
+        icon.x = -icon.width / 2;
+        icon.y = icon.height / 2;
+        cancelButton.addChild(icon);
+
         const cancelMouseHolder:Bitmap = new Bitmap(Colors.transparent);
         cancelMouseHolder.width = cancelMouseHolder.height = cancelMouseHolderSize;
-        cancelMouseHolder.x = cancelMouseHolder.y = -cancelMouseHolderSize / 2;
+        cancelMouseHolder.x = icon.x - cancelMouseHolderSize / 2;
+        cancelMouseHolder.y = icon.y - cancelMouseHolderSize / 2;
         cancelButton.addChild(cancelMouseHolder);
-        cancelButton.addChild(new CloseMC());
+
         cancelButton.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
 
         this.layout = layout;
@@ -63,8 +70,8 @@ public class PopupLandscape extends Popup {
         }
 
         cancelButton.scaleX = cancelButton.scaleY = value.scale;
-        cancelButton.x = width - value.popupPadding - cancelButton.width / 2;
-        cancelButton.y = value.popupPadding + cancelButton.height / 2;
+        cancelButton.x = width - value.popupPadding;
+        cancelButton.y = value.popupPadding;
 
         content.x = -width / 2;
         content.y = -height / 2;

@@ -13,10 +13,10 @@ import ru.rknrl.dto.SlotId;
 public class BuildPopup extends Popup {
     private var slotId:SlotId;
     private var popup:Popup;
+    private const items:Vector.<PopupItem> = new <PopupItem>[];
 
     public function BuildPopup(slotId:SlotId, price:int, layout:Layout, locale:CastlesLocale) {
         this.slotId = slotId;
-        const items:Vector.<PopupItem> = new <PopupItem>[];
 
         for each(var buildingType:BuildingType in BuildingType.values) {
             const item:BuildItem = new BuildItem(buildingType, layout, new PopupBuildIcon(buildingType), locale.buildingName(buildingType), price);
@@ -38,6 +38,10 @@ public class BuildPopup extends Popup {
     private function onClick(event:MouseEvent):void {
         const item:BuildItem = BuildItem(event.target);
         dispatchEvent(new BuildEvent(slotId, item.buildingType));
+    }
+
+    override public function animatePrices():void {
+        for each(var item:PopupItem in items) item.animatePrices();
     }
 }
 }

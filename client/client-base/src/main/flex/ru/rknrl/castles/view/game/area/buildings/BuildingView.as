@@ -67,10 +67,9 @@ public class BuildingView extends Sprite {
     }
 
     public function set owner(value:BuildingOwner):void {
-        if (_owner && _owner.equals(value)) return;
+        building.transform.colorTransform = Colors.buildingTransform(value);
+        if (_owner && !_owner.equals(value)) buildingHolder.bounce();
         _owner = value;
-        building.transform.colorTransform = Colors.buildingTransform(owner);
-        buildingHolder.bounce();
     }
 
     public function set count(value:int):void {

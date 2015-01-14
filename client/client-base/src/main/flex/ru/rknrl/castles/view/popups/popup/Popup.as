@@ -9,5 +9,8 @@ public class Popup extends Sprite {
 
     public function set transition(value:Number):void {
     }
+
+    public function animatePrices():void {
+    }
 }
 }

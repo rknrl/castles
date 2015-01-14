@@ -26,6 +26,8 @@ import ru.rknrl.castles.view.menu.top.TopScreen;
 import ru.rknrl.castles.view.popups.PopupEvent;
 import ru.rknrl.castles.view.popups.PopupManager;
 import ru.rknrl.dto.BuildingType;
+import ru.rknrl.dto.ItemType;
+import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.loaders.ILoadImageManager;
 
@@ -64,9 +66,6 @@ public class MenuView extends Sprite {
         addChild(popupManager = new PopupManager(layout));
 
         addEventListener(PopupEvent.CLOSE, popupManager.close);
-        addEventListener(BuildEvent.BUILD, popupManager.close);
-        addEventListener(UpgradeBuildingEvent.UPGRADE_BUILDING, popupManager.close);
-        addEventListener(RemoveBuildingEvent.REMOVE_BUILDING, popupManager.close);
     }
 
     private var _layout:Layout;
@@ -83,6 +82,19 @@ public class MenuView extends Sprite {
 
     public function set gold(value:int):void {
         screenNavigator.gold = value;
+    }
+
+    public function animatePrices():void {
+        screenNavigator.animatePrices();
+        popupManager.animatePrices();
+    }
+
+    public function animateMagicItem(itemType:ItemType):void {
+        shopScreen.animate(itemType);
+    }
+
+    public function animateFlask(skillType:SkillType):void {
+        skillScreen.animate(skillType);
     }
 
     public function set startLocation(value:StartLocation):void {
@@ -121,7 +133,7 @@ public class MenuView extends Sprite {
         screenNavigator.currentScreenIndex = index;
     }
 
-    castlesTest function closePopup():void {
+    public function closePopup():void {
         popupManager.close();
     }
 

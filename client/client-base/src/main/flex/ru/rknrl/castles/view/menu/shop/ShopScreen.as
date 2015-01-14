@@ -2,7 +2,6 @@ package ru.rknrl.castles.view.menu.shop {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
-import flash.text.TextField;
 
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
@@ -12,8 +11,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.utils.Align;
-import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.castles.view.utils.createTextField;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.dto.ItemType;
 
 public class ShopScreen extends Screen {
@@ -21,7 +19,7 @@ public class ShopScreen extends Screen {
 
     private var magicItemsHolder:Sprite;
     private const magicItems:Vector.<ShopMagicItem> = new <ShopMagicItem>[];
-    private var titleTextField:TextField;
+    private var titleTextField:AnimatedTextField;
 
     public function ShopScreen(itemsCount:ItemsCount, itemPrice:int, layout:Layout, locale:CastlesLocale) {
         this.locale = locale;
@@ -34,7 +32,7 @@ public class ShopScreen extends Screen {
             magicItemsHolder.addChild(item);
         }
 
-        titleTextField = createTextField(Fonts.title);
+        titleTextField = new AnimatedTextField(Fonts.title);
 
         _layout = layout;
         this.itemPrice = itemPrice;
@@ -56,7 +54,6 @@ public class ShopScreen extends Screen {
 
     public function set itemPrice(value:int):void {
         titleTextField.text = locale.shopTitle(value);
-        applyStarTextFormat(titleTextField);
         alignTitle();
     }
 
@@ -65,6 +62,7 @@ public class ShopScreen extends Screen {
     override public function set layout(value:Layout):void {
         _layout = value;
 
+        titleTextField.textScale = value.scale;
         magicItemsHolder.scaleX = magicItemsHolder.scaleY = value.scale;
         const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(magicItems), Layout.itemSize, Layout.itemGap) * value.scale;
         magicItemsHolder.x = value.screenCenterX - totalWidth / 2;
@@ -75,15 +73,14 @@ public class ShopScreen extends Screen {
 
     private function alignTitle():void {
         titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
-        const titlePos:Point = _layout.title(titleTextField.width, titleTextField.height);
-        titleTextField.x = titlePos.x;
-        titleTextField.y = titlePos.y;
+        const titlePos:Point = _layout.title(titleTextField.textWidth, titleTextField.textHeight);
+        titleTextField.x = titlePos.x + titleTextField.textWidth / 2;
+        titleTextField.y = titlePos.y + titleTextField.textHeight / 2;
     }
 
     private function onClick(event:MouseEvent):void {
         event.stopImmediatePropagation();
         const item:ShopMagicItem = ShopMagicItem(event.target);
-        item.bounce();
         dispatchEvent(new MagicItemClickEvent(item.itemType));
     }
 
@@ -93,6 +90,14 @@ public class ShopScreen extends Screen {
 
     override public function get titleContent():DisplayObject {
         return titleTextField;
+    }
+
+    public function animate(itemType:ItemType):void {
+        getMagicItem(itemType).bounce();
+    }
+
+    override public function animatePrices():void {
+        titleTextField.elastic();
     }
 }
 }
