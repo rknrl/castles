@@ -61,6 +61,7 @@ public class MagicItemsView extends Sprite {
     }
 
     private function onClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
         const item:GameMagicItem = GameMagicItem(event.target);
         dispatchEvent(new MagicItemClickEvent(item.itemType));
     }

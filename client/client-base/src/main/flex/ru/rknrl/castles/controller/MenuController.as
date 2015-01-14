@@ -21,6 +21,7 @@ import ru.rknrl.dto.BuyBuildingDTO;
 import ru.rknrl.dto.BuyItemDTO;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.RemoveBuildingDTO;
+import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
@@ -156,15 +157,17 @@ public class MenuController {
     }
 
     private function onUpgradeClick(event:UpgradeClickEvent):void {
-        if (model.gold < model.upgradePrices.getPrice(model.skillLevels.totalLevel + 1)) {
-            view.animatePrices();
-        } else {
-            const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
-            dto.type = event.skillType;
-            sender.upgradeSkill(dto);
+        if (model.skillLevels.getLevel(event.skillType) != SkillLevel.SKILL_LEVEL_3) {
+            if (model.gold < model.upgradePrices.getPrice(model.skillLevels.totalLevel + 1)) {
+                view.animatePrices();
+            } else {
+                const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
+                dto.type = event.skillType;
+                sender.upgradeSkill(dto);
 
-            view.animateFlask(event.skillType);
-            view.lock = true;
+                view.animateFlask(event.skillType);
+                view.lock = true;
+            }
         }
     }
 

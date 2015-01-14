@@ -4,11 +4,9 @@ import flash.display.Sprite;
 import flash.events.Event;
 
 import ru.rknrl.castles.view.Colors;
-
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.utils.Animated;
+import ru.rknrl.castles.view.utils.AnimatedShadow;
 import ru.rknrl.castles.view.utils.Fly;
-import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.ItemType;
 
 public class GameMagicItem extends Sprite {
@@ -16,8 +14,8 @@ public class GameMagicItem extends Sprite {
     private static const mouseHolderH:Number = 96;
 
     private var fly:Fly;
-    private var holder:Animated;
     private var magicItem:GameMagicItemIcon;
+    private var shadow:AnimatedShadow;
 
     public function GameMagicItem(itemType:ItemType, count:int) {
         _itemType = itemType;
@@ -31,14 +29,12 @@ public class GameMagicItem extends Sprite {
         mouseHolder.y = -40;
         addChild(mouseHolder);
 
-        addChild(holder = new Animated());
-
-        const shadow:Shadow = new Shadow();
+        shadow = new AnimatedShadow();
         shadow.y = Layout.shadowDistance;
-        holder.addChild(shadow);
+        addChild(shadow);
 
         magicItem = new GameMagicItemIcon(itemType, count);
-        holder.addChild(magicItem);
+        addChild(magicItem);
 
         fly = new Fly(magicItem, shadow);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -63,7 +59,7 @@ public class GameMagicItem extends Sprite {
     }
 
     public function set selected(value:Boolean):void {
-        scaleX = scaleY = value ? 2 : 1;
+        scaleX = scaleY = value ? 1.8 : 1;
     }
 
     public function set lock(value:Boolean):void {
@@ -71,7 +67,8 @@ public class GameMagicItem extends Sprite {
     }
 
     public function animate():void {
-        holder.bounce();
+        shadow.bounce();
+        magicItem.bounce();
     }
 }
 }

@@ -8,14 +8,14 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.Animated;
+import ru.rknrl.castles.view.utils.AnimatedShadow;
 import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.utils.LockView;
-import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
 
-public class FlaskView extends Animated {
+public class FlaskView extends Sprite {
     private static const flaskHeight:Number = 104;
     private static const textFlaskGap:Number = 16;
     private static const textHeight:Number = 22;
@@ -38,8 +38,10 @@ public class FlaskView extends Animated {
 
     private var fly:Fly;
 
+    private var flaskHolder:Animated;
     private var fill:FlaskFill;
     private var lockView:LockView;
+    private var shadow:AnimatedShadow;
 
     public function FlaskView(skillType:SkillType, skillLevel:SkillLevel, name:String) {
         _skillType = skillType;
@@ -60,8 +62,7 @@ public class FlaskView extends Animated {
         textField.y = textY;
         addChild(textField);
 
-        const flaskHolder:Sprite = new Sprite();
-        addChild(flaskHolder);
+        addChild(flaskHolder = new Animated());
 
         const flask:Flask = new Flask();
         flask.transform.colorTransform = Colors.transform(Colors.skill(skillType));
@@ -72,7 +73,7 @@ public class FlaskView extends Animated {
 
         flaskHolder.addChild(lockView = new LockView());
 
-        const shadow:Shadow = new Shadow();
+        shadow = new AnimatedShadow();
         shadow.y = flaskHeight / 2 + Layout.shadowDistance;
         addChild(shadow);
 
@@ -99,6 +100,11 @@ public class FlaskView extends Animated {
     public function set lock(value:Boolean):void {
         lockView.visible = value;
         mouseEnabled = !value;
+    }
+
+    public function bounce():void {
+        flaskHolder.bounce();
+        shadow.bounce();
     }
 }
 }
