@@ -28,7 +28,7 @@ public class BankScreen extends Screen {
     }
 
     public function set products(value:Products):void {
-        button.text = locale.bankButton(value.product.count, value.product.price);
+        button.text = locale.bankButton(value.product.count, value.product.price, value.product.currency);
     }
 
     override public function set layout(value:Layout):void {

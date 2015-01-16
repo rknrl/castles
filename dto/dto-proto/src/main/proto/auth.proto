@@ -47,4 +47,5 @@ message ProductDTO {
     required string photoUrl = 4;
     required int32 count = 5;
     required int32 price = 6;
+    required string currency = 7;
 }

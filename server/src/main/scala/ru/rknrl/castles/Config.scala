@@ -53,5 +53,6 @@ class Config(val host: String,
       .setPhotoUrl(p.photoUrl)
       .setCount(productInfo.count)
       .setPrice(productInfo.price)
+      .setCurrency(productInfo.currency)
       .build()
 }

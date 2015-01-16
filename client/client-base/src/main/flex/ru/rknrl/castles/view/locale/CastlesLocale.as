@@ -10,8 +10,8 @@ public class CastlesLocale {
         return "Играть";
     }
 
-    public function bankButton(count:int, price:int):String {
-        return "Купить " + count + "★ за " + price + "$";
+    public function bankButton(count:int, price:int, currency:String):String {
+        return "Купить " + count + "★ за " + price + " " + currency;
     }
 
     public function balance(value:int):String {
