@@ -7,8 +7,14 @@ import ru.rknrl.dto.CommonDTO.BuildingLevel
 import scala.collection.JavaConverters._
 
 object AccountConfig {
-  type BuildingPrices = Map[BuildingLevel, Int]
-  type SkillUpgradePrices = Map[Int, Int]
+
+  class BuildingPrices(val map: Map[BuildingLevel, Int]) {
+    def apply(level: BuildingLevel) = map(level)
+  }
+
+  class SkillUpgradePrices(val map: Map[Int, Int]) {
+    def apply(totalLevel: Int) = map(totalLevel)
+  }
 }
 
 class AccountConfig(val initGold: Int,
@@ -18,11 +24,11 @@ class AccountConfig(val initGold: Int,
                     val itemPrice: Int) {
 
   private def buildingPricesDto =
-    for ((buildingLevel, price) ← buildingPrices)
+    for ((buildingLevel, price) ← buildingPrices.map)
     yield BuildingPriceDTO.newBuilder().setLevel(buildingLevel).setPrice(price).build()
 
   private def skillUpgradePricesDto =
-    for ((totalLevel, price) ← skillUpgradePrices)
+    for ((totalLevel, price) ← skillUpgradePrices.map)
     yield SkillUpgradePriceDTO.newBuilder().setTotalLevel(totalLevel).setPrice(price).build()
 
   def dto = AccountConfigDTO.newBuilder()

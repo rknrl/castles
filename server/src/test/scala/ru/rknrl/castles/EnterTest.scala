@@ -6,7 +6,6 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.Tcp.Connect
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import ru.rknrl.castles.config.ConfigTest
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.testkit.{ClientConnected, ServerBounded, TcpClientMock, TcpMock}
@@ -17,7 +16,7 @@ import ru.rknrl.dto.CommonDTO._
 
 import scala.concurrent.duration._
 
-class ActorsTest
+class EnterTest
   extends TestKit(ActorSystem("test-actor-system"))
   with WordSpecLike
   with DefaultTimeout
@@ -25,7 +24,7 @@ class ActorsTest
   with Matchers
   with BeforeAndAfterAll {
 
-  val configMock = ConfigTest.configMock
+  val configMock = ConfigMock.config
 
   val matchmaking = system.actorOf(Props(classOf[MatchMaking], 10 millis, configMock.game), "matchmaking")
 

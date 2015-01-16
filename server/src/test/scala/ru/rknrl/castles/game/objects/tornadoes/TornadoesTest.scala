@@ -1,7 +1,6 @@
 package ru.rknrl.castles.game.objects.tornadoes
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.config.GameConfigTest
 import ru.rknrl.castles.game.GameConfigMock
 import ru.rknrl.castles.game.objects.PlayerStateTest
 import ru.rknrl.castles.game.objects.players.PlayerId

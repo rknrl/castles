@@ -4,7 +4,6 @@ import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
-import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.database.AccountStateDb.Put
 import ru.rknrl.castles.game.Game.{Join, Offline}
 import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}

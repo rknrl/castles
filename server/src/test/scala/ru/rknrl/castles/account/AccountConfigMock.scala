@@ -1,17 +1,18 @@
 package ru.rknrl.castles.account
 
+import ru.rknrl.castles.account.AccountConfig.{SkillUpgradePrices, BuildingPrices}
 import ru.rknrl.dto.CommonDTO.BuildingLevel
 
-object AccountConfigTest {
+object AccountConfigMock {
   def config = new AccountConfig(
     initGold = 100,
     initItemCount = 2,
-    buildingPrices = Map(
+    buildingPrices = new BuildingPrices(Map(
       BuildingLevel.LEVEL_1 → 4,
       BuildingLevel.LEVEL_2 → 16,
       BuildingLevel.LEVEL_3 → 64
-    ),
-    skillUpgradePrices = Map(
+    )),
+    skillUpgradePrices = new SkillUpgradePrices(Map(
       1 → 1,
       2 → 2,
       3 → 4,
@@ -21,11 +22,7 @@ object AccountConfigTest {
       7 → 64,
       8 → 128,
       9 → 256
-    ),
+    )),
     itemPrice = 1
   )
-}
-
-class AccountConfigTest {
-
 }

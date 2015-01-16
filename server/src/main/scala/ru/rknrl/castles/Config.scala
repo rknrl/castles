@@ -1,22 +1,25 @@
-package ru.rknrl.castles.config
+package ru.rknrl.castles
 
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.game._
-import ru.rknrl.core.social.Products.Products
+import ru.rknrl.core.social.Product
 import ru.rknrl.core.social.SocialConfigs
 import ru.rknrl.dto.AuthDTO.ProductDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, BuildingLevel, BuildingType}
 
-
 object Config {
-  type BuildingsConfig = Map[BuildingType, BuildingConfig]
-  type BuildingLevelToFactor = Map[BuildingLevel, Double]
+  class BuildingsConfig(map: Map[BuildingType, BuildingConfig]) {
+    def apply(buildingType: BuildingType) = map(buildingType)
+  }
+  class BuildingLevelToFactor(map: Map[BuildingLevel, Double]) {
+    def apply(level: BuildingLevel) = map(level)
+  }
 }
 
 class Config(val host: String,
              val gamePort: Int,
              val policyPort: Int,
-             val products: Products,
+             val products: List[Product],
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig) {
@@ -24,10 +27,10 @@ class Config(val host: String,
   val speed = 0.00005
 
   private def checkProductInfoConfig() =
-    for ((id, p) ← products)
+    for (p ← products)
       for (social ← List(social.vk, social.ok, social.mm))
         if (social.isDefined)
-          if (!social.get.productsInfo.contains(id)) throw new Exception("can't find product info in config " + id)
+          if (!social.get.productsInfo.exists(_.id == p.id)) throw new Exception("can't find product info in config " + p.id)
 
   checkProductInfoConfig()
 
@@ -41,8 +44,8 @@ class Config(val host: String,
     }
 
   def productsDto(accountType: AccountType) =
-    for ((id, p) ← products;
-         productInfo = socialByAccountType(accountType).get.productsInfo(id))
+    for (p ← products;
+         productInfo = socialByAccountType(accountType).get.productsInfo.find(_.id == p.id).get)
     yield ProductDTO.newBuilder()
       .setId(p.id)
       .setTitle(p.title)

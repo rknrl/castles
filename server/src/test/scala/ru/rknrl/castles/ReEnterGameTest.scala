@@ -2,7 +2,6 @@ package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
-import _root_.ru.rknrl.castles.config.ConfigTest
 import _root_.ru.rknrl.castles.rmi._
 import _root_.ru.rknrl.dto.AuthDTO._
 import akka.actor.{ActorSystem, Props}
@@ -26,7 +25,7 @@ class ReEnterGameTest
   with Matchers
   with BeforeAndAfterAll {
 
-  val configMock = ConfigTest.configMock
+  val configMock = ConfigMock.config
 
   val matchmaking = system.actorOf(Props(classOf[MatchMaking], 10 millis, configMock.game), "matchmaking")
 

@@ -2,18 +2,17 @@ package ru.rknrl.castles
 
 import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
-import ru.rknrl.castles.config.Config
-import ru.rknrl.castles.config.ConfigJsonProtocol._
+import net.liftweb.json._
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.payments.PaymentsServer
 import ru.rknrl.utils.PolicyServer
 import spray.can.Http
-import spray.json._
 
 import scala.concurrent.duration._
 import scala.io.Source
 
 object Main {
+  implicit val formats = DefaultFormats + new BuildingPricesSerializer + new BuildingLevelToFactorSerializer + new BuildingsConfigSerializer + new SkillUpgradePricesSerializer
 
   def main(args: Array[String]): Unit = {
     val configPath = args(0)
@@ -23,7 +22,7 @@ object Main {
 
     val configString = Source.fromFile(configPath, "UTF-8").mkString
 
-    val config = configString.parseJson.convertTo[Config]
+    val config = JsonParser.parse(configString).extract[Config]
 
     implicit val system = ActorSystem("main-actor-system")
 

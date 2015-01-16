@@ -1,8 +1,8 @@
 package ru.rknrl.castles
 
 import akka.actor.{Actor, ActorRef, Props}
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{Account, AccountState, GetAccountState}
-import ru.rknrl.castles.config.Config
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}

@@ -1,6 +1,7 @@
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.config.Config.{BuildingLevelToFactor, BuildingsConfig}
+import ru.rknrl.castles.Config
+import ru.rknrl.castles.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 object GameConfigMock {
@@ -91,8 +92,8 @@ object GameConfigMock {
     )
 
   def gameConfig(constants: Constants = constantsMock(),
-                 buildingsConfig: BuildingsConfig = buildingsConfigMock(),
-                 levelToFactor: BuildingLevelToFactor = levelToFactorMock(),
+                 buildingsConfig: Map[BuildingType, BuildingConfig] = buildingsConfigMock(),
+                 levelToFactor: Map[BuildingLevel, Double] = levelToFactorMock(),
                  fireball: FireballConfig = fireballMock(),
                  volcano: VolcanoConfig = volcanoMock(),
                  tornado: TornadoConfig = tornadoMock(),
@@ -101,8 +102,8 @@ object GameConfigMock {
                  assistance: AssistanceConfig = assistanceMock()) =
     new GameConfig(
       constants,
-      buildingsConfig,
-      levelToFactor,
+      new BuildingsConfig(buildingsConfig),
+      new BuildingLevelToFactor(levelToFactor),
       fireball,
       volcano,
       tornado,

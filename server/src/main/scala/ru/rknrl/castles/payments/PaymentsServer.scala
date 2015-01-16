@@ -2,8 +2,7 @@ package ru.rknrl.castles.payments
 
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
-import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.config.Config
+import ru.rknrl.castles.{Config, AccountId}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.castles.payments.PaymentsServer._
 import ru.rknrl.core.social.{Product, SocialConfig}
@@ -87,13 +86,13 @@ class PaymentsServer(config: Config) extends Actor with HttpService {
 
           complete(callback.accountNotFoundError)
 
-        else if (!(config.products contains productId))
+        else if (!(config.products exists (_.id == productId)))
 
           complete(callback.accountNotFoundError)
 
         else {
-          val product = config.products(productId)
-          val productInfo = socialConfig.productsInfo(productId)
+          val product = config.products.find(_.id == productId).get
+          val productInfo = socialConfig.productsInfo.find(_.id == productId).get
 
           if (productInfo.price != price) {
             complete(callback.accountNotFoundError)

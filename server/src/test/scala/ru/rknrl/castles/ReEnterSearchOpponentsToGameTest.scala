@@ -2,19 +2,17 @@ package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
-import _root_.ru.rknrl.castles.config.ConfigTest
 import _root_.ru.rknrl.castles.rmi._
 import _root_.ru.rknrl.dto.AuthDTO._
+import _root_.ru.rknrl.dto.CommonDTO._
 import akka.actor.{ActorSystem, Props}
 import akka.io.Tcp.{Connect, PeerClosed}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import ru.rknrl.castles.database.InMemoryDb
-import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
+import ru.rknrl.core.rmi.{TcpReceiver, RegisterReceiver, ReceiverRegistered}
 import ru.rknrl.core.rmi.testkit._
-import _root_.ru.rknrl.dto.AccountDTO._
-import _root_.ru.rknrl.dto.AuthDTO._
-import _root_.ru.rknrl.dto.CommonDTO._
+import _root_.ru.rknrl.core.rmi._
 
 import scala.concurrent.duration._
 
@@ -26,7 +24,7 @@ class ReEnterSearchOpponentsToGameTest
   with Matchers
   with BeforeAndAfterAll {
 
-  val configMock = ConfigTest.configMock
+  val configMock = ConfigMock.config
 
   val matchmaking = system.actorOf(Props(classOf[MatchMaking], 300 millis, configMock.game), "matchmaking")
 

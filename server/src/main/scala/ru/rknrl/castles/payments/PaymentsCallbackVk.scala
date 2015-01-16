@@ -26,7 +26,7 @@ object VkStatus {
    * В случае ответа об успехе платёжная система зачислит голоса на счёт приложения.
    * Если в ответ будет получено сообщение об ошибке, заказ отменяется.
    */
-  val CHARGABLE = "chargeable"
+  val CHARGEABLE = "chargeable"
 }
 
 object VkLang {
@@ -97,7 +97,7 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
             // (String) новый статус заказа
             val status = params.getParam("status")
 
-            assert(status == VkStatus.CHARGABLE)
+            assert(status == VkStatus.CHARGEABLE)
 
             // (String) идентификатор товара в приложении
             val itemId = params.getParam("item_id")

@@ -91,6 +91,14 @@
             <version>0.2.15</version>
         </dependency>
 
+        <!-- lift-json -->
+
+        <dependency>
+            <groupId>net.liftweb</groupId>
+            <artifactId>lift-json_2.11</artifactId>
+            <version>3.0-M2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
