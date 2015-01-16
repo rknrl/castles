@@ -32,6 +32,28 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
         mouseHolder.height = value.screenHeight;
     }
 
+    override protected function updateScreensPos():void {
+        const prevIndex:int = getNextIndex(currentScreenIndex);
+        const nextIndex:int = getPrevIndex(currentScreenIndex);
+
+        screens[currentScreenIndex].x = 0;
+        screens[currentScreenIndex].visible = true;
+
+        screens[prevIndex].x = -layout.screenWidth;
+        screens[prevIndex].visible = true;
+
+        screens[nextIndex].x = layout.screenWidth;
+        screens[nextIndex].visible = true;
+    }
+
+    protected function getNextIndex(index:int):int {
+        return index > 0 ? index - 1 : screens.length - 1;
+    }
+
+    protected function getPrevIndex(index:int):int {
+        return index < screens.length - 1 ? index + 1 : 0;
+    }
+
     // mouse
 
     private static const epsilon:Number = 0.5;

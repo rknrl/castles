@@ -133,26 +133,8 @@ public class ScreenNavigator extends Sprite {
         if (_title) addChild(_title);
     }
 
-    private function updateScreensPos():void {
-        const prevIndex:int = getNextIndex(_currentScreenIndex);
-        const nextIndex:int = getPrevIndex(_currentScreenIndex);
-
-        _screens[_currentScreenIndex].x = 0;
-        _screens[_currentScreenIndex].visible = true;
-
-        _screens[prevIndex].x = -_layout.screenWidth;
-        _screens[prevIndex].visible = true;
-
-        _screens[nextIndex].x = _layout.screenWidth;
-        _screens[nextIndex].visible = true;
-    }
-
-    protected function getNextIndex(index:int):int {
-        return index > 0 ? index - 1 : _screens.length - 1;
-    }
-
-    protected function getPrevIndex(index:int):int {
-        return index < _screens.length - 1 ? index + 1 : 0;
+    protected function updateScreensPos():void {
+        throw OverrideMe();
     }
 
     public function set lock(value:Boolean):void {

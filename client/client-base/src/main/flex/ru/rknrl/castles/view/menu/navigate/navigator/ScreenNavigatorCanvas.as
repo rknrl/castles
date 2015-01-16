@@ -17,9 +17,25 @@ public class ScreenNavigatorCanvas extends ScreenNavigator {
         return 1.5;
     }
 
+    private var nextScreenIndex:int;
+
     private function onChangeScreen(event:ChangeScreenEvent):void {
-        // nextScreenIndex = screens.indexOf(event.screen);
-        nextX = layout.screenWidth;
+        const index:Number = screens.indexOf(event.screen);
+        if (nextScreenIndex != index) {
+            nextX = index > nextScreenIndex ? -layout.screenWidth : layout.screenWidth;
+            nextScreenIndex = index;
+            updateScreensPos();
+        }
+    }
+
+    override protected function updateScreensPos():void {
+        screens[currentScreenIndex].x = 0;
+        screens[currentScreenIndex].visible = true;
+
+        if (nextScreenIndex != currentScreenIndex) {
+            screens[nextScreenIndex].x = layout.screenWidth;
+            screens[nextScreenIndex].visible = true;
+        }
     }
 
     private static const epsilon:Number = 0.5;
@@ -41,16 +57,17 @@ public class ScreenNavigatorCanvas extends ScreenNavigator {
         }
 
         if (holder.x >= layout.screenCenterX) {
-            currentScreenIndex = getNextIndex(currentScreenIndex);
+            currentScreenIndex = nextScreenIndex;
             holder.x -= layout.screenWidth;
             nextX = 0;
         } else if (holder.x <= -layout.screenCenterX) {
-            currentScreenIndex = getPrevIndex(currentScreenIndex);
+            currentScreenIndex = nextScreenIndex;
             holder.x += layout.screenWidth;
             nextX = 0;
         }
 
         screens[currentScreenIndex].transition = 1 - Math.abs(holder.x) / layout.screenCenterX;
     }
+
 }
 }
