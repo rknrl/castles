@@ -4,6 +4,7 @@ import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
 import ru.rknrl.castles.view.layout.LayoutPortrait;
+import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorMobileFactory;
 import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
@@ -58,7 +59,7 @@ public class MainMobileBase extends Main {
          trace("deviceLocale:" + deviceLocale);
          */
 
-        super(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout, new ScreenNavigatorMobileFactory());
     }
 }
 }

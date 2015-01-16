@@ -1,4 +1,5 @@
 package ru.rknrl.castles {
+[SWF(frameRate="60", quality="high")]
 public class MainMobileEmulator extends MainMobileBase {
     public function MainMobileEmulator() {
 //        super("178.62.255.28", 2335, 2336);

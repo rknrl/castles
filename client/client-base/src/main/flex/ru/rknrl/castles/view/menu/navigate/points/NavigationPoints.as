@@ -15,7 +15,13 @@ public class NavigationPoints extends Sprite {
             addChild(point);
             points.push(point);
         }
-        Align.horizontal(Vector.<DisplayObject>(points), Layout.navigationPointSize, Layout.navigationPointGap);
+        _pointsWidth = Align.horizontal(Vector.<DisplayObject>(points), Layout.navigationPointSize, Layout.navigationPointGap);
+    }
+
+    private var _pointsWidth: Number;
+
+    public function get pointsWidth():Number {
+        return _pointsWidth * scaleX;
     }
 
     private function getPoint(screen:Screen):NavigationPoint {

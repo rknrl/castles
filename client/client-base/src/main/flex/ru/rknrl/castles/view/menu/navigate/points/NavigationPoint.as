@@ -21,6 +21,8 @@ public class NavigationPoint extends Sprite {
         _screen = screen;
         redraw();
         addEventListener(MouseEvent.MOUSE_DOWN, onClick);
+        addEventListener(MouseEvent.ROLL_OVER, onRollOver);
+        addEventListener(MouseEvent.ROLL_OUT, onRollOut);
     }
 
     private var _screen:Screen;
@@ -36,11 +38,28 @@ public class NavigationPoint extends Sprite {
         redraw();
     }
 
+    private var _rollOver:Boolean;
+
+    private function onRollOver(event:MouseEvent):void {
+        _rollOver = true;
+        redraw();
+    }
+
+    private function onRollOut(event:MouseEvent):void {
+        _rollOver = false;
+        redraw();
+    }
+
     private function redraw():void {
         graphics.clear();
-        graphics.beginFill(_selected ? Colors.darkGrey : Colors.grey);
+        graphics.beginFill(color);
         graphics.drawCircle(0, 0, Layout.navigationPointSize / 2);
         graphics.endFill();
+    }
+
+    private function get color():uint {
+        if (_rollOver) return 0xeeeeee;
+        return _selected ? Colors.darkGrey : Colors.grey;
     }
 
     private function onClick(event:MouseEvent):void {

@@ -22,6 +22,10 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
+    override protected function get navigationPointsScale():Number {
+        return 1;
+    }
+
     override public function set layout(value:Layout):void {
         super.layout = value;
         mouseHolder.width = value.screenWidth;

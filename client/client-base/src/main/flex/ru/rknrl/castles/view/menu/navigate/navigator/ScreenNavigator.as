@@ -9,6 +9,7 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
+import ru.rknrl.utils.OverrideMe;
 
 public class ScreenNavigator extends Sprite {
     private var locale:CastlesLocale;
@@ -86,9 +87,9 @@ public class ScreenNavigator extends Sprite {
     public function set layout(value:Layout):void {
         _layout = value;
 
-        _navigationPoints.scaleX = _navigationPoints.scaleY = value.scale;
-        _navigationPoints.x = (value.screenWidth - _navigationPoints.width) / 2;
-        _navigationPoints.y = value.navigationPointsY;
+        _navigationPoints.scaleX = _navigationPoints.scaleY = layout.scale * navigationPointsScale;
+        _navigationPoints.x = layout.screenCenterX - _navigationPoints.pointsWidth / 2;
+        _navigationPoints.y = layout.navigationPointsY;
 
         alignBalance();
 
@@ -97,6 +98,10 @@ public class ScreenNavigator extends Sprite {
         }
 
         updateScreensPos();
+    }
+
+    protected function get navigationPointsScale():Number {
+        throw OverrideMe;
     }
 
     private function alignBalance():void {

@@ -37,7 +37,7 @@ public class BuildingView extends Sprite {
         buildingHolder.addChild(new Shadow());
         buildingHolder.addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
 
-        addChild(textFieldHolder = new Animated());
+        buildingHolder.addChild(textFieldHolder = new Animated());
         textFieldHolder.y = textFieldCenterY;
         textFieldHolder.addChild(textField = createTextField(Fonts.buildingNumber));
 

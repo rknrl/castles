@@ -9,16 +9,19 @@ import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
+import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorFactory;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
     private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
+    private var screenNavigatorFactory:ScreenNavigatorFactory;
 
-    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, screenNavigatorFactory:ScreenNavigatorFactory) {
         _layout = layout;
         this.locale = locale;
         this.loadImageManager = loadImageManager;
+        this.screenNavigatorFactory = screenNavigatorFactory;
     }
 
     private var _layout:Layout;
@@ -34,7 +37,7 @@ public class View extends Sprite {
 
     public function addMenu(model:MenuModel):MenuView {
         if (menu) throw new Error("menu already exists");
-        addChild(menu = new MenuView(_layout, locale, loadImageManager, model));
+        addChild(menu = new MenuView(_layout, locale, loadImageManager, model, screenNavigatorFactory));
         return menu;
     }
 

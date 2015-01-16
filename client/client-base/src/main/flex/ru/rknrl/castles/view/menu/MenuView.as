@@ -2,9 +2,6 @@ package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.castlesTest;
-import ru.rknrl.castles.model.events.BuildEvent;
-import ru.rknrl.castles.model.events.RemoveBuildingEvent;
-import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.bank.Products;
 import ru.rknrl.castles.model.menu.main.StartLocation;
@@ -19,7 +16,7 @@ import ru.rknrl.castles.view.menu.main.popups.BuildPopup;
 import ru.rknrl.castles.view.menu.main.popups.UpgradePopup;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.menu.navigate.navigator.ScreenNavigator;
-import ru.rknrl.castles.view.menu.navigate.navigator.ScreenNavigatorMobile;
+import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorFactory;
 import ru.rknrl.castles.view.menu.shop.ShopScreen;
 import ru.rknrl.castles.view.menu.skills.SkillsScreen;
 import ru.rknrl.castles.view.menu.top.TopScreen;
@@ -45,7 +42,8 @@ public class MenuView extends Sprite {
     public function MenuView(layout:Layout,
                              locale:CastlesLocale,
                              loadImageManager:ILoadImageManager,
-                             model:MenuModel) {
+                             model:MenuModel,
+                             screenNavigatorFactory:ScreenNavigatorFactory) {
 
         _layout = layout;
         this.locale = locale;
@@ -62,7 +60,7 @@ public class MenuView extends Sprite {
             skillScreen,
             bankScreen
         ];
-        addChild(screenNavigator = new ScreenNavigatorMobile(screens, model.gold, layout, locale));
+        addChild(screenNavigator = screenNavigatorFactory.create(screens, model.gold, layout, locale));
         addChild(popupManager = new PopupManager(layout));
 
         addEventListener(PopupEvent.CLOSE, popupManager.close);
@@ -125,7 +123,7 @@ public class MenuView extends Sprite {
         popupManager.open(new BuildPopup(slotId, price, _layout, locale));
     }
 
-    public function openUpgradePopup(slotId:SlotId, buildingType: BuildingType, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int):void {
+    public function openUpgradePopup(slotId:SlotId, buildingType:BuildingType, canUpgrade:Boolean, canRemove:Boolean, upgradePrice:int):void {
         popupManager.open(new UpgradePopup(slotId, buildingType, canUpgrade, canRemove, upgradePrice, _layout, locale));
     }
 

@@ -5,6 +5,7 @@ import flash.utils.ByteArray;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
+import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorCanvasFactory;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
@@ -30,7 +31,7 @@ public class MainWebBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        super(host, gamePort, policyPort, accountId, authenticationSecret, DeviceType.CANVAS, localesUrl, defaultLocale, log, social, layout);
+        super(host, gamePort, policyPort, accountId, authenticationSecret, DeviceType.CANVAS, localesUrl, defaultLocale, log, social, layout, new ScreenNavigatorCanvasFactory());
 
         stage.addEventListener(Event.RESIZE, onResize);
     }
