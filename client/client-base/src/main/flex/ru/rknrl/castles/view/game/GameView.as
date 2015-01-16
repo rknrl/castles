@@ -48,17 +48,20 @@ public class GameView extends Sprite {
     private function onAddedToStage(event:Event):void {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
+        addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
-        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
     }
 
     public function removeListeners():void {
         stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
-        stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseEvent);
         stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
         stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+    }
+
+    private function onEnterFrame(event:Event):void {
+        dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(area.mouseX, area.mouseY)))
     }
 
     private function onMouseEvent(event:MouseEvent):void {
@@ -69,8 +72,6 @@ public class GameView extends Sprite {
         switch (eventType) {
             case MouseEvent.MOUSE_DOWN:
                 return GameMouseEvent.MOUSE_DOWN;
-            case MouseEvent.MOUSE_MOVE:
-                return GameMouseEvent.MOUSE_MOVE;
             case MouseEvent.MOUSE_UP:
                 return GameMouseEvent.MOUSE_UP;
         }

@@ -90,14 +90,23 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameViewEvents.LEAVE_BUTTON_CLICK, onLeaveButtonClick);
         view.addEventListener(MagicItemClickEvent.MAGIC_ITEM_CLICK, onMagicItemClick);
 
-        view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+        view.addEventListener(GameMouseEvent.ENTER_FRAME, onEnterFrame);
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
-        view.addEventListener(GameMouseEvent.MOUSE_MOVE, onMouseMove);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
     }
 
-    private function onEnterFrame(event:Event):void {
+    private function onEnterFrame(event:GameMouseEvent):void {
         update(getTimer());
+
+        if (magicItems.selected) {
+            tornadoPath.mouseMove(event.mousePos);
+        } else {
+            if (arrows.drawing) {
+                const building:Building = buildings.selfInXy(selfId, event.mousePos);
+                if (building) arrows.addArrow(building);
+                arrows.mouseMove(event.mousePos);
+            }
+        }
     }
 
     private function update(time:int):void {
@@ -205,18 +214,6 @@ public class GameController implements IGameFacade {
         } else {
             const building:Building = buildings.selfInXy(selfId, event.mousePos);
             if (building) arrows.startDraw(building);
-        }
-    }
-
-    private function onMouseMove(event:GameMouseEvent):void {
-        if (magicItems.selected) {
-            tornadoPath.mouseMove(event.mousePos);
-        } else {
-            if (arrows.drawing) {
-                const building:Building = buildings.selfInXy(selfId, event.mousePos);
-                if (building) arrows.addArrow(building);
-                arrows.mouseMove(event.mousePos);
-            }
         }
     }
 

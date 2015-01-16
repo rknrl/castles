@@ -5,7 +5,7 @@ import ru.rknrl.castles.model.points.Point;
 
 public class GameMouseEvent extends Event {
     public static const MOUSE_DOWN:String = "gameMouseDown";
-    public static const MOUSE_MOVE:String = "gameMouseMove";
+    public static const ENTER_FRAME:String = "gameEnterFrame";
     public static const MOUSE_UP:String = "gameMouseUp";
 
     private var _mousePos:Point;
