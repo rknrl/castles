@@ -2,6 +2,13 @@
   "host": "127.0.0.1",
   "gamePort": 2335,
   "policyPort": 2336,
+  "db": {
+    "username": "username",
+    "host": "localhost",
+    "port": 123,
+    "password": "enter mysql password",
+    "database": "castles"
+  },
   "products": [
     {
       "id": 1,
@@ -32,7 +39,7 @@
     "itemPrice": 1
   },
   "game": {
-    "buildings": {
+    "buildingsConfig": {
       "tower": {
         "regeneration": 0.0001,
         "startPopulation": 10,
@@ -62,9 +69,9 @@
       }
     },
     "levelToFactor": {
-      "level1": 1.0,
-      "level2": 1.5,
-      "level3": 2.0
+      "buildingLevel1": 1.0,
+      "buildingLevel2": 1.5,
+      "buildingLevel3": 2.0
     },
     "constants": {
       "unitToExitFactor": 0.5,
@@ -101,32 +108,38 @@
     "vk": {
       "appId": "enter vk id",
       "appSecret": "enter vk secret",
-      "productsInfo": {
-        "1": {
+      "productsInfo": [
+        {
+          "id": 1,
           "count": 100,
-          "price": 1
+          "price": 1,
+          "currency": "голос"
         }
-      }
+      ]
     },
     "ok": {
       "appId": "enter ok id",
       "appSecret": "enter ok secret",
-      "productsInfo": {
-        "1": {
+      "productsInfo": [
+        {
+          "id": 1,
           "count": 100,
-          "price": 1
+          "price": 1,
+          "currency": "ок"
         }
-      }
+      ]
     },
     "mm": {
       "appId": "enter mm id",
       "appSecret": "enter mm secret",
-      "productsInfo": {
-        "1": {
+      "productsInfo": [
+        {
+          "id": 1,
           "count": 100,
-          "price": 1
+          "price": 1,
+          "currency": "мэйлик"
         }
-      }
+      ]
     }
   }
 }

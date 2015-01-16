@@ -1,24 +1,28 @@
 package ru.rknrl.castles
 
 import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
-import ru.rknrl.core.social.Product
-import ru.rknrl.core.social.SocialConfigs
+import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto.AuthDTO.ProductDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, BuildingLevel, BuildingType}
 
 object Config {
+
   class BuildingsConfig(map: Map[BuildingType, BuildingConfig]) {
     def apply(buildingType: BuildingType) = map(buildingType)
   }
+
   class BuildingLevelToFactor(map: Map[BuildingLevel, Double]) {
     def apply(level: BuildingLevel) = map(level)
   }
+
 }
 
 class Config(val host: String,
              val gamePort: Int,
              val policyPort: Int,
+             val db: DbConfiguration,
              val products: List[Product],
              val social: SocialConfigs,
              val account: AccountConfig,

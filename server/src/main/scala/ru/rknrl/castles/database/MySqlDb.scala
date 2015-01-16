@@ -12,16 +12,16 @@ import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, Put}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class MySqlDb extends Actor {
-  val configuration = new Configuration(
-    username = "username",
-    host = "localhost",
-    port = 123,
-    password = Some("password"),
-    database = Some("accounts")
-  )
+class DbConfiguration(username: String,
+                      host: String,
+                      port: Int,
+                      password: String,
+                      database: String) {
+  def configuration = new Configuration(username, host, port, Some(password), Some(database))
+}
 
-  val connection = new MySQLConnection(configuration)
+class MySqlDb(configuration: DbConfiguration) extends Actor {
+  val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)
 

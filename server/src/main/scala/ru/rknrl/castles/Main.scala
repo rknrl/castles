@@ -14,15 +14,16 @@ import scala.io.Source
 object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new BuildingLevelToFactorSerializer + new BuildingsConfigSerializer + new SkillUpgradePricesSerializer
 
-  def main(args: Array[String]): Unit = {
-    val configPath = args(0)
-
+  def main(configPaths: Array[String]): Unit = {
     println(s"ver 0.05")
-    println(s"configPath='$configPath'")
+    configPaths.map(path ⇒ println(s"configPath='$path'"))
 
-    val configString = Source.fromFile(configPath, "UTF-8").mkString
-
-    val config = JsonParser.parse(configString).extract[Config]
+    val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
+    val parsedConfigs = configStrings.map(JsonParser.parse)
+    val iterator = parsedConfigs.iterator
+    var mergedConfig = iterator.next()
+    while (iterator.hasNext) mergedConfig = mergedConfig merge iterator.next()
+    val config = mergedConfig.extract[Config]
 
     implicit val system = ActorSystem("main-actor-system")
 
