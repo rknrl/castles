@@ -36,6 +36,8 @@ import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
 
 public class GameController implements IGameFacade {
+    private var width: Number;
+    private var height: Number;
     private var view:GameView;
     private var sender:GameFacadeSender;
     private var selfId:PlayerIdDTO;
@@ -54,6 +56,9 @@ public class GameController implements IGameFacade {
                                    gameState:GameStateDTO) {
         this.view = view;
         this.sender = sender;
+
+        width = gameState.width;
+        height = gameState.height;
 
         selfId = gameState.selfId;
 
@@ -210,7 +215,9 @@ public class GameController implements IGameFacade {
 
     private function onMouseDown(event:GameMouseEvent):void {
         if (magicItems.selected) {
-            itemMouseDown(event.mousePos);
+            if (event.mousePos.x > 0 && event.mousePos.y > 0 && event.mousePos.x < width && event.mousePos.y < height) {
+                itemMouseDown(event.mousePos);
+            }
         } else {
             const building:Building = buildings.selfInXy(selfId, event.mousePos);
             if (building) arrows.startDraw(building);
