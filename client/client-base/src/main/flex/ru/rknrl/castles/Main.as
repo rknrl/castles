@@ -6,6 +6,7 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
+import flash.events.UncaughtErrorEvent;
 import flash.net.Socket;
 import flash.system.Security;
 
@@ -36,6 +37,7 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
+    private static const errorsUrl:String = "http://127.0.0.1/bugs";
     private static const avatarsLimit:int = 10;
 
     private var host:String;
@@ -81,6 +83,8 @@ public class Main extends Sprite implements IAuthFacade {
         _layout = layout;
         this.deviceFactory = deviceFactory;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
     }
 
     private var _layout:Layout;
@@ -201,11 +205,8 @@ public class Main extends Sprite implements IAuthFacade {
         }
     }
 
-    private function onConnectionError(event:Event):void {
-        log.add("onConnectionError");
-
+    private function destroy():void {
         destroyConnection();
-
         view.removeLoadingScreenIfExists();
         view.addNoConnectionScreen();
     }
@@ -214,6 +215,19 @@ public class Main extends Sprite implements IAuthFacade {
         view.removeNoConnectionScreen();
         view.addLoadingScreen();
         tryConnect();
+    }
+
+    private function onConnectionError(event:Event):void {
+        log.add("onConnectionError");
+        destroy();
+    }
+
+    private function onUncaughtError(event:UncaughtErrorEvent):void {
+        const error:Error = event.error as Error;
+        const stackTrace:String = error ? error.getStackTrace() : "";
+        log.error(event.error.toString(), stackTrace);
+        log.send(errorsUrl);
+        destroy();
     }
 }
 }
