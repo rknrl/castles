@@ -14,7 +14,7 @@ public class LockView extends Sprite {
 
     private function onEnterFrame(event:Event):void {
         const speed:Number = 5;
-        bar.rotation = (getTimer() % (360 * speed)) / speed;
+        bar.rotation = (getTimer() / speed) % 360;
     }
 }
 }

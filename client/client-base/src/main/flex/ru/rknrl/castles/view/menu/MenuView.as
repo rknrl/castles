@@ -1,5 +1,8 @@
 package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
+import flash.ui.Keyboard;
 
 import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.model.menu.MenuModel;
@@ -11,12 +14,12 @@ import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.bank.BankScreen;
+import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.menu.main.MainScreen;
 import ru.rknrl.castles.view.menu.main.popups.BuildPopup;
 import ru.rknrl.castles.view.menu.main.popups.UpgradePopup;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.castles.view.menu.navigate.navigator.ScreenNavigator;
-import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorFactory;
 import ru.rknrl.castles.view.menu.shop.ShopScreen;
 import ru.rknrl.castles.view.menu.skills.SkillsScreen;
 import ru.rknrl.castles.view.menu.top.TopScreen;
@@ -38,12 +41,13 @@ public class MenuView extends Sprite {
     private var bankScreen:BankScreen;
     private var screenNavigator:ScreenNavigator;
     private var popupManager:PopupManager;
+    private var tutor:MenuTutorView;
 
     public function MenuView(layout:Layout,
                              locale:CastlesLocale,
                              loadImageManager:ILoadImageManager,
                              model:MenuModel,
-                             screenNavigatorFactory:ScreenNavigatorFactory) {
+                             deviceFactory:DeviceFactory) {
 
         _layout = layout;
         this.locale = locale;
@@ -60,10 +64,15 @@ public class MenuView extends Sprite {
             skillScreen,
             bankScreen
         ];
-        addChild(screenNavigator = screenNavigatorFactory.create(screens, model.gold, layout, locale));
+        addChild(screenNavigator = deviceFactory.screenNavigator(screens, model.gold, layout, locale));
         addChild(popupManager = new PopupManager(layout));
+        addChild(tutor = new MenuTutorView(layout, deviceFactory));
 
         addEventListener(PopupEvent.CLOSE, popupManager.close);
+
+        addEventListener(Event.ADDED_TO_STAGE, function (event:Event):void {
+            stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+        });
     }
 
     private var _layout:Layout;
@@ -72,6 +81,7 @@ public class MenuView extends Sprite {
         _layout = value;
         screenNavigator.layout = value;
         popupManager.layout = value;
+        tutor.layout = value;
     }
 
     public function set lock(value:Boolean):void {
@@ -127,12 +137,12 @@ public class MenuView extends Sprite {
         popupManager.open(new UpgradePopup(slotId, buildingType, canUpgrade, canRemove, upgradePrice, _layout, locale));
     }
 
-    castlesTest function setScreen(index:int):void {
-        screenNavigator.currentScreenIndex = index;
-    }
-
     public function closePopup():void {
         popupManager.close();
+    }
+
+    castlesTest function setScreen(index:int):void {
+        screenNavigator.currentScreenIndex = index;
     }
 
     castlesTest function closePopupImmediate():void {
@@ -145,6 +155,48 @@ public class MenuView extends Sprite {
         use namespace castlesTest;
 
         popupManager.openImmediate();
+    }
+
+    // tutor
+
+    public function playSwipeTutor():void {
+        tutor.playSwipe();
+    }
+
+    public function playSlotTutor():void {
+        tutor.playSlot(SlotId.SLOT_1);
+    }
+
+    public function playEmptySlotTutor():void {
+        tutor.playSlot(SlotId.SLOT_2);
+    }
+
+    public function playMagicItemTutor():void {
+        tutor.playMagicItem();
+    }
+
+    public function playFlaskTutor():void {
+        tutor.playFlask();
+    }
+
+    private function onKeyUp(event:KeyboardEvent):void {
+        switch (event.keyCode) {
+            case Keyboard.N:
+                playSwipeTutor();
+                break;
+            case Keyboard.S:
+                playSlotTutor();
+                break;
+            case Keyboard.E:
+                playEmptySlotTutor();
+                break;
+            case Keyboard.I:
+                playMagicItemTutor();
+                break;
+            case Keyboard.F:
+                playFlaskTutor();
+                break;
+        }
     }
 }
 }

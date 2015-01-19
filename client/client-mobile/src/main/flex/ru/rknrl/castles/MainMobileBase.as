@@ -3,8 +3,10 @@ import flash.display.StageAspectRatio;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
+import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
-import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorMobileFactory;
+import ru.rknrl.castles.view.menu.factory.MobileFactory;
 import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
@@ -48,7 +50,7 @@ public class MainMobileBase extends Main {
         log.add("authenticationSecret=" + authenticationSecret.body);
         log.add("authenticationParams=" + authenticationSecret.params);
 
-        const layout:LayoutPortrait = new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
+        const layout:Layout = tablet ? new LayoutLandscape(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor) : new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
@@ -59,7 +61,7 @@ public class MainMobileBase extends Main {
          trace("deviceLocale:" + deviceLocale);
          */
 
-        super(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout, new ScreenNavigatorMobileFactory());
+        super(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout, new MobileFactory());
     }
 }
 }

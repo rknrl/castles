@@ -16,9 +16,6 @@ import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.dto.SkillType;
 
 public class SkillsScreen extends Screen {
-    private static const flaskWidth:Number = 38;
-    private static const flaskGap:Number = 16;
-
     private var locale:CastlesLocale;
 
     private var flasksHolder:Sprite;
@@ -79,7 +76,7 @@ public class SkillsScreen extends Screen {
         _layout = value;
 
         flasksHolder.scaleX = flasksHolder.scaleY = value.scale;
-        const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(flasks), flaskWidth, flaskGap) * value.scale;
+        const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(flasks), Layout.flaskWidth, Layout.flaskGap) * value.scale;
         flasksHolder.x = value.screenCenterX - totalWidth / 2;
         flasksHolder.y = value.contentCenterY;
 

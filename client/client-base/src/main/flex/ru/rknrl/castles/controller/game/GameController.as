@@ -1,8 +1,10 @@
 package ru.rknrl.castles.controller.game {
 import flash.events.Event;
+import flash.ui.Keyboard;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.controller.mock.DtoMock;
+import ru.rknrl.castles.model.GameKeyEvent;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -36,8 +38,8 @@ import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
 
 public class GameController implements IGameFacade {
-    private var width: Number;
-    private var height: Number;
+    private var width:Number;
+    private var height:Number;
     private var view:GameView;
     private var sender:GameFacadeSender;
     private var selfId:PlayerIdDTO;
@@ -79,7 +81,7 @@ public class GameController implements IGameFacade {
         for each(var b:BuildingDTO in gameState.buildings) {
             const owner:BuildingOwner = new BuildingOwner(b.hasOwner, b.owner);
             const pos:Point = new Point(b.x, b.y);
-            buildingList.push(new Building(b.id, pos, owner));
+            buildingList.push(new Building(b.id, pos, owner, b.strengthened));
             view.area.addBuilding(b.id, b.building.type, b.building.level, owner, b.population, b.strengthened, pos);
         }
         buildings = new Buildings(buildingList);
@@ -98,6 +100,8 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameMouseEvent.ENTER_FRAME, onEnterFrame);
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
+
+        view.addEventListener(GameKeyEvent.KEY, onKeyUp);
     }
 
     private function onEnterFrame(event:GameMouseEvent):void {
@@ -162,7 +166,7 @@ public class GameController implements IGameFacade {
 
     public function onUpdateBuilding(dto:BuildingUpdateDTO):void {
         const owner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
-        buildings.byId(dto.id).owner = owner;
+        buildings.byId(dto.id).update(owner, dto.strengthened);
 
         view.area.setBuildingCount(dto.id, dto.population);
         view.area.setBuildingOwner(dto.id, owner);
@@ -286,6 +290,80 @@ public class GameController implements IGameFacade {
                     sender.castAssistance(building.id);
                     magicItems.useItem();
                 }
+                break;
+        }
+    }
+
+    // tutor
+
+    private function playFireballTutor():void {
+        const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playFireball(buildingPos);
+    }
+
+    private function playVolcanoTutor():void {
+        const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playVolcano(buildingPos);
+    }
+
+    private function playTornadoTutor():void {
+        const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
+
+        const points:Vector.<Point> = new <Point>[];
+        const deltaX:int = 200;
+        const deltaY:int = 50;
+        for (var x:int = 0; x < deltaX; x++) {
+            points.push(new Point(buildingPos.x - x, buildingPos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
+        }
+        view.tutor.playTornado(points);
+    }
+
+    private function playAssistanceTutor():void {
+        const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
+        view.tutor.playAssistance(buildingPos);
+    }
+
+    private function playStrengthenedTutor():void {
+        const buildingPos:Point = buildings.getUnstrengthenedSelfBuildingPos(selfId);
+        if (buildingPos) {
+            view.tutor.playStrengthening(buildingPos);
+        }
+    }
+
+    private function playArrowTutor():void {
+        const startPos:Point = buildings.getSelfBuildingPos(selfId);
+        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playArrow(startPos, endPos);
+    }
+
+    private function playArrowsTutor():void {
+        const startPos:Vector.<Point> = buildings.getSelfBuildingsPos(selfId);
+        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playArrows(startPos[0], startPos[1], endPos);
+    }
+
+    private function onKeyUp(event:GameKeyEvent):void {
+        switch (event.keyCode) {
+            case Keyboard.NUMBER_1:
+                playFireballTutor();
+                break;
+            case Keyboard.NUMBER_2:
+                playStrengthenedTutor();
+                break;
+            case Keyboard.NUMBER_3:
+                playVolcanoTutor();
+                break;
+            case Keyboard.NUMBER_4:
+                playTornadoTutor();
+                break;
+            case Keyboard.NUMBER_5:
+                playAssistanceTutor();
+                break;
+            case Keyboard.A:
+                playArrowTutor();
+                break;
+            case Keyboard.B:
+                playArrowsTutor();
                 break;
         }
     }

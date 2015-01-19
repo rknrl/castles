@@ -21,7 +21,7 @@ import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorFactory;
+import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Sex;
 import ru.rknrl.core.social.Social;
@@ -63,11 +63,11 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var view:View;
     private var loadImageManager:ILoadImageManager;
-    private var screenNavigatorFactory:ScreenNavigatorFactory;
+    private var deviceFactory:DeviceFactory;
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout, screenNavigatorFactory:ScreenNavigatorFactory) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -79,7 +79,7 @@ public class Main extends Sprite implements IAuthFacade {
         this.log = log;
         this.social = social;
         _layout = layout;
-        this.screenNavigatorFactory = screenNavigatorFactory;
+        this.deviceFactory = deviceFactory;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -122,7 +122,7 @@ public class Main extends Sprite implements IAuthFacade {
         locale = new CastlesLocale(data);
 
         loadImageManager = new LoadImageManagerMock(0, false);
-        addChild(view = new View(_layout, locale, loadImageManager, screenNavigatorFactory));
+        addChild(view = new View(_layout, locale, loadImageManager, deviceFactory));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
 

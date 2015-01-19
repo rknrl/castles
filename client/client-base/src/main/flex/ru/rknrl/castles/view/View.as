@@ -9,19 +9,19 @@ import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.castles.view.menu.navigate.navigator.factory.ScreenNavigatorFactory;
+import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
     private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
-    private var screenNavigatorFactory:ScreenNavigatorFactory;
+    private var deviceFactory:DeviceFactory;
 
-    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, screenNavigatorFactory:ScreenNavigatorFactory) {
+    public function View(layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, deviceFactory:DeviceFactory) {
         _layout = layout;
         this.locale = locale;
         this.loadImageManager = loadImageManager;
-        this.screenNavigatorFactory = screenNavigatorFactory;
+        this.deviceFactory = deviceFactory;
     }
 
     private var _layout:Layout;
@@ -37,7 +37,7 @@ public class View extends Sprite {
 
     public function addMenu(model:MenuModel):MenuView {
         if (menu) throw new Error("menu already exists");
-        addChild(menu = new MenuView(_layout, locale, loadImageManager, model, screenNavigatorFactory));
+        addChild(menu = new MenuView(_layout, locale, loadImageManager, model, deviceFactory));
         return menu;
     }
 
@@ -60,7 +60,7 @@ public class View extends Sprite {
 
     public function addGame(playerInfos:Vector.<PlayerInfo>, h:int, v:int):GameView {
         if (game) throw new Error("game already exists");
-        addChild(game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager));
+        addChild(game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager, deviceFactory));
         return game;
     }
 

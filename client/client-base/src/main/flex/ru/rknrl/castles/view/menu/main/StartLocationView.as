@@ -4,15 +4,13 @@ import flash.events.MouseEvent;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.SlotClickEvent;
-import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.menu.main.StartLocation;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
 public class StartLocationView extends Sprite {
-    private static const gapX:Number = 20;
-    private static const gapY:Number = 40;
 
     private const idToSlot:Dictionary = new Dictionary();
 
@@ -22,10 +20,9 @@ public class StartLocationView extends Sprite {
             const slotDto:SlotDTO = startLocation.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
             slot.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
-
-            const pos:Point = getSlotPos(slotId);
-            slot.x = pos.x * gapX;
-            slot.y = pos.y * gapY;
+            const pos:Point = Layout.slotPos(slotId);
+            slot.x = pos.x;
+            slot.y = pos.y;
             idToSlot[slotId] = slot;
             addChild(slot);
         }

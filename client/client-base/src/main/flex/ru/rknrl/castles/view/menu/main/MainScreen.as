@@ -17,7 +17,6 @@ import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.utils.centerize;
 
 public class MainScreen extends Screen {
-    private static const startLocationScale:Number = 1.5;
     private static const mouseHolderW:Number = 200;
     private static const mouseHolderH:Number = 64;
 
@@ -38,7 +37,7 @@ public class MainScreen extends Screen {
         mouseHolder.y = -mouseHolderH / 2;
         playHolder.addChild(mouseHolder);
 
-        const playTextField: TextField = createTextField(Fonts.play);
+        const playTextField:TextField = createTextField(Fonts.play);
         playTextField.text = locale.play;
         centerize(playTextField);
         playHolder.addChild(playTextField);
@@ -51,9 +50,9 @@ public class MainScreen extends Screen {
     }
 
     override public function set layout(value:Layout):void {
-        startLocationView.scaleX = startLocationView.scaleY = value.scale * startLocationScale;
-        startLocationView.x = value.screenCenterX;
-        startLocationView.y = value.startLocationY;
+        startLocationView.scaleX = startLocationView.scaleY = value.scale * Layout.startLocationScale;
+        startLocationView.x = value.startLocation.x;
+        startLocationView.y = value.startLocation.y;
 
         playHolder.scaleX = playHolder.scaleY = value.scale;
         playHolder.x = value.screenCenterX;

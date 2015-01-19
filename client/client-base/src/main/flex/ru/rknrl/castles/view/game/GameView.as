@@ -5,6 +5,7 @@ import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.ui.Keyboard;
 
+import ru.rknrl.castles.model.GameKeyEvent;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
@@ -15,6 +16,7 @@ import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
+import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {
@@ -26,13 +28,15 @@ public class GameView extends Sprite {
 
     private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
     public var magicItems:MagicItemsView;
+    public var tutor:GameTutorialView;
 
-    public function GameView(playerInfos:Vector.<PlayerInfo>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function GameView(playerInfos:Vector.<PlayerInfo>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, deviceFactory:DeviceFactory) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
         addChild(area = new GameArea(h, v));
         addChild(ui = new Sprite());
         ui.addChild(magicItems = new MagicItemsView(layout));
+        addChild(tutor = new GameTutorialView(layout, deviceFactory));
 
         for (var i:int = 0; i < playerInfos.length; i++) {
             const playerInfo:PlayerInfo = playerInfos[i];
@@ -51,13 +55,13 @@ public class GameView extends Sprite {
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
         stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
         stage.addEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
     }
 
     public function removeListeners():void {
         stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseEvent);
         stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseEvent);
-        stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+        stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
     }
 
     private function onEnterFrame(event:Event):void {
@@ -99,13 +103,20 @@ public class GameView extends Sprite {
         }
 
         if (gameOverScreen) gameOverScreen.layout = value;
+        if (tutor) {
+            tutor.layout = value;
+            tutor.areaPos = areaPos;
+        }
     }
 
-    private function onKeyDown(event:KeyboardEvent):void {
-        if (event.keyCode == Keyboard.ESCAPE) {
-            stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-            dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
+    private function onKeyUp(event:KeyboardEvent):void {
+        switch (event.keyCode) {
+            case Keyboard.ESCAPE:
+                stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+                dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
+                break;
         }
+        dispatchEvent(new GameKeyEvent(event.keyCode));
     }
 
     private var gameOverScreen:GameOverScreen;

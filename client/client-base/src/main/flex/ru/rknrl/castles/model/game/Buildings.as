@@ -31,5 +31,42 @@ public class Buildings {
         const building:Building = inXy(pos);
         return building && building.owner.equalsId(selfId) ? building : null;
     }
+
+    public function getSelfBuildingPos(selfId:PlayerIdDTO):Point {
+        const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
+        if (selfBuildings.length < 1) throw new Error("getSelfBuildingPos: buildings.length=" + selfBuildings.length);
+        return selfBuildings[0].pos;
+    }
+
+    public function getSelfBuildingsPos(selfId:PlayerIdDTO):Vector.<Point> {
+        const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
+        if (selfBuildings.length < 3) throw new Error("getSelfBuildingsPos: buildings.length=" + selfBuildings.length);
+        return new <Point>[
+            selfBuildings[1].pos,
+            selfBuildings[2].pos
+        ];
+    }
+
+    private function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
+        const selfBuildings:Vector.<Building> = new <Building>[];
+        for each(var building:Building in buildings) {
+            if (building.owner.equalsId(selfId)) selfBuildings.push(building);
+        }
+        return selfBuildings;
+    }
+
+    public function getUnstrengthenedSelfBuildingPos(selfId:PlayerIdDTO):Point {
+        for each(var building:Building in buildings) {
+            if (building.owner.equalsId(selfId) && !building.strengthened) return building.pos;
+        }
+        return null;
+    }
+
+    public function getEnemyBuildingPos(selfId:PlayerIdDTO):Point {
+        for each(var building:Building in buildings) {
+            if (building.owner && !building.owner.equalsId(selfId)) return building.pos;
+        }
+        throw new Error("no enemy buildings");
+    }
 }
 }

@@ -17,18 +17,26 @@ public class Building {
 
     private var _owner:BuildingOwner;
 
-    public function set owner(value:BuildingOwner):void {
-        _owner = value;
-    }
-
     public function get owner():BuildingOwner {
         return _owner;
     }
 
-    public function Building(id:BuildingIdDTO, pos:Point, owner:BuildingOwner) {
+    private var _strengthened:Boolean;
+
+    public function get strengthened():Boolean {
+        return _strengthened;
+    }
+
+    public function update(owner:BuildingOwner, strengthened:Boolean):void {
+        _owner = owner;
+        _strengthened = strengthened;
+    }
+
+    public function Building(id:BuildingIdDTO, pos:Point, owner:BuildingOwner, strengthened:Boolean) {
         _id = id;
         _pos = pos;
         _owner = owner;
+        _strengthened = strengthened;
     }
 }
 }

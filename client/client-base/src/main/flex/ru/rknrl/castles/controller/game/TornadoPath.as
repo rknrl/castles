@@ -2,6 +2,7 @@ package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.points.Points;
 import ru.rknrl.castles.view.game.area.TornadoPathView;
 
 public class TornadoPath {
@@ -38,7 +39,10 @@ public class TornadoPath {
                     points.shift();
                 }
                 lastTime = time;
-                view.drawPath(points);
+                if (points.length >= 2) {
+                    const p:Points = new Points(points);
+                    view.drawPath(p, p.totalDistance);
+                }
             }
         }
     }

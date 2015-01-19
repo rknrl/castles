@@ -2,10 +2,12 @@ package ru.rknrl.castles.view.layout {
 
 import flash.text.TextField;
 
+import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.SlotId;
 import ru.rknrl.utils.OverrideMe;
 
 public class Layout {
@@ -20,6 +22,44 @@ public class Layout {
         const widthScale:Number = stageWidth / originalWidth;
         const heightScale:Number = stageHeight / originalHeight;
         return Math.min(widthScale, heightScale);
+    }
+
+    public static const startLocationScale:Number = 1.5;
+    private static const slotGapX:Number = 20;
+    private static const slotGapY:Number = 40;
+
+    public static function slotPos(slotId:SlotId):Point {
+        const pos:Point = getSlotPos(slotId);
+        return new Point(pos.x * slotGapX, pos.y * slotGapY);
+    }
+
+    public function get startLocation():Point {
+        return new Point(screenCenterX, startLocationY);
+    }
+
+    public function slotPosGlobal(slotId:SlotId):Point {
+        const slot:Point = slotPos(slotId);
+        return new Point(startLocation.x + slot.x * scale * startLocationScale, startLocation.y + slot.y * scale * startLocationScale);
+    }
+
+    public function get firstMagicItem():Point {
+        return new Point(screenCenterX - (itemSize + itemGap) * 2 * scale, contentCenterY);
+    }
+
+    public static const flaskWidth:Number = 38;
+    public static const flaskGap:Number = 16;
+
+    public function get firstFlask():Point {
+        return new Point(screenCenterX - (flaskWidth + flaskGap) * scale, contentCenterY);
+    }
+
+    public function get middleNavigationPoint():Point {
+        return new Point(screenCenterX, navigationPointsY);
+    }
+
+    public function gameMagicItem(index:int):Point {
+        const i:int = index - 2;
+        return new Point(screenCenterX + (itemSize + itemGap) * i * scale, gameMagicItemsY);
     }
 
     public function Layout(stageWidth:int, stageHeight:int, scale:Number, contentsScaleFactor:Number) {

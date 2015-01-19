@@ -64,7 +64,7 @@ public class FlaskView extends Sprite {
 
         addChild(flaskHolder = new Animated());
 
-        const flask:Flask = new Flask();
+        const flask:FlaskMC = new FlaskMC();
         flask.transform.colorTransform = Colors.transform(Colors.skill(skillType));
         flaskHolder.addChild(flask);
 

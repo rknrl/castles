@@ -5,9 +5,8 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.points.Points;
 
 public class DashLine {
-    public static function drawPath(g:Graphics, points:Points, dashLength:int = 10, gap:int = 10):void {
-        const distance:Number = points.totalDistance;
-
+    public static function drawPath(g:Graphics, points:Points, distance:Number, dashLength:int = 10, gap:int = 10):void {
+        if (distance < 0) throw new Error("negative distance");
         var d:Number = 0;
         while (d < distance) {
             const p1:Point = points.getPos(d);
