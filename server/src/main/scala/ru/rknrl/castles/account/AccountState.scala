@@ -65,18 +65,24 @@ class AccountState(val startLocation: StartLocation,
 }
 
 object AccountState {
-  private def emptyStartLocationSlots = for (id ← SlotId.values()) yield
-    id → new StartLocationSlot(id, None)
+  private def initSlotBuildings =
+    Map(
+      SlotId.SLOT_1 → None,
+      SlotId.SLOT_2 → None,
+      SlotId.SLOT_3 → Some(new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
+      SlotId.SLOT_4 → Some(new BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
+      SlotId.SLOT_5 → Some(new BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
+    )
 
-  private def initStartLocationSlots = {
-    val id = SlotId.SLOT_1
-    val building = new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)
-    emptyStartLocationSlots.toMap.updated(id, new StartLocationSlot(id, Some(building)))
-  }
+  private def initSlots =
+    for ((slotId, building) ← initSlotBuildings)
+    yield slotId → new StartLocationSlot(slotId, building)
 
-  private def initStartLocation = new StartLocation(initStartLocationSlots)
+  private def initStartLocation = new StartLocation(initSlots)
 
-  private def initSkillLevels = for (skillType ← SkillType.values()) yield skillType → SkillLevel.SKILL_LEVEL_0
+  private def initSkillLevels =
+    for (skillType ← SkillType.values())
+    yield skillType → SkillLevel.SKILL_LEVEL_0
 
   private def initSkills = new Skills(initSkillLevels.toMap)
 

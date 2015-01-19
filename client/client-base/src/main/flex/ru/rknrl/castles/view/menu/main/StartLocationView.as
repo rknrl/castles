@@ -15,8 +15,7 @@ public class StartLocationView extends Sprite {
     private const idToSlot:Dictionary = new Dictionary();
 
     public function StartLocationView(startLocation:StartLocation) {
-        for (var i:int = SlotId.values.length - 1; i >= 0; i--) {
-            const slotId:SlotId = SlotId.values[i];
+        for each(var slotId: SlotId in SlotId.values) {
             const slotDto:SlotDTO = startLocation.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
             slot.addEventListener(MouseEvent.MOUSE_DOWN, onClick);

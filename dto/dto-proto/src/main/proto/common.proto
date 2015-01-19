@@ -84,26 +84,28 @@ enum SlotId {
 }
 
 enum Slot1Pos {
-    SLOT_1_X = -2;
-    SLOT_1_Y = 0;
+    SLOT_1_X = -1;
+    SLOT_1_Y = -1;
 }
 
 enum Slot2Pos {
-    SLOT_2_X = -1;
+    SLOT_2_X = 1;
     SLOT_2_Y = -1;
 }
 
 enum Slot3Pos {
-    SLOT_3_X = 0;
+    SLOT_3_X = -2;
     SLOT_3_Y = 0;
 }
 
 enum Slot4Pos {
-    SLOT_4_X = 1;
-    SLOT_4_Y = -1;
+    SLOT_4_X = 0;
+    SLOT_4_Y = 0;
 }
 
 enum Slot5Pos {
     SLOT_5_X = 2;
     SLOT_5_Y = 0;
 }
+
+
