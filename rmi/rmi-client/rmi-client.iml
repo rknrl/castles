@@ -3,7 +3,7 @@
   <component name="FlexBuildConfigurationManager" active="rmi-client">
     <configurations>
       <configuration name="rmi-client" pure-as="true" output-type="Library" output-file="rmi-client.swc" output-folder="$MODULE_DIR$/target">
-        <dependencies target-player="15.0">
+        <dependencies target-player="10.1">
           <entries>
             <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
               <dependency linkage="Merged" />

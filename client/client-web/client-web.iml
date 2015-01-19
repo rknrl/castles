@@ -3,7 +3,7 @@
   <component name="FlexBuildConfigurationManager" active="client-web">
     <configurations>
       <configuration name="client-web" pure-as="true" main-class="ru.rknrl.castles.MainWeb" output-file="castles-web.swf" output-folder="$MODULE_DIR$/target">
-        <dependencies target-player="15.0">
+        <dependencies target-player="10.1">
           <entries>
             <entry module-name="social-client-web" build-configuration-name="social-client-web">
               <dependency linkage="Merged" />

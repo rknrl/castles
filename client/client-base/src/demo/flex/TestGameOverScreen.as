@@ -22,7 +22,7 @@ public class TestGameOverScreen extends Sprite {
                 PlayerInfo.fromDtoVector(losers),
                 true,
                 2,
-                new LayoutPortrait(stage.stageWidth, stage.stageHeight, stage.contentsScaleFactor),
+                new LayoutPortrait(stage.stageWidth, stage.stageHeight, 1),
                 new CastlesLocale(""),
                 new LoadImageManagerMock(1000)
         );
