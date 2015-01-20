@@ -3,13 +3,14 @@ package ru.rknrl.base.account
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.base.{MatchMaking, AccountId}
 import ru.rknrl.base.game.Game.{Join, Offline}
-import ru.rknrl.castles.MatchMaking._
+import MatchMaking._
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.AccountStateDb.Put
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
-import ru.rknrl.castles.{AccountId, Config}
+import ru.rknrl.castles.Config
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}

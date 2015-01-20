@@ -1,6 +1,6 @@
 package ru.rknrl.castles.database
 
-import ru.rknrl.castles.AccountId
+import ru.rknrl.base.AccountId
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 
 object AccountStateDb {

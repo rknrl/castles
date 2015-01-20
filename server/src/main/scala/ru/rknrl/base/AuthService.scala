@@ -1,8 +1,9 @@
-package ru.rknrl.castles
+package ru.rknrl.base
 
 import akka.actor.{ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.account.GetAccountState
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountState, CastlesAccount}
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
 import ru.rknrl.castles.rmi._

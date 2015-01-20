@@ -1,6 +1,7 @@
 package ru.rknrl.castles.account
 
 import akka.actor.ActorRef
+import ru.rknrl.base.AccountId
 import ru.rknrl.base.account.Account
 import ru.rknrl.castles._
 import ru.rknrl.castles.database.AccountStateDb.Put

@@ -1,6 +1,6 @@
 package ru.rknrl.castles.game.objects.players
 
-import ru.rknrl.castles.AccountId
+import ru.rknrl.base.AccountId
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO.{PlayerDTO, PlayerIdDTO}

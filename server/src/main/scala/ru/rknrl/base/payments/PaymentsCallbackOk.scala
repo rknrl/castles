@@ -1,7 +1,7 @@
 package ru.rknrl.base.payments
 
 import akka.util.Crypt
-import ru.rknrl.castles.AccountId
+import ru.rknrl.base.AccountId
 import ru.rknrl.base.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.CommonDTO.AccountType

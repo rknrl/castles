@@ -1,7 +1,7 @@
 package ru.rknrl.castles.game
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.AccountId
+import ru.rknrl.base.AccountId
 import ru.rknrl.castles.account.objects.items.ItemsTest
 import ru.rknrl.castles.account.objects.skills.SkillsTest
 import ru.rknrl.castles.account.objects.startLocation.StartLocationTest

@@ -1,6 +1,7 @@
 package ru.rknrl.castles
 
 import org.scalatest.{FlatSpec, Matchers}
+import ru.rknrl.base.AccountId
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 
 class AccountIdTest extends FlatSpec with Matchers {

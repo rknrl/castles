@@ -6,6 +6,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.Tcp.Connect
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import ru.rknrl.base.{MatchMaking, TcpServer}
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.testkit.{ClientConnected, ServerBounded, TcpClientMock, TcpMock}

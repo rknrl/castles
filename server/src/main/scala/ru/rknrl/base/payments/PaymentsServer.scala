@@ -3,9 +3,10 @@ package ru.rknrl.base.payments
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.StoppingStrategyActor
+import ru.rknrl.base.AccountId
 import ru.rknrl.base.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.base.payments.PaymentsServer._
-import ru.rknrl.castles.{AccountId, Config}
+import ru.rknrl.castles.Config
 import ru.rknrl.core.social.{Product, SocialConfig}
 import spray.http.MediaTypes._
 import spray.routing.HttpService
