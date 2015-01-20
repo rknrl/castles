@@ -9,15 +9,23 @@ import ru.rknrl.castles.game.objects.bullets.Bullets._
 import ru.rknrl.castles.game.objects.fireballs.Fireballs._
 import ru.rknrl.castles.game.objects.players._
 import ru.rknrl.castles.game.objects.tornadoes.Tornadoes._
-import ru.rknrl.castles.game.objects.units.GameUnits
 import ru.rknrl.castles.game.objects.units.GameUnits.{getUpdateMessages, _}
+import ru.rknrl.castles.game.objects.units.{GameUnits, UnitId}
 import ru.rknrl.castles.game.objects.volcanoes.Volcanoes._
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO._
-import ru.rknrl.utils.{BuildingIdIterator, UnitIdIterator}
+import ru.rknrl.utils.IdIterator
 
 import scala.collection.JavaConverters._
+
+class BuildingIdIterator extends IdIterator {
+  def next = new BuildingId(nextInt)
+}
+
+class UnitIdIterator extends IdIterator {
+  def next = new UnitId(nextInt)
+}
 
 object GameState {
 

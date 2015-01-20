@@ -2,6 +2,7 @@ package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
 import ru.rknrl.castles.database.AccountStateDb.Put
@@ -30,7 +31,7 @@ class Account(accountId: AccountId,
               accountStateDb: ActorRef,
               auth: ActorRef,
               config: Config,
-              name: String) extends Actor {
+              name: String) extends EscalateStrategyActor {
 
   private var accountRmiRegistered: Boolean = false
 
@@ -166,6 +167,8 @@ class Account(accountId: AccountId,
       assert(game.isDefined)
       assert(enterGameRmi.isDefined)
       assert(gameRmi.isDefined)
+
+      enterGameRmi.get ! LeaveGameMsg()
 
       state = state.addGold(reward)
       for ((itemType, count) ← usedItems)

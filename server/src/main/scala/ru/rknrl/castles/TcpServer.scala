@@ -2,12 +2,12 @@ package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorRef, Props}
-import ru.rknrl.castles.Config
+import akka.actor.{ActorRef, Props}
+import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends Actor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends StoppingStrategyActor {
 
   import akka.io.Tcp._
 

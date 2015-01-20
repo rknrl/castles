@@ -4,11 +4,12 @@ import java.io.DataOutputStream
 
 import akka.actor.Actor
 import akka.util.ByteString
+import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, Put}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 
-class InMemoryDb extends Actor {
+class InMemoryDb extends StoppingStrategyActor {
   private var map = Map[AccountId, ByteString]()
 
   override def receive = {

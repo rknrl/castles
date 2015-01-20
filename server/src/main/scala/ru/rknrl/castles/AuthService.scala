@@ -1,6 +1,7 @@
 package ru.rknrl.castles
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{SupervisorStrategy, Actor, ActorRef, Props}
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{Account, AccountState, GetAccountState}
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
@@ -15,7 +16,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
                   accountStateDb: ActorRef,
                   config: Config,
-                  name: String) extends Actor {
+                  name: String) extends EscalateStrategyActor {
 
   private val authRmi = context.actorOf(Props(classOf[AuthRMI], tcpSender, self), "auth-rmi" + name)
 

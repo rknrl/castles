@@ -37,7 +37,7 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
-    private static const errorsUrl:String = "http://127.0.0.1/bugs";
+    private static const errorsUrl:String = "http://127.0.0.1:8080/bug";
     private static const avatarsLimit:int = 10;
 
     private var host:String;

@@ -6,7 +6,6 @@ import ru.rknrl.castles.game.objects.buildings.{BuildingId, BuildingTest, Buildi
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.game.objects.{Moving, PlayerStateTest}
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
-import ru.rknrl.utils.UnitIdIterator
 
 class ExitUnitToUnitsTest extends FlatSpec with Matchers {
   val states = PlayerStateTest.playerStates

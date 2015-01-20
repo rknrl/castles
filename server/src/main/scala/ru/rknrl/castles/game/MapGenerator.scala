@@ -5,7 +5,6 @@ import java.util.Random
 import ru.rknrl.castles.account.objects.{BuildingPrototype, IJ}
 import ru.rknrl.castles.game.objects.buildings.Building
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
-import ru.rknrl.utils.BuildingIdIterator
 
 object MapGenerator {
   private def exists(newPos: IJ, positions: Iterable[IJ]) =

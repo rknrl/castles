@@ -1,7 +1,9 @@
 package ru.rknrl.castles
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.SupervisorStrategy.Stop
+import akka.actor._
 import ru.rknrl.castles.MatchMaking._
+import ru.rknrl.castles.account.LeaveGame
 import ru.rknrl.castles.account.objects._
 import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.game.Game.StopGame
@@ -56,12 +58,29 @@ class PlayerIdIterator extends IdIterator {
 
 class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Actor {
 
+  /**
+   * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
+   */
+  override def supervisorStrategy = OneForOneStrategy() {
+    case _: Exception ⇒
+      val gameInfo = gameRefToGameInfo(sender)
+      for (accountId ← gameInfo.accountIds
+           if accountIdToGameInfo.contains(accountId) && accountIdToGameInfo(accountId) == gameInfo) {
+        onAccountLeaveGame(accountId)
+        accountIdToAccountRef(accountId) ! LeaveGame(Map.empty, 0)
+      }
+      onGameOver(sender)
+      Stop
+  }
+
   class GameInfo(val gameRef: ActorRef,
-                 val externalAccountIds: Iterable[AccountId])
+                 val accountIds: Iterable[AccountId])
 
   private var gameOrders = List[GameOrder]()
 
   private var accountIdToGameInfo = Map[AccountId, GameInfo]()
+
+  private var gameRefToGameInfo = Map[ActorRef, GameInfo]()
 
   private var accountIdToAccountRef = Map[AccountId, ActorRef]()
 
@@ -98,12 +117,13 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
      * Game оповещает, что игрок вышел из игры
      */
     case Leaved(accountId) ⇒
-      accountIdToGameInfo = accountIdToGameInfo - accountId
+      onAccountLeaveGame(accountId)
 
     /**
      * Game оповещает, что игра закончена - останавливаем актор игры
      */
     case GameOver ⇒
+      onGameOver(sender)
       sender ! StopGame
 
     /**
@@ -138,6 +158,12 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
 
     currentGameOrders = gameOrders
   }
+
+  private def onAccountLeaveGame(accountId: AccountId) =
+    accountIdToGameInfo = accountIdToGameInfo - accountId
+
+  private def onGameOver(gameRef: ActorRef) =
+    gameRefToGameInfo = gameRefToGameInfo - gameRef
 
   private def friendlyDevices(a: DeviceType, b: DeviceType) =
     (a == DeviceType.PHONE && b == DeviceType.PHONE) || (a != DeviceType.PHONE && b != DeviceType.PHONE)
@@ -189,6 +215,8 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
     val ids = orders.map(_.accountId)
 
     val info = new GameInfo(game, ids)
+
+    gameRefToGameInfo = gameRefToGameInfo + (game → info)
 
     for (order ← orders) {
       accountIdToGameInfo = accountIdToGameInfo + (order.accountId → info)

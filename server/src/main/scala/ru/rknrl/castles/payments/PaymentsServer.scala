@@ -2,9 +2,10 @@ package ru.rknrl.castles.payments
 
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
-import ru.rknrl.castles.{Config, AccountId}
+import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.castles.payments.PaymentsServer._
+import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.social.{Product, SocialConfig}
 import spray.http.MediaTypes._
 import spray.routing.HttpService
@@ -46,12 +47,18 @@ object PaymentsServer {
 
 }
 
-class PaymentsServer(config: Config) extends Actor with HttpService {
+class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpService {
 
   private var accountIdToAccount = Map[AccountId, ActorRef]()
 
   private val paymentsCallbacks =
-    path("vk_callback") {
+    path("bug") {
+      get {
+        complete {
+          <h1>Say hello to spray</h1>
+        }
+      }
+    } ~ path("vk_callback") {
       requestUri {
         uri ⇒
           respondWithMediaType(`text/plain`) {

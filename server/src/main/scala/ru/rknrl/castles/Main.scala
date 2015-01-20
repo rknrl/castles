@@ -1,11 +1,11 @@
 package ru.rknrl.castles
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{SupervisorStrategy, ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import net.liftweb.json._
+import ru.rknrl.PolicyServer
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.castles.payments.PaymentsServer
-import ru.rknrl.utils.PolicyServer
 import spray.can.Http
 
 import scala.concurrent.duration._

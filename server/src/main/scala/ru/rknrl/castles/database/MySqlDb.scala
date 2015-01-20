@@ -2,11 +2,11 @@ package ru.rknrl.castles.database
 
 import java.io.DataOutputStream
 
-import akka.actor.Actor
 import akka.util.ByteString
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, QueryResult, RowData}
+import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, Put}
 
 import scala.concurrent.duration._
@@ -20,7 +20,7 @@ class DbConfiguration(username: String,
   def configuration = new Configuration(username, host, port, Some(password), Some(database))
 }
 
-class MySqlDb(configuration: DbConfiguration) extends Actor {
+class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor {
   val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)

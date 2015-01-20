@@ -1,10 +1,10 @@
 package ru.rknrl.castles.game.objects
 
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.objects.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.objects.units.GameUnit
-import ru.rknrl.utils.{Point, UnitIdIterator}
+import ru.rknrl.castles.game.{GameConfig, UnitIdIterator}
+import ru.rknrl.utils.Point
 
 object Assistance {
   def `casts→units`(casts: Map[PlayerId, BuildingId],

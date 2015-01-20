@@ -1,6 +1,7 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{Actor, ActorRef}
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{GameOver, Leaved}
 import ru.rknrl.castles.account.LeaveGame
@@ -66,7 +67,7 @@ object PlayerState extends Enumeration {
 class Game(players: Map[PlayerId, Player],
            big: Boolean,
            config: GameConfig,
-           matchmaking: ActorRef) extends Actor {
+           matchmaking: ActorRef) extends EscalateStrategyActor {
 
   private val playersList = for ((id, player) ← players) yield player
 
@@ -363,10 +364,6 @@ class Game(players: Map[PlayerId, Player],
 
     val accountId = `playerId→accountId`(playerId)
     matchmaking ! Leaved(accountId)
-
-    // Ответ самому игроку
-
-    `playerId→enterGameRmi`(playerId) ! LeaveGameMsg()
 
     // Говорим аккаунту
 

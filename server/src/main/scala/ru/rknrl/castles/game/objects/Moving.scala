@@ -1,12 +1,11 @@
 package ru.rknrl.castles.game.objects
 
-import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.{UnitIdIterator, GameConfig}
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.objects.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.objects.units.GameUnit
 import ru.rknrl.castles.rmi.RemoveUnitMsg
 import ru.rknrl.dto.GameDTO.MoveDTO
-import ru.rknrl.utils.UnitIdIterator
 
 import scala.collection.JavaConverters._
 
