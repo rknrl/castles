@@ -2,11 +2,12 @@ package ru.rknrl.castles
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
+import ru.rknrl.base.game.Game
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.LeaveGame
 import ru.rknrl.castles.account.objects._
 import ru.rknrl.castles.bot.Bot
-import ru.rknrl.castles.game.Game.StopGame
+import Game.StopGame
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
@@ -210,7 +211,7 @@ class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Acto
       playerId → new Player(playerId, order.accountId, order.userInfo, order.startLocation, order.skills, order.items, isBot = order.isBot)
     }
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, gameConfig, self), gameIdIterator.next)
+    val game = context.actorOf(Props(classOf[CastlesGame], players.toMap, big, gameConfig, self), gameIdIterator.next)
 
     val ids = orders.map(_.accountId)
 

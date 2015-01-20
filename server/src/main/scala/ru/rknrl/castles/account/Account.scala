@@ -3,10 +3,11 @@ package ru.rknrl.castles.account
 import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.base.game.Game
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles._
 import ru.rknrl.castles.database.AccountStateDb.Put
-import ru.rknrl.castles.game.Game.{Join, Offline}
+import Game.{Join, Offline}
 import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}

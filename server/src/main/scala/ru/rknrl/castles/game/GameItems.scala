@@ -1,5 +1,6 @@
 package ru.rknrl.castles.game
 
+import ru.rknrl.base.game.PersonalMessage
 import ru.rknrl.castles.account.objects.Items
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.rmi.UpdateItemStatesMsg
