@@ -7,7 +7,7 @@ import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.AccountStateDb.Put
-import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}
+import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}

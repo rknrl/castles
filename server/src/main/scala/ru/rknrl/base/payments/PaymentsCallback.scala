@@ -1,7 +1,7 @@
-package ru.rknrl.castles.payments
+package ru.rknrl.base.payments
 
 import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.payments.PaymentsCallback.{Response, ResponseBase}
+import ru.rknrl.base.payments.PaymentsCallback.{Response, ResponseBase}
 import spray.http.HttpResponse
 
 object PaymentsCallback {

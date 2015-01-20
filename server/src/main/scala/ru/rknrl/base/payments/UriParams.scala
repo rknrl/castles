@@ -1,4 +1,4 @@
-package ru.rknrl.castles.payments
+package ru.rknrl.base.payments
 
 import spray.http.Uri
 
