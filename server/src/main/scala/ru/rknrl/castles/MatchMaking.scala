@@ -2,9 +2,9 @@ package ru.rknrl.castles
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
+import ru.rknrl.base.account.LeaveGame
 import ru.rknrl.base.game.Game
 import ru.rknrl.castles.MatchMaking._
-import ru.rknrl.castles.account.LeaveGame
 import ru.rknrl.castles.account.objects._
 import ru.rknrl.castles.bot.Bot
 import Game.StopGame

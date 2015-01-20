@@ -2,10 +2,10 @@ package ru.rknrl.base.game
 
 import akka.actor.ActorRef
 import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.base.account.LeaveGame
 import ru.rknrl.base.game.Game.{StopGame, Offline, Join}
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{GameOver, Leaved}
-import ru.rknrl.castles.account.LeaveGame
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.game.GameState
 import ru.rknrl.castles.rmi._

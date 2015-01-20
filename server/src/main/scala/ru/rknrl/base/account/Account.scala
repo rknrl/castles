@@ -1,21 +1,19 @@
-package ru.rknrl.castles.account
+package ru.rknrl.base.account
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.game.Game
+import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.castles.MatchMaking._
-import ru.rknrl.castles._
+import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.AccountStateDb.Put
-import Game.{Join, Offline}
 import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
+import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
-import ru.rknrl.dto.AccountDTO._
-import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
-import ru.rknrl.dto.CommonDTO._
+import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
+import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -23,23 +21,22 @@ case object GetAccountState
 
 case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int)
 
-class Account(accountId: AccountId,
-              accountState: AccountState,
-              deviceType: DeviceType,
-              userInfo: UserInfoDTO,
-              tcpSender: ActorRef, tcpReceiver: ActorRef,
-              matchmaking: ActorRef,
-              accountStateDb: ActorRef,
-              auth: ActorRef,
-              config: Config,
-              name: String) extends EscalateStrategyActor {
-
-  private var accountRmiRegistered: Boolean = false
+abstract class Account(accountId: AccountId,
+                       deviceType: DeviceType,
+                       userInfo: UserInfoDTO,
+                       tcpSender: ActorRef, tcpReceiver: ActorRef,
+                       matchmaking: ActorRef,
+                       accountStateDb: ActorRef,
+                       auth: ActorRef,
+                       config: Config,
+                       name: String) extends EscalateStrategyActor {
 
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
   tcpReceiver ! RegisterReceiver(accountRmi)
 
-  private var state = accountState
+  protected var state: AccountState
+
+  private var accountRmiRegistered: Boolean = false
 
   private var reenterGame: Boolean = true
 
@@ -53,7 +50,9 @@ class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  def receive = {
+  protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator]): AuthenticationSuccessDTO
+
+  override def receive = {
     case EnterGameMsg() ⇒
       matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, isBot = false))
 
@@ -62,30 +61,6 @@ class Account(accountId: AccountId,
      */
     case Put(accountId, accountStateDto) ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
-
-    case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
-      state = state.swapSlots(swap.getId1, swap.getId2)
-      accountStateDb ! Put(accountId, state.dto)
-
-    case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
-      state = state.buyBuilding(buy.getId, buy.getBuildingType)
-      accountStateDb ! Put(accountId, state.dto)
-
-    case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
-      state = state.upgradeBuilding(dto.getId)
-      accountStateDb ! Put(accountId, state.dto)
-
-    case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
-      state = state.removeBuilding(dto.getId)
-      accountStateDb ! Put(accountId, state.dto)
-
-    case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
-      state = state.upgradeSkill(upgrade.getType, config.account)
-      accountStateDb ! Put(accountId, state.dto)
-
-    case BuyItemMsg(buy: BuyItemDTO) ⇒
-      state = state.buyItem(buy.getType)
-      accountStateDb ! Put(accountId, state.dto)
 
     case AddProduct(orderId, product, count) ⇒
       product.id match {
@@ -125,13 +100,7 @@ class Account(accountId: AccountId,
       } else {
         reenterGame = false
 
-        auth ! AuthenticationSuccessDTO.newBuilder()
-          .setAccountState(state.dto)
-          .setConfig(config.account.dto)
-          .addAllTop(topMock.asJava)
-          .addAllProducts(config.productsDto(accountId.accountType).asJava)
-          .setEnterGame(enterGame)
-          .build
+        auth ! authenticationSuccessDto(enterGame, None)
       }
 
     /**
@@ -218,37 +187,12 @@ class Account(accountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! AuthenticationSuccessDTO.newBuilder()
-          .setAccountState(state.dto)
-          .setConfig(config.account.dto)
-          .addAllTop(topMock.asJava)
-          .addAllProducts(config.productsDto(accountId.accountType).asJava)
-          .setEnterGame(false)
-          .setGame(gameAddress)
-          .build
+        auth ! authenticationSuccessDto(enterGame = false, Some(gameAddress))
 
         reenterGame = false
       } else
         accountRmi ! EnteredGameMsg(gameAddress)
     }
-
-  private def topMock =
-    for (i ← 1 to 5)
-    yield TopUserInfoDTO.newBuilder()
-      .setPlace(i)
-      .setInfo(
-        UserInfoDTO.newBuilder()
-          .setAccountId(
-            AccountIdDTO.newBuilder()
-              .setId("1")
-              .setType(AccountType.DEV)
-              .build()
-          )
-          .setFirstName("name" + i)
-          .setPhoto256(i.toString)
-          .build()
-      ).build()
-
 
   override def preStart(): Unit = println("AccountService start " + name)
 

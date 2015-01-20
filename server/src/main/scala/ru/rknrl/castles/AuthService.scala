@@ -1,16 +1,16 @@
 package ru.rknrl.castles
 
-import akka.actor.{SupervisorStrategy, Actor, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.{Account, AccountState, GetAccountState}
+import ru.rknrl.base.account.GetAccountState
+import ru.rknrl.castles.account.{AccountState, CastlesAccount}
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
-import ru.rknrl.dto.CommonDTO.{UserInfoDTO, AccountType, DeviceType}
+import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 
 class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
@@ -87,7 +87,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
   }
 
   private def startAccount(state: AccountState) = {
-    val accountRef = context.actorOf(Props(classOf[Account], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
+    val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
     accountRef ! GetAccountState
   }
 
