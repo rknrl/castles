@@ -15,7 +15,7 @@ public class Volcano {
         return _id;
     }
 
-    private static const radiuses:Vector.<Number> = new <Number>[10, 20, 40];
+    private static const radiuses:Vector.<Number> = new <Number>[20, 30, 40];
 
     public function radius(time:int):Number {
         const progress:Number = (time - startTime) / millisTillEnd;

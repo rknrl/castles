@@ -11,13 +11,16 @@ import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 class Constants(val unitToExitFactor: Double,
                 val itemCooldown: Long)
 
-class FireballConfig(val damage: Double,
+class FireballConfig(val damageVsUnit: Double,
+                     val damageVsBuilding: Double,
                      val flyDuration: Long)
 
-class VolcanoConfig(val damage: Double,
+class VolcanoConfig(val damageVsUnit: Double,
+                    val damageVsBuilding: Double,
                     val duration: Long)
 
-class TornadoConfig(val damage: Double,
+class TornadoConfig(val damageVsUnit: Double,
+                    val damageVsBuilding: Double,
                     val duration: Long,
                     val speed: Double)
 
@@ -167,21 +170,21 @@ class GameConfig(val constants: Constants,
                                 fireballPlayer: PlayerState,
                                 unitPlayer: PlayerState) = {
     val attack = churchesPopulationToAttack(fireballPlayer.churchesPopulation)
-    unitCount - fireball.damage * attack / unitPlayer.stat.defence
+    unitCount - fireball.damageVsUnit * attack / unitPlayer.stat.defence
   }
 
   def unitCountAfterVolcanoHit(unitCount: Double,
                                volcanoPlayer: PlayerState,
                                unitPlayer: PlayerState) = {
     val attack = churchesPopulationToAttack(volcanoPlayer.churchesPopulation)
-    unitCount - volcano.damage * attack / unitPlayer.stat.defence
+    unitCount - volcano.damageVsUnit * attack / unitPlayer.stat.defence
   }
 
   def unitCountAfterTornadoHit(unitCount: Double,
                                tornadoPlayer: PlayerState,
                                unitPlayer: PlayerState) = {
     val attack = churchesPopulationToAttack(tornadoPlayer.churchesPopulation)
-    unitCount - tornado.damage * attack / unitPlayer.stat.defence
+    unitCount - tornado.damageVsUnit * attack / unitPlayer.stat.defence
   }
 
   def buildingPopulationAfterFireballHit(b: Building,
@@ -189,7 +192,7 @@ class GameConfig(val constants: Constants,
                                          buildingPlayer: Option[PlayerState]) = {
     val buildingStat = if (buildingPlayer.isEmpty) buildings(b.prototype).stat else buildings(b.prototype).stat + buildingPlayer.get.stat
     val attack = churchesPopulationToAttack(fireballPlayer.churchesPopulation)
-    Math.max(0, b.population - fireball.damage * attack / buildingStat.defence)
+    Math.max(0, b.population - fireball.damageVsBuilding * attack / buildingStat.defence)
   }
 
   def buildingPopulationAfterVolcanoHit(b: Building,
@@ -197,7 +200,7 @@ class GameConfig(val constants: Constants,
                                         buildingPlayer: Option[PlayerState]) = {
     val buildingStat = if (buildingPlayer.isEmpty) buildings(b.prototype).stat else buildings(b.prototype).stat + buildingPlayer.get.stat
     val attack = churchesPopulationToAttack(volcanoPlayer.churchesPopulation)
-    Math.max(0, b.population - volcano.damage * attack / buildingStat.defence)
+    Math.max(0, b.population - volcano.damageVsBuilding * attack / buildingStat.defence)
   }
 
   def buildingPopulationAfterTornadoHit(b: Building,
@@ -205,7 +208,7 @@ class GameConfig(val constants: Constants,
                                         buildingPlayer: Option[PlayerState]) = {
     val buildingStat = if (buildingPlayer.isEmpty) buildings(b.prototype).stat else buildings(b.prototype).stat + buildingPlayer.get.stat
     val attack = churchesPopulationToAttack(tornadoPlayer.churchesPopulation)
-    Math.max(0, b.population - tornado.damage * attack / buildingStat.defence)
+    Math.max(0, b.population - tornado.damageVsBuilding * attack / buildingStat.defence)
   }
 
   def unitSpeedInVolcano(speed: Double) =

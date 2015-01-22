@@ -177,7 +177,7 @@ class GameState(val time: Long,
     val enterUnits = `units→enterUnit`(units.units, time)
     val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits) ++ units.`killed→removeMessages`
 
-    val createdBullets = createBullets(buildings, units, time, config, playerStates)
+    val createdBullets = List.empty;// createBullets(buildings, units, time, config, playerStates)
 
     val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
     val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)

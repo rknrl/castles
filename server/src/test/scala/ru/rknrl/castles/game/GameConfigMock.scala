@@ -45,25 +45,31 @@ object GameConfigMock {
       BuildingLevel.LEVEL_3 → level3
     )
 
-  def fireballMock(damage: Double = 1,
+  def fireballMock(damageVsUnit: Double = 1,
+                   damageVsBuilding: Double = 1,
                    flyDuration: Long = 1000) =
     new FireballConfig(
-      damage = damage,
+      damageVsUnit = damageVsUnit,
+      damageVsBuilding = damageVsBuilding,
       flyDuration = flyDuration
     )
 
-  def volcanoMock(damage: Double = 1,
+  def volcanoMock(damageVsUnit: Double = 1,
+                  damageVsBuilding: Double = 1,
                   duration: Long = 5000) =
     new VolcanoConfig(
-      damage = damage,
+      damageVsUnit = damageVsUnit,
+      damageVsBuilding = damageVsBuilding,
       duration = duration
     )
 
-  def tornadoMock(damage: Double = 1,
+  def tornadoMock(damageVsUnit: Double = 1,
+                  damageVsBuilding: Double = 1,
                   duration: Long = 5000,
                   speed: Double = 0.05) =
     new TornadoConfig(
-      damage = damage,
+      damageVsUnit = damageVsUnit,
+      damageVsBuilding = damageVsBuilding,
       duration = duration,
       speed = speed
     )
