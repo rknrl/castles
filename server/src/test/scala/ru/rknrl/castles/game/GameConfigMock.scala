@@ -1,6 +1,5 @@
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.Config
 import ru.rknrl.castles.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
@@ -47,31 +46,37 @@ object GameConfigMock {
 
   def fireballMock(damageVsUnit: Double = 1,
                    damageVsBuilding: Double = 1,
-                   flyDuration: Long = 1000) =
+                   flyDuration: Long = 1000,
+                   radius: Double = 39) =
     new FireballConfig(
       damageVsUnit = damageVsUnit,
       damageVsBuilding = damageVsBuilding,
-      flyDuration = flyDuration
+      flyDuration = flyDuration,
+      radius = radius
     )
 
   def volcanoMock(damageVsUnit: Double = 1,
                   damageVsBuilding: Double = 1,
-                  duration: Long = 5000) =
+                  duration: Long = 5000,
+                  radius: Double = 39) =
     new VolcanoConfig(
       damageVsUnit = damageVsUnit,
       damageVsBuilding = damageVsBuilding,
-      duration = duration
+      duration = duration,
+      radius = radius
     )
 
   def tornadoMock(damageVsUnit: Double = 1,
                   damageVsBuilding: Double = 1,
                   duration: Long = 5000,
-                  speed: Double = 0.05) =
+                  speed: Double = 0.05,
+                  radius: Double = 39) =
     new TornadoConfig(
       damageVsUnit = damageVsUnit,
       damageVsBuilding = damageVsBuilding,
       duration = duration,
-      speed = speed
+      speed = speed,
+      radius = radius
     )
 
   def strengtheningMock(factor: Double = 1.5,

@@ -13,16 +13,19 @@ class Constants(val unitToExitFactor: Double,
 
 class FireballConfig(val damageVsUnit: Double,
                      val damageVsBuilding: Double,
-                     val flyDuration: Long)
+                     val flyDuration: Long,
+                     val radius: Double)
 
 class VolcanoConfig(val damageVsUnit: Double,
                     val damageVsBuilding: Double,
-                    val duration: Long)
+                    val duration: Long,
+                    val radius: Double)
 
 class TornadoConfig(val damageVsUnit: Double,
                     val damageVsBuilding: Double,
                     val duration: Long,
-                    val speed: Double)
+                    val speed: Double,
+                    val radius: Double)
 
 class StrengtheningConfig(val factor: Double,
                           val duration: Long)
@@ -39,7 +42,7 @@ class AssistanceConfig(val count: Int) {
 class BuildingConfig(val regeneration: Double,
                      val startPopulation: Int,
                      val stat: Stat) {
-  def *(k: Double) = new BuildingConfig(regeneration, GameConfig.truncatePopulation(startPopulation * k), stat * k)
+  def *(k: Double) = new BuildingConfig(regeneration, GameConfig.truncatePopulation(startPopulation * k), new Stat(attack = stat.attack * k, defence = stat.defence * k, speed = stat.speed))
 }
 
 class GameConfig(val constants: Constants,
@@ -73,7 +76,7 @@ class GameConfig(val constants: Constants,
   def getStartPopulation(prototype: BuildingPrototype) = buildings(prototype).startPopulation
 
   def getUnitSpeed(prototype: BuildingPrototype, player: PlayerState, strengthened: Boolean) =
-    (buildings(prototype).stat + player.stat).speed
+    (buildings(prototype).stat * player.stat).speed
 
   def getAttack(prototype: BuildingPrototype, player: Option[PlayerState], strengthened: Boolean) = {
     val stat = if (player.isEmpty) buildings(prototype).stat else buildings(prototype).stat + player.get.stat
@@ -85,15 +88,15 @@ class GameConfig(val constants: Constants,
     stat.defence * toFactor(strengthened)
   }
 
-  def fireballSplashRadius(player: PlayerState) = 1
+  def fireballSplashRadius(player: PlayerState) = fireball.radius
 
   def fireballFlyDuration = fireball.flyDuration
 
   def volcanoDuration(player: PlayerState) = volcano.duration
 
-  def volcanoRadius(player: PlayerState) = 1
+  def volcanoRadius(player: PlayerState) = volcano.radius
 
-  def tornadoRadius(player: PlayerState) = 1
+  def tornadoRadius(player: PlayerState) = tornado.radius
 
   def tornadoDuration(player: PlayerState) = tornado.duration
 

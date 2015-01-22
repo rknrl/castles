@@ -38,11 +38,16 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
     .addAllLevels(levelsDto.asJava)
     .build()
 
+  val levelsCount = SkillLevel.values().size - 1
+  val maxAttack = 1.0
+  val maxDefence = 1.0
+  val maxSpeed = 0.75
+
   def stat =
     new Stat(
-      levels(SkillType.ATTACK).getNumber,
-      levels(SkillType.DEFENCE).getNumber,
-      levels(SkillType.SPEED).getNumber
+      1 + levels(SkillType.ATTACK).getNumber * maxAttack / levelsCount,
+      1 + levels(SkillType.DEFENCE).getNumber * maxDefence / levelsCount,
+      1 + levels(SkillType.SPEED).getNumber * maxSpeed / levelsCount
     )
 }
 

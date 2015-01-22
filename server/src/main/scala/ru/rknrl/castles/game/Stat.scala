@@ -3,7 +3,7 @@ package ru.rknrl.castles.game
 class Stat(val attack: Double,
            val defence: Double,
            val speed: Double) {
-  def +(that: Stat) = new Stat(attack + that.attack, defence + that.defence, speed + that.defence)
+  def +(that: Stat) = new Stat(attack + that.attack, defence + that.defence, speed + that.speed)
 
-  def *(k: Double) = new Stat(attack * k, defence * k, speed * k)
+  def *(that: Stat) = new Stat(attack * that.attack, defence * that.defence, speed * that.speed)
 }
