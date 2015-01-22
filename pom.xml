@@ -10,7 +10,6 @@
         <module>dto</module>
         <module>rmi</module>
         <module>server</module>
-        <module>balance</module>
     </modules>
 
     <dependencyManagement>
