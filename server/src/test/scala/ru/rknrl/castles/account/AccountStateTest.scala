@@ -13,6 +13,7 @@ object AccountStateTest {
                    items: Items = ItemsTest.items,
                    gold: Int = 666,
                    rating: Int = 666,
+                   gamesCount: Int = 0,
                    config: AccountConfig = AccountConfigMock.config) =
     new AccountState(
       startLocation,
@@ -20,6 +21,7 @@ object AccountStateTest {
       items,
       gold,
       rating,
+      gamesCount,
       config
     )
 }

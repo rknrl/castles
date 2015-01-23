@@ -20,7 +20,7 @@ import scala.concurrent.duration._
 
 case object GetAccountState
 
-case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int)
+case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
 
 abstract class Account(accountId: AccountId,
                        deviceType: DeviceType,
@@ -55,7 +55,7 @@ abstract class Account(accountId: AccountId,
 
   override def receive = {
     case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, isBot = false))
+      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
     /**
      * from accountStateDb
@@ -132,9 +132,9 @@ abstract class Account(accountId: AccountId,
       sendJoin()
 
     /**
-     * Game говорит, что для этого игрока бой завершен
+     * Matchmaking говорит, что для этого игрока бой завершен
      */
-    case LeaveGame(usedItems, reward) ⇒
+    case LeaveGame(usedItems, reward, newRating) ⇒
       assert(game.isDefined)
       assert(enterGameRmi.isDefined)
       assert(gameRmi.isDefined)
@@ -142,6 +142,9 @@ abstract class Account(accountId: AccountId,
       enterGameRmi.get ! LeaveGameMsg()
 
       state = state.addGold(reward)
+        .incGamesCount
+        .setNewRating(newRating)
+
       for ((itemType, count) ← usedItems)
         state = state.addItem(itemType, -count)
 

@@ -51,22 +51,22 @@ class CastlesGame(players: Map[PlayerId, Player],
   override def receive = {
     super.receive orElse {
       case MoveMsg(dto: MoveDTO) ⇒
-        if (canPlay) moveActions = moveActions + (senderPlayerId → dto)
+        if (senderCanPlay) moveActions = moveActions + (senderPlayerId → dto)
 
       case CastFireballMsg(point: PointDTO) ⇒
-        if (canPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
+        if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
 
       case CastStrengtheningMsg(buildingId: BuildingIdDTO) ⇒
-        if (canPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+        if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → new BuildingId(buildingId.getId))
 
       case CastVolcanoMsg(point: PointDTO) ⇒
-        if (canPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
+        if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
 
       case CastTornadoMsg(dto: CastTorandoDTO) ⇒
-        if (canPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
+        if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
 
       case CastAssistanceMsg(buildingId: BuildingIdDTO) ⇒
-        if (canPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+        if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
     }
   }
 }

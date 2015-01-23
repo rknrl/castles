@@ -2,12 +2,12 @@ package ru.rknrl.base.game
 
 import akka.actor.ActorRef
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.{MatchMaking, AccountId}
+import ru.rknrl.base.AccountId
+import ru.rknrl.base.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
 import ru.rknrl.base.account.LeaveGame
-import ru.rknrl.base.game.Game.{StopGame, Offline, Join}
-import MatchMaking.{GameOver, Leaved}
-import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
+import ru.rknrl.base.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.GameState
+import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._
@@ -64,8 +64,8 @@ object PlayerState extends Enumeration {
  *
  */
 abstract class Game(players: Map[PlayerId, Player],
-                        matchmaking: ActorRef,
-                        winReward: Int) extends EscalateStrategyActor {
+                    matchmaking: ActorRef,
+                    winReward: Int) extends EscalateStrategyActor {
 
   protected val playersList = for ((id, player) ← players) yield player
 
@@ -89,9 +89,9 @@ abstract class Game(players: Map[PlayerId, Player],
     yield playerId → PlayerState.GAME
 
   /**
-   * Список игроков, которые завершили игру, их места и награды
+   * Игроки, которые завершили игру и их места
    */
-  private var gameOvers = List[GameOverDTO]()
+  private var gameOvers = Map[PlayerId, Int]()
 
   private var `playerId→account` = Map[PlayerId, ActorRef]()
 
@@ -111,8 +111,7 @@ abstract class Game(players: Map[PlayerId, Player],
          if playerState == PlayerState.GAME)
     yield playerId
 
-  private def getPlace =
-    players.size - playersInGame.size
+  private def getPlace = playersInGame.size
 
   /**
    * Все вышли из игры
@@ -120,15 +119,18 @@ abstract class Game(players: Map[PlayerId, Player],
   private def allLeaved =
     playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
 
-  private def playerInfosMock =
+  private def playerInfos =
     for ((id, player) ← players)
     yield PlayerInfoDTO.newBuilder()
       .setId(id.dto)
       .setInfo(player.userInfo)
       .build
 
+  private def placeToReward(place: Int) =
+    if (place == 1) winReward else 0
+
   private def getReward(playerId: PlayerId) =
-    gameOvers.find(_.getPlayerId.getId == playerId.id).get.getReward
+    placeToReward(gameOvers(playerId))
 
   private def getNewLosers =
     for ((playerId, playerState) ← playerStates
@@ -167,7 +169,7 @@ abstract class Game(players: Map[PlayerId, Player],
 
   protected def senderPlayerId = `gameRmi→playerId`(sender)
 
-  protected def canPlay = playerStates(senderPlayerId) == PlayerState.GAME
+  protected def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
   protected var gameState: GameState
 
@@ -206,8 +208,8 @@ abstract class Game(players: Map[PlayerId, Player],
       online = online + playerId
       val builder = gameState.dtoBuilder(playerId)
       val dto = builder
-        .addAllPlayerInfos(playerInfosMock.asJava)
-        .addAllGameOvers(gameOvers.asJava)
+        .addAllPlayerInfos(playerInfos.asJava)
+        .addAllGameOvers(gameOverDto.asJava)
         .build
       sender ! JoinGameMsg(dto)
 
@@ -247,10 +249,11 @@ abstract class Game(players: Map[PlayerId, Player],
   }
 
   private def addLoser(playerId: PlayerId, place: Int) {
+    println(place)
     playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
 
     val dto = getLoseDto(playerId, place)
-    gameOvers = gameOvers :+ dto
+    gameOvers = gameOvers + (playerId → place)
     sendToPlayers(List(GameOverMsg(dto)), List.empty)
 
     // Если в бою остался один игрок - объявляем его победителем
@@ -260,7 +263,7 @@ abstract class Game(players: Map[PlayerId, Player],
     if (winnerId.isDefined) {
       playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
-      gameOvers = gameOvers :+ winDto
+      gameOvers = gameOvers + (winnerId.get → 1)
       sendToPlayers(List(GameOverMsg(winDto)), List.empty)
       scheduler.cancel()
     }
@@ -280,21 +283,26 @@ abstract class Game(players: Map[PlayerId, Player],
       .setReward(0)
       .build()
 
+  private def gameOverDto =
+    for ((playerId, place) ← gameOvers)
+    yield GameOverDTO.newBuilder()
+      .setPlayerId(playerId.dto)
+      .setPlace(place)
+      .setReward(placeToReward(place))
+      .build()
+
   private def addLeaved(playerId: PlayerId) {
     playerStates = playerStates.updated(playerId, PlayerState.LEAVED)
 
     // Говорим матчмейкингу, что игрок вышел
 
     val accountId = `playerId→accountId`(playerId)
-    matchmaking ! Leaved(accountId)
-
-    // Говорим аккаунту
-
-    `playerId→account`(playerId) ! LeaveGame(gameState.gameItems.states(playerId).usedItems, getReward(playerId))
+    val place = gameOvers(playerId)
+    matchmaking ! PlayerLeaveGame(accountId, place = place, reward = placeToReward(place), usedItems = gameState.gameItems.states(playerId).usedItems)
 
     // Если вышли все - завершаем игру
 
-    if (allLeaved) matchmaking ! GameOver
+    if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
 
   override def preStart(): Unit = println("Game start")

@@ -11,7 +11,8 @@ message AccountStateDTO {
     required SkillsDTO skills = 2;
     required ItemsDTO items = 3;
     required int32 gold = 4;
-    required int32 rating = 5;
+    required double rating = 5;
+    required int32 gamesCount = 6;
 }
 
 // start location

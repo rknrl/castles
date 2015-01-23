@@ -8,7 +8,8 @@ class AccountState(val startLocation: StartLocation,
                    val skills: Skills,
                    val items: Items,
                    val gold: Int,
-                   val rating: Int,
+                   val rating: Double,
+                   val gamesCount: Int,
                    val config: AccountConfig) {
 
   def swapSlots(id1: SlotId, id2: SlotId): AccountState =
@@ -51,12 +52,17 @@ class AccountState(val startLocation: StartLocation,
     copy(newGold = gold + value)
   }
 
+  def incGamesCount = copy(newGamesCount = gamesCount + 1)
+
+  def setNewRating(newRating: Double) = copy(newRating = newRating)
+
   private def copy(newStartLocation: StartLocation = startLocation,
                    newSkills: Skills = skills,
                    newItems: Items = items,
                    newGold: Int = gold,
-                   newRating: Int = rating) =
-    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, config)
+                   newRating: Double = rating,
+                   newGamesCount: Int = gamesCount) =
+    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount, config)
 
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
@@ -64,6 +70,7 @@ class AccountState(val startLocation: StartLocation,
     .setItems(items.dto)
     .setGold(gold)
     .setRating(rating)
+    .setGamesCount(gamesCount)
     .build()
 }
 
@@ -95,14 +102,23 @@ object AccountState {
 
   private val initRating = 1400
 
-  def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems(config), config.initGold, initRating, config)
+  def initAccount(config: AccountConfig) = new AccountState(
+    startLocation = initStartLocation,
+    skills = initSkills,
+    items = initItems(config),
+    gold = config.initGold,
+    rating = initRating,
+    gamesCount = 0,
+    config = config
+  )
 
   def fromDto(dto: AccountStateDTO, config: AccountConfig) = new AccountState(
-    StartLocation.fromDto(dto.getStartLocation),
-    Skills.fromDto(dto.getSkills),
-    Items.fromDto(dto.getItems),
-    dto.getGold,
-    dto.getRating,
-    config
+    startLocation = StartLocation.fromDto(dto.getStartLocation),
+    skills = Skills.fromDto(dto.getSkills),
+    items = Items.fromDto(dto.getItems),
+    gold = dto.getGold,
+    rating = dto.getRating,
+    gamesCount = dto.getGamesCount,
+    config = config
   )
 }

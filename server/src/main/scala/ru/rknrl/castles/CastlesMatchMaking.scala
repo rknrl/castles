@@ -21,12 +21,8 @@ class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) exten
   }
 
   private def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
-    var sorted = orders.sortBy(_.rating)(Ordering.Int.reverse)
+    var sorted = orders.sortBy(_.rating)(Ordering.Double.reverse)
     var createdGames = List.empty[GameInfo]
-
-    if(orders.size > 0) {
-      println()
-    }
 
     while (sorted.size > playersCount) {
       createdGames = createdGames :+ createGame(big, sorted.take(playersCount))
@@ -52,7 +48,7 @@ class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) exten
       val accountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
 
-      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), order.rating, isBot = true)
+      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
