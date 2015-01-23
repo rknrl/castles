@@ -3,6 +3,7 @@ package ru.rknrl.castles
 import akka.actor.Props
 import ru.rknrl.base.MatchMaking.GameOrder
 import ru.rknrl.base._
+import ru.rknrl.castles.account.objects.{Item, Items}
 import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.objects.players.Player
@@ -45,13 +46,19 @@ class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) exten
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
-      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, order.items, isBot = true)
+
+      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), isBot = true)
       orders = orders :+ botOrder
       placeGameOrder(botOrder, bot)
     }
 
     createGame(bigGame, orders)
   }
+
+  private def botItems(playerItems: Items) =
+    new Items(playerItems.items.map {
+      case (itemType, item) ⇒ (itemType, new Item(itemType, item.count * 2))
+    })
 
   private def botUserInfo(accountId: AccountId, number: Int) =
     UserInfoDTO.newBuilder()

@@ -9,7 +9,7 @@ import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.game.{GameConfig, GameState}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
-import ru.rknrl.dto.GameDTO.{CellSize, GameStateDTO, MoveDTO}
+import ru.rknrl.dto.GameDTO.{GameStateDTO, MoveDTO}
 import ru.rknrl.utils.Point
 
 import scala.collection.JavaConverters._
@@ -18,8 +18,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
   private val interval = 2000L
   private var lastTime = 0L
 
-  private val cellDiagonal = Math.sqrt(CellSize.SIZE_VALUE * CellSize.SIZE_VALUE)
-  private val mapDiagonal = Math.sqrt(15 * 15)
+  private var mapDiagonal = Double.NaN
 
   private var game: Option[ActorRef] = None
   private var gameState: Option[GameState] = None
@@ -43,6 +42,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
     case JoinGameMsg(gameState: GameStateDTO) ⇒
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
+      mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
     case newGameState: GameState ⇒
       gameState = Some(newGameState)
@@ -53,7 +53,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
         val myBuildings = buildings.filter(my).toList
 
-        val fromBuildings = myBuildings.filter(_.population > 8)
+        val fromBuildings = myBuildings.filter(_.population > 5)
 
         if (fromBuildings.size > 0) {
           val enemyBuildings = buildings.filterNot(my).toList
@@ -85,23 +85,26 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
               .build()
           )
 
-          if (time - lastCastTime > 20000) {
+          if (time - lastCastTime > 10000) {
             lastCastTime = time
 
             val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState}
 
-            val availableCast = items.filter(itemState ⇒ itemState.count > 0 &&
-              newGameState.gameItems.canCast(playerId.get, itemState.itemType, config, time))
+            val availableCast = items.filter(itemState ⇒
+              itemState.count > 0 &&
+                itemState.itemType != ItemType.TORNADO &&
+                newGameState.gameItems.canCast(playerId.get, itemState.itemType, config, time))
 
             val rnd = Math.floor(Math.random() * availableCast.size).toInt
             val itemType = availableCast.toList(rnd).itemType
 
+            val ownedEnemyBuildings = enemyBuildings.filter(_.owner.isDefined)
+
             itemType match {
               case ItemType.FIREBALL ⇒
-                sender() ! CastFireballMsg(enemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
-              case ItemType.TORNADO ⇒
+                sender() ! CastFireballMsg(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.VOLCANO ⇒
-                sender() ! CastVolcanoMsg(enemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                sender() ! CastVolcanoMsg(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.STRENGTHENING ⇒
                 sender() ! CastStrengtheningMsg(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
               case ItemType.ASSISTANCE ⇒
@@ -128,7 +131,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
   def distanceWeight(pos: Point, myBuildings: Iterable[Building]) = {
     val distances = myBuildings.map(_.pos.distance(pos))
-    (distances.sum / myBuildings.size) / (cellDiagonal * mapDiagonal) // from 0 to 1
+    (distances.sum / myBuildings.size) / mapDiagonal // from 0 to 1
   }
 
   def ownerWeight(owner: Option[PlayerId]) = if (owner.isDefined) 0.3 else 0.0

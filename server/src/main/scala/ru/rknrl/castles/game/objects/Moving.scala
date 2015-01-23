@@ -1,9 +1,9 @@
 package ru.rknrl.castles.game.objects
 
-import ru.rknrl.castles.game.{UnitIdIterator, GameConfig}
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.objects.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.objects.units.GameUnit
+import ru.rknrl.castles.game.{GameConfig, UnitIdIterator}
 import ru.rknrl.castles.rmi.RemoveUnitMsg
 import ru.rknrl.dto.GameDTO.MoveDTO
 
@@ -21,16 +21,13 @@ object Moving {
          fromBuildingDto ← fromBuildingsDto;
          fromBuildingId = new BuildingId(fromBuildingDto.getId);
          fromBuilding = buildings(fromBuildingId)
-         if config.unitsToExit(fromBuilding.floorPopulation) >= 1
-    ) yield {
-      val toBuildingId = new BuildingId(moveDto.getToBuilding.getId)
-
-      assert(fromBuildingId != toBuildingId)
-
-      assert(fromBuilding.owner.get == playerId)
-
+         if config.unitsToExit(fromBuilding.floorPopulation) >= 1;
+         toBuildingId = new BuildingId(moveDto.getToBuilding.getId)
+         if fromBuildingId != toBuildingId
+         if fromBuilding.owner.get == playerId
+    ) yield
       ExitUnit(playerId, fromBuildingId, toBuildingId)
-    }
+
 
   def `exitUnit→units`(exitUnits: Iterable[ExitUnit], buildings: Buildings, config: GameConfig, unitIdIterator: UnitIdIterator, playerStates: PlayerStates, time: Long) =
     for (exitUnit ← exitUnits) yield {
