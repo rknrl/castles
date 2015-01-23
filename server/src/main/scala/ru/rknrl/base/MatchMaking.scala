@@ -3,7 +3,7 @@ package ru.rknrl.base
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy}
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.LeaveGame
+import ru.rknrl.base.account.Account.{LeaveGame, DuplicateAcсount}
 import ru.rknrl.base.game.Game.StopGame
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.castles.game.GameConfig
@@ -41,7 +41,7 @@ object MatchMaking {
 
   case class PlaceGameOrder(gameOrder: GameOrder)
 
-  case class InGame(externalAccountId: AccountId)
+  case class InGame(externalAccountId: AccountId, deviceType: DeviceType)
 
   // matchmaking -> account
 
@@ -79,7 +79,9 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
   }
 
   class GameInfo(val gameRef: ActorRef,
-                 val orders: Iterable[GameOrder])
+                 val orders: Iterable[GameOrder]) {
+    def big = orders.size == 4
+  }
 
   private var gameOrders = List[GameOrder]()
 
@@ -103,7 +105,11 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
     /** Аккаунт спрашивает находится ли он сейчас в игре?
       * В ответ отпарвялем InGameState
       */
-    case InGame(accountId) ⇒
+    case InGame(accountId, deviceType: DeviceType) ⇒
+      if (accountIdToAccountRef.contains(accountId)) {
+        val oldAccountRef = accountIdToAccountRef(accountId)
+        oldAccountRef ! DuplicateAcсount
+      }
       accountIdToAccountRef = accountIdToAccountRef.updated(accountId, sender)
 
       val gameInfo = accountIdToGameInfo.get(accountId)
@@ -170,11 +176,10 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
     val gameInfo = gameRefToGameInfo(sender)
     val orders = gameInfo.orders
     val order = orders.find(_.accountId == accountId).get
-    val big = orders.size == 4
 
     val averageEnemyRating = orders.filter(_ != order).map(_.rating).sum / (orders.size - 1)
 
-    val sA = getSA(big, place)
+    val sA = getSA(gameInfo.big, place)
     val newRating = getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
 
     top = insert(top, TopItem(accountId, newRating))

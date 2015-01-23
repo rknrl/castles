@@ -30,6 +30,10 @@ public class GameView extends Sprite {
     public var magicItems:MagicItemsView;
     public var tutor:GameTutorialView;
 
+    public function get supportedPlayersCount():int {
+        return _layout.supportedPlayersCount;
+    }
+
     public function GameView(playerInfos:Vector.<PlayerInfo>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, deviceFactory:DeviceFactory) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
@@ -110,11 +114,8 @@ public class GameView extends Sprite {
     }
 
     private function onKeyUp(event:KeyboardEvent):void {
-        switch (event.keyCode) {
-            case Keyboard.ESCAPE:
-                stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-                dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
-                break;
+        if (event.keyCode == Keyboard.ESCAPE) {
+            dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
         }
         dispatchEvent(new GameKeyEvent(event.keyCode));
     }

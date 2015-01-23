@@ -102,6 +102,9 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
 
         view.addEventListener(GameKeyEvent.KEY, onKeyUp);
+
+        // Человек мог играть на компе, а потом перезайти в бой на мобиле
+        if(gameState.players.length > view.supportedPlayersCount) onSurrender()
     }
 
     private function onEnterFrame(event:GameMouseEvent):void {
@@ -207,7 +210,8 @@ public class GameController implements IGameFacade {
         }
     }
 
-    private function onSurrender(event:Event):void {
+    private function onSurrender(event:Event = null):void {
+        view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
         sender.surrender();
     }
 

@@ -38,7 +38,6 @@ class CastlesAccount(accountId: AccountId,
     builder.build
   }
 
-
   override def receive = {
     super.receive orElse {
       case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒

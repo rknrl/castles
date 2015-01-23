@@ -4,7 +4,6 @@ import akka.actor.ActorRef
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
-import ru.rknrl.base.account.LeaveGame
 import ru.rknrl.base.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.GameState
 import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
@@ -52,7 +51,6 @@ object PlayerState extends Enumeration {
 }
 
 /**
- *
  * Online/Offline:
  *
  * Игрок может терять соединение, в этом случае к нам приходит сообщение Offline
@@ -77,20 +75,17 @@ abstract class Game(players: Map[PlayerId, Player],
     for ((playerId, player) ← players)
     yield playerId → player.accountId
 
-  /**
-   * Игроки, с которыми в данный момент установлено соединение
-   * Добавление происходит на сообщение JoinMsg
-   * Удаление происходит при потере коннекта, на сообщение Offline
-   */
+  /** Игроки, с которыми в данный момент установлено соединение
+    * Добавление происходит на сообщение JoinMsg
+    * Удаление происходит при потере коннекта, на сообщение Offline
+    */
   private var online = Set[PlayerId]()
 
   private var playerStates =
     for ((playerId, player) ← players)
     yield playerId → PlayerState.GAME
 
-  /**
-   * Игроки, которые завершили игру и их места
-   */
+  /** Игроки, которые завершили игру и их места */
   private var gameOvers = Map[PlayerId, Int]()
 
   private var `playerId→account` = Map[PlayerId, ActorRef]()
@@ -103,9 +98,7 @@ abstract class Game(players: Map[PlayerId, Player],
 
   private var `gameRmi→playerId` = Map[ActorRef, PlayerId]()
 
-  /**
-   * Игроки еще не завершившие игру
-   */
+  /** Игроки еще не завершившие игру */
   private def playersInGame =
     for ((playerId, playerState) ← playerStates
          if playerState == PlayerState.GAME)
@@ -113,9 +106,7 @@ abstract class Game(players: Map[PlayerId, Player],
 
   private def getPlace = playersInGame.size
 
-  /**
-   * Все вышли из игры
-   */
+  /** Все вышли из игры */
   private def allLeaved =
     playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
 
@@ -159,9 +150,7 @@ abstract class Game(players: Map[PlayerId, Player],
       gameRmi ! all
     }
 
-  /**
-   * Отправить игрокам-ботам геймстейт
-   */
+  /** Отправить игрокам-ботам геймстейт */
   private def sendGameStateToBots() =
     for ((playerId, ref) ← `playerId→gameRmi`
          if players(playerId).isBot)
@@ -176,10 +165,9 @@ abstract class Game(players: Map[PlayerId, Player],
   protected def updateGameState: (GameState, Iterable[Msg], Iterable[PersonalMessage])
 
   override def receive = {
-    /**
-     * Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
-     * Добавляем/Обнавляем рефы в мапах
-     */
+    /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
+      * Добавляем/Обнавляем рефы в мапах
+      */
     case Join(accountId, enterGameRmiRef, gameRmiRef) ⇒
       val playerId = `accountId→playerId`(accountId)
       `playerId→account` = `playerId→account` + (playerId → sender)
@@ -190,19 +178,17 @@ abstract class Game(players: Map[PlayerId, Player],
       `playerId→gameRmi` = `playerId→gameRmi` + (playerId → gameRmiRef)
       `gameRmi→playerId` = `gameRmi→playerId` + (gameRmiRef → playerId)
 
-    /**
-     * Аккаунт говорит, что потеряли связь с игроком
-     * Убираем из его мапы online
-     */
+    /** Аккаунт говорит, что потеряли связь с игроком
+      * Убираем из его мапы online
+      */
     case Offline(accountId) ⇒
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
 
-    /**
-     * Игрок входит в бой
-     * Кладем его в мапу online
-     * и отправляем стартовое сообщение JoinGameMsg
-     */
+    /** Игрок входит в бой
+      * Кладем его в мапу online
+      * и отправляем стартовое сообщение JoinGameMsg
+      */
     case JoinMsg() ⇒
       val playerId = `enterGameRmi→playerId`(sender)
       online = online + playerId
@@ -213,29 +199,21 @@ abstract class Game(players: Map[PlayerId, Player],
         .build
       sender ! JoinGameMsg(dto)
 
-    /**
-     * Игрок сдается
-     */
+    /** Игрок сдается */
     case SurrenderMsg() ⇒
       assert(playerStates(senderPlayerId) == PlayerState.GAME)
       addLoser(senderPlayerId, getPlace)
 
-    /**
-     * Игрок окончательно выходит из боя (нажал leave в GameOverScreen)
-     */
+    /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case LeaveMsg() ⇒
       assert(playerStates(senderPlayerId) == PlayerState.GAME_OVER)
       addLeaved(senderPlayerId)
 
-    /**
-     * Matchmaking завершает игру (Ответ на GameOver)
-     */
+    /** Matchmaking завершает игру (Ответ на AllPlayersLeaveGame) */
     case StopGame ⇒
       context stop self
 
-    /**
-     * Scheduler говорит, что пора обновить game state и отправить игрокам
-     */
+    /** Scheduler говорит, что пора обновить game state и отправить игрокам */
     case UpdateGameState ⇒
       val (newGameState, messages, personalMessages) = updateGameState
       gameState = newGameState

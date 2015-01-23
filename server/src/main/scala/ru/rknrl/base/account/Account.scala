@@ -3,24 +3,31 @@ package ru.rknrl.base.account
 import akka.actor.{ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.{MatchMaking, AccountId}
+import ru.rknrl.base.AccountId
+import ru.rknrl.base.MatchMaking._
+import ru.rknrl.base.account.Account.{DuplicateAcсount, LeaveGame, GetAuthenticationSuccess}
 import ru.rknrl.base.game.Game.{Join, Offline}
-import MatchMaking._
+import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.AccountStateDb.Put
-import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.rmi._
-import ru.rknrl.castles.Config
-import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
+import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-case object GetAccountState
+object Account {
 
-case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
+  case object GetAuthenticationSuccess
+
+  case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
+
+  case object DuplicateAcсount
+
+}
 
 abstract class Account(accountId: AccountId,
                        deviceType: DeviceType,
@@ -57,9 +64,7 @@ abstract class Account(accountId: AccountId,
     case EnterGameMsg() ⇒
       matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
-    /**
-     * from accountStateDb
-     */
+    /** from accountStateDb */
     case Put(accountId, accountStateDto) ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
@@ -83,17 +88,15 @@ abstract class Account(accountId: AccountId,
         case _ ⇒ // send error
       }
 
-    /**
-     * Auth спрашивает accountState
-     * Спрашиваем матчмейкинг находится ли этот игрок в бою
-     */
-    case GetAccountState ⇒
-      matchmaking ! InGame(accountId)
+    /** Auth спрашивает accountState
+      * Спрашиваем матчмейкинг находится ли этот игрок в бою
+      */
+    case GetAuthenticationSuccess ⇒
+      matchmaking ! InGame(accountId, deviceType)
 
-    /**
-     * Matchmaking ответил на InGame
-     * Отправляем Auth accountState
-     */
+    /** Matchmaking ответил на InGame
+      * Отправляем Auth accountState
+      */
     case InGameResponse(gameRef, enterGame) ⇒
       if (gameRef.isDefined) {
         reenterGame = true
@@ -104,9 +107,7 @@ abstract class Account(accountId: AccountId,
         auth ! authenticationSuccessDto(enterGame, None)
       }
 
-    /**
-     * Matchmaking говорит к какой игре коннектится
-     */
+    /** Matchmaking говорит к какой игре коннектится */
     case ConnectToGame(gameRef) ⇒
       connectToGame(gameRef)
 
@@ -131,9 +132,7 @@ abstract class Account(accountId: AccountId,
 
       sendJoin()
 
-    /**
-     * Matchmaking говорит, что для этого игрока бой завершен
-     */
+    /** Matchmaking говорит, что для этого игрока бой завершен */
     case LeaveGame(usedItems, reward, newRating) ⇒
       assert(game.isDefined)
       assert(enterGameRmi.isDefined)
@@ -163,6 +162,9 @@ abstract class Account(accountId: AccountId,
       gameRmiRegistered = false
 
       accountStateDb ! Put(accountId, state.dto)
+
+    /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
+    case DuplicateAcсount ⇒ tcpReceiver ! CloseConnection
   }
 
   private def connectToGame(game: ActorRef) = {

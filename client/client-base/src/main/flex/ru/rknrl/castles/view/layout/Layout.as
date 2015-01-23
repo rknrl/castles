@@ -179,6 +179,10 @@ public class Layout {
         return notScaledGameAvatarSize * scale;
     }
 
+    public function get supportedPlayersCount():int {
+        throw OverrideMe;
+    }
+
     public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
         throw OverrideMe()
     }

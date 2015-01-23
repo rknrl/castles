@@ -2,7 +2,7 @@ package ru.rknrl.base
 
 import akka.actor.{ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.account.GetAccountState
+import ru.rknrl.base.account.Account.GetAuthenticationSuccess
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountState, CastlesAccount}
 import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
@@ -53,9 +53,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
     case ReceiverRegistered(ref) ⇒
       authRmi ! AuthReadyMsg()
 
-    /**
-     * from player
-     */
+    /** from player */
     case AuthenticateMsg(authenticate) ⇒
       if (checkSecret(authenticate)) {
         accountId = Some(new AccountId(authenticate.getUserInfo.getAccountId))
@@ -65,23 +63,17 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
       } else
         reject()
 
-    /**
-     * from AccountStateDb
-     */
+    /** from AccountStateDb */
     case dto: AccountStateDTO ⇒
       val state = AccountState.fromDto(dto, config.account)
       startAccount(state)
 
-    /**
-     * from AccountStateDb
-     */
+    /** from AccountStateDb */
     case NoExist(key) ⇒
       val state = AccountState.initAccount(config.account)
       startAccount(state)
 
-    /**
-     * from Account
-     */
+    /** from Account */
     case dto: AuthenticationSuccessDTO ⇒
       authRmi ! AuthenticationSuccessMsg(dto)
       tcpReceiver ! UnregisterReceiver(authRmi)
@@ -89,7 +81,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
 
   private def startAccount(state: AccountState) = {
     val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
-    accountRef ! GetAccountState
+    accountRef ! GetAuthenticationSuccess
   }
 
   override def preStart(): Unit = println("AuthService start " + name)

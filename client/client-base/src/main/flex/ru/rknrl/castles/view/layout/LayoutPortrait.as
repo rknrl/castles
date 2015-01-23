@@ -75,6 +75,9 @@ public class LayoutPortrait extends Layout {
                 return new Point(0, 0);
             case 1:
                 return new Point(0, 0);
+            case 2:
+            case 3:
+                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
         }
         throw new Error("invalid avatar playerId " + playerId.id);
     }
@@ -87,8 +90,15 @@ public class LayoutPortrait extends Layout {
                 return new Point(-notScaledGameAvatarSize / 2 - gap - width, y);
             case 1:
                 return new Point(notScaledGameAvatarSize / 2 + gap, y);
+            case 2:
+            case 3:
+                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
         }
         throw new Error("invalid avatar playerId " + playerId.id);
+    }
+
+    override public function get supportedPlayersCount():int {
+        return 2;
     }
 
     override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
@@ -106,6 +116,9 @@ public class LayoutPortrait extends Layout {
                 return new Point(areaRight - gameAvatarSize / 2, areaTop - gap - gameAvatarSize / 2);
             case 1:
                 return new Point(areaLeft + gameAvatarSize / 2, areaBottom + gap + gameAvatarSize / 2);
+            case 2:
+            case 3:
+                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
         }
         throw new Error("invalid avatar number " + playerId.id);
     }

@@ -79,6 +79,10 @@ public class LayoutLandscape extends Layout {
         return screenHeight - (96 + 24) * scale;
     }
 
+    override public function get supportedPlayersCount():int {
+        return 4;
+    }
+
     override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
         const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
         const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
