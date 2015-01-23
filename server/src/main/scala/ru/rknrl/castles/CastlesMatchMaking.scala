@@ -1,7 +1,7 @@
 package ru.rknrl.castles
 
 import akka.actor.Props
-import ru.rknrl.base.MatchMaking.GameOrder
+import ru.rknrl.base.MatchMaking.{TopItem, GameOrder}
 import ru.rknrl.base._
 import ru.rknrl.castles.account.objects.{Item, Items}
 import ru.rknrl.castles.bot.Bot
@@ -11,7 +11,7 @@ import ru.rknrl.dto.CommonDTO.{DeviceType, UserInfoDTO}
 
 import scala.concurrent.duration.FiniteDuration
 
-class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends MatchMaking(interval, gameConfig) {
+class CastlesMatchMaking(interval: FiniteDuration, top: List[TopItem], gameConfig: GameConfig) extends MatchMaking(interval, top, gameConfig) {
 
   override def tryCreateGames(gameOrders: List[GameOrder]) = {
     val (smallGameOrders, bigGameOrders) = gameOrders.span(_.deviceType == DeviceType.PHONE)

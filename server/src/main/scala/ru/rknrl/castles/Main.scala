@@ -4,6 +4,7 @@ import akka.actor.{SupervisorStrategy, ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import net.liftweb.json._
 import ru.rknrl.PolicyServer
+import ru.rknrl.base.MatchMaking.TopItem
 import ru.rknrl.base.TcpServer
 import ru.rknrl.castles.database.InMemoryDb
 import ru.rknrl.base.payments.PaymentsServer
@@ -28,7 +29,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val matchmaking = system.actorOf(Props(classOf[CastlesMatchMaking], 3 seconds, config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[CastlesMatchMaking], 3 seconds, List.empty[TopItem], config.game), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[PaymentsServer], config), "payment-server")
     IO(Http) ! Http.Bind(payments, config.host, 8080)

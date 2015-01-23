@@ -55,9 +55,11 @@ object MatchMaking {
 
   case object AllPlayersLeaveGame
 
+  case class TopItem(accountId: AccountId, rating: Double)
+
 }
 
-abstract class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Actor {
+abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: GameConfig) extends Actor {
   /** Если у бота случается ошибка - стопаем его
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
@@ -175,8 +177,13 @@ abstract class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) ext
     val sA = getSA(big, place)
     val newRating = getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
 
+    top = insert(top, TopItem(accountId, newRating))
+
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating)
   }
+
+  private def insert(list: List[TopItem], item: TopItem) =
+    (top.filter(_.accountId != item.accountId) :+ item).sortBy(_.rating).take(5)
 
   private def onGameOver(gameRef: ActorRef) =
     gameRefToGameInfo = gameRefToGameInfo - gameRef

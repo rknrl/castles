@@ -249,7 +249,6 @@ abstract class Game(players: Map[PlayerId, Player],
   }
 
   private def addLoser(playerId: PlayerId, place: Int) {
-    println(place)
     playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
 
     val dto = getLoseDto(playerId, place)
