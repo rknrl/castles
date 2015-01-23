@@ -57,19 +57,23 @@ object MatchMaking {
 
 abstract class MatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends Actor {
   /**
+   * Если у бота случается ошибка - стопаем его
    * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
    */
   override def supervisorStrategy = OneForOneStrategy() {
     case _: Exception ⇒
-      val gameInfo = gameRefToGameInfo(sender)
-      for (order ← gameInfo.orders;
-           accountId = order.accountId
-           if accountIdToGameInfo.contains(accountId) && accountIdToGameInfo(accountId) == gameInfo) {
-        onAccountLeaveGame(accountId)
-        accountIdToAccountRef(accountId) ! LeaveGame(Map.empty, 0)
-      }
-      onGameOver(sender)
-      Stop
+      if (gameRefToGameInfo.contains(sender)) {
+        val gameInfo = gameRefToGameInfo(sender)
+        for (order ← gameInfo.orders;
+             accountId = order.accountId
+             if accountIdToGameInfo.contains(accountId) && accountIdToGameInfo(accountId) == gameInfo) {
+          onAccountLeaveGame(accountId)
+          accountIdToAccountRef(accountId) ! LeaveGame(Map.empty, 0)
+        }
+        onGameOver(sender)
+        Stop
+      } else
+        Stop // stop bot
   }
 
   class GameInfo(val gameRef: ActorRef,

@@ -44,7 +44,7 @@ class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) exten
 
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
-      val bot = context.actorOf(Props(classOf[Bot], accountId), accountId.id)
+      val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
       val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, order.items, isBot = true)
       orders = orders :+ botOrder
       placeGameOrder(botOrder, bot)

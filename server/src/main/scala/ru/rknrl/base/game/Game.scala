@@ -165,10 +165,9 @@ abstract class Game(players: Map[PlayerId, Player],
          if players(playerId).isBot)
       ref ! gameState
 
-  protected def getPlayerId = `gameRmi→playerId`(sender)
+  protected def senderPlayerId = `gameRmi→playerId`(sender)
 
-  protected def assertCanPlay() =
-    assert(playerStates(getPlayerId) == PlayerState.GAME)
+  protected def canPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
   protected var gameState: GameState
 
@@ -216,15 +215,15 @@ abstract class Game(players: Map[PlayerId, Player],
      * Игрок сдается
      */
     case SurrenderMsg() ⇒
-      assert(playerStates(getPlayerId) == PlayerState.GAME)
-      addLoser(getPlayerId, getPlace)
+      assert(playerStates(senderPlayerId) == PlayerState.GAME)
+      addLoser(senderPlayerId, getPlace)
 
     /**
      * Игрок окончательно выходит из боя (нажал leave в GameOverScreen)
      */
     case LeaveMsg() ⇒
-      assert(playerStates(getPlayerId) == PlayerState.GAME_OVER)
-      addLeaved(getPlayerId)
+      assert(playerStates(senderPlayerId) == PlayerState.GAME_OVER)
+      addLeaved(senderPlayerId)
 
     /**
      * Matchmaking завершает игру (Ответ на GameOver)

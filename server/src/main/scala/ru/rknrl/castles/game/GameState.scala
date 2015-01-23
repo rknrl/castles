@@ -221,7 +221,7 @@ class GameState(val time: Long,
       .applyBullets(finishedBullets, playerStates, config, time)
       .applyRemoveMessages(removeUnitMessages)
 
-    val updateBuildingMessages = Buildings.getUpdateMessages(buildings.buildings, newBuildings.buildings)
+    val updateBuildingMessages = Buildings.getUpdateMessages(buildings.map, newBuildings.map)
     val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
 
     val newFireballs = fireballs
@@ -240,7 +240,7 @@ class GameState(val time: Long,
       .add(createdBullets)
       .cleanup(time)
 
-    val newPlayerStates = playerStates.updateChurchesPopulation(buildings.buildings)
+    val newPlayerStates = playerStates.updateChurchesPopulation(buildings.map)
 
     val newGameState = new GameState(
       newTime,
@@ -270,7 +270,7 @@ class GameState(val time: Long,
   }
 
   def isPlayerLose(playerId: PlayerId) =
-    !buildings.buildings.exists { case (buildingId, building) ⇒ building.owner == Some(playerId)}
+    !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId)}
 
   def dtoBuilder(id: PlayerId) =
     GameStateDTO.newBuilder()

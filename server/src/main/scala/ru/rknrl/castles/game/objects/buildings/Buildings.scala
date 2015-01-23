@@ -9,8 +9,8 @@ import ru.rknrl.castles.game.objects.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.objects.volcanoes.{Volcano, Volcanoes}
 import ru.rknrl.castles.rmi.UpdateBuildingMsg
 
-class Buildings(val buildings: Map[BuildingId, Building]) {
-  def apply(id: BuildingId) = buildings(id)
+class Buildings(val map: Map[BuildingId, Building]) {
+  def apply(id: BuildingId) = map(id)
 
   def updatePopulation(deltaTime: Long, config: GameConfig) = {
     def updateBuilding(b: Building) = {
@@ -18,7 +18,7 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
       b.setPopulation(Math.min(b.population + add, config.maxPopulation))
     }
 
-    new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))
+    new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
   def applyExitUnits(exitUnits: Iterable[ExitUnit], config: GameConfig) = {
@@ -29,11 +29,11 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
       } else
         b
 
-    new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))
+    new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
   def applyEnterUnits(enterUnits: Iterable[EnterUnit], config: GameConfig, playerStates: PlayerStates) = {
-    var newBuildings = buildings
+    var newBuildings = map
     for (enterUnit ← enterUnits) {
       val b = newBuildings(enterUnit.unit.targetBuildingId)
       if (b.owner.isDefined && b.owner.get == enterUnit.unit.owner) {
@@ -56,7 +56,7 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
         b.strength(time)
       else
         b
-    new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))
+    new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
   def cleanupStrengthening(time: Long, config: GameConfig, playerStates: PlayerStates) = {
@@ -67,11 +67,11 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
       else
         b
     }
-    new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))
+    new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
   def canShoot(time: Long, config: GameConfig, playerStates: PlayerStates) =
-    for ((id, b) ← buildings;
+    for ((id, b) ← map;
          playerState = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
          if time - b.lastShootTime > config.shootingInterval(b, playerState))
     yield b
@@ -83,12 +83,12 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
       else
         b
 
-    new Buildings(for ((id, b) ← buildings) yield id → updateBuilding(b))
+    new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
   def applyFireballs(fireballs: Iterable[Fireball], playerStates: PlayerStates, config: GameConfig) =
     new Buildings(
-      for ((id, b) ← buildings)
+      for ((id, b) ← map)
       yield {
         val nearFireballs = Fireballs.inRadius(fireballs, b.pos, config, playerStates)
         var newB = b
@@ -103,7 +103,7 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
 
   def applyTornadoes(tornadoes: Iterable[Tornado], playerStates: PlayerStates, config: GameConfig, time: Long) =
     new Buildings(
-      for ((id, b) ← buildings)
+      for ((id, b) ← map)
       yield {
         val nearTornadoes = Tornadoes.inRadius(tornadoes, b.pos, config, playerStates, time)
         var newB = b
@@ -117,7 +117,7 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
 
   def applyVolcanoes(volcanoes: Iterable[Volcano], playerStates: PlayerStates, config: GameConfig) =
     new Buildings(
-      for ((id, b) ← buildings)
+      for ((id, b) ← map)
       yield {
         val nearVolcanoes = Volcanoes.inRadius(volcanoes, b.pos, config, playerStates)
         var newB = b
@@ -129,9 +129,9 @@ class Buildings(val buildings: Map[BuildingId, Building]) {
       }
     )
 
-  def dto = for ((id, building) ← buildings) yield building.dto
+  def dto = for ((id, building) ← map) yield building.dto
 
-  def updateDto = for ((id, building) ← buildings) yield building.updateDto
+  def updateDto = for ((id, building) ← map) yield building.updateDto
 }
 
 object Buildings {
