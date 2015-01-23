@@ -33,6 +33,7 @@ object MatchMaking {
                   val startLocation: StartLocation,
                   val skills: Skills,
                   val items: Items,
+                  val rating: Int,
                   val isBot: Boolean)
 
   // account -> matchmaking

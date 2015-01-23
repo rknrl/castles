@@ -12,12 +12,14 @@ object AccountStateTest {
                    skills: Skills = SkillsTest.skills,
                    items: Items = ItemsTest.items,
                    gold: Int = 666,
+                   rating: Int = 666,
                    config: AccountConfig = AccountConfigMock.config) =
     new AccountState(
       startLocation,
       skills,
       items,
       gold,
+      rating,
       config
     )
 }

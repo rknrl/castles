@@ -13,46 +13,51 @@ import scala.concurrent.duration.FiniteDuration
 
 class CastlesMatchMaking(interval: FiniteDuration, gameConfig: GameConfig) extends MatchMaking(interval, gameConfig) {
 
-  private def isBigGame(deviceType: DeviceType) = deviceType != DeviceType.PHONE
+  override def tryCreateGames(gameOrders: List[GameOrder]) = {
+    val (smallGameOrders, bigGameOrders) = gameOrders.span(_.deviceType == DeviceType.PHONE)
 
-  private def friendlyDevices(a: DeviceType, b: DeviceType) =
-    (a == DeviceType.PHONE && b == DeviceType.PHONE) || (a != DeviceType.PHONE && b != DeviceType.PHONE)
+    createGames(big = false, playersCount = 2, smallGameOrders) ++
+      createGames(big = true, playersCount = 4, bigGameOrders)
+  }
 
-  /**
-   * Создать игры из имеющихся заявок
-   * Если заявок две - создаем игру между этими двумя игроками
-   * Если заявка одна - создаем игру с ботом
-   */
-  override def tryCreateGames(gameOrders: List[GameOrder]) =
-    if (gameOrders.size == 2 && friendlyDevices(gameOrders(0).deviceType, gameOrders(1).deviceType)) {
-      val order1 = gameOrders(0)
-      val order2 = gameOrders(1)
-      List(createGame(isBigGame(order1.deviceType), List(order1, order2)))
-    } else if (gameOrders.size == 1) {
-      val order = gameOrders(0)
-      List(createGameWithBot(order))
-    } else
-      List.empty
+  private def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
+    var sorted = orders.sortBy(_.rating)(Ordering.Int.reverse)
+    var createdGames = List.empty[GameInfo]
+
+    if(orders.size > 0) {
+      println()
+    }
+
+    while (sorted.size > playersCount) {
+      createdGames = createdGames :+ createGame(big, sorted.take(playersCount))
+      sorted = sorted.drop(playersCount)
+    }
+
+    if (sorted.size > 0)
+      createdGames = createdGames :+ createGameWithBot(big, playersCount, sorted)
+
+    createdGames
+  }
 
   private val botIdIterator = new BotIdIterator
 
-  private def createGameWithBot(order: GameOrder) = {
-    val bigGame = isBigGame(order.deviceType)
+  private def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder]) = {
+    val botsCount = if (big) playerCount - orders.size else playerCount - orders.size
+    assert(botsCount >= 1, botsCount)
 
-    val botsCount = if (bigGame) 3 else 1
-
-    var orders = List(order)
+    val order = orders.head
+    var result = orders
 
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
 
-      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), isBot = true)
-      orders = orders :+ botOrder
+      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), order.rating, isBot = true)
+      result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
 
-    createGame(bigGame, orders)
+    createGame(big, result)
   }
 
   private def botItems(playerItems: Items) =

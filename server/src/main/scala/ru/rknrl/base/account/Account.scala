@@ -55,7 +55,7 @@ abstract class Account(accountId: AccountId,
 
   override def receive = {
     case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, isBot = false))
+      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, isBot = false))
 
     /**
      * from accountStateDb

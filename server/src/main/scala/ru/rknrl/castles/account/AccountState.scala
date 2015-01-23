@@ -8,6 +8,7 @@ class AccountState(val startLocation: StartLocation,
                    val skills: Skills,
                    val items: Items,
                    val gold: Int,
+                   val rating: Int,
                    val config: AccountConfig) {
 
   def swapSlots(id1: SlotId, id2: SlotId): AccountState =
@@ -53,14 +54,16 @@ class AccountState(val startLocation: StartLocation,
   private def copy(newStartLocation: StartLocation = startLocation,
                    newSkills: Skills = skills,
                    newItems: Items = items,
-                   newGold: Int = gold) =
-    new AccountState(newStartLocation, newSkills, newItems, newGold, config)
+                   newGold: Int = gold,
+                   newRating: Int = rating) =
+    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, config)
 
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
     .setSkills(skills.dto)
     .setItems(items.dto)
     .setGold(gold)
+    .setRating(rating)
     .build()
 }
 
@@ -90,13 +93,16 @@ object AccountState {
 
   private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)
 
-  def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems(config), config.initGold, config)
+  private val initRating = 1400
+
+  def initAccount(config: AccountConfig) = new AccountState(initStartLocation, initSkills, initItems(config), config.initGold, initRating, config)
 
   def fromDto(dto: AccountStateDTO, config: AccountConfig) = new AccountState(
     StartLocation.fromDto(dto.getStartLocation),
     Skills.fromDto(dto.getSkills),
     Items.fromDto(dto.getItems),
     dto.getGold,
+    dto.getRating,
     config
   )
 }
