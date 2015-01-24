@@ -1,9 +1,9 @@
 package ru.rknrl.castles.game.objects.tornadoes
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.game.GameConfigMock
 import ru.rknrl.castles.game.objects.PlayerStateTest
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.dto.GameDTO.{CastTorandoDTO, PointDTO}
 import ru.rknrl.utils.{Point, Points}
 

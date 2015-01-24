@@ -5,6 +5,7 @@ import ru.rknrl.castles.game.objects.Moving.ExitUnit
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.game.objects.{Moving, PlayerStateTest}
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 class ExitUnitToUnitsTest extends FlatSpec with Matchers {

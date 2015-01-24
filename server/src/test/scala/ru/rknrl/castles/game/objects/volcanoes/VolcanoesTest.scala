@@ -1,9 +1,9 @@
 package ru.rknrl.castles.game.objects.volcanoes
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.game.GameConfigMock
 import ru.rknrl.castles.game.objects.PlayerStateTest
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.utils.Point
 
 class VolcanoesTest extends FlatSpec with Matchers {

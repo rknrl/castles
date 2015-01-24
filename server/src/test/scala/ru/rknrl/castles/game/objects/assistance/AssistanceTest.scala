@@ -5,6 +5,7 @@ import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.game.objects.{Assistance, PlayerStateTest}
+import ru.rknrl.castles.mock.GameConfigMock
 
 class AssistanceTest extends FlatSpec with Matchers {
   val playerId0 = new PlayerId(0)

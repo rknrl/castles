@@ -1,6 +1,7 @@
-package ru.rknrl.castles.game
+package ru.rknrl.castles.mock
 
 import ru.rknrl.castles.Config.{BuildingLevelToFactor, BuildingsConfig}
+import ru.rknrl.castles.game._
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 object GameConfigMock {

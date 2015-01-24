@@ -1,10 +1,10 @@
 package ru.rknrl.castles.game.objects.bullets
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.game.GameConfigMock
 import ru.rknrl.castles.game.objects.PlayerStateTest
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.objects.units.{GameUnitTest, GameUnits}
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.utils.Point
 
 class BulletsTest extends FlatSpec with Matchers {

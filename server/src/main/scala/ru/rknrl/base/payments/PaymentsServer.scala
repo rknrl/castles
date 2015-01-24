@@ -1,7 +1,9 @@
 package ru.rknrl.base.payments
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.ActorRef
+import akka.event.slf4j.Logger
 import akka.pattern.Patterns
+import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.payments.PaymentsCallback.{PaymentResponse, Response}
@@ -9,6 +11,8 @@ import ru.rknrl.base.payments.PaymentsServer._
 import ru.rknrl.castles.Config
 import ru.rknrl.core.social.{Product, SocialConfig}
 import spray.http.MediaTypes._
+import spray.http._
+import spray.httpx.marshalling.Marshaller
 import spray.routing.HttpService
 
 import scala.concurrent.Await
@@ -49,14 +53,21 @@ object PaymentsServer {
 }
 
 class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpService {
+  private val bugLog = LoggerFactory.getLogger("client")
 
   private var accountIdToAccount = Map[AccountId, ActorRef]()
 
+  implicit val UTF8StringMarshaller =
+    Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
+      ctx.marshalTo(HttpEntity(contentType, value))
+    }
+
   private val paymentsCallbacks =
     path("bug") {
-      get {
-        complete {
-          <h1>Say hello to spray</h1>
+      post {
+        entity(as[String]) { log =>
+          bugLog.info(log)
+          complete(StatusCodes.OK)
         }
       }
     } ~ path("vk_callback") {
@@ -130,7 +141,7 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
 
   def actorRefFactory = context
 
-  def receive = {
+  def receive = runRoute(paymentsCallbacks) orElse {
     case Register(accountId) ⇒
       accountIdToAccount = accountIdToAccount.updated(accountId, sender)
       sender ! Registered
@@ -138,7 +149,5 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
     case Unregister(accountId) ⇒
       accountIdToAccount = accountIdToAccount - accountId
       sender ! Unregistered
-
-    case _ ⇒ runRoute(paymentsCallbacks)
   }
 }

@@ -1,6 +1,7 @@
-package ru.rknrl.castles.account
+package ru.rknrl.castles.mock
 
-import ru.rknrl.castles.account.AccountConfig.{SkillUpgradePrices, BuildingPrices}
+import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.account.AccountConfig.{BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.dto.CommonDTO.BuildingLevel
 
 object AccountConfigMock {

@@ -2,10 +2,10 @@ package ru.rknrl.castles.game.objects.moving
 
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.account.objects.BuildingPrototype
-import ru.rknrl.castles.game.GameConfigMock
 import ru.rknrl.castles.game.objects.{PlayerStateTest, Moving}
 import ru.rknrl.castles.game.objects.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 import ru.rknrl.dto.GameDTO.MoveDTO
 

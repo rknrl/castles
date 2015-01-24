@@ -8,6 +8,7 @@ import ru.rknrl.castles.game.objects.PlayerStateTest
 import ru.rknrl.castles.game.objects.bullets.Bullet
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.castles.game.objects.units.{GameUnitTest, GameUnits}
+import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 class BuildingsTest extends FlatSpec with Matchers {
