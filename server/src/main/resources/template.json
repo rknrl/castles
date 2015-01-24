@@ -18,7 +18,7 @@
     }
   ],
   "account": {
-    "initGold": 8,
+    "initGold": 1000,
     "initItemCount": 2,
     "buildingPrices": {
       "level1": 4,
@@ -41,61 +41,67 @@
   "game": {
     "buildingsConfig": {
       "tower": {
-        "regeneration": 0.0001,
+        "regeneration": 0.0002,
         "startPopulation": 10,
         "stat": {
-          "attack": 2,
-          "defence": 3,
-          "speed": 0.025
+          "attack": 5,
+          "defence": 4,
+          "speed": 0.06
         }
       },
       "house": {
-        "regeneration": 0.0003,
-        "startPopulation": 30,
+        "regeneration": 0.0004,
+        "startPopulation": 10,
         "stat": {
           "attack": 2,
           "defence": 2,
-          "speed": 0.05
+          "speed": 0.07
         }
       },
       "church": {
         "regeneration": 0.0002,
-        "startPopulation": 20,
+        "startPopulation": 5,
         "stat": {
-          "attack": 1,
-          "defence": 1,
-          "speed": 0.1
+          "attack": 3,
+          "defence": 3,
+          "speed": 0.08
         }
       }
     },
     "levelToFactor": {
       "buildingLevel1": 1.0,
-      "buildingLevel2": 1.5,
-      "buildingLevel3": 2.0
+      "buildingLevel2": 1.1,
+      "buildingLevel3": 1.2
     },
     "constants": {
       "unitToExitFactor": 0.5,
-      "itemCooldown": 5000
+      "itemCooldown": 20000
     },
     "fireball": {
-      "damage": 0.1,
-      "flyDuration": 1000
+      "damageVsUnit": 15,
+      "damageVsBuilding": 10,
+      "flyDuration": 1000,
+      "radius": 39
     },
     "volcano": {
-      "damage": 0.1,
-      "duration": 2000
+      "damageVsUnit": 0.06,
+      "damageVsBuilding": 0.12,
+      "duration": 6000,
+      "radius": 39
     },
     "tornado": {
-      "damage": 0.1,
-      "duration": 2000,
-      "speed": 0.05
+      "damageVsUnit": 0.24,
+      "damageVsBuilding": 0.24,
+      "duration": 10000,
+      "speed": 0.033,
+      "radius": 39
     },
     "strengthening": {
       "factor": 1.5,
-      "duration": 5000
+      "duration": 10000
     },
     "shooting": {
-      "damage": 0.0,
+      "damage": 2,
       "speed": 0.0004,
       "shootInterval": 3000,
       "shootRadius": 1
