@@ -1,6 +1,6 @@
 package ru.rknrl.base.account
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
@@ -37,7 +37,7 @@ abstract class Account(accountId: AccountId,
                        accountStateDb: ActorRef,
                        auth: ActorRef,
                        config: Config,
-                       name: String) extends EscalateStrategyActor {
+                       name: String) extends EscalateStrategyActor with ActorLogging {
 
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
   tcpReceiver ! RegisterReceiver(accountRmi)
@@ -200,10 +200,10 @@ abstract class Account(accountId: AccountId,
         accountRmi ! EnteredGameMsg(gameAddress)
     }
 
-  override def preStart(): Unit = println("AccountService start " + name)
+  override def preStart(): Unit = log.info("AccountService start " + name)
 
   override def postStop(): Unit = {
     if (game.isDefined) game.get ! Offline(accountId)
-    println("AccountService stop " + name)
+    log.info("AccountService stop " + name)
   }
 }

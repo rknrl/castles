@@ -1,6 +1,7 @@
 package ru.rknrl.castles
 
 import akka.actor.{SupervisorStrategy, ActorSystem, Props}
+import akka.event.Logging
 import akka.io.{IO, Tcp}
 import net.liftweb.json._
 import ru.rknrl.PolicyServer

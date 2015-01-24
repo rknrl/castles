@@ -1,6 +1,6 @@
 package ru.rknrl.base
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.account.Account.GetAuthenticationSuccess
 import ru.rknrl.castles.Config
@@ -17,7 +17,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
                   accountStateDb: ActorRef,
                   config: Config,
-                  name: String) extends EscalateStrategyActor {
+                  name: String) extends EscalateStrategyActor with ActorLogging {
 
   private val authRmi = context.actorOf(Props(classOf[AuthRMI], tcpSender, self), "auth-rmi" + name)
 
@@ -44,7 +44,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
     }
 
   def reject() = {
-    println("reject")
+    log.info("reject")
     tcpReceiver ! UnregisterReceiver(authRmi)
     tcpReceiver ! CloseConnection
   }
@@ -84,7 +84,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
     accountRef ! GetAuthenticationSuccess
   }
 
-  override def preStart(): Unit = println("AuthService start " + name)
+  override def preStart(): Unit = log.info("AuthService start " + name)
 
-  override def postStop(): Unit = println("AuthService stop " + name)
+  override def postStop(): Unit = log.info("AuthService stop " + name)
 }

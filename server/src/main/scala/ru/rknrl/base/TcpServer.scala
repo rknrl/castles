@@ -2,13 +2,13 @@ package ru.rknrl.base
 
 import java.net.InetSocketAddress
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends StoppingStrategyActor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends StoppingStrategyActor with ActorLogging {
 
   import akka.io.Tcp._
 
@@ -18,10 +18,10 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountSta
 
   def receive = {
     case Bound(localAddress) ⇒
-      println("bound " + localAddress)
+      log.info("bound " + localAddress)
 
     case CommandFailed(_: Bind) ⇒
-      println("command failed " + address)
+      log.info("command failed " + address)
       context stop self
 
     case Connected(remote, local) ⇒
@@ -36,11 +36,11 @@ class CastlesTcpReceiver(tcpSender: ActorRef,
                          matchmaking: ActorRef,
                          accountStateDb: ActorRef,
                          config: Config,
-                         name: String) extends TcpReceiver(name) {
+                         name: String) extends TcpReceiver(name) with ActorLogging {
 
   context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
 
-  override def preStart(): Unit = println("TcpReceiver start " + name)
+  override def preStart(): Unit = log.info("TcpReceiver start " + name)
 
-  override def postStop(): Unit = println("TcpReceiver stop " + name)
+  override def postStop(): Unit = log.info("TcpReceiver stop " + name)
 }

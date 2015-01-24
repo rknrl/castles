@@ -1,6 +1,6 @@
 package ru.rknrl.base.game
 
-import akka.actor.ActorRef
+import akka.actor.{ActorLogging, ActorRef}
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
@@ -63,7 +63,7 @@ object PlayerState extends Enumeration {
  */
 abstract class Game(players: Map[PlayerId, Player],
                     matchmaking: ActorRef,
-                    winReward: Int) extends EscalateStrategyActor {
+                    winReward: Int) extends EscalateStrategyActor with ActorLogging {
 
   protected val playersList = for ((id, player) ← players) yield player
 
@@ -282,7 +282,7 @@ abstract class Game(players: Map[PlayerId, Player],
     if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
 
-  override def preStart(): Unit = println("Game start")
+  override def preStart(): Unit = log.info("Game start")
 
-  override def postStop(): Unit = println("Game stop")
+  override def postStop(): Unit = log.info("Game stop")
 }

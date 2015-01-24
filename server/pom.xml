@@ -69,6 +69,20 @@
             <artifactId>akka-testkit_2.11</artifactId>
         </dependency>
 
+        <!-- sf4j logging -->
+
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_2.11</artifactId>
+            <version>2.3.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.9</version>
+        </dependency>
+
         <!-- spray -->
 
         <dependency>
