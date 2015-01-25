@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cp -a ~/dev/rknrl/castles/client/client-web/src/main/www/. /var/www
-cp ~/dev/rknrl/castles/client/client-web/target/castles-web.swf /var/www/castles.swf
+cp ~/dev/rknrl/castles/client/client-web/target/castles-web.swf /var/www/game.swf
