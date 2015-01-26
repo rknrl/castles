@@ -7,8 +7,8 @@ import net.liftweb.json._
 import ru.rknrl.PolicyServer
 import ru.rknrl.base.TcpServer
 import ru.rknrl.base.payments.PaymentsServer
-import ru.rknrl.castles.database.AccountStateDb.GetTop
-import ru.rknrl.castles.database.MySqlDb
+import ru.rknrl.base.database.AccountStateDb.GetTop
+import ru.rknrl.base.database.MySqlDb
 import spray.can.Http
 
 import scala.concurrent.Await

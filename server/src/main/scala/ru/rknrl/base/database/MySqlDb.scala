@@ -1,4 +1,4 @@
-package ru.rknrl.castles.database
+package ru.rknrl.base.database
 
 import akka.actor.ActorLogging
 import com.github.mauricio.async.db.mysql.MySQLConnection
@@ -7,7 +7,7 @@ import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.TopItem
-import ru.rknrl.castles.database.AccountStateDb._
+import ru.rknrl.base.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
 

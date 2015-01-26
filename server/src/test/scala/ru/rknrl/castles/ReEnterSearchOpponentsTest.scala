@@ -9,7 +9,7 @@ import akka.io.Tcp.{Connect, PeerClosed}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestKit}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import ru.rknrl.base.{MatchMaking, TcpServer}
-import ru.rknrl.castles.database.InMemoryDb
+import ru.rknrl.base.database.InMemoryDb
 import ru.rknrl.castles.mock.ConfigMock
 import ru.rknrl.core.rmi.{RegisterReceiver, ReceiverRegistered, TcpReceiver}
 import ru.rknrl.core.rmi.testkit._

@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.account.Account
 import ru.rknrl.castles._
-import ru.rknrl.castles.database.AccountStateDb.Update
+import ru.rknrl.base.database.AccountStateDb.Update
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}

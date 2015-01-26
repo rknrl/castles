@@ -5,7 +5,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.account.Account.GetAuthenticationSuccess
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountState, CastlesAccount}
-import ru.rknrl.castles.database.AccountStateDb.{Insert, Get, NoExist}
+import ru.rknrl.base.database.AccountStateDb.{Insert, Get, NoExist}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
