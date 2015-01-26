@@ -1,16 +1,18 @@
 package ru.rknrl.castles.database
 
-import java.io.DataOutputStream
-
-import akka.util.ByteString
+import akka.actor.ActorLogging
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
-import com.github.mauricio.async.db.{Configuration, QueryResult, RowData}
+import com.github.mauricio.async.db.{Configuration, RowData}
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, Put}
+import ru.rknrl.base.AccountId
+import ru.rknrl.base.MatchMaking.TopItem
+import ru.rknrl.castles.database.AccountStateDb._
+import ru.rknrl.dto.AccountDTO.AccountStateDTO
+import ru.rknrl.dto.CommonDTO.AccountType
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 class DbConfiguration(username: String,
                       host: String,
@@ -20,49 +22,60 @@ class DbConfiguration(username: String,
   def configuration = new Configuration(username, host, port, Some(password), Some(database))
 }
 
-class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor {
+class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with ActorLogging {
   val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)
 
   override def receive: Receive = {
-    case put@Put(key, value) ⇒
-      val builder = ByteString.newBuilder
-      val os = new DataOutputStream(builder.asOutputStream)
-      value.writeDelimitedTo(os)
-      val byteString = builder.result()
 
-      val future: Future[QueryResult] = connection.sendQuery("SELECT 0")
+    case GetTop ⇒
+      log.info("GetTop")
+      //val future: Future[QueryResult] = connection.sendQuery("SELECT * FROM account_state LIMIT 5 ORDER BY rating DESC;")
+      sender ! List(TopItem(new AccountId(AccountType.VKONTAKTE, "1"), 1400))
 
-      val mapResult: Future[Any] = future.map(
-        queryResult => queryResult.rows match {
-          case Some(resultSet) =>
-            val row: RowData = resultSet.head
-            row(0)
-            sender ! put
-
-          case None => -1
-        }
+    case insert@Insert(id, accountState) ⇒
+      log.info("Insert " + id)
+      val ref = sender()
+      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state) VALUES (?,?,?);", Seq(id.dto.toByteArray, accountState.getRating, accountState.toByteArray)).map(
+        queryResult ⇒
+          if (queryResult.rowsAffected == 1)
+            ref ! accountState
+          else
+            log.error("Insert rowsAffected=" + queryResult.rowsAffected)
       )
 
-    case Get(key) ⇒
-      val future: Future[QueryResult] = connection.sendQuery("SELECT 0")
+    case update@Update(id, accountState) ⇒
+      log.info("Update " + id)
+      val ref = sender()
+      connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, id.dto.toByteArray)).map(
+        queryResult ⇒
+          if (queryResult.rowsAffected == 1)
+            ref ! update
+          else
+            log.error("Update rowsAffected=" + queryResult.rowsAffected)
+      )
 
-      val mapResult: Future[Any] = future.map(
-        queryResult => queryResult.rows match {
-          case Some(resultSet) =>
-            val row: RowData = resultSet.head
-            row(0)
+    case Get(id) ⇒
+      log.info("Get " + id)
+      val ref = sender()
+      connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(id.dto.toByteArray)).map(
+        queryResult ⇒ queryResult.rows match {
+          case Some(resultSet) ⇒
+            if (resultSet.size == 0) {
+              log.info("Get response Some.size == 0")
+              ref ! NoExist
+            } else {
+              log.info("Get response Some.size != 0")
+              val row: RowData = resultSet.head
 
-          /*
-                      val byteString = map(key)
-                      val is = byteString.iterator.asInputStream
-                      val accountStateDto = AccountStateDTO.parseDelimitedFrom(is)
-                      sender ! accountStateDto
-          */
+              val byteArray = row(0).asInstanceOf[Array[Byte]]
+              val state = AccountStateDTO.parseFrom(byteArray)
 
-          case None => -1
-            sender ! NoExist(key)
+              ref ! state
+            }
+          case None ⇒
+            log.error("Get response None")
         }
       )
   }

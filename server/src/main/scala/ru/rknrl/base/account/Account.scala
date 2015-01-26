@@ -5,12 +5,12 @@ import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{DuplicateAcсount, LeaveGame, GetAuthenticationSuccess}
+import ru.rknrl.base.account.Account.{DuplicateAcсount, GetAuthenticationSuccess, LeaveGame}
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.AccountStateDb.Put
+import ru.rknrl.castles.database.AccountStateDb.Update
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
@@ -65,7 +65,7 @@ abstract class Account(accountId: AccountId,
       matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
     /** from accountStateDb */
-    case Put(accountId, accountStateDto) ⇒
+    case Update(accountId, accountStateDto) ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
     case AddProduct(orderId, product, count) ⇒
@@ -74,11 +74,11 @@ abstract class Account(accountId: AccountId,
         case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
       }
 
-      val future = Patterns.ask(accountStateDb, Put(accountId, state.dto), 5 seconds)
+      val future = Patterns.ask(accountStateDb, Update(accountId, state.dto), 5 seconds)
       val result = Await.result(future, 5 seconds)
 
       result match {
-        case Put(accountId, accountStateDto) ⇒
+        case Update(accountId, accountStateDto) ⇒
           if (accountStateDto.getGold == state.gold) {
             sender ! ProductAdded(orderId)
             accountRmi ! AccountStateUpdatedMsg(accountStateDto)
@@ -161,7 +161,7 @@ abstract class Account(accountId: AccountId,
       gameRmi = None
       gameRmiRegistered = false
 
-      accountStateDb ! Put(accountId, state.dto)
+      accountStateDb ! Update(accountId, state.dto)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
     case DuplicateAcсount ⇒ tcpReceiver ! CloseConnection

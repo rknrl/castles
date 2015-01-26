@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.account.Account
 import ru.rknrl.castles._
-import ru.rknrl.castles.database.AccountStateDb.Put
+import ru.rknrl.castles.database.AccountStateDb.Update
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
@@ -13,15 +13,15 @@ import ru.rknrl.dto.CommonDTO._
 import scala.collection.JavaConverters._
 
 class CastlesAccount(accountId: AccountId,
-                    accountState: AccountState,
-                    deviceType: DeviceType,
-                    userInfo: UserInfoDTO,
-                    tcpSender: ActorRef, tcpReceiver: ActorRef,
-                    matchmaking: ActorRef,
-                    accountStateDb: ActorRef,
-                    auth: ActorRef,
-                    config: Config,
-                    name: String) extends Account(accountId, deviceType, userInfo, tcpSender, tcpReceiver, matchmaking, accountStateDb, auth, config, name) {
+                     accountState: AccountState,
+                     deviceType: DeviceType,
+                     userInfo: UserInfoDTO,
+                     tcpSender: ActorRef, tcpReceiver: ActorRef,
+                     matchmaking: ActorRef,
+                     accountStateDb: ActorRef,
+                     auth: ActorRef,
+                     config: Config,
+                     name: String) extends Account(accountId, deviceType, userInfo, tcpSender, tcpReceiver, matchmaking, accountStateDb, auth, config, name) {
 
   override var state = accountState
 
@@ -42,27 +42,27 @@ class CastlesAccount(accountId: AccountId,
     super.receive orElse {
       case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
         state = state.swapSlots(swap.getId1, swap.getId2)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
 
       case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
         state = state.buyBuilding(buy.getId, buy.getBuildingType)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
 
       case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
         state = state.upgradeBuilding(dto.getId)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
 
       case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
         state = state.removeBuilding(dto.getId)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
 
       case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
         state = state.upgradeSkill(upgrade.getType, config.account)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
 
       case BuyItemMsg(buy: BuyItemDTO) ⇒
         state = state.buyItem(buy.getType)
-        accountStateDb ! Put(accountId, state.dto)
+        accountStateDb ! Update(accountId, state.dto)
     }
   }
 

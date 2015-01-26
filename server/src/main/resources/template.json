@@ -3,9 +3,9 @@
   "gamePort": 2335,
   "policyPort": 2336,
   "db": {
-    "username": "username",
     "host": "localhost",
-    "port": 123,
+    "port": 3306,
+    "username": "username",
     "password": "enter mysql password",
     "database": "castles"
   },

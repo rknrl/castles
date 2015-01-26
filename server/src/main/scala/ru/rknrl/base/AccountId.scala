@@ -16,6 +16,8 @@ class AccountId(val accountType: AccountType,
 
   override def hashCode = (accountType.getNumber + id).hashCode
 
+  override def toString = accountType.toString + " " + id
+
   def dto = AccountIdDTO.newBuilder()
     .setId(id)
     .setType(accountType)

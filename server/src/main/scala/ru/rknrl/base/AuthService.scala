@@ -5,7 +5,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.account.Account.GetAuthenticationSuccess
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountState, CastlesAccount}
-import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist}
+import ru.rknrl.castles.database.AccountStateDb.{Insert, Get, NoExist}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
@@ -64,24 +64,19 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
         reject()
 
     /** from AccountStateDb */
-    case dto: AccountStateDTO ⇒
-      val state = AccountState.fromDto(dto, config.account)
-      startAccount(state)
+    case NoExist ⇒
+      accountStateDb ! Insert(accountId.get, AccountState.initAccount(config.account).dto)
 
     /** from AccountStateDb */
-    case NoExist(key) ⇒
-      val state = AccountState.initAccount(config.account)
-      startAccount(state)
+    case dto: AccountStateDTO ⇒
+      val state = AccountState.fromDto(dto, config.account)
+      val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
+      accountRef ! GetAuthenticationSuccess
 
     /** from Account */
     case dto: AuthenticationSuccessDTO ⇒
       authRmi ! AuthenticationSuccessMsg(dto)
       tcpReceiver ! UnregisterReceiver(authRmi)
-  }
-
-  private def startAccount(state: AccountState) = {
-    val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
-    accountRef ! GetAuthenticationSuccess
   }
 
   override def preStart(): Unit = log.info("AuthService start " + name)
