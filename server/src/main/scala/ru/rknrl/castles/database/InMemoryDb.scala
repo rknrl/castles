@@ -9,17 +9,17 @@ class InMemoryDb extends StoppingStrategyActor {
   private var map = Map[AccountId, Array[Byte]]()
 
   override def receive = {
-    case insert@Insert(key, value) ⇒
-      map = map + (key → value.toByteArray)
-      sender ! value
+    case Insert(accountId, accountState) ⇒
+      map = map + (accountId → accountState.toByteArray)
+      sender ! accountState
 
-    case update@Update(key, value) ⇒
-      map = map + (key → value.toByteArray)
-      sender ! update
+    case Update(accountId, accountState) ⇒
+      map = map + (accountId → accountState.toByteArray)
+      sender ! accountState
 
-    case Get(key) ⇒
-      if (map.contains(key)) {
-        val byteArray = map(key)
+    case Get(accountId) ⇒
+      if (map.contains(accountId)) {
+        val byteArray = map(accountId)
         val accountStateDto = AccountStateDTO.parseFrom(byteArray)
         sender ! accountStateDto
       } else

@@ -5,7 +5,7 @@ import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{DuplicateAcсount, GetAuthenticationSuccess, LeaveGame}
+import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.Config
@@ -13,6 +13,7 @@ import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.AccountStateDb.Update
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
+import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
@@ -25,7 +26,7 @@ object Account {
 
   case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
 
-  case object DuplicateAcсount
+  case object DuplicateAccount
 
 }
 
@@ -64,8 +65,8 @@ abstract class Account(accountId: AccountId,
     case EnterGameMsg() ⇒
       matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
-    /** from accountStateDb */
-    case Update(accountId, accountStateDto) ⇒
+    /** from AccountStateDb, ответ на Update */
+    case accountStateDto: AccountStateDTO ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
     case AddProduct(orderId, product, count) ⇒
@@ -164,7 +165,7 @@ abstract class Account(accountId: AccountId,
       accountStateDb ! Update(accountId, state.dto)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
-    case DuplicateAcсount ⇒ tcpReceiver ! CloseConnection
+    case DuplicateAccount ⇒ tcpReceiver ! CloseConnection
   }
 
   private def connectToGame(game: ActorRef) = {

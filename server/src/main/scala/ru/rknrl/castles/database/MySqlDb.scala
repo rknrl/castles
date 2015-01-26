@@ -30,14 +30,12 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
   override def receive: Receive = {
 
     case GetTop ⇒
-      log.info("GetTop")
       //val future: Future[QueryResult] = connection.sendQuery("SELECT * FROM account_state LIMIT 5 ORDER BY rating DESC;")
       sender ! List(TopItem(new AccountId(AccountType.VKONTAKTE, "1"), 1400))
 
-    case insert@Insert(id, accountState) ⇒
-      log.info("Insert " + id)
+    case Insert(accountId, accountState) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state) VALUES (?,?,?);", Seq(id.dto.toByteArray, accountState.getRating, accountState.toByteArray)).map(
+      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state) VALUES (?,?,?);", Seq(accountId.dto.toByteArray, accountState.getRating, accountState.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             ref ! accountState
@@ -45,21 +43,19 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
             log.error("Insert rowsAffected=" + queryResult.rowsAffected)
       )
 
-    case update@Update(id, accountState) ⇒
-      log.info("Update " + id)
+    case Update(accountId, accountState) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, id.dto.toByteArray)).map(
+      connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, accountId.dto.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! update
+            ref ! accountState
           else
             log.error("Update rowsAffected=" + queryResult.rowsAffected)
       )
 
-    case Get(id) ⇒
-      log.info("Get " + id)
+    case Get(accountId) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(id.dto.toByteArray)).map(
+      connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.dto.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             if (resultSet.size == 0) {

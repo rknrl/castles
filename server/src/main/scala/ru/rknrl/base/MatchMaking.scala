@@ -3,7 +3,7 @@ package ru.rknrl.base
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy}
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{LeaveGame, DuplicateAcсount}
+import ru.rknrl.base.account.Account.{LeaveGame, DuplicateAccount}
 import ru.rknrl.base.game.Game.StopGame
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.castles.game.GameConfig
@@ -108,7 +108,7 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
     case InGame(accountId, deviceType: DeviceType) ⇒
       if (accountIdToAccountRef.contains(accountId)) {
         val oldAccountRef = accountIdToAccountRef(accountId)
-        oldAccountRef ! DuplicateAcсount
+        oldAccountRef ! DuplicateAccount
       }
       accountIdToAccountRef = accountIdToAccountRef.updated(accountId, sender)
 
