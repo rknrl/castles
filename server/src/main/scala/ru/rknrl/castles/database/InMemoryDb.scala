@@ -2,18 +2,23 @@ package ru.rknrl.castles.database
 
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.base.AccountId
-import ru.rknrl.castles.database.AccountStateDb.{Get, Insert, NoExist, Update}
+import ru.rknrl.base.MatchMaking.TopItem
+import ru.rknrl.castles.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 
-class InMemoryDb extends StoppingStrategyActor {
+class InMemoryDb(config: Any) extends StoppingStrategyActor {
   private var map = Map[AccountId, Array[Byte]]()
 
   override def receive = {
+    case GetTop ⇒ sender() ! List.empty[TopItem]
+
     case Insert(accountId, accountState) ⇒
+      if (map.contains(accountId)) throw new Error("db already has accountId=" + accountId)
       map = map + (accountId → accountState.toByteArray)
       sender ! accountState
 
     case Update(accountId, accountState) ⇒
+      if (!map.contains(accountId)) throw new Error("db hasn't accountId=" + accountId)
       map = map + (accountId → accountState.toByteArray)
       sender ! accountState
 
