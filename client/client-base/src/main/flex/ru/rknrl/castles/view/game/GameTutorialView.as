@@ -60,7 +60,8 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             tween(pos, toGlobal(buildingPos)),
             click,
-            wait(400)
+            wait(400),
+            close
         ]);
     }
 
@@ -91,8 +92,11 @@ public class GameTutorialView extends TutorialView {
             }),
             tween(toGlobal(startBuildingPos), toGlobal(endBuildingPos)),
             wait(400),
-            mouseUp
-        ], arrows.removeArrows);
+            mouseUp,
+            exec(arrows.removeArrows),
+            wait(400),
+            close
+        ]);
     }
 
     public function playArrows(startBuildingPos1:Point, startBuildingPos2:Point, endBuildingPos:Point):void {
@@ -111,8 +115,11 @@ public class GameTutorialView extends TutorialView {
             }),
             tween(toGlobal(startBuildingPos2), toGlobal(endBuildingPos)),
             wait(400),
-            mouseUp
-        ], arrows.removeArrows);
+            mouseUp,
+            exec(arrows.removeArrows),
+            wait(400),
+            close
+        ]);
     }
 
     private var tornadoStartTime:int;
@@ -123,6 +130,16 @@ public class GameTutorialView extends TutorialView {
 
         const pos:Point = layout.gameMagicItem(indexOf(ItemType.TORNADO));
 
+        function addTornadoPath():void {
+            tornadoStartTime = getTimer();
+            tornado = true;
+        }
+
+        function removeTornadoPath():void {
+            tornado = false;
+            tornadoPath.clear();
+        }
+
         play(new <ITutorCommand>[
             open,
             tween(screenCorner, pos),
@@ -131,18 +148,14 @@ public class GameTutorialView extends TutorialView {
             tween(pos, toGlobal(points[0])),
             mouseDown,
             wait(400),
-            exec(function ():void {
-                tornadoStartTime = getTimer();
-                tornado = true;
-            }),
+            exec(addTornadoPath),
             tweenPath(new Points(toGlobalPoints(points))),
             wait(400),
-            mouseUp
-        ], function ():void {
-            tornado = false;
-            tornadoPath.clear();
-        });
-
+            mouseUp,
+            exec(removeTornadoPath),
+            wait(400),
+            close
+        ]);
     }
 
     private static const easer:IEaser = new Linear(0, 1);

@@ -1,10 +1,8 @@
 package ru.rknrl.castles.controller.game {
 import flash.events.Event;
-import flash.ui.Keyboard;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.controller.mock.DtoMock;
-import ru.rknrl.castles.model.GameKeyEvent;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -32,6 +30,7 @@ import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.dto.TornadoDTO;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
@@ -43,6 +42,7 @@ public class GameController implements IGameFacade {
     private var view:GameView;
     private var sender:GameFacadeSender;
     private var selfId:PlayerIdDTO;
+    private var tutorState:TutorStateDTO;
 
     private var bullets:Bullets;
     private var fireballs:Fireballs;
@@ -55,9 +55,11 @@ public class GameController implements IGameFacade {
 
     public function GameController(view:GameView,
                                    sender:GameFacadeSender,
-                                   gameState:GameStateDTO) {
+                                   gameState:GameStateDTO,
+                                   tutorState:TutorStateDTO) {
         this.view = view;
         this.sender = sender;
+        this.tutorState = tutorState;
 
         width = gameState.width;
         height = gameState.height;
@@ -101,14 +103,16 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
 
-        view.addEventListener(GameKeyEvent.KEY, onKeyUp);
-
         // Человек мог играть на компе, а потом перезайти в бой на мобиле
-        if(gameState.players.length > view.supportedPlayersCount) onSurrender()
+        if (gameState.players.length > view.supportedPlayersCount) onSurrender()
     }
 
+    private static const tutorInterval:int = 10000;
+    private var tutorLastTime:int = -8000;
+
     private function onEnterFrame(event:GameMouseEvent):void {
-        update(getTimer());
+        const time:int = getTimer();
+        update(time);
 
         if (magicItems.selected) {
             tornadoPath.mouseMove(event.mousePos);
@@ -118,6 +122,24 @@ public class GameController implements IGameFacade {
                 if (building) arrows.addArrow(building);
                 arrows.mouseMove(event.mousePos);
             }
+        }
+
+        if (time - tutorLastTime > tutorInterval && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
+            tutorLastTime = time;
+            if (!tutorState.arrow)
+                playArrowTutor();
+            else if (!tutorState.arrows && buildings.getSelfBuildingsPos(selfId))
+                playArrowsTutor();
+            else if (!tutorState.fireball)
+                playFireballTutor();
+            else if (!tutorState.tornado)
+                playTornadoTutor();
+            else if (!tutorState.strengthened)
+                playStrengthenedTutor();
+            else if (!tutorState.volcano)
+                playVolcanoTutor();
+            else if (!tutorState.assistance)
+                playAssistanceTutor();
         }
     }
 
@@ -236,6 +258,11 @@ public class GameController implements IGameFacade {
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
                 if (tornadoPath.points.length >= 2) {
+                    if (!tutorState.tornado) {
+                        tutorState.tornado = true;
+                        tutorLastTime = getTimer();
+                    }
+
                     const gameState:CastTorandoDTO = new CastTorandoDTO();
                     gameState.points = Point.pointsToDto(tornadoPath.points);
                     sender.castTornado(gameState);
@@ -256,6 +283,18 @@ public class GameController implements IGameFacade {
                     }
 
                     if (filteredIds.length > 0) {
+                        if (filteredIds.length > 1 && tutorState.arrow) {
+                            if (!tutorState.arrows) {
+                                tutorState.arrows = true;
+                                tutorLastTime = getTimer();
+                            }
+                        } else {
+                            if (!tutorState.arrow) {
+                                tutorState.arrow = true;
+                                tutorLastTime = getTimer();
+                            }
+                        }
+
                         const dto:MoveDTO = new MoveDTO();
                         dto.toBuilding = toBuilding.id;
                         dto.fromBuildings = filteredIds;
@@ -271,17 +310,32 @@ public class GameController implements IGameFacade {
     private function itemMouseDown(mousePos:Point):void {
         switch (magicItems.selected) {
             case ItemType.FIREBALL:
+                if (!tutorState.fireball) {
+                    tutorState.fireball = true;
+                    tutorLastTime = getTimer();
+                }
+
                 sender.castFireball(mousePos.dto());
                 magicItems.useItem();
                 break;
             case ItemType.STRENGTHENING:
                 const strBuilding:Building = buildings.selfInXy(selfId, mousePos);
                 if (strBuilding) {
+                    if (!tutorState.strengthened) {
+                        tutorState.strengthened = true;
+                        tutorLastTime = getTimer();
+                    }
+
                     sender.castStrengthening(strBuilding.id);
                     magicItems.useItem();
                 }
                 break;
             case ItemType.VOLCANO:
+                if (!tutorState.volcano) {
+                    tutorState.volcano = true;
+                    tutorLastTime = getTimer();
+                }
+
                 sender.castVolcano(mousePos.dto());
                 magicItems.useItem();
                 break;
@@ -291,6 +345,11 @@ public class GameController implements IGameFacade {
             case ItemType.ASSISTANCE:
                 const building:Building = buildings.selfInXy(selfId, mousePos);
                 if (building) {
+                    if (!tutorState.assistance) {
+                        tutorState.assistance = true;
+                        tutorLastTime = getTimer();
+                    }
+
                     sender.castAssistance(building.id);
                     magicItems.useItem();
                 }
@@ -344,32 +403,6 @@ public class GameController implements IGameFacade {
         const startPos:Vector.<Point> = buildings.getSelfBuildingsPos(selfId);
         const endPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playArrows(startPos[0], startPos[1], endPos);
-    }
-
-    private function onKeyUp(event:GameKeyEvent):void {
-        switch (event.keyCode) {
-            case Keyboard.NUMBER_1:
-                playFireballTutor();
-                break;
-            case Keyboard.NUMBER_2:
-                playStrengthenedTutor();
-                break;
-            case Keyboard.NUMBER_3:
-                playVolcanoTutor();
-                break;
-            case Keyboard.NUMBER_4:
-                playTornadoTutor();
-                break;
-            case Keyboard.NUMBER_5:
-                playAssistanceTutor();
-                break;
-            case Keyboard.A:
-                playArrowTutor();
-                break;
-            case Keyboard.B:
-                playArrowsTutor();
-                break;
-        }
     }
 }
 }

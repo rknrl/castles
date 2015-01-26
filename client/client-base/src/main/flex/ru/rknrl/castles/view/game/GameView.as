@@ -5,7 +5,6 @@ import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.ui.Keyboard;
 
-import ru.rknrl.castles.model.GameKeyEvent;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
@@ -117,7 +116,6 @@ public class GameView extends Sprite {
         if (event.keyCode == Keyboard.ESCAPE) {
             dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
         }
-        dispatchEvent(new GameKeyEvent(event.keyCode));
     }
 
     private var gameOverScreen:GameOverScreen;

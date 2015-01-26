@@ -2,6 +2,7 @@ package ru.rknrl.castles.view.menu.navigate.navigator {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 
+import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
@@ -118,6 +119,8 @@ public class ScreenNavigator extends Sprite {
     }
 
     public function set currentScreenIndex(index:int):void {
+        const changed:Boolean = _currentScreenIndex != index;
+
         _currentScreenIndex = index;
 
         for (var i:int = 0; i < _screens.length; i++) {
@@ -131,6 +134,8 @@ public class ScreenNavigator extends Sprite {
         if (_title) removeChild(_title);
         _title = _screens[index].titleContent;
         if (_title) addChild(_title);
+
+        if (changed) dispatchEvent(new ScreenChangedEvent(index));
     }
 
     protected function updateScreensPos():void {

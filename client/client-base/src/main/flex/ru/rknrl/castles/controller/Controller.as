@@ -26,6 +26,7 @@ import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.log.Log;
 
 public class Controller implements IAccountFacade, IEnterGameFacade {
@@ -35,6 +36,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
     private var sender:AccountFacadeSender;
     private var log:Log;
     private var social:Social;
+    private var tutorState:TutorStateDTO;
 
     private var menu:MenuController;
 
@@ -54,9 +56,11 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
+        tutorState = authenticationSuccess.accountState.tutor;
+
         const model:MenuModel = new MenuModel(authenticationSuccess);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, sender, model, social);
+        menu = new MenuController(menuView, sender, model, tutorState, social);
 
         if (authenticationSuccess.enterGame) {
             view.hideMenu();
@@ -69,6 +73,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
     }
 
     public function onAccountStateUpdated(dto:AccountStateDTO):void {
+        tutorState = dto.tutor;
         menu.onAccountStateUpdated(dto);
     }
 
@@ -123,7 +128,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.playerInfos);
         const gameView:GameView = view.addGame(playerInfos, h, v);
-        game = new GameController(gameView, new GameFacadeSender(connection), gameState);
+        game = new GameController(gameView, new GameFacadeSender(connection), gameState, tutorState);
 
         gameFacadeReceiver = new GameFacadeReceiver(game);
         gameConnection.registerReceiver(gameFacadeReceiver);

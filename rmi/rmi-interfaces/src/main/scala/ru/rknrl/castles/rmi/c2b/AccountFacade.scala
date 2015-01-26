@@ -16,4 +16,6 @@ abstract class AccountFacade {
   def upgradeSkill(upgrade: UpgradeSkillDTO)
 
   def buyItem(buy: BuyItemDTO)
+
+  def updateTutorState(state: TutorStateDTO)
 }

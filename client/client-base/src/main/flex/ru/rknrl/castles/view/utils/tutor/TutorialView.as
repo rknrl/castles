@@ -67,11 +67,11 @@ public class TutorialView extends TutorialViewBase {
         command = null;
     }
 
-    override protected function close(event:Event = null):void {
+    override protected function closeImpl(event:Event = null):void {
         if (command) {
             onTutorComplete()
         }
-        super.close(event);
+        super.closeImpl(event);
     }
 
     private function onEnterFrame(event:Event):void {
@@ -90,6 +90,10 @@ public class TutorialView extends TutorialViewBase {
 
     public function get open():ITutorCommand {
         return exec(openImpl);
+    }
+
+    public function get close():ITutorCommand {
+        return exec(closeImpl);
     }
 
     public function pos(point:Point):ITutorCommand {

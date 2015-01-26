@@ -38,10 +38,13 @@ public class MenuTutorView extends TutorialView {
         }
 
         play(new <ITutorCommand>[
+            wait(500),
             open,
             pos(startPos),
             wait(500),
-            tween(startPos, endPos)
+            tween(startPos, endPos),
+            wait(1000),
+            close
         ], onComplete);
     }
 
@@ -59,10 +62,13 @@ public class MenuTutorView extends TutorialView {
 
     private function tweenAndClick(clickPos:Point):void {
         play(new <ITutorCommand>[
+            wait(500),
             open,
             tween(screenCorner, clickPos),
             wait(100),
-            click
+            click,
+            wait(1000),
+            close
         ]);
     }
 }

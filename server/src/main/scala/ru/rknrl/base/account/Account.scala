@@ -6,11 +6,11 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
+import ru.rknrl.base.database.AccountStateDb.Update
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.base.database.AccountStateDb.Update
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
@@ -61,9 +61,11 @@ abstract class Account(accountId: AccountId,
 
   protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator]): AuthenticationSuccessDTO
 
+  private def placeGameOrder() =
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
+
   override def receive = {
-    case EnterGameMsg() ⇒
-      matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
+    case EnterGameMsg() ⇒ placeGameOrder()
 
     /** from AccountStateDb, ответ на Update */
     case accountStateDto: AccountStateDTO ⇒
@@ -102,9 +104,12 @@ abstract class Account(accountId: AccountId,
       if (gameRef.isDefined) {
         reenterGame = true
         connectToGame(gameRef.get)
+      } else if (!enterGame && state.gamesCount == 0) {
+        placeGameOrder(); // При первом заходе сразу попадаем в бой
+        reenterGame = false
+        auth ! authenticationSuccessDto(enterGame = true, None)
       } else {
         reenterGame = false
-
         auth ! authenticationSuccessDto(enterGame, None)
       }
 

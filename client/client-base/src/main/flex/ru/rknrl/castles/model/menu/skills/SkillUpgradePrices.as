@@ -14,5 +14,9 @@ public class SkillUpgradePrices {
         }
         throw new Error("can't find skill upgrade price for level " + totalLevel)
     }
+
+    public function get firstUpgradePrice():int {
+        return getPrice(1);
+    }
 }
 }

@@ -1,10 +1,8 @@
 package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
-import flash.events.Event;
-import flash.events.KeyboardEvent;
-import flash.ui.Keyboard;
 
 import ru.rknrl.castles.castlesTest;
+import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.bank.Products;
 import ru.rknrl.castles.model.menu.main.StartLocation;
@@ -69,10 +67,11 @@ public class MenuView extends Sprite {
         addChild(tutor = new MenuTutorView(layout, deviceFactory));
 
         addEventListener(PopupEvent.CLOSE, popupManager.close);
+    }
 
-        addEventListener(Event.ADDED_TO_STAGE, function (event:Event):void {
-            stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-        });
+    override public function set visible(value:Boolean):void {
+        super.visible = value;
+        if (value) dispatchEvent(new ScreenChangedEvent(ScreenChangedEvent.SCREEN_MAIN));
     }
 
     private var _layout:Layout;
@@ -177,26 +176,6 @@ public class MenuView extends Sprite {
 
     public function playFlaskTutor():void {
         tutor.playFlask();
-    }
-
-    private function onKeyUp(event:KeyboardEvent):void {
-        switch (event.keyCode) {
-            case Keyboard.N:
-                playSwipeTutor();
-                break;
-            case Keyboard.S:
-                playSlotTutor();
-                break;
-            case Keyboard.E:
-                playEmptySlotTutor();
-                break;
-            case Keyboard.I:
-                playMagicItemTutor();
-                break;
-            case Keyboard.F:
-                playFlaskTutor();
-                break;
-        }
     }
 }
 }

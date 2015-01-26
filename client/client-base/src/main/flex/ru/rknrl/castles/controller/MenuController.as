@@ -1,9 +1,11 @@
 package ru.rknrl.castles.controller {
 import flash.events.Event;
+import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
+import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.events.SlotClickEvent;
 import ru.rknrl.castles.model.events.SlotSwapEvent;
 import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
@@ -24,6 +26,7 @@ import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SwapSlotsDTO;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
 
@@ -32,12 +35,14 @@ public class MenuController {
     private var sender:AccountFacadeSender;
     private var model:MenuModel;
     private var social:Social;
+    private var tutorState:TutorStateDTO;
 
-    public function MenuController(view:MenuView, sender:AccountFacadeSender, model:MenuModel, social:Social) {
+    public function MenuController(view:MenuView, sender:AccountFacadeSender, model:MenuModel, tutorState:TutorStateDTO, social:Social) {
         this.view = view;
         this.sender = sender;
         this.model = model;
         this.social = social;
+        this.tutorState = tutorState;
 
         social.addEventListener(PaymentDialogEvent.PAYMENT_DIALOG_CLOSED, onPaymentDialogClosed);
         social.addEventListener(PaymentDialogEvent.PAYMENT_SUCCESS, onPaymentSuccess);
@@ -54,6 +59,7 @@ public class MenuController {
         view.addEventListener(UpgradeClickEvent.UPGRADE_CLICK, onUpgradeClick);
 
         view.addEventListener(ViewEvents.BUY, onBuy);
+        view.addEventListener(ScreenChangedEvent.SCREEN_CHANGED, onScreenChanged);
     }
 
     public function onAccountStateUpdated(accountState:AccountStateDTO):void {
@@ -63,6 +69,7 @@ public class MenuController {
         view.itemsCount = model.itemsCount;
         view.skillLevels = model.skillLevels;
         view.lock = false;
+        tutorState = accountState.tutor;
     }
 
     private function onSlotClick(event:SlotClickEvent):void {
@@ -75,10 +82,12 @@ public class MenuController {
                 const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
             }
             if (canUpgrade || canRemove) {
+                tutorState.slot = true;
                 view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
             }
 
         } else {
+            tutorState.emptySlot = true;
             view.openBuildPopup(event.slotId, model.buildingPrices.buildPrice);
         }
     }
@@ -147,6 +156,8 @@ public class MenuController {
         if (model.gold < model.itemPrice) {
             view.animatePrices();
         } else {
+            tutorState.magicItem = true;
+
             const dto:BuyItemDTO = new BuyItemDTO();
             dto.type = event.itemType;
             sender.buyItem(dto);
@@ -161,6 +172,8 @@ public class MenuController {
             if (model.gold < model.upgradePrices.getPrice(model.skillLevels.totalLevel + 1)) {
                 view.animatePrices();
             } else {
+                tutorState.skills = true;
+
                 const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
                 dto.type = event.skillType;
                 sender.upgradeSkill(dto);
@@ -192,6 +205,59 @@ public class MenuController {
     private function onPaymentFail(event:PaymentDialogEvent):void {
         trace("payment fail");
         view.lock = false;
+    }
+
+    /** Какой это по счету запуск приложения */
+    private var appRunCount:int = 3;
+
+    /** Сколько раз показывался этот экран с момента установки приложения */
+    private const screenShowCount:Dictionary = initShowCount();
+
+    /** Сколько раз показывался туториал для этого экрана за текущий запуск приложения */
+    private const tutorCount:Dictionary = initShowCount();
+
+    private static function initShowCount():Dictionary {
+        const result:Dictionary = new Dictionary();
+        for each(var screenIndex:int in ScreenChangedEvent.ALL) {
+            result[screenIndex] = 0;
+        }
+        return result;
+    }
+
+    private function onScreenChanged(event:ScreenChangedEvent):void {
+        const screenIndex:int = event.screenIndex;
+        if (screenIndex > 0) tutorState.navigate = true;
+
+        screenShowCount[screenIndex]++;
+
+        if (appRunCount >= 3 && tutorCount[screenIndex] == 0) {
+            switch (screenIndex) {
+                case ScreenChangedEvent.SCREEN_MAIN:
+                    if (!tutorState.navigate) {
+                        tutorCount[screenIndex]++;
+                        view.playSwipeTutor();
+                    } else if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
+                        tutorCount[screenIndex]++;
+                        view.playSlotTutor();
+                    } else if (!tutorState.emptySlot && model.gold >= model.buildingPrices.buildPrice) {
+                        tutorCount[screenIndex]++;
+                        view.playEmptySlotTutor();
+                    }
+                    break;
+                case ScreenChangedEvent.SCREEN_SHOP:
+                    if (!tutorState.magicItem && screenShowCount[screenIndex] >= 3 && model.gold >= model.itemPrice) {
+                        tutorCount[screenIndex]++;
+                        view.playMagicItemTutor();
+                    }
+                    break;
+                case ScreenChangedEvent.SCREEN_SKILLS:
+                    if (!tutorState.skills && screenShowCount[screenIndex] >= 3 && model.gold >= model.upgradePrices.firstUpgradePrice) {
+                        tutorCount[screenIndex]++;
+                        view.playFlaskTutor();
+                    }
+                    break;
+            }
+        }
     }
 }
 }

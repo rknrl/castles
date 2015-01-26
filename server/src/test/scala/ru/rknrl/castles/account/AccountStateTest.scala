@@ -6,6 +6,7 @@ import ru.rknrl.castles.account.objects.skills.SkillsTest
 import ru.rknrl.castles.account.objects.startLocation.StartLocationTest
 import ru.rknrl.castles.account.objects.{BuildingPrototype, Items, Skills, StartLocation}
 import ru.rknrl.castles.mock.AccountConfigMock
+import ru.rknrl.dto.AccountDTO.TutorStateDTO
 import ru.rknrl.dto.CommonDTO._
 
 object AccountStateTest {
@@ -15,6 +16,7 @@ object AccountStateTest {
                    gold: Int = 666,
                    rating: Int = 666,
                    gamesCount: Int = 0,
+                   tutor: TutorStateDTO = AccountState.initTutor,
                    config: AccountConfig = AccountConfigMock.config) =
     new AccountState(
       startLocation,
@@ -23,6 +25,7 @@ object AccountStateTest {
       gold,
       rating,
       gamesCount,
+      tutor,
       config
     )
 }

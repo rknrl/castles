@@ -40,7 +40,7 @@ public class Buildings {
 
     public function getSelfBuildingsPos(selfId:PlayerIdDTO):Vector.<Point> {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
-        if (selfBuildings.length < 3) throw new Error("getSelfBuildingsPos: buildings.length=" + selfBuildings.length);
+        if (selfBuildings.length < 3) return null;
         return new <Point>[
             selfBuildings[1].pos,
             selfBuildings[2].pos

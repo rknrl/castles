@@ -16,7 +16,6 @@ public class TutorialViewBase extends Sprite {
         visible = false;
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
-        addEventListener(MouseEvent.MOUSE_DOWN, close);
         _layout = layout;
     }
 
@@ -40,13 +39,17 @@ public class TutorialViewBase extends Sprite {
         updateTransition();
     }
 
-    protected function close(event:Event = null):void {
+    protected function closeImpl(event:Event = null):void {
         nextTransition = 0;
     }
 
-    private function closeImpl():void {
+    private function closeImmediate():void {
         if (!visible) throw new Error("tutor not visible");
         visible = false;
+    }
+
+    public function get playing():Boolean {
+        return visible;
     }
 
     private static const epsilon:Number = 0.005;
@@ -75,7 +78,7 @@ public class TutorialViewBase extends Sprite {
 
         if (modalScreen) alpha = transition;
 
-        if (nextTransition == 0 && transition == 0 && visible) closeImpl();
+        if (nextTransition == 0 && transition == 0 && visible) closeImmediate();
     }
 }
 }

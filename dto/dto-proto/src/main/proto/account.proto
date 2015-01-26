@@ -13,6 +13,22 @@ message AccountStateDTO {
     required int32 gold = 4;
     required double rating = 5;
     required int32 gamesCount = 6;
+    required TutorStateDTO tutor = 7;
+}
+
+message TutorStateDTO {
+    required bool arrow = 1;
+    required bool arrows = 2;
+    required bool fireball = 3;
+    required bool volcano = 4;
+    required bool tornado = 5;
+    required bool assistance = 6;
+    required bool strengthened = 7;
+    required bool slot = 8;
+    required bool emptySlot = 9;
+    required bool navigate = 10;
+    required bool magicItem = 11;
+    required bool skills = 12;
 }
 
 // start location
