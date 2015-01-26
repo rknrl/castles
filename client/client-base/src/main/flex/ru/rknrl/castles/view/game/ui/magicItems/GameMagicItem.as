@@ -14,6 +14,7 @@ public class GameMagicItem extends Sprite {
     private static const mouseHolderH:Number = 96;
 
     private var fly:Fly;
+    private var holder: Sprite;
     private var magicItem:GameMagicItemIcon;
     private var shadow:AnimatedShadow;
 
@@ -29,12 +30,14 @@ public class GameMagicItem extends Sprite {
         mouseHolder.y = -40;
         addChild(mouseHolder);
 
+        addChild(holder = new Sprite());
+
         shadow = new AnimatedShadow();
         shadow.y = Layout.shadowDistance;
-        addChild(shadow);
+        holder.addChild(shadow);
 
         magicItem = new GameMagicItemIcon(itemType, count);
-        addChild(magicItem);
+        holder.addChild(magicItem);
 
         fly = new Fly(magicItem, shadow);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -59,7 +62,7 @@ public class GameMagicItem extends Sprite {
     }
 
     public function set selected(value:Boolean):void {
-        scaleX = scaleY = value ? 1.8 : 1;
+        holder.scaleX = holder.scaleY = value ? 1.8 : 1;
     }
 
     public function set lock(value:Boolean):void {
