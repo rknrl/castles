@@ -3,13 +3,13 @@ package ru.rknrl.castles.database
 import akka.actor.ActorLogging
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
-import com.github.mauricio.async.db.{Configuration, RowData}
+import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.TopItem
 import ru.rknrl.castles.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.CommonDTO.AccountType
+import ru.rknrl.dto.CommonDTO.AccountIdDTO
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -23,15 +23,28 @@ class DbConfiguration(username: String,
 }
 
 class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with ActorLogging {
-  val connection = new MySQLConnection(configuration.configuration)
+  private val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)
 
-  override def receive: Receive = {
+  private def rowDataToTopItem(rowData: RowData) = {
+    val idByteArray = rowData(0).asInstanceOf[Array[Byte]]
+    val id = AccountIdDTO.parseFrom(idByteArray)
+    val rating = rowData(1).asInstanceOf[Double]
+    TopItem(new AccountId(id), rating)
+  }
 
+  override def receive: Receive = {
     case GetTop ⇒
-      //val future: Future[QueryResult] = connection.sendQuery("SELECT * FROM account_state LIMIT 5 ORDER BY rating DESC;")
-      sender ! List(TopItem(new AccountId(AccountType.VKONTAKTE, "1"), 1400))
+      val ref = sender()
+      connection.sendQuery("SELECT id, rating FROM account_state ORDER BY rating DESC LIMIT 5;").map(
+        queryResult ⇒ queryResult.rows match {
+          case Some(resultSet) ⇒
+            ref ! resultSet.map(rowDataToTopItem).toList
+          case None ⇒
+            log.error("Top response None")
+        }
+      )
 
     case Insert(accountId, accountState) ⇒
       val ref = sender()
@@ -59,17 +72,17 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             if (resultSet.size == 0) {
-              log.info("Get response Some.size == 0")
               ref ! NoExist
-            } else {
-              log.info("Get response Some.size != 0")
+            } else if (resultSet.size == 1) {
               val row: RowData = resultSet.head
 
               val byteArray = row(0).asInstanceOf[Array[Byte]]
               val state = AccountStateDTO.parseFrom(byteArray)
 
               ref ! state
-            }
+            } else
+              log.error("Update rows=" + resultSet.size)
+
           case None ⇒
             log.error("Get response None")
         }
