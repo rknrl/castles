@@ -1,5 +1,7 @@
 package ru.rknrl.base.payments
 
+import java.net.{URLDecoder}
+
 import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
@@ -74,9 +76,10 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
         entity(as[String]) { data ⇒
           respondWithMediaType(`application/json`) {
             log.info("vk_callback: " + data)
-            val unescape = data.replace("+", " ") // todo: Разобраться кто его эскейпит на "+"
+            val encoded = URLDecoder.decode(data, "UTF-8")
+            log.info("encoded: " + encoded)
             val vk = config.social.vk.get
-            completePayment(new PaymentsCallbackVk(unescape, vk, config.products), vk)
+            completePayment(new PaymentsCallbackVk(encoded, vk, config.products), vk)
           }
         }
       }

@@ -82,7 +82,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
 
       // (String) подпись уведомления
       val sig = params.getParam("sig").toUpperCase
-      val expectSig = Crypt.md5(params.concat + config.appSecret)
+      val expectSig = Crypt.md5((params.concat + config.appSecret).getBytes("UTF-8"))
 
       if (sig != expectSig) {
         log.info("sig=" + sig + ",expect " + expectSig)
@@ -128,12 +128,12 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
             val product = products.find(_.id == item)
             if (products.isEmpty) {
               log.info("can't find product with id " + item)
-              response(VkPaymentsError.INVALID_REQUEST.toString)
+              response(VkPaymentsError.ITEM_NOT_FOUND.toString)
             } else {
               val productInfo = config.productsInfo.find(_.id == product.get.id)
               if (productInfo.isEmpty) {
                 log.info("can't find product info with id " + item)
-                response(VkPaymentsError.INVALID_REQUEST.toString)
+                response(VkPaymentsError.ITEM_NOT_FOUND.toString)
               } else {
                 // (String) язык пользователя в формате язык_страна
                 val lang = params.getParam("lang")
@@ -190,7 +190,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
 
     val itemIdStr = if (itemId.isDefined) s""""item_id":"${itemId.get}",""" else ""
 
-    val expirationStr = if (expiration.isDefined) s""""item_id":"${expiration.get}"""" else ""
+    val expirationStr = if (expiration.isDefined) s""""item_id":"${expiration.get}",""" else ""
 
     s"""
      |{
@@ -198,8 +198,8 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
      |    "title":"$title",
      |    $photoUrlStr
      |    $itemIdStr
-     |    "price": $price,
      |    $expirationStr
+     |    "price": $price
      |  }
      |}""".stripMargin
   }
