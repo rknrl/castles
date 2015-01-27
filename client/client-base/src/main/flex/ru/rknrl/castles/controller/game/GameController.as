@@ -3,6 +3,7 @@ import flash.events.Event;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.controller.mock.DtoMock;
+import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -11,6 +12,7 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.tutor.GameTutorState;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.rmi.GameFacadeSender;
 import ru.rknrl.castles.rmi.IGameFacade;
@@ -30,7 +32,6 @@ import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.dto.TornadoDTO;
-import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
@@ -42,7 +43,8 @@ public class GameController implements IGameFacade {
     private var view:GameView;
     private var sender:GameFacadeSender;
     private var selfId:PlayerIdDTO;
-    private var tutorState:TutorStateDTO;
+    private var tutorState:GameTutorState;
+    private var localStorage:CastlesLocalStorage;
 
     private var bullets:Bullets;
     private var fireballs:Fireballs;
@@ -56,10 +58,12 @@ public class GameController implements IGameFacade {
     public function GameController(view:GameView,
                                    sender:GameFacadeSender,
                                    gameState:GameStateDTO,
-                                   tutorState:TutorStateDTO) {
+                                   localStorage:CastlesLocalStorage) {
         this.view = view;
         this.sender = sender;
-        this.tutorState = tutorState;
+        this.localStorage = localStorage;
+
+        tutorState = localStorage.gameTutorState;
 
         width = gameState.width;
         height = gameState.height;
@@ -260,6 +264,7 @@ public class GameController implements IGameFacade {
                 if (tornadoPath.points.length >= 2) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
+                        localStorage.saveGameTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 
@@ -286,11 +291,13 @@ public class GameController implements IGameFacade {
                         if (filteredIds.length > 1 && tutorState.arrow) {
                             if (!tutorState.arrows) {
                                 tutorState.arrows = true;
+                                localStorage.saveGameTutorState(tutorState);
                                 tutorLastTime = getTimer();
                             }
                         } else {
                             if (!tutorState.arrow) {
                                 tutorState.arrow = true;
+                                localStorage.saveGameTutorState(tutorState);
                                 tutorLastTime = getTimer();
                             }
                         }
@@ -312,6 +319,7 @@ public class GameController implements IGameFacade {
             case ItemType.FIREBALL:
                 if (!tutorState.fireball) {
                     tutorState.fireball = true;
+                    localStorage.saveGameTutorState(tutorState);
                     tutorLastTime = getTimer();
                 }
 
@@ -323,6 +331,7 @@ public class GameController implements IGameFacade {
                 if (strBuilding) {
                     if (!tutorState.strengthened) {
                         tutorState.strengthened = true;
+                        localStorage.saveGameTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 
@@ -333,6 +342,7 @@ public class GameController implements IGameFacade {
             case ItemType.VOLCANO:
                 if (!tutorState.volcano) {
                     tutorState.volcano = true;
+                    localStorage.saveGameTutorState(tutorState);
                     tutorLastTime = getTimer();
                 }
 
@@ -347,6 +357,7 @@ public class GameController implements IGameFacade {
                 if (building) {
                     if (!tutorState.assistance) {
                         tutorState.assistance = true;
+                        localStorage.saveGameTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 

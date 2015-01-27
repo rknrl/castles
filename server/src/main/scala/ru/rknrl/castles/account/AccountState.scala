@@ -10,7 +10,6 @@ class AccountState(val startLocation: StartLocation,
                    val gold: Int,
                    val rating: Double,
                    val gamesCount: Int,
-                   val tutor: TutorStateDTO,
                    val config: AccountConfig) {
 
   def swapSlots(id1: SlotId, id2: SlotId): AccountState =
@@ -63,7 +62,7 @@ class AccountState(val startLocation: StartLocation,
                    newGold: Int = gold,
                    newRating: Double = rating,
                    newGamesCount: Int = gamesCount) =
-    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount, tutor, config)
+    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount, config)
 
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
@@ -72,7 +71,6 @@ class AccountState(val startLocation: StartLocation,
     .setGold(gold)
     .setRating(rating)
     .setGamesCount(gamesCount)
-    .setTutor(tutor)
     .build()
 }
 
@@ -104,21 +102,6 @@ object AccountState {
 
   private val initRating = 1400
 
-  def initTutor = TutorStateDTO.newBuilder()
-    .setArrow(false)
-    .setArrows(false)
-    .setFireball(false)
-    .setTornado(false)
-    .setVolcano(false)
-    .setAssistance(false)
-    .setStrengthened(false)
-    .setSlot(false)
-    .setEmptySlot(false)
-    .setNavigate(false)
-    .setMagicItem(false)
-    .setSkills(false)
-    .build()
-
   def initAccount(config: AccountConfig) = new AccountState(
     startLocation = initStartLocation,
     skills = initSkills,
@@ -126,7 +109,6 @@ object AccountState {
     gold = config.initGold,
     rating = initRating,
     gamesCount = 0,
-    tutor = initTutor,
     config = config
   )
 
@@ -137,7 +119,6 @@ object AccountState {
     gold = dto.getGold,
     rating = dto.getRating,
     gamesCount = dto.getGamesCount,
-    tutor = dto.getTutor,
     config = config
   )
 }

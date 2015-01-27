@@ -16,7 +16,6 @@ object AccountStateTest {
                    gold: Int = 666,
                    rating: Int = 666,
                    gamesCount: Int = 0,
-                   tutor: TutorStateDTO = AccountState.initTutor,
                    config: AccountConfig = AccountConfigMock.config) =
     new AccountState(
       startLocation,
@@ -25,7 +24,6 @@ object AccountStateTest {
       gold,
       rating,
       gamesCount,
-      tutor,
       config
     )
 }

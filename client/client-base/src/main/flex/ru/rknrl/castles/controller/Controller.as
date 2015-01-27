@@ -6,6 +6,7 @@ import flash.net.Socket;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.game.GameController;
+import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -26,7 +27,6 @@ import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
-import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.log.Log;
 
 public class Controller implements IAccountFacade, IEnterGameFacade {
@@ -36,9 +36,9 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
     private var sender:AccountFacadeSender;
     private var log:Log;
     private var social:Social;
-    private var tutorState:TutorStateDTO;
 
     private var menu:MenuController;
+    private var localStorage:CastlesLocalStorage;
 
     public function Controller(view:View,
                                authenticationSuccess:AuthenticationSuccessDTO,
@@ -54,13 +54,13 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         this.log = log;
         this.social = social;
 
-        view.addEventListener(ViewEvents.PLAY, onPlay);
+        localStorage = new CastlesLocalStorage(log);
 
-        tutorState = authenticationSuccess.accountState.tutor;
+        view.addEventListener(ViewEvents.PLAY, onPlay);
 
         const model:MenuModel = new MenuModel(authenticationSuccess);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, sender, model, tutorState, social);
+        menu = new MenuController(menuView, sender, model, social, localStorage);
 
         if (authenticationSuccess.enterGame) {
             view.hideMenu();
@@ -72,8 +72,8 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         }
     }
 
+
     public function onAccountStateUpdated(dto:AccountStateDTO):void {
-        tutorState = dto.tutor;
         menu.onAccountStateUpdated(dto);
     }
 
@@ -128,7 +128,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.playerInfos);
         const gameView:GameView = view.addGame(playerInfos, h, v);
-        game = new GameController(gameView, new GameFacadeSender(connection), gameState, tutorState);
+        game = new GameController(gameView, new GameFacadeSender(connection), gameState, localStorage);
 
         gameFacadeReceiver = new GameFacadeReceiver(game);
         gameConnection.registerReceiver(gameFacadeReceiver);
