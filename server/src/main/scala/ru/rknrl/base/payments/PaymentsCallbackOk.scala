@@ -25,7 +25,7 @@ class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def response =
     try {
-      val params = new UriParams(uri)
+      val params = UriParams.parseGet(uri)
 
       // (String) Идентификатор пользователя
       val uid = params.getParam("uid")

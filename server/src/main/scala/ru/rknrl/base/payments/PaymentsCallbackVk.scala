@@ -5,23 +5,21 @@ import ru.rknrl.base.AccountId
 import ru.rknrl.base.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.CommonDTO.AccountType
-import spray.http.{HttpResponse, Uri}
+import spray.http.HttpResponse
 
 object VkNotificationType {
-  /**
-   * получение информации о товаре
-   */
+  /** Получение информации о товаре */
   val GET_ITEM = "get_item"
+  val GET_ITEM_TEST = "get_item_test"
 
-  /**
-   * изменение статуса заказа
-   */
+  /** Изменение статуса заказа */
   val ORDER_STATUS_CHANGE = "order_status_change"
+  val ORDER_STATUS_CHANGE_TEST = "order_status_change_test"
 }
 
 object VkStatus {
   /**
-   * заказ готов к оплате.
+   * Заказ готов к оплате.
    * Необходимо оформить заказ пользователю внутри приложения.
    * В случае ответа об успехе платёжная система зачислит голоса на счёт приложения.
    * Если в ответ будет получено сообщение об ошибке, заказ отменяется.
@@ -40,7 +38,7 @@ object VkLang {
  * 15 dec 2014
  * http://vk.com/dev/payments_callbacks
  */
-class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallback {
+class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterable[ru.rknrl.core.social.Product]) extends PaymentsCallback {
 
   override def error = HttpResponse(entity = VkPaymentsError.COMMON(critical = true).toString)
 
@@ -54,7 +52,9 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def response =
     try {
-      val params = new UriParams(uri)
+      val params = UriParams.parsePost(request)
+
+      log.info(params.toString)
 
       // (String) тип уведомления
       val notificationType = params.getParam("notification_type")
@@ -62,7 +62,7 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       // (Int) идентификатор приложения
       val appId = params.getParam("app_id")
 
-      assert(appId == config.appId)
+      assert(appId == config.appId, "appId=" + appId + ",expect " + config.appId)
 
       // (Int) идентификатор пользователя, сделавшего заказ
       val userId = params.getParam("user_id")
@@ -72,32 +72,34 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       // (Int) идентификатор получателя заказа (в данный момент совпадает с user_id, но в будущем может отличаться)
       val receiverId = params.getParam("receiver_id")
 
-      assert(userId == receiverId)
+      assert(userId == receiverId, "userId=" + userId + ",expect " + receiverId)
 
       // (Int) идентификатор заказа
       val orderId = params.getParam("order_id")
 
       // (String) наименование товара, переданное диалоговому окну покупки (см. Параметры диалогового окна платежей)
-      val item = params.getParam("item")
+      val item: Int = params.getParam("item").toInt
 
       // (String) подпись уведомления
-      val sig = params.getParam("sig")
+      val sig = params.getParam("sig").toUpperCase
+      val expectSig = Crypt.md5(params.concat + config.appSecret)
 
-      if (sig.toUpperCase != Crypt.md5(params.concat + config.appSecret))
+      if (sig != expectSig) {
+        log.info("sig=" + sig + ",expect " + expectSig)
         response(VkPaymentsError.INVALID_SIG.toString)
-      else
+      } else
         notificationType match {
-          /**
-           * http://vk.com/dev/payments_status
-           */
-          case VkNotificationType.ORDER_STATUS_CHANGE ⇒
+          /** http://vk.com/dev/payments_status */
+          case VkNotificationType.ORDER_STATUS_CHANGE | VkNotificationType.ORDER_STATUS_CHANGE_TEST ⇒
+            log.info("ORDER_STATUS_CHANGE")
+
             // (Int) дата создания заказа (в формате unix timestamp)
             val date = params.getParam("date")
 
             // (String) новый статус заказа
             val status = params.getParam("status")
 
-            assert(status == VkStatus.CHARGEABLE)
+            assert(status == VkStatus.CHARGEABLE, "status=" + status + ", expect " + VkStatus.CHARGEABLE)
 
             // (String) идентификатор товара в приложении
             val itemId = params.getParam("item_id")
@@ -119,28 +121,40 @@ class PaymentsCallbackVk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
               httpResponse = HttpResponse(entity = successResponse(orderId, appOrderId = None))
             )
 
-          /**
-           * http://vk.com/dev/payments_getitem
-           */
-          case VkNotificationType.GET_ITEM ⇒
-            // (String) язык пользователя в формате язык_страна.
-            val lang = params.getParam("lang")
+          /** http://vk.com/dev/payments_getitem */
+          case VkNotificationType.GET_ITEM | VkNotificationType.GET_ITEM_TEST ⇒
+            log.info("GET_ITEM")
 
-            response(
-              itemResponse(
-                title = "Звезды",
-                photoUrl = Some("http://звезыикон"),
-                price = 1,
-                itemId = Some("1"),
-                expiration = None
-              )
-            )
+            val product = products.find(_.id == item)
+            if (products.isEmpty) {
+              log.info("can't find product with id " + item)
+              response(VkPaymentsError.INVALID_REQUEST.toString)
+            } else {
+              val productInfo = config.productsInfo.find(_.id == product.get.id)
+              if (productInfo.isEmpty) {
+                log.info("can't find product info with id " + item)
+                response(VkPaymentsError.INVALID_REQUEST.toString)
+              } else {
+                // (String) язык пользователя в формате язык_страна
+                val lang = params.getParam("lang")
 
+                response(
+                  itemResponse(
+                    title = product.get.title,
+                    photoUrl = Some(product.get.photoUrl),
+                    price = productInfo.get.price,
+                    itemId = Some(product.get.id.toString),
+                    expiration = None
+                  )
+                )
+              }
+            }
           case _ ⇒
             response(VkPaymentsError.INVALID_REQUEST.toString)
         }
     } catch {
-      case _: Throwable ⇒
+      case e: Throwable ⇒
+        log.error("error request parsing ", e)
         response(VkPaymentsError.INVALID_REQUEST.toString)
     }
 
@@ -214,16 +228,14 @@ private class VkPaymentsError private(val errorCode: Int,
       |{
       |  "error": {
       |    "error_code": $errorCode,
-      |    "error_msg": $description,
+      |    "error_msg": "$description",
       |    "critical": $criticalToString
       |  }
       |}
     """.stripMargin
 }
 
-/**
- * http://vk.com/dev/payments_errors
- */
+/** http://vk.com/dev/payments_errors */
 private object VkPaymentsError {
   def COMMON(critical: Boolean) = new VkPaymentsError(errorCode = 1, description = "общая ошибка", critical = critical)
 

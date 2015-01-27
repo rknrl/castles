@@ -1,7 +1,6 @@
 package ru.rknrl.base.payments
 
-import akka.actor.ActorRef
-import akka.event.slf4j.Logger
+import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
@@ -52,7 +51,7 @@ object PaymentsServer {
 
 }
 
-class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpService {
+class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpService with ActorLogging {
   private val bugLog = LoggerFactory.getLogger("client")
 
   private var accountIdToAccount = Map[AccountId, ActorRef]()
@@ -71,17 +70,21 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
         }
       }
     } ~ path("vk_callback") {
-      requestUri {
-        uri ⇒
-          respondWithMediaType(`text/plain`) {
+      post {
+        entity(as[String]) { data ⇒
+          respondWithMediaType(`application/json`) {
+            log.info("vk_callback: " + data)
+            val unescape = data.replace("+", " ") // todo: Разобраться кто его эскейпит на "+"
             val vk = config.social.vk.get
-            completePayment(new PaymentsCallbackVk(uri, vk), vk)
+            completePayment(new PaymentsCallbackVk(unescape, vk, config.products), vk)
           }
+        }
       }
     } ~ path("ok_callback") {
       requestUri {
         uri ⇒
           respondWithMediaType(`application/xml`) {
+            log.info("ok_callback: " + uri)
             val ok = config.social.ok.get
             completePayment(new PaymentsCallbackOk(uri, ok), ok)
           }
@@ -90,6 +93,7 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
       requestUri {
         uri ⇒
           respondWithMediaType(`text/plain`) {
+            log.info("mm_callback: " + uri)
             val mm = config.social.mm.get
             completePayment(new PaymentsCallbackMm(uri, mm), mm)
           }
@@ -100,20 +104,25 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
     val response = callback.response
 
     response match {
-      case PaymentResponse(orderId, accountId, productId, price, httpResponse) ⇒
-        if (!(accountIdToAccount contains accountId))
+      case p@PaymentResponse(orderId, accountId, productId, price, httpResponse) ⇒
+        log.info("payment callback PaymentResponse " + p)
 
+        if (!(accountIdToAccount contains accountId)) {
+
+          log.info("account not found " + accountId)
           complete(callback.accountNotFoundError)
 
-        else if (!(config.products exists (_.id == productId)))
+        } else if (!(config.products exists (_.id == productId))) {
 
+          log.info("product not found " + productId)
           complete(callback.accountNotFoundError)
 
-        else {
+        } else {
           val product = config.products.find(_.id == productId).get
           val productInfo = socialConfig.productsInfo.find(_.id == productId).get
 
           if (productInfo.price != price) {
+            log.info("price=" + price + ",expect " + productInfo.price)
             complete(callback.accountNotFoundError)
           } else {
             val future = Patterns.ask(accountIdToAccount(accountId), AddProduct(orderId, product, productInfo.count), 5 seconds)
@@ -121,20 +130,26 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
 
             result match {
               case ProductAdded(oId) ⇒
-                if (orderId == oId)
+                if (orderId == oId) {
+                  log.info("ProductAdded complete: " + httpResponse)
                   complete(httpResponse)
-                else
+                } else {
+                  log.info("ProductAdded orderId=" + oId + ", expected " + orderId)
                   complete(callback.databaseError)
-              case _ ⇒
+                }
+              case invalid ⇒
+                log.info("Add to database invalid result " + invalid)
                 complete(callback.databaseError)
             }
           }
         }
 
       case Response(httpResponse) ⇒
+        log.info("payment callback response: " + httpResponse)
         complete(httpResponse)
 
-      case _ ⇒
+      case invalid ⇒
+        log.info("payment callback invalid response: " + invalid)
         complete(callback.error)
     }
   }

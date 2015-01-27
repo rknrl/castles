@@ -1,5 +1,6 @@
 package ru.rknrl.base.payments
 
+import org.slf4j.LoggerFactory
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.payments.PaymentsCallback.{Response, ResponseBase}
 import spray.http.HttpResponse
@@ -28,6 +29,8 @@ object PaymentsCallback {
  * Обработчик платежных сообщений от соц. сети
  */
 trait PaymentsCallback {
+  val log = LoggerFactory.getLogger("payment")
+
   def response: ResponseBase
 
   /**

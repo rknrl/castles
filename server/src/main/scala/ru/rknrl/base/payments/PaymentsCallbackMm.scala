@@ -63,7 +63,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
 
   override def response =
     try {
-      val params = new UriParams(uri)
+      val params = UriParams.parseGet(uri)
 
       // (Int) идентификатор вашего приложения
       val appId = params.getParam("app_id")

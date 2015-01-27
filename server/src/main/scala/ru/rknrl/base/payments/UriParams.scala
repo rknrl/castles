@@ -2,14 +2,18 @@ package ru.rknrl.base.payments
 
 import spray.http.Uri
 
-class UriParams(uri: Uri) {
-  private val params = parseParams(getParams(uri))
+object UriParams {
+  def parseGet(uri: Uri) = new UriParams(uri.toString().split('?')(1))
+
+  def parsePost(data: String) = new UriParams(data)
+}
+
+class UriParams private(data: String) {
+  private val params = parseParams(data: String)
 
   def getParam(name: String) = params(name)
 
   def hasParam(name: String) = params.contains(name)
-
-  private def getParams(uri: Uri) = uri.toString().split('?')(1)
 
   private def parseParams(params: String) = params.split('&').map(splitByEqual).toMap
 
@@ -19,14 +23,19 @@ class UriParams(uri: Uri) {
   }
 
   def concat = {
-    val sorted = params.toList.sorted(new Ordering[(String, String)] {
-      override def compare(x: (String, String), y: (String, String)) =
-        String.CASE_INSENSITIVE_ORDER.compare(x._1, y._1)
-    })
+    val sorted = params.toList.sortBy(t ⇒ t._1)
 
     var s = ""
-    for ((key, value) ← sorted) {
+    for ((key, value) ← sorted if key != "sig") {
       s += key + "=" + value
+    }
+    s
+  }
+
+  override def toString = {
+    var s = ""
+    for ((key, value) ← params) {
+      s += key + "='" + value + "'\n"
     }
     s
   }

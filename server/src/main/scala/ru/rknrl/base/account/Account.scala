@@ -72,6 +72,7 @@ abstract class Account(accountId: AccountId,
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
     case AddProduct(orderId, product, count) ⇒
+      log.info("AddProduct")
       product.id match {
         case 1 ⇒ state = state.addGold(count)
         case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
@@ -81,14 +82,16 @@ abstract class Account(accountId: AccountId,
       val result = Await.result(future, 5 seconds)
 
       result match {
-        case Update(accountId, accountStateDto) ⇒
+        case accountStateDto: AccountStateDTO ⇒
           if (accountStateDto.getGold == state.gold) {
             sender ! ProductAdded(orderId)
             accountRmi ! AccountStateUpdatedMsg(accountStateDto)
           } else {
+            log.info("invalid gold=" + accountStateDto.getGold + ", but expected " + state.gold)
             // send error
           }
-        case _ ⇒ // send error
+        case invalid ⇒ // send error
+          log.info("invalid result=" + invalid)
       }
 
     /** Auth спрашивает accountState
