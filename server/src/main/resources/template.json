@@ -2,6 +2,7 @@
   "host": "127.0.0.1",
   "gamePort": 2335,
   "policyPort": 2336,
+  "httpPort": 80,
   "db": {
     "host": "localhost",
     "port": 3306,

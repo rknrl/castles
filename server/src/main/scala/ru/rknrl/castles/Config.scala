@@ -22,6 +22,7 @@ object Config {
 class Config(val host: String,
              val gamePort: Int,
              val policyPort: Int,
+             val httpPort: Int,
              val db: DbConfiguration,
              val products: List[Product],
              val social: SocialConfigs,

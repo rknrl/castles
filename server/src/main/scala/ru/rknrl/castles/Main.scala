@@ -19,7 +19,7 @@ object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new BuildingLevelToFactorSerializer + new BuildingsConfigSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
-    println(s"ver: 27 jan 2015 19:07")
+    println(s"ver: 27 jan 2015 21:36")
     configPaths.map(path ⇒ println(s"configPath='$path'"))
 
     val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
@@ -38,7 +38,7 @@ object Main {
     val matchmaking = system.actorOf(Props(classOf[CastlesMatchMaking], 3 seconds, top, config.game), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[PaymentsServer], config), "payment-server")
-    IO(Http) ! Http.Bind(payments, config.host, 8080)
+    IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
