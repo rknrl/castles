@@ -17,9 +17,6 @@ public class Fly {
 
         displayObjectY = displayObject.y;
         rnd = Math.random();
-
-        displayObject.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        displayObject.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
     }
 
     private var _fraction:Number;
@@ -38,16 +35,6 @@ public class Fly {
         const unit:Number = (_fraction + 1) / 2; // from 0 to 1
         const scale:Number = 0.5 + unit * 0.5;
         shadow.scaleX = shadow.scaleY = scale;
-    }
-
-    private var mouseDown:Boolean;
-
-    private function onMouseDown(event:MouseEvent):void {
-        mouseDown = true;
-    }
-
-    private function onMouseUp(event:MouseEvent):void {
-        mouseDown = false;
     }
 }
 }

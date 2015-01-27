@@ -101,7 +101,7 @@ public class Main extends Sprite implements IAuthFacade {
         stage.align = StageAlign.TOP_LEFT;
         stage.quality = StageQuality.BEST;
 
-        localeLoader = new TextLoader(localesUrl + "castles - EN.tsv");
+        localeLoader = new TextLoader(localesUrl + "castles - RU.tsv");
         localeLoader.addEventListener(Event.COMPLETE, onLocaleComplete);
         localeLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLocaleError);
         localeLoader.addEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
@@ -138,7 +138,7 @@ public class Main extends Sprite implements IAuthFacade {
             myUserInfo = userInfo;
             log.add("myUserInfo: " + myUserInfo)
         } else {
-            myUserInfo = new UserInfo(accountId.id, CastlesUserInfo.defaultName, null, Sex.UNDEFINED);
+            myUserInfo = new UserInfo(accountId.id, locale.defaultName, null, Sex.UNDEFINED);
             log.add("myUserInfo fail");
         }
 

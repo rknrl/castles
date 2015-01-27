@@ -81,5 +81,25 @@ public class CastlesLocale {
     public function lose(reward:int):String {
         return "Поражение! Награда " + reward + "★";
     }
+
+    public function get defaultName():String {
+        return "Гость";
+    }
+
+    public function get loading():String {
+        return "Загрузка";
+    }
+
+    public function get searchOpponents():String {
+        return "Ищем противников";
+    }
+
+    public function get noConnection():String {
+        return "Нет интернет соединения";
+    }
+
+    public function get fastAndTrust():String {
+        return "Быстро\nи\nнадежно";
+    }
 }
 }

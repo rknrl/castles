@@ -85,7 +85,7 @@ public class View extends Sprite {
     }
 
     public function addLoadingScreen():void {
-        _addLoadingScreen("Загрузка");
+        _addLoadingScreen(locale.loading);
     }
 
     public function removeLoadingScreen():void {
@@ -97,7 +97,7 @@ public class View extends Sprite {
     }
 
     public function addSearchOpponentScreen():void {
-        _addLoadingScreen("Ищем противника");
+        _addLoadingScreen(locale.searchOpponents);
     }
 
     public function removeSearchOpponentsScreen():void {
@@ -106,7 +106,7 @@ public class View extends Sprite {
 
     public function addNoConnectionScreen():void {
         if (loadingScreen) throw new Error("loadingScreen already exists");
-        addChild(loadingScreen = new NoConnectionScreen("Нет интернет соединения", _layout));
+        addChild(loadingScreen = new NoConnectionScreen(locale.noConnection, _layout));
     }
 
     public function removeNoConnectionScreen():void {

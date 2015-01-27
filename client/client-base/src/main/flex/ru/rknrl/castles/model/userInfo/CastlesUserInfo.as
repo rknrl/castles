@@ -7,8 +7,6 @@ import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.UserInfoDTO;
 
 public class CastlesUserInfo extends UserInfo {
-    public static const defaultName:String = "Гость";
-
     private var _accountType:AccountType;
     private var _photo96:String;
     private var _photo256:String;

@@ -18,7 +18,7 @@ public class BankScreen extends Screen {
     public function BankScreen(products:Products, layout:Layout, locale:CastlesLocale) {
         this.locale = locale;
 
-        if (layout.needShield) addChild(shield = new ShieldView());
+        if (layout.needShield) addChild(shield = new ShieldView(locale.fastAndTrust));
 
         button = new Button(layout);
         button.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
