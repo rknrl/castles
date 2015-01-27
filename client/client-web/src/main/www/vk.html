@@ -110,8 +110,8 @@
          */
         function showPaymentDialog(p) {
             VK.callMethod("showOrderBox", {
-                type: p.type,
-                votes: p.votes
+                type: "item",
+                item: p.item
             });
         }
 
