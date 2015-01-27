@@ -1,40 +1,24 @@
-sale	Распродажа
-fast_and_trust	Быстро\nи\nНадежно
-buy_button	Купить $1★ за $2$
-win	Победа
-defeat	Поражение
-reward	Награда $1★
-no_reward	Нет награды
-to_menu	В меню
-play_again	Сыграть еще
-no_connection	Нет интернет\nсоединения
-try_connect	Подключиться
-fireball	Фаерболл
-strengthening	Усиление
-volcano	Вулкан
-tornado	Торнадо
-assistance	Подмога
-shop_title	Любой предмет за
-skills_title	Любое улучшение за
-skills_title_complete	Собраны все улучшения
+play	Играть
+bank_button	Купить $1★ за $2 $3
+balance	У вас $1★
+shop_title	Любой предмет за $1★
+upgrades_complete	Собраны все улучшения
+upgrades_title	Любое улучшение за $1★
+top_title	Лучшие на этой неделе
 attack	Атака
 defence	Защита
 speed	Скорость
-upgrade	Улучшить
-upgrade_info	Защита больше
-remove	Удалить
-build	Построить
-house	Дом
+house	Домик
 tower	Башня
 church	Церковь
-house_info	Стандарт
-tower_info	Атака и защита
-church_info	Скорость
-main_title	Башенки
-play	Играть
-enter_game	Ищем противника..
-button_castle	Башенки
-button_skills	Улучшения
-button_shop	Предметы
-button_bank	Банк
-loading	Загрузка..
+build	Построить
+cancel	Отмена
+upgrade	Улучшить
+remove	Удалить
+win	Победа! Награда $1★
+lost	Поражение! Награда $1★
+default_name	Гость
+loading	Загрзка
+search_opponents	Ищем противников
+no_connection	Нет интернет соединения
+fast_and_trust	Быстро\nи\nнадежно

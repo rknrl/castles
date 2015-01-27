@@ -1,47 +1,74 @@
 package ru.rknrl.castles.view.locale {
+import ru.rknrl.Locale;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SkillType;
 
-public class CastlesLocale {
+public class CastlesLocale extends Locale {
+    private static const PLAY:String = "play";
+    private static const BANK_BUTTON:String = "bank_button";
+    private static const BALANCE:String = "balance";
+    private static const SHOP_TITLE:String = "shop_title";
+    private static const UPGRADES_COMPLETE:String = "upgrades_complete";
+    private static const UPGRADES_TITLE:String = "upgrades_title";
+    private static const TOP_TITLE:String = "top_title";
+    private static const ATTACK:String = "attack";
+    private static const DEFENCE:String = "defence";
+    private static const SPEED:String = "speed";
+    private static const HOUSE:String = "house";
+    private static const TOWER:String = "tower";
+    private static const CHURCH:String = "church";
+    private static const BUILD:String = "build";
+    private static const CANCEL:String = "cancel";
+    private static const UPGRADE:String = "upgrade";
+    private static const REMOVE:String = "remove";
+    private static const WIN:String = "win";
+    private static const LOST:String = "lost";
+    private static const DEFAULT_NAME:String = "default_name";
+    private static const LOADING:String = "loading";
+    private static const SEARCH_OPPONENTS:String = "search_opponents";
+    private static const NO_CONNECTION:String = "no_connection";
+    private static const FAST_AND_TRUST:String = "fast_and_trust";
+
     public function CastlesLocale(data:String) {
+        super(data);
     }
 
     public function get play():String {
-        return "Играть";
+        return translate(PLAY);
     }
 
     public function bankButton(count:int, price:int, currency:String):String {
-        return "Купить " + count + "★ за " + price + " " + currency;
+        return translate(BANK_BUTTON).replace("$1", count).replace("$2", price).replace("$3", currency);
     }
 
     public function balance(value:int):String {
-        return "У вас " + value + "★";
+        return translate(BALANCE).replace("$1", value);
     }
 
     public function shopTitle(price:int):String {
-        return "Любой предмет за " + price + "★";
+        return translate(SHOP_TITLE).replace("$1", price);
     }
 
     public function get upgradesComplete():String {
-        return "Собраны все улучшения";
+        return translate(UPGRADES_COMPLETE);
     }
 
     public function upgradesTitle(price:int):String {
-        return "Любое улучшение за " + price + "★";
+        return translate(UPGRADES_TITLE).replace("$1", price);
     }
 
     public function get topTitle():String {
-        return "Лучшие за прошлую неделю";
+        return translate(TOP_TITLE);
     }
 
     public function skillName(skillType:SkillType):String {
         switch (skillType) {
             case SkillType.ATTACK:
-                return "Атака";
+                return translate(ATTACK);
             case SkillType.DEFENCE:
-                return "Защита";
+                return translate(DEFENCE);
             case SkillType.SPEED:
-                return "Скорость";
+                return translate(SPEED);
         }
         throw new Error("unknown skillType " + skillType);
     }
@@ -49,57 +76,57 @@ public class CastlesLocale {
     public function buildingName(buildingType:BuildingType):String {
         switch (buildingType) {
             case BuildingType.HOUSE:
-                return "Домик";
+                return translate(HOUSE);
             case BuildingType.CHURCH:
-                return "Церковь";
+                return translate(CHURCH);
             case BuildingType.TOWER:
-                return "Башня";
+                return translate(TOWER);
         }
         throw new Error("unknown buildingType " + buildingType);
     }
 
     public function get build():String {
-        return "Построить";
+        return translate(BUILD);
     }
 
     public function get cancel():String {
-        return "Отмена";
+        return translate(CANCEL);
     }
 
     public function get upgrade():String {
-        return "Улучшить";
+        return translate(UPGRADE);
     }
 
     public function get remove():String {
-        return "Удалить";
+        return translate(REMOVE);
     }
 
     public function win(reward:int):String {
-        return "Победа! Награда " + reward + "★";
+        return translate(WIN).replace("$1", reward);
     }
 
     public function lose(reward:int):String {
-        return "Поражение! Награда " + reward + "★";
+        return translate(LOST).replace("$1", reward);
     }
 
     public function get defaultName():String {
-        return "Гость";
+        return translate(DEFAULT_NAME);
     }
 
     public function get loading():String {
-        return "Загрузка";
+        return translate(LOADING);
     }
 
     public function get searchOpponents():String {
-        return "Ищем противников";
+        return translate(SEARCH_OPPONENTS);
     }
 
     public function get noConnection():String {
-        return "Нет интернет соединения";
+        return translate(NO_CONNECTION);
     }
 
     public function get fastAndTrust():String {
-        return "Быстро\nи\nнадежно";
+        return translate(FAST_AND_TRUST);
     }
 }
 }

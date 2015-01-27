@@ -15,7 +15,7 @@ import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
 
 public class MainMobileBase extends Main {
-    [Embed(source="/castles - EN.tsv", mimeType="application/octet-stream")]
+    [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
     private static function isTablet(fullScreenWidth:int, fullScreenHeight:int):Boolean {

@@ -13,7 +13,7 @@ import ru.rknrl.dto.DeviceType;
 import ru.rknrl.log.Log;
 
 public class MainWebBase extends Main {
-    [Embed(source="/castles - EN.tsv", mimeType="application/octet-stream")]
+    [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
     private var log:Log;
