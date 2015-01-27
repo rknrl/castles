@@ -256,10 +256,10 @@ public class MenuController {
                         view.playSwipeTutor();
                     } else if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
                         tutorShows[screenIndex] = true;
-                        view.playSlotTutor();
-                    } else if (!tutorState.emptySlot && model.gold >= model.buildingPrices.buildPrice) {
+                        view.playSlotTutor(model.startLocation.getNotEmptySlot());
+                    } else if (!tutorState.emptySlot && model.startLocation.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
                         tutorShows[screenIndex] = true;
-                        view.playEmptySlotTutor();
+                        view.playEmptySlotTutor(model.startLocation.getEmptySlot());
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SHOP:

@@ -162,12 +162,12 @@ public class MenuView extends Sprite {
         tutor.playSwipe();
     }
 
-    public function playSlotTutor():void {
-        tutor.playSlot(SlotId.SLOT_1);
+    public function playSlotTutor(slotId:SlotId):void {
+        tutor.playSlot(slotId);
     }
 
-    public function playEmptySlotTutor():void {
-        tutor.playSlot(SlotId.SLOT_2);
+    public function playEmptySlotTutor(slotId:SlotId):void {
+        tutor.playSlot(slotId);
     }
 
     public function playMagicItemTutor():void {

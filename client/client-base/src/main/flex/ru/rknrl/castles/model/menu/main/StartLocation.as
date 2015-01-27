@@ -38,5 +38,19 @@ public class StartLocation {
     private static function equalsPrototype(a:BuildingPrototypeDTO, b:BuildingPrototypeDTO):Boolean {
         return a.type == b.type && a.level == b.level;
     }
+
+    public function getEmptySlot():SlotId {
+        for each(var slot:SlotDTO in dto.slots) {
+            if (!slot.hasBuildingPrototype) return slot.id
+        }
+        return null;
+    }
+
+    public function getNotEmptySlot():SlotId {
+        for each(var slot:SlotDTO in dto.slots) {
+            if (slot.hasBuildingPrototype) return slot.id
+        }
+        throw new Error("no buildings in start location");
+    }
 }
 }
