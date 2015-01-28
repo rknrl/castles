@@ -41,8 +41,7 @@ object GameState {
       new Building(
         buildingIdIterator.next,
         prototype,
-        x = xy.x,
-        y = xy.y,
+        xy,
         population = config.getStartPopulation(prototype),
         owner = Some(player.id),
         strengthened = false,
@@ -57,8 +56,7 @@ object GameState {
       val pos = positions(id)
       StartLocationPosDTO.newBuilder()
         .setPlayerId(player.id.dto)
-        .setX(pos.toXY.x.toFloat)
-        .setY(pos.toXY.y.toFloat)
+        .setPos(pos.toXY.dto)
         .setOrientation(orientations(id))
         .build()
     }
@@ -67,7 +65,7 @@ object GameState {
     for (b ← topRandomBuildings)
     yield {
       val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
-      new Building(buildingIdIterator.next, b.prototype, pos.x, pos.y, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+      new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
     }
 
   def mirrorBuildings4(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
@@ -80,7 +78,7 @@ object GameState {
         case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
       }
 
-      new Building(buildingIdIterator.next, b.prototype, pos.x, pos.y, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+      new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
     }
 
   def init(time: Long, players: List[Player], big: Boolean, config: GameConfig) = {
@@ -177,7 +175,7 @@ class GameState(val time: Long,
     val enterUnits = `units→enterUnit`(units.units, time)
     val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits) ++ units.`killed→removeMessages`
 
-    val createdBullets = List.empty;// createBullets(buildings, units, time, config, playerStates)
+    val createdBullets = List.empty; // createBullets(buildings, units, time, config, playerStates)
 
     val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
     val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)

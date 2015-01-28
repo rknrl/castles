@@ -46,10 +46,10 @@ class FireballsTest extends FlatSpec with Matchers {
 
     addMessages.size should be(3)
 
-    addMessages(0).fireballDTO.getX should be(0.1f)
+    addMessages(0).fireballDTO.getPos.getX should be(0.1f)
 
-    addMessages(1).fireballDTO.getX should be(0.2f)
+    addMessages(1).fireballDTO.getPos.getX should be(0.2f)
 
-    addMessages(2).fireballDTO.getX should be(0.3f)
+    addMessages(2).fireballDTO.getPos.getX should be(0.3f)
   }
 }

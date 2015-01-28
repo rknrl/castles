@@ -19,8 +19,7 @@ class BuildingId(val id: Int) {
 
 class Building(val id: BuildingId,
                val prototype: BuildingPrototype,
-               val x: Double,
-               val y: Double,
+               val pos: Point,
                val population: Double,
                val owner: Option[PlayerId],
                val strengthened: Boolean,
@@ -28,8 +27,6 @@ class Building(val id: BuildingId,
                val lastShootTime: Long) {
 
   assert(population >= 0, population)
-
-  def pos = new Point(x, y)
 
   def floorPopulation = GameConfig.truncatePopulation(population)
 
@@ -51,8 +48,7 @@ class Building(val id: BuildingId,
     new Building(
       id,
       prototype,
-      x,
-      y,
+      pos,
       newPopulation,
       newOwner,
       newStrengthened,
@@ -66,8 +62,7 @@ class Building(val id: BuildingId,
     val builder = BuildingDTO.newBuilder()
       .setId(id.dto)
       .setBuilding(prototype.dto)
-      .setX(x.toFloat)
-      .setY(y.toFloat)
+      .setPos(pos.dto)
       .setPopulation(floorPopulation)
       .setStrengthened(strengthened)
 

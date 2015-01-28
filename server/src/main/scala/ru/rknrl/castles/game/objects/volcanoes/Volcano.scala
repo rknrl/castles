@@ -5,19 +5,15 @@ import ru.rknrl.utils.{PeriodObject, Point}
 import ru.rknrl.dto.GameDTO.VolcanoDTO
 
 class Volcano(val playerId: PlayerId,
-              val x: Double,
-              val y: Double,
+              val pos: Point,
               val startTime: Long,
               val duration: Long) extends PeriodObject[VolcanoDTO] {
-
-  val pos = new Point(x, y)
 
   def dto(time: Long) = {
     timeAssert(time)
 
     VolcanoDTO.newBuilder()
-      .setX(x.toFloat)
-      .setY(y.toFloat)
+      .setPos(pos.dto)
       .setMillisTillEnd(millisTillEnd(time))
       .build()
   }

@@ -73,8 +73,8 @@ class GameUnitTest extends FlatSpec with Matchers {
     dto.getId.getId should be(u.id.id)
     dto.getType should be(u.buildingPrototype.buildingType)
     dto.getCount should be(u.count)
-    dto.getX should be(u.getPos(time).x.toFloat)
-    dto.getY should be(u.getPos(time).y.toFloat)
+    dto.getPos.getX should be(u.getPos(time).x.toFloat)
+    dto.getPos.getY should be(u.getPos(time).y.toFloat)
     dto.getSpeed should be(u.speed.toFloat)
     dto.getTargetBuildingId.getId should be(u.targetBuildingId.id)
     dto.getOwner.getId should be(u.owner.id)
@@ -87,8 +87,8 @@ class GameUnitTest extends FlatSpec with Matchers {
     val dto = u.updateDto(time)
 
     dto.getId.getId should be(u.id.id)
-    dto.getX should be(u.getPos(time).x.toFloat)
-    dto.getY should be(u.getPos(time).y.toFloat)
+    dto.getPos.getX should be(u.getPos(time).x.toFloat)
+    dto.getPos.getY should be(u.getPos(time).y.toFloat)
     dto.getSpeed should be(u.speed.toFloat)
     dto.getCount should be(u.count)
   }

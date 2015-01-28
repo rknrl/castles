@@ -26,7 +26,7 @@ public class Units {
     }
 
     public function add(endPos:Point, dto:UnitDTO):void {
-        const startPos:Point = new Point(dto.x, dto.y);
+        const startPos:Point = new Point(dto.pos.x, dto.pos.y);
 
         units.push(new Unit(dto.id, startPos, endPos, getTimer(), dto.speed));
 
@@ -34,10 +34,10 @@ public class Units {
     }
 
     public function updateUnit(dto:UnitUpdateDTO):void {
-        getUnit(dto.id).update(getTimer(), new Point(dto.x, dto.y), dto.speed);
+        getUnit(dto.id).update(getTimer(), new Point(dto.pos.x, dto.pos.y), dto.speed);
 
         view.setUnitCount(dto.id, dto.count);
-        view.setUnitPos(dto.id, new Point(dto.x, dto.y));
+        view.setUnitPos(dto.id, new Point(dto.pos.x, dto.pos.y));
     }
 
     public function remove(id:UnitIdDTO):void {

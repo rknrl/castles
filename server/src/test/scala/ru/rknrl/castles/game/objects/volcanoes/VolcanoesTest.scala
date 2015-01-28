@@ -7,9 +7,9 @@ import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.utils.Point
 
 class VolcanoesTest extends FlatSpec with Matchers {
-  private val volcano0 = new Volcano(new PlayerId(0), x = 100, y = 200, startTime = 800, duration = 2000)
-  private val volcano1 = new Volcano(new PlayerId(1), x = 500, y = 800, startTime = 1000, duration = 500)
-  private val volcano2 = new Volcano(new PlayerId(2), x = 600, y = 200, startTime = 1000, duration = 2000)
+  private val volcano0 = new Volcano(new PlayerId(0), new Point(100, 200), startTime = 800, duration = 2000)
+  private val volcano1 = new Volcano(new PlayerId(1), new Point(500, 800), startTime = 1000, duration = 500)
+  private val volcano2 = new Volcano(new PlayerId(2), new Point(600, 200), startTime = 1000, duration = 2000)
 
   private val config = GameConfigMock.gameConfig()
 
@@ -27,16 +27,16 @@ class VolcanoesTest extends FlatSpec with Matchers {
     volcanoes.size should be(3)
 
     volcanoes(0).playerId should be(new PlayerId(0))
-    volcanoes(0).x should be(0.1.toFloat.toDouble)
-    volcanoes(0).y should be(0.2.toFloat.toDouble)
+    volcanoes(0).pos.x should be(0.1.toFloat.toDouble)
+    volcanoes(0).pos.y should be(0.2.toFloat.toDouble)
 
     volcanoes(1).playerId should be(new PlayerId(1))
-    volcanoes(1).x should be(0.2.toFloat.toDouble)
-    volcanoes(1).y should be(0.3.toFloat.toDouble)
+    volcanoes(1).pos.x should be(0.2.toFloat.toDouble)
+    volcanoes(1).pos.y should be(0.3.toFloat.toDouble)
 
     volcanoes(2).playerId should be(new PlayerId(2))
-    volcanoes(2).x should be(0.3.toFloat.toDouble)
-    volcanoes(2).y should be(0.4.toFloat.toDouble)
+    volcanoes(2).pos.x should be(0.3.toFloat.toDouble)
+    volcanoes(2).pos.y should be(0.4.toFloat.toDouble)
 
   }
 
@@ -49,8 +49,8 @@ class VolcanoesTest extends FlatSpec with Matchers {
 
     addMessages.size should be(3)
 
-    addMessages(0).volcanoDTO.getX should be(100)
-    addMessages(1).volcanoDTO.getX should be(500)
-    addMessages(2).volcanoDTO.getX should be(600)
+    addMessages(0).volcanoDTO.getPos.getX should be(100)
+    addMessages(1).volcanoDTO.getPos.getX should be(500)
+    addMessages(2).volcanoDTO.getPos.getX should be(600)
   }
 }

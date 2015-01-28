@@ -16,6 +16,7 @@ import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.ItemsDTO;
 import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.dto.PointDTO;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillLevelDTO;
@@ -263,8 +264,9 @@ public class DtoMock {
         const dto:StartLocationPosDTO = new StartLocationPosDTO();
         dto.playerId = playerIdDto(playerId);
         dto.orientation = orientation;
-        dto.x = i * CellSize.SIZE.id();
-        dto.y = j * CellSize.SIZE.id();
+        dto.pos = new PointDTO();
+        dto.pos.x = i * CellSize.SIZE.id();
+        dto.pos.y = j * CellSize.SIZE.id();
         return dto;
     }
 
@@ -292,8 +294,9 @@ public class DtoMock {
         if (ownerId > -1) dto.owner = playerIdDto(ownerId);
         dto.population = 47;
         dto.strengthened = false;
-        dto.x = i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
-        dto.y = j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
+        dto.pos = new PointDTO();
+        dto.pos.x = i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
+        dto.pos.y = j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
         return dto;
     }
 

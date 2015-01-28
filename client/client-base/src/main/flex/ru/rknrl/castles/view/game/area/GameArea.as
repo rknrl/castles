@@ -84,8 +84,8 @@ public class GameArea extends Sprite {
             const orientation:StartLocationOrientation = dto.orientation;
             const isMirrorH:Boolean = orientation == StartLocationOrientation.TOP_RIGHT || orientation == StartLocationOrientation.BOTTOM_RIGHT;
             const isMirrorV:Boolean = orientation == StartLocationOrientation.TOP_LEFT || orientation == StartLocationOrientation.TOP_RIGHT;
-            const x:Number = isMirrorH ? dto.x - pos.x * cellSize : dto.x + pos.x * cellSize;
-            const y:Number = isMirrorV ? dto.y - pos.y * cellSize : dto.y + pos.y * cellSize;
+            const x:Number = isMirrorH ? dto.pos.x - pos.x * cellSize : dto.pos.x + pos.x * cellSize;
+            const y:Number = isMirrorV ? dto.pos.y - pos.y * cellSize : dto.pos.y + pos.y * cellSize;
             ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
         }
     }

@@ -20,7 +20,7 @@ public class Volcanoes {
         const time:int = getTimer();
         const volcano:Volcano = new Volcano(volcanoIterator++, time, dto.millisTillEnd);
         volcanoes.push(volcano);
-        view.addVolcano(volcano.id, new Point(dto.x, dto.y), volcano.radius(time));
+        view.addVolcano(volcano.id, new Point(dto.pos.x, dto.pos.y), volcano.radius(time));
     }
 
     public function update(time:int):void {

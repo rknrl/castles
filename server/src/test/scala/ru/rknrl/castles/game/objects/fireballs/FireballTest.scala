@@ -16,7 +16,7 @@ object FireballTest {
 class FireballTest extends FlatSpec with Matchers {
   "dto" should "be correct" in {
     val dto = FireballTest.fireball().dto(time = 0)
-    dto.getX should be(124.124f)
-    dto.getY should be(7667.435f)
+    dto.getPos.getX should be(124.124f)
+    dto.getPos.getY should be(7667.435f)
   }
 }

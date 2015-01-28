@@ -2,6 +2,7 @@ package ru.rknrl.castles.game.objects.volcanoes
 
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.utils.Point
 
 object VolcanoTest {
   def volcano(playerId: PlayerId = new PlayerId(77),
@@ -11,8 +12,7 @@ object VolcanoTest {
               duration: Long = 50) =
     new Volcano(
       playerId,
-      x,
-      y,
+      new Point(x, y),
       startTime,
       duration
     )
@@ -25,8 +25,8 @@ class VolcanoTest extends FlatSpec with Matchers {
     val v = VolcanoTest.volcano()
 
     val dto = v.dto(currentTime)
-    dto.getX should be(66.666f)
-    dto.getY should be(44.444f)
+    dto.getPos.getX should be(66.666f)
+    dto.getPos.getY should be(44.444f)
     dto.getMillisTillEnd should be(v.millisTillEnd(currentTime))
   }
 }

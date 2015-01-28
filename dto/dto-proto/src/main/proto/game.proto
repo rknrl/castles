@@ -64,19 +64,17 @@ enum StartLocationOrientation {
 
 message StartLocationPosDTO {
     required PlayerIdDTO playerId = 1;
-    required float x = 2;
-    required float y = 3;
-    required StartLocationOrientation orientation = 4;
+    required PointDTO pos = 2;
+    required StartLocationOrientation orientation = 3;
 }
 
 message BuildingDTO {
     required BuildingIdDTO id = 1;
     required BuildingPrototypeDTO building = 2;
-    required float x = 3;
-    required float y = 4;
-    required int32 population = 5;
-    optional PlayerIdDTO owner = 6;
-    required bool strengthened = 7;
+    required PointDTO pos = 3;
+    required int32 population = 4;
+    optional PlayerIdDTO owner = 5;
+    required bool strengthened = 6;
 }
 
 message BuildingUpdateDTO {
@@ -90,32 +88,28 @@ message UnitDTO {
     required UnitIdDTO id = 1;
     required BuildingType type = 2;
     required int32 count = 3;
-    required float x = 4;
-    required float y = 5;
-    required float speed = 6;
-    required BuildingIdDTO targetBuildingId = 7;
-    required PlayerIdDTO owner = 8;
-    required bool strengthened = 9;
+    required PointDTO pos = 4;
+    required float speed = 5;
+    required BuildingIdDTO targetBuildingId = 6;
+    required PlayerIdDTO owner = 7;
+    required bool strengthened = 8;
 }
 
 message UnitUpdateDTO {
     required UnitIdDTO id = 1;
-    required float x = 2;
-    required float y = 3;
-    required float speed = 4;
-    required int32 count = 5;
+    required PointDTO pos = 2;
+    required float speed = 3;
+    required int32 count = 4;
 }
 
 message FireballDTO {
-    required float x = 1;
-    required float y = 2;
-    required int32 millisTillSplash = 3;
+    required PointDTO pos = 1;
+    required int32 millisTillSplash = 2;
 }
 
 message VolcanoDTO {
-    required float x = 1;
-    required float y = 2;
-    required int32 millisTillEnd = 3;
+    required PointDTO pos = 1;
+    required int32 millisTillEnd = 2;
 }
 
 message TornadoDTO {

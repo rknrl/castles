@@ -27,14 +27,14 @@ public class Fireballs {
     public function add(dto:FireballDTO):void {
         const time:int = getTimer();
 
-        const fromLeft:Boolean = dto.x > areaWidth / 2;
-        const fromTop:Boolean = dto.y > areaHeight / 2;
-        const dx:Number = fromLeft ? dto.x : areaWidth - dto.x;
-        const dy:Number = fromTop ? dto.y : areaHeight - dto.y;
+        const fromLeft:Boolean = dto.pos.x > areaWidth / 2;
+        const fromTop:Boolean = dto.pos.y > areaHeight / 2;
+        const dx:Number = fromLeft ? dto.pos.x : areaWidth - dto.pos.x;
+        const dy:Number = fromTop ? dto.pos.y : areaHeight - dto.pos.y;
         const d:Number = Math.max(dx, dy);
 
-        const startPos:Point = new Point(fromLeft ? dto.x - d : dto.x + d, fromTop ? dto.y - d : dto.y + d);
-        const endPos:Point = new Point(dto.x, dto.y);
+        const startPos:Point = new Point(fromLeft ? dto.pos.x - d : dto.pos.x + d, fromTop ? dto.pos.y - d : dto.pos.y + d);
+        const endPos:Point = new Point(dto.pos.x, dto.pos.y);
 
         const fireball:Fireball = new Fireball(fireballIterator++, startPos, endPos, time, dto.millisTillSplash);
         fireballs.push(fireball);

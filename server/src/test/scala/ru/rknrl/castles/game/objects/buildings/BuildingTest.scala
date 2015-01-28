@@ -4,6 +4,7 @@ import org.scalatest._
 import ru.rknrl.castles.account.objects.BuildingPrototype
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
+import ru.rknrl.utils.Point
 
 object BuildingTest {
   private val playerId0 = new PlayerId(0)
@@ -26,8 +27,7 @@ object BuildingTest {
     new Building(
       id = id,
       prototype = prototype,
-      x = x,
-      y = y,
+      new Point(x, y),
       population = population,
       owner = owner,
       strengthened = strengthened,
@@ -65,8 +65,8 @@ class BuildingTest extends FlatSpec with Matchers {
 
     b.id should be(a.id)
     b.prototype should be(a.prototype)
-    b.x should be(a.x)
-    b.y should be(a.y)
+    b.pos.x should be(a.pos.x)
+    b.pos.y should be(a.pos.y)
     b.owner should be(a.owner)
     b.strengthened should be(a.strengthened)
     b.strengtheningStartTime should be(a.strengtheningStartTime)
@@ -85,8 +85,8 @@ class BuildingTest extends FlatSpec with Matchers {
 
     b.id should be(a.id)
     b.prototype should be(a.prototype)
-    b.x should be(a.x)
-    b.y should be(a.y)
+    b.pos.x should be(a.pos.x)
+    b.pos.y should be(a.pos.y)
     b.population should be(a.population)
     b.strengthened should be(a.strengthened)
     b.strengtheningStartTime should be(a.strengtheningStartTime)
@@ -109,8 +109,8 @@ class BuildingTest extends FlatSpec with Matchers {
 
     b.id should be(a.id)
     b.prototype should be(a.prototype)
-    b.x should be(a.x)
-    b.y should be(a.y)
+    b.pos.x should be(a.pos.x)
+    b.pos.y should be(a.pos.y)
     b.population should be(a.population)
     b.owner should be(a.owner)
     b.lastShootTime should be(a.lastShootTime)
@@ -127,8 +127,8 @@ class BuildingTest extends FlatSpec with Matchers {
 
     b.id should be(a.id)
     b.prototype should be(a.prototype)
-    b.x should be(a.x)
-    b.y should be(a.y)
+    b.pos.x should be(a.pos.x)
+    b.pos.y should be(a.pos.y)
     b.population should be(a.population)
     b.owner should be(a.owner)
     b.lastShootTime should be(a.lastShootTime)
@@ -145,8 +145,8 @@ class BuildingTest extends FlatSpec with Matchers {
 
     b.id should be(a.id)
     b.prototype should be(a.prototype)
-    b.x should be(a.x)
-    b.y should be(a.y)
+    b.pos.x should be(a.pos.x)
+    b.pos.y should be(a.pos.y)
     b.population should be(a.population)
     b.owner should be(a.owner)
     b.strengthened should be(a.strengthened)
@@ -203,8 +203,8 @@ class BuildingTest extends FlatSpec with Matchers {
     dto.getId.getId should be(7)
     dto.getBuilding.getType should be(BuildingType.TOWER)
     dto.getBuilding.getLevel should be(BuildingLevel.LEVEL_2)
-    dto.getX should be(9.12.toFloat)
-    dto.getY should be(8.24.toFloat)
+    dto.getPos.getX should be(9.12.toFloat)
+    dto.getPos.getY should be(8.24.toFloat)
   }
 
   "dto" should "set population correctly" in {

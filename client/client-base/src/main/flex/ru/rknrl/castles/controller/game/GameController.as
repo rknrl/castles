@@ -107,7 +107,7 @@ public class GameController implements IGameFacade {
         var buildingList:Vector.<Building> = new <Building>[];
         for each(var b:BuildingDTO in gameState.buildings) {
             const owner:BuildingOwner = new BuildingOwner(b.hasOwner, b.owner);
-            const pos:Point = new Point(b.x, b.y);
+            const pos:Point = new Point(b.pos.x, b.pos.y);
             buildingList.push(new Building(b.id, pos, owner, b.strengthened));
             view.area.addBuilding(b.id, b.building.type, b.building.level, owner, b.population, b.strengthened, pos);
         }

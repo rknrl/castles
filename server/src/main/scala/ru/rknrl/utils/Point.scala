@@ -6,6 +6,8 @@ import ru.rknrl.dto.GameDTO.PointDTO
  * todo equals with Point.as
  */
 class Point(val x: Double, val y: Double) {
+  def this(dto: PointDTO) = this(dto.getX, dto.getY)
+
   def distance(endPos: Point) = {
     val dx = endPos.x - x
     val dy = endPos.y - y

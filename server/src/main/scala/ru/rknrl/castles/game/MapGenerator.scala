@@ -61,7 +61,7 @@ object MapGenerator {
       new Building(
         id = buildingIdIterator.next,
         prototype = prototype,
-        pos.toXY.x, pos.toXY.y,
+        pos.toXY,
         population = config.getStartPopulation(prototype),
         owner = None,
         strengthened = false,

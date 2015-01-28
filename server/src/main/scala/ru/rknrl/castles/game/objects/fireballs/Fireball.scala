@@ -10,8 +10,7 @@ class Fireball(val playerId: PlayerId,
                val startTime: Long) extends PeriodObject[FireballDTO] {
 
   def dto(time: Long) = FireballDTO.newBuilder()
-    .setX(pos.x.toFloat)
-    .setY(pos.y.toFloat)
+    .setPos(pos.dto)
     .setMillisTillSplash(millisTillEnd(time))
     .build()
 }
