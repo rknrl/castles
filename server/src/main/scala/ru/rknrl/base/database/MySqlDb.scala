@@ -3,13 +3,13 @@ package ru.rknrl.base.database
 import akka.actor.ActorLogging
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
-import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
+import com.github.mauricio.async.db.{Configuration, RowData}
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.TopItem
 import ru.rknrl.base.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.CommonDTO.AccountIdDTO
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -31,13 +31,15 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
     val idByteArray = rowData(0).asInstanceOf[Array[Byte]]
     val id = AccountIdDTO.parseFrom(idByteArray)
     val rating = rowData(1).asInstanceOf[Double]
-    TopItem(new AccountId(id), rating)
+    val userInfoByteArray = rowData(2).asInstanceOf[Array[Byte]]
+    val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
+    TopItem(new AccountId(id), rating, userInfo)
   }
 
   override def receive: Receive = {
     case GetTop ⇒
       val ref = sender()
-      connection.sendQuery("SELECT id, rating FROM account_state ORDER BY rating DESC LIMIT 5;").map(
+      connection.sendQuery("SELECT id, rating, userInfo FROM account_state ORDER BY rating DESC LIMIT 5;").map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             ref ! resultSet.map(rowDataToTopItem).toList
@@ -46,9 +48,9 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
         }
       )
 
-    case Insert(accountId, accountState) ⇒
+    case Insert(accountId, accountState, userInfo) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state) VALUES (?,?,?);", Seq(accountId.dto.toByteArray, accountState.getRating, accountState.toByteArray)).map(
+      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.dto.toByteArray, accountState.getRating, accountState.toByteArray, userInfo.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             ref ! accountState
@@ -62,6 +64,16 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             ref ! accountState
+          else
+            log.error("Update rowsAffected=" + queryResult.rowsAffected)
+      )
+
+    case UpdateUserInfo(accountId, userInfo) ⇒
+      val ref = sender()
+      connection.sendPreparedStatement("UPDATE account_state SET userInfo=? WHERE id=?;", Seq(userInfo.toByteArray, accountId.dto.toByteArray)).map(
+        queryResult ⇒
+          if (queryResult.rowsAffected == 1)
+            ref ! userInfo
           else
             log.error("Update rowsAffected=" + queryResult.rowsAffected)
       )

@@ -2,7 +2,6 @@ package ru.rknrl.castles.controller.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.controller.mock.DtoMock;
 import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
@@ -55,6 +54,27 @@ public class GameController implements IGameFacade {
     private var tornadoPath:TornadoPath;
     private var magicItems:MagicItems;
 
+    private var players:Vector.<PlayerInfoDTO>;
+
+    public function getPlayerInfo(playerId:PlayerIdDTO):PlayerInfoDTO {
+        for each(var playerInfo:PlayerInfoDTO in players) {
+            if (playerInfo.id.id == playerId.id) return playerInfo;
+        }
+        throw new Error("can't find playerInfo " + playerId.id);
+    }
+
+    public function getSelfPlayerInfo():PlayerInfoDTO {
+        return getPlayerInfo(selfId);
+    }
+
+    public function getEnemiesPlayerInfos():Vector.<PlayerInfoDTO> {
+        const result:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[];
+        for each(var playerInfo:PlayerInfoDTO in players) {
+            if (playerInfo.id.id != selfId.id) result.push(playerInfo);
+        }
+        return result;
+    }
+
     public function GameController(view:GameView,
                                    sender:GameFacadeSender,
                                    gameState:GameStateDTO,
@@ -69,6 +89,7 @@ public class GameController implements IGameFacade {
         height = gameState.height;
 
         selfId = gameState.selfId;
+        players = gameState.playerInfos;
 
         bullets = new Bullets(view.area.bullets);
         fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
@@ -229,10 +250,9 @@ public class GameController implements IGameFacade {
 
     public function onGameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
-            const winner:PlayerInfoDTO = DtoMock.playerInfo1;
-            const loser:PlayerInfoDTO = DtoMock.playerInfo2;
-            const losers:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[loser];
-            view.openGameOverScreen(PlayerInfo.fromDto(winner), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
+            const winners:Vector.<PlayerInfoDTO> = dto.place == 1 ? new <PlayerInfoDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
+            const losers:Vector.<PlayerInfoDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerInfoDTO>[getSelfPlayerInfo()];
+            view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         }
     }
 

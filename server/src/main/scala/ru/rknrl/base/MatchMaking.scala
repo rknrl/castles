@@ -3,12 +3,13 @@ package ru.rknrl.base
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy}
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{LeaveGame, DuplicateAccount}
+import ru.rknrl.base.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.base.game.Game.StopGame
 import ru.rknrl.base.payments.PaymentsServer.{AccountNotExists, AddProduct}
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
 
@@ -46,17 +47,17 @@ object MatchMaking {
 
   // matchmaking -> account
 
-  case class InGameResponse(gameRef: Option[ActorRef], enterGame: Boolean)
+  case class InGameResponse(gameRef: Option[ActorRef], enterGame: Boolean, top: Iterable[TopUserInfoDTO])
 
   case class ConnectToGame(game: ActorRef)
 
   // game -> matchmaking
 
-  case class PlayerLeaveGame(externalAccountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int])
+  case class PlayerLeaveGame(externalAccountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
 
   case object AllPlayersLeaveGame
 
-  case class TopItem(accountId: AccountId, rating: Double)
+  case class TopItem(accountId: AccountId, rating: Double, info: UserInfoDTO)
 
 }
 
@@ -71,7 +72,7 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
         for (order ← gameInfo.orders;
              accountId = order.accountId
              if accountIdToGameInfo.contains(accountId) && accountIdToGameInfo(accountId) == gameInfo) {
-          onAccountLeaveGame(accountId, place = gameInfo.orders.size, reward = 0, usedItems = Map.empty)
+          onAccountLeaveGame(accountId, place = gameInfo.orders.size, reward = 0, usedItems = Map.empty, gameInfo.orders.find(_.accountId == accountId).get.userInfo)
         }
         onGameOver(sender)
         Stop
@@ -105,9 +106,9 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
   def receive = {
     /** from PaymentServer */
     case msg@AddProduct(accountId, _, _, _) ⇒
-      if(accountIdToAccountRef.contains(accountId))
+      if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
-        else
+      else
         sender ! AccountNotExists
 
     /** Аккаунт спрашивает находится ли он сейчас в игре?
@@ -122,15 +123,15 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
 
       val gameInfo = accountIdToGameInfo.get(accountId)
       if (gameInfo.isEmpty)
-        sender ! InGameResponse(None, enterGame = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId))
+        sender ! InGameResponse(None, enterGame = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId), topDto)
       else
-        sender ! InGameResponse(Some(gameInfo.get.gameRef), enterGame = false)
+        sender ! InGameResponse(Some(gameInfo.get.gameRef), enterGame = false, topDto)
 
     /** Аккаунт присылает заявку на игру */
     case PlaceGameOrder(gameOrder) ⇒ placeGameOrder(gameOrder, sender)
 
     /** Game оповещает, что игрок вышел из игры */
-    case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒ onAccountLeaveGame(accountId, place, reward, usedItems)
+    case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒ onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
     case AllPlayersLeaveGame ⇒
@@ -178,7 +179,7 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
     }
   }
 
-  private def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int]) = {
+  private def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
     accountIdToGameInfo = accountIdToGameInfo - accountId
 
     val gameInfo = gameRefToGameInfo(sender)
@@ -190,13 +191,20 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
     val sA = getSA(gameInfo.big, place)
     val newRating = getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
 
-    top = insert(top, TopItem(accountId, newRating))
+    top = insert(top, TopItem(accountId, newRating, userInfo))
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating)
   }
 
   private def insert(list: List[TopItem], item: TopItem) =
     (top.filter(_.accountId != item.accountId) :+ item).sortBy(_.rating).take(5)
+
+  private def topDto =
+    for (i ← 0 until top.size)
+    yield TopUserInfoDTO.newBuilder()
+      .setPlace(i + 1)
+      .setInfo(top(i).info)
+      .build
 
   private def onGameOver(gameRef: ActorRef) =
     gameRefToGameInfo = gameRefToGameInfo - gameRef

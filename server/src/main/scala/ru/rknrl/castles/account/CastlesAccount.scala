@@ -25,11 +25,11 @@ class CastlesAccount(accountId: AccountId,
 
   override var state = accountState
 
-  override protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator]) = {
+  override protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
     val builder = AuthenticationSuccessDTO.newBuilder()
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
-      .addAllTop(topMock.asJava)
+      .addAllTop(top.asJava)
       .addAllProducts(config.productsDto(accountId.accountType).asJava)
       .setEnterGame(enterGame)
 
@@ -65,21 +65,4 @@ class CastlesAccount(accountId: AccountId,
         accountStateDb ! Update(accountId, state.dto)
     }
   }
-
-  private def topMock =
-    for (i ← 1 to 5)
-    yield TopUserInfoDTO.newBuilder()
-      .setPlace(i)
-      .setInfo(
-        UserInfoDTO.newBuilder()
-          .setAccountId(
-            AccountIdDTO.newBuilder()
-              .setId("1")
-              .setType(AccountType.DEV)
-              .build()
-          )
-          .setFirstName("name" + i)
-          .setPhoto256(i.toString)
-          .build()
-      ).build()
 }

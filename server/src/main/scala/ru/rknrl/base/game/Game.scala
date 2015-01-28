@@ -275,7 +275,7 @@ abstract class Game(players: Map[PlayerId, Player],
 
     val accountId = `playerId→accountId`(playerId)
     val place = gameOvers(playerId)
-    matchmaking ! PlayerLeaveGame(accountId, place = place, reward = placeToReward(place), usedItems = gameState.gameItems.states(playerId).usedItems)
+    matchmaking ! PlayerLeaveGame(accountId, place = place, reward = placeToReward(place), usedItems = gameState.gameItems.states(playerId).usedItems, players(playerId).userInfo)
 
     // Если вышли все - завершаем игру
 

@@ -14,11 +14,11 @@ public class TestGameOverScreen extends Sprite {
     private var gameOverScreen:GameOverScreen;
 
     public function TestGameOverScreen() {
-        const winner:PlayerInfoDTO = DtoMock.playerInfo1;
+        const winners:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[DtoMock.playerInfo1];
         const losers:Vector.<PlayerInfoDTO> = DtoMock.playerInfosLandscape();
 
         gameOverScreen = new GameOverScreen(
-                PlayerInfo.fromDto(winner),
+                PlayerInfo.fromDtoVector(winners),
                 PlayerInfo.fromDtoVector(losers),
                 true,
                 2,

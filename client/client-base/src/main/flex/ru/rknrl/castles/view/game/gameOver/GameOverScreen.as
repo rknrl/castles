@@ -27,7 +27,7 @@ public class GameOverScreen extends Sprite {
     private var holderWidth:Number;
     private var winnerAvatar:FlyAvatar;
 
-    public function GameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function GameOverScreen(winners:Vector.<PlayerInfo>, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(mouseHolder = new Bitmap(Colors.transparent));
 
         addChild(title = createTextField(Fonts.title));
@@ -38,11 +38,15 @@ public class GameOverScreen extends Sprite {
         holderWidth = Layout.itemSize * (losers.length + 1) + Layout.itemGap * (losers.length - 1) + winnerLooserGap + animationOffset;
 
         const avatarBitmapSize:Number = Layout.itemSize * layout.bitmapDataScale;
-        const winnerPhotoUrl:String = winner.info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
-        const winnerColor:uint = Colors.playerColor(winner.playerId);
-        winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager, winnerColor);
-        winnerAvatar.x = Layout.itemSize / 2;
-        holder.addChild(winnerAvatar);
+
+        for(var i: int = 0; i < winners.length; i++) {
+            const winner: PlayerInfo = winners[i];
+            const winnerPhotoUrl:String = winner.info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
+            const winnerColor:uint = Colors.playerColor(winner.playerId);
+            winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager, winnerColor);
+            winnerAvatar.x = Layout.itemSize / 2 - Layout.itemSize / 2 - i * (Layout.itemSize + Layout.itemGap);
+            holder.addChild(winnerAvatar);
+        }
 
         for (var i:int = 0; i < losers.length; i++) {
             const url:String = losers[i].info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);

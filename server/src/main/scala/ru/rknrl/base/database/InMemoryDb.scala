@@ -12,7 +12,7 @@ class InMemoryDb(config: Any) extends StoppingStrategyActor {
   override def receive = {
     case GetTop ⇒ sender() ! List.empty[TopItem]
 
-    case Insert(accountId, accountState) ⇒
+    case Insert(accountId, accountState, userInfo) ⇒
       if (map.contains(accountId)) throw new Error("db already has accountId=" + accountId)
       map = map + (accountId → accountState.toByteArray)
       sender ! accountState
@@ -21,6 +21,10 @@ class InMemoryDb(config: Any) extends StoppingStrategyActor {
       if (!map.contains(accountId)) throw new Error("db hasn't accountId=" + accountId)
       map = map + (accountId → accountState.toByteArray)
       sender ! accountState
+
+    case UpdateUserInfo(accountId, userInfo) ⇒
+      if (!map.contains(accountId)) throw new Error("db hasn't accountId=" + accountId)
+      sender ! userInfo
 
     case Get(accountId) ⇒
       if (map.contains(accountId)) {

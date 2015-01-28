@@ -6,7 +6,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
-import ru.rknrl.base.database.AccountStateDb.Update
+import ru.rknrl.base.database.AccountStateDb.{UpdateUserInfo, Update}
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{DatabaseError, AddProduct, ProductAdded}
 import ru.rknrl.castles.Config
@@ -14,7 +14,7 @@ import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AuthDTO.AuthenticationSuccessDTO
+import ru.rknrl.dto.AuthDTO.{TopUserInfoDTO, AuthenticationSuccessDTO}
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
 import scala.concurrent.Await
@@ -49,6 +49,8 @@ abstract class Account(accountId: AccountId,
 
   private var reenterGame: Boolean = true
 
+  private var top: Option[Iterable[TopUserInfoDTO]]= None
+
   private var enterGameRmiRegistered: Boolean = false
 
   private var enterGameRmi: Option[ActorRef] = None
@@ -59,7 +61,7 @@ abstract class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator]): AuthenticationSuccessDTO
+  protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticationSuccessDTO
 
   private def placeGameOrder() =
     matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
@@ -104,17 +106,18 @@ abstract class Account(accountId: AccountId,
     /** Matchmaking ответил на InGame
       * Отправляем Auth accountState
       */
-    case InGameResponse(gameRef, enterGame) ⇒
+    case InGameResponse(gameRef, enterGame, top) ⇒
+      this.top = Some(top)
       if (gameRef.isDefined) {
         reenterGame = true
         connectToGame(gameRef.get)
       } else if (!enterGame && state.gamesCount == 0) {
         placeGameOrder(); // При первом заходе сразу попадаем в бой
         reenterGame = false
-        auth ! authenticationSuccessDto(enterGame = true, None)
+        auth ! authenticationSuccessDto(enterGame = true, None, top)
       } else {
         reenterGame = false
-        auth ! authenticationSuccessDto(enterGame, None)
+        auth ! authenticationSuccessDto(enterGame, None, top)
       }
 
     /** Matchmaking говорит к какой игре коннектится */
@@ -203,7 +206,7 @@ abstract class Account(accountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! authenticationSuccessDto(enterGame = false, Some(gameAddress))
+        auth ! authenticationSuccessDto(enterGame = false, Some(gameAddress), top.get)
 
         reenterGame = false
       } else

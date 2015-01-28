@@ -120,11 +120,11 @@ public class GameView extends Sprite {
 
     private var gameOverScreen:GameOverScreen;
 
-    public function openGameOverScreen(winner:PlayerInfo, losers:Vector.<PlayerInfo>, win:Boolean, reward:int):void {
+    public function openGameOverScreen(winners:Vector.<PlayerInfo>, losers:Vector.<PlayerInfo>, win:Boolean, reward:int):void {
         if (gameOverScreen) throw new Error("gameOverScreen already open");
         area.visible = false;
         ui.visible = false;
-        addChild(gameOverScreen = new GameOverScreen(winner, losers, win, reward, _layout, locale, loadImageManager))
+        addChild(gameOverScreen = new GameOverScreen(winners, losers, win, reward, _layout, locale, loadImageManager))
     }
 }
 }

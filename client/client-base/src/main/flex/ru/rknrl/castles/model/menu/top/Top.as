@@ -1,5 +1,7 @@
 package ru.rknrl.castles.model.menu.top {
+import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.model.userInfo.TopUserInfo;
+import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.TopUserInfoDTO;
 
 public class Top {
@@ -13,7 +15,7 @@ public class Top {
         for each(var userInfo:TopUserInfoDTO in dto) {
             if (userInfo.place == place) return TopUserInfo.fromDto(userInfo);
         }
-        throw new Error("can't find userInfo for place " + place);
+        return new TopUserInfo(place, new CastlesUserInfo(place.toString(), AccountType.DEV, "Somebody", null, null, null));
     }
 }
 }

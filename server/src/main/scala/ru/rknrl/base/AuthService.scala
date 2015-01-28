@@ -65,7 +65,7 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
 
     /** from AccountStateDb */
     case NoExist ⇒
-      accountStateDb ! Insert(accountId.get, AccountState.initAccount(config.account).dto)
+      accountStateDb ! Insert(accountId.get, AccountState.initAccount(config.account).dto, userInfo.get)
 
     /** from AccountStateDb */
     case dto: AccountStateDTO ⇒

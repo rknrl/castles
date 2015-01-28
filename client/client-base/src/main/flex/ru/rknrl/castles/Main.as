@@ -11,7 +11,6 @@ import flash.net.Socket;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
-import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.rmi.AccountFacadeReceiver;
@@ -33,12 +32,13 @@ import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.loaders.LoadImageManager;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 
 public class Main extends Sprite implements IAuthFacade {
     private static const errorsUrl:String = "http://127.0.0.1:8080/bug";
-    private static const avatarsLimit:int = 10;
+    private static const cachedAvatarsLimit:int = 10;
 
     private var host:String;
     private var gamePort:int;
@@ -125,7 +125,7 @@ public class Main extends Sprite implements IAuthFacade {
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
         locale = new CastlesLocale(data);
 
-        loadImageManager = new LoadImageManagerMock(0, false);
+        loadImageManager = new LoadImageManager(cachedAvatarsLimit);
         addChild(view = new View(_layout, locale, loadImageManager, deviceFactory));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
