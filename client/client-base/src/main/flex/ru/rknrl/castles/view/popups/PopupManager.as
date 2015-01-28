@@ -3,9 +3,11 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.Popup;
+import ru.rknrl.test;
+
+use namespace test;
 
 public class PopupManager extends Sprite {
     public function PopupManager(layout:Layout) {
@@ -42,12 +44,12 @@ public class PopupManager extends Sprite {
         nextTransition = 0;
     }
 
-    castlesTest function openImmediate():void {
+    test function openImmediate():void {
         transition = nextTransition = 1;
         updateTransition();
     }
 
-    castlesTest function closeImmediate(): void {
+    test function closeImmediate():void {
         removePopup();
     }
 
@@ -92,7 +94,7 @@ public class PopupManager extends Sprite {
     }
 
     public function animatePrices():void {
-        if(popup) popup.animatePrices();
+        if (popup) popup.animatePrices();
     }
 }
 }

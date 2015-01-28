@@ -3,7 +3,6 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.points.Points;
 import ru.rknrl.castles.view.layout.Layout;
@@ -13,8 +12,6 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorCommandQueue;
 import ru.rknrl.castles.view.utils.tutor.commands.Wait;
-
-use namespace castlesTest;
 
 public class TutorialView extends TutorialViewBase {
     private var _itemsLayer:Sprite;

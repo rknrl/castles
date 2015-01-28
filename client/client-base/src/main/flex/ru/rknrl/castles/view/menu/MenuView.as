@@ -1,7 +1,6 @@
 package ru.rknrl.castles.view.menu {
 import flash.display.Sprite;
 
-import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.bank.Products;
@@ -28,6 +27,7 @@ import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.test;
 
 public class MenuView extends Sprite {
     private var locale:CastlesLocale;
@@ -140,18 +140,18 @@ public class MenuView extends Sprite {
         popupManager.close();
     }
 
-    castlesTest function setScreen(index:int):void {
+    test function setScreen(index:int):void {
         screenNavigator.currentScreenIndex = index;
     }
 
-    castlesTest function closePopupImmediate():void {
-        use namespace castlesTest;
+    test function closePopupImmediate():void {
+        use namespace test;
 
         popupManager.closeImmediate();
     }
 
-    castlesTest function openPopupImmediate():void {
-        use namespace castlesTest;
+    test function openPopupImmediate():void {
+        use namespace test;
 
         popupManager.openImmediate();
     }
