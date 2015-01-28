@@ -5,6 +5,7 @@ import akka.actor.{Actor, ActorRef, OneForOneStrategy}
 import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{LeaveGame, DuplicateAccount}
 import ru.rknrl.base.game.Game.StopGame
+import ru.rknrl.base.payments.PaymentsServer.{AccountNotExists, AddProduct}
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.players.PlayerId
@@ -102,6 +103,13 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
   protected def tryCreateGames(gameOrders: List[GameOrder]): Iterable[GameInfo]
 
   def receive = {
+    /** from PaymentServer */
+    case msg@AddProduct(accountId, _, _, _) ⇒
+      if(accountIdToAccountRef.contains(accountId))
+        accountIdToAccountRef(accountId) forward msg
+        else
+        sender ! AccountNotExists
+
     /** Аккаунт спрашивает находится ли он сейчас в игре?
       * В ответ отпарвялем InGameState
       */

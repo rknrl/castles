@@ -1,6 +1,6 @@
 package ru.rknrl.base.payments
 
-import java.net.{URLDecoder}
+import java.net.URLDecoder
 
 import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
@@ -21,42 +21,22 @@ import scala.concurrent.duration._
 
 object PaymentsServer {
 
-  /**
-   * Account -> Payments
-   */
-  case class Register(accountId: AccountId)
+  /** Payments -> Matchmaking -> Account */
+  case class AddProduct(accountId: AccountId, oderId: String, product: Product, count: Int)
 
-  /**
-   * Payments -> Account response
-   */
-  case object Registered
-
-  /**
-   * Account -> Payments
-   */
-  case class Unregister(accountId: AccountId)
-
-  /**
-   * Payments -> Account response
-   */
-  case object Unregistered
-
-  /**
-   * Payments -> Account
-   */
-  case class AddProduct(oderId: String, product: Product, count: Int)
-
-  /**
-   * Account -> Payments response
-   */
+  /** Account -> Payments response */
   case class ProductAdded(orderId: String)
+
+  /** Matchmaking -> Payments */
+  case object AccountNotExists
+
+  /** Account -> Payments */
+  case object DatabaseError
 
 }
 
-class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpService with ActorLogging {
+class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
   private val bugLog = LoggerFactory.getLogger("client")
-
-  private var accountIdToAccount = Map[AccountId, ActorRef]()
 
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
@@ -110,12 +90,7 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
       case p@PaymentResponse(orderId, accountId, productId, price, httpResponse) ⇒
         log.info("payment callback PaymentResponse " + p)
 
-        if (!(accountIdToAccount contains accountId)) {
-
-          log.info("account not found " + accountId)
-          complete(callback.accountNotFoundError)
-
-        } else if (!(config.products exists (_.id == productId))) {
+        if (!(config.products exists (_.id == productId))) {
 
           log.info("product not found " + productId)
           complete(callback.accountNotFoundError)
@@ -128,7 +103,7 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
             log.info("price=" + price + ",expect " + productInfo.price)
             complete(callback.accountNotFoundError)
           } else {
-            val future = Patterns.ask(accountIdToAccount(accountId), AddProduct(orderId, product, productInfo.count), 5 seconds)
+            val future = Patterns.ask(matchmaking, AddProduct(accountId, orderId, product, productInfo.count), 5 seconds)
             val result = Await.result(future, 5 seconds)
 
             result match {
@@ -140,6 +115,11 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
                   log.info("ProductAdded orderId=" + oId + ", expected " + orderId)
                   complete(callback.databaseError)
                 }
+
+              case AccountNotExists ⇒
+                log.info("account not found " + accountId)
+                complete(callback.accountNotFoundError)
+
               case invalid ⇒
                 log.info("Add to database invalid result " + invalid)
                 complete(callback.databaseError)
@@ -159,13 +139,5 @@ class PaymentsServer(config: Config) extends StoppingStrategyActor with HttpServ
 
   def actorRefFactory = context
 
-  def receive = runRoute(paymentsCallbacks) orElse {
-    case Register(accountId) ⇒
-      accountIdToAccount = accountIdToAccount.updated(accountId, sender)
-      sender ! Registered
-
-    case Unregister(accountId) ⇒
-      accountIdToAccount = accountIdToAccount - accountId
-      sender ! Unregistered
-  }
+  def receive = runRoute(paymentsCallbacks)
 }

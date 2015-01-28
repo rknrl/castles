@@ -8,7 +8,7 @@ import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
 import ru.rknrl.base.database.AccountStateDb.Update
 import ru.rknrl.base.game.Game.{Join, Offline}
-import ru.rknrl.base.payments.PaymentsServer.{AddProduct, ProductAdded}
+import ru.rknrl.base.payments.PaymentsServer.{DatabaseError, AddProduct, ProductAdded}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.rmi._
@@ -71,7 +71,7 @@ abstract class Account(accountId: AccountId,
     case accountStateDto: AccountStateDTO ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
-    case AddProduct(orderId, product, count) ⇒
+    case AddProduct(accountId, orderId, product, count) ⇒
       log.info("AddProduct")
       product.id match {
         case 1 ⇒ state = state.addGold(count)
@@ -88,10 +88,11 @@ abstract class Account(accountId: AccountId,
             accountRmi ! AccountStateUpdatedMsg(accountStateDto)
           } else {
             log.info("invalid gold=" + accountStateDto.getGold + ", but expected " + state.gold)
-            // send error
+            sender ! DatabaseError
           }
         case invalid ⇒ // send error
           log.info("invalid result=" + invalid)
+          sender ! DatabaseError
       }
 
     /** Auth спрашивает accountState
