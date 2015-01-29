@@ -35,24 +35,26 @@ public class GameOverScreen extends Sprite {
         applyStarTextFormat(title);
 
         addChild(holder = new Sprite());
-        holderWidth = Layout.itemSize * (losers.length + 1) + Layout.itemGap * (losers.length - 1) + winnerLooserGap + animationOffset;
+        const winnersWidth:Number = winners.length * Layout.itemSize + (winners.length - 1) * Layout.itemGap;
+        const losersWidth:Number = losers.length * Layout.itemSize + (losers.length - 1) * Layout.itemGap;
+        holderWidth = winnersWidth + winnerLooserGap + animationOffset + losersWidth;
 
         const avatarBitmapSize:Number = Layout.itemSize * layout.bitmapDataScale;
 
-        for(var i: int = 0; i < winners.length; i++) {
-            const winner: PlayerInfo = winners[i];
+        for (var i:int = 0; i < winners.length; i++) {
+            const winner:PlayerInfo = winners[i];
             const winnerPhotoUrl:String = winner.info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
             const winnerColor:uint = Colors.playerColor(winner.playerId);
             winnerAvatar = new FlyAvatar(winnerPhotoUrl, layout.bitmapDataScale, loadImageManager, winnerColor);
-            winnerAvatar.x = Layout.itemSize / 2 - Layout.itemSize / 2 - i * (Layout.itemSize + Layout.itemGap);
+            winnerAvatar.x = Layout.itemSize / 2 + i * (Layout.itemSize + Layout.itemGap);
             holder.addChild(winnerAvatar);
         }
 
-        for (var i:int = 0; i < losers.length; i++) {
+        for (i = 0; i < losers.length; i++) {
             const url:String = losers[i].info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
             const color:uint = Colors.playerColor(losers[i].playerId);
             const loserAvatar:LoserAvatar = new LoserAvatar(url, loadImageManager, color);
-            loserAvatar.x = Layout.itemSize + winnerLooserGap + Layout.itemSize / 2 + i * (Layout.itemSize + Layout.itemGap);
+            loserAvatar.x = winnersWidth + winnerLooserGap + Layout.itemSize / 2 + i * (Layout.itemSize + Layout.itemGap);
             holder.addChild(loserAvatar);
         }
 
