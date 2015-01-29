@@ -62,7 +62,6 @@ public class ShopScreen extends Screen {
     override public function set layout(value:Layout):void {
         _layout = value;
 
-        titleTextField.textScale = value.scale;
         magicItemsHolder.scaleX = magicItemsHolder.scaleY = value.scale;
         const totalWidth:Number = Align.horizontal(Vector.<DisplayObject>(magicItems), Layout.itemSize, Layout.itemGap) * value.scale;
         magicItemsHolder.x = value.screenCenterX - totalWidth / 2;
@@ -72,7 +71,7 @@ public class ShopScreen extends Screen {
     }
 
     private function alignTitle():void {
-        titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
+        titleTextField.textScale = _layout.scale;
         const titlePos:Point = _layout.title(titleTextField.textWidth, titleTextField.textHeight);
         titleTextField.x = titlePos.x + titleTextField.textWidth / 2;
         titleTextField.y = titlePos.y + titleTextField.textHeight / 2;

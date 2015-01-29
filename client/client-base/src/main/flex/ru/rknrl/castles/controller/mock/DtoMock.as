@@ -40,6 +40,7 @@ public class DtoMock {
         dto.photoUrl = "photoUrl";
         dto.count = 100;
         dto.price = 1;
+        dto.currency = "$";
         return dto;
     }
 

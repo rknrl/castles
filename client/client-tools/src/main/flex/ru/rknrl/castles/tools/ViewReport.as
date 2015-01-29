@@ -9,13 +9,11 @@ import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.castlesTest;
 import ru.rknrl.castles.controller.mock.DtoMock;
+import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.model.userInfo.PlayerInfo;
-import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
@@ -24,7 +22,7 @@ import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
+import ru.rknrl.castles.view.menu.factory.MobileFactory;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.PlayerInfoDTO;
@@ -33,6 +31,8 @@ import ru.rknrl.dto.StartLocationPosDTO;
 import ru.rknrl.loaders.BitmapLoader;
 import ru.rknrl.loaders.ILoader;
 import ru.rknrl.loaders.ParallelLoader;
+import ru.rknrl.loaders.TextLoader;
+import ru.rknrl.test;
 
 public class ViewReport extends Sprite {
     private static function htmlBegin():String {
@@ -91,6 +91,8 @@ public class ViewReport extends Sprite {
     layouts["iPad"] = new LayoutLandscape(1024, 768, 1);
     layouts["iPad2"] = new LayoutLandscape(2048, 1536, 1);
 
+    private var localeLoader: TextLoader;
+
     public function ViewReport() {
         const loaders:Vector.<ILoader> = new <ILoader>[];
         for each(var device:String in devices) {
@@ -98,6 +100,7 @@ public class ViewReport extends Sprite {
                 loaders.push(new BitmapLoader("reference/" + device + "/" + name + ".png"))
             }
         }
+        loaders.push(localeLoader = new TextLoader("castles - RU.tsv"));
         const loader:ParallelLoader = new ParallelLoader(loaders);
         loader.addEventListener(Event.COMPLETE, onComplete);
         loader.load();
@@ -109,13 +112,14 @@ public class ViewReport extends Sprite {
         references = ParallelLoader(event.target).data;
         createViewReport();
         createViewMergers();
+        trace("complete");
     }
 
     private var html:String;
 
     private function createViewReport():void {
         html = htmlBegin();
-        const locale:CastlesLocale = new CastlesLocale("");
+        const locale:CastlesLocale = new CastlesLocale(localeLoader.text);
         for (var name:String in layouts) {
             html += "<p>" + name + "</p>";
             render("report/", name + "/", layouts[name], locale, false);
@@ -130,7 +134,7 @@ public class ViewReport extends Sprite {
 
     private function createViewMergers():void {
         html = htmlBegin();
-        const locale:CastlesLocale = new CastlesLocale("");
+        const locale:CastlesLocale = new CastlesLocale(localeLoader.text);
         render("merge/", "iPhone5/", layouts["iPhone5"], locale, true);
         render("merge/", "iPad2/", layouts["iPad2"], locale, true);
         html += htmlEnd();
@@ -142,12 +146,11 @@ public class ViewReport extends Sprite {
     }
 
     private function render(folder:String, device:String, layout:Layout, locale:CastlesLocale, merge:Boolean):void {
-        use namespace castlesTest;
+        use namespace test;
 
         const loadImageManager:LoadImageManagerMock = new LoadImageManagerMock(0);
         const bg:BitmapData = new BitmapData(layout.screenWidth, layout.screenHeight, false, 0xffffff);
-
-        const view:View = new View(layout, locale, loadImageManager);
+        const view:View = new View(layout, locale, loadImageManager, new MobileFactory());
         addChild(view);
 
         view.addLoadingScreen();
@@ -204,7 +207,7 @@ public class ViewReport extends Sprite {
         const gameView:GameView = view.addGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
         const buildings:Vector.<BuildingDTO> = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
         for each(var b:BuildingDTO in  buildings) {
-            gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.x, b.y));
+            gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
         }
         const startLocations:Vector.<StartLocationPosDTO> = layout is LayoutPortrait ? DtoMock.startLocationsPosPortrait() : DtoMock.startLocationsPosLandscape();
         for each(var s:StartLocationPosDTO in startLocations) {
@@ -213,7 +216,7 @@ public class ViewReport extends Sprite {
 
         screenshot(folder, device, "GameScreen", bg);
 
-        gameView.openGameOverScreen(PlayerInfo.fromDto(DtoMock.winner()), PlayerInfo.fromDtoVector(losers), true, 2);
+        gameView.openGameOverScreen(new <PlayerInfo>[PlayerInfo.fromDto(DtoMock.winner())], PlayerInfo.fromDtoVector(losers), true, 2);
         screenshot(folder, device, "GameOverScreen", bg);
 
         view.removeGame();
