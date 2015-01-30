@@ -5,10 +5,11 @@ import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
 import ru.rknrl.PolicyServer
-import ru.rknrl.base.{AdminTcpServer, TcpServer}
-import ru.rknrl.base.payments.PaymentsServer
+import ru.rknrl.base.TcpServer
+import ru.rknrl.base.admin.AdminTcpServer
 import ru.rknrl.base.database.AccountStateDb.GetTop
 import ru.rknrl.base.database.MySqlDb
+import ru.rknrl.base.payments.PaymentsServer
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -42,7 +43,7 @@ object Main {
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, accountStateDb), "admin-server")
+    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, accountStateDb), "admin-server")
     system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, accountStateDb), "tcp-server")
   }
 }

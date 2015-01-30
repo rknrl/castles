@@ -1,7 +1,7 @@
 package ru.rknrl.castles
 
-import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.base.database.DbConfiguration
+import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto.AuthDTO.ProductDTO
@@ -24,6 +24,8 @@ class Config(val host: String,
              val policyPort: Int,
              val adminPort: Int,
              val httpPort: Int,
+             val adminLogin: String,
+             val adminPassword: String,
              val db: DbConfiguration,
              val products: List[Product],
              val social: SocialConfigs,

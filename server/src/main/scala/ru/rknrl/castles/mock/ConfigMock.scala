@@ -11,6 +11,8 @@ object ConfigMock {
     124,
     125,
     8080,
+    "adminLogin",
+    "adminPassword",
     new DbConfiguration("username", "host", 213, "pass", "database"),
     List.empty,
     new SocialConfigs(None, None, None),

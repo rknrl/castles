@@ -1,69 +1,19 @@
-package ru.rknrl.base
+package ru.rknrl.base.admin
 
-import java.net.InetSocketAddress
-
-import akka.actor.{ActorLogging, ActorRef, Props}
+import akka.actor.{Props, ActorLogging, ActorRef}
 import akka.pattern.Patterns
-import ru.rknrl.base.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
+import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.base.database.AccountStateDb.{Update, Get, NoExist, StateResponse}
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.objects.BuildingPrototype
 import ru.rknrl.castles.rmi._
-import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver, TcpReceiver}
+import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AdminDTO.AdminAccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
-import ru.rknrl.{EscalateStrategyActor, StoppingStrategyActor}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
-class AdminTcpServer(tcp: ActorRef, host: String, port: Int, accountStateDb: ActorRef) extends StoppingStrategyActor with ActorLogging {
-
-  import akka.io.Tcp._
-
-  val address = new InetSocketAddress(host, port)
-
-  tcp ! Bind(self, address)
-
-  def receive = {
-    case Bound(localAddress) ⇒
-      log.info("bound " + localAddress)
-
-    case CommandFailed(_: Bind) ⇒
-      log.info("command failed " + address)
-      context stop self
-
-    case Connected(remote, local) ⇒
-      val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val tcpSender = sender()
-      val tcpReceiver = context.actorOf(Props(classOf[AuthTcpReceiver], tcpSender, accountStateDb, name), "admin-tcp-receiver" + name)
-      tcpSender ! Register(tcpReceiver)
-  }
-}
-
-class AuthTcpReceiver(tcpSender: ActorRef,
-                      accountStateDb: ActorRef,
-                      name: String) extends TcpReceiver(name) with ActorLogging {
-
-  context.actorOf(Props(classOf[AdminAuth], tcpSender, self, accountStateDb, name), "admin-auth" + name)
-}
-
-class AdminAuth(tcpSender: ActorRef, tcpReceiver: ActorRef, accountStateDb: ActorRef, name: String) extends EscalateStrategyActor with ActorLogging {
-
-  private val rmi = context.actorOf(Props(classOf[AdminAuthRMI], tcpSender, self), "admin-auth-rmi" + name)
-  tcpReceiver ! RegisterReceiver(rmi)
-
-  def receive = {
-    case ReceiverRegistered(ref) ⇒
-      rmi ! AdminAuthReadyMsg()
-
-    /** from player */
-    case AuthenticateAsAdminMsg(authenticate) ⇒
-      context.actorOf(Props(classOf[Admin], tcpSender, tcpReceiver, accountStateDb, name), "admin" + name)
-      sender ! AuthenticatedAsAdminMsg()
-
-  }
-}
 
 class Admin(tcpSender: ActorRef, tcpReceiver: ActorRef, accountStateDb: ActorRef, name: String) extends EscalateStrategyActor with ActorLogging {
 

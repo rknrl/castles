@@ -4,6 +4,8 @@
   "policyPort": 2336,
   "adminPort": 2337,
   "httpPort": 80,
+  "adminLogin": "enter admin login",
+  "adminPassword": "enter admin login",
   "db": {
     "host": "localhost",
     "port": 3306,
