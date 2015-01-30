@@ -50,27 +50,27 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
 
     case Insert(accountId, accountState, userInfo) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.dto.toByteArray, accountState.getRating, accountState.toByteArray, userInfo.toByteArray)).map(
+      connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.getRating, accountState.toByteArray, userInfo.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! accountState
+            ref ! StateResponse(accountId, accountState)
           else
             log.error("Insert rowsAffected=" + queryResult.rowsAffected)
       )
 
     case Update(accountId, accountState) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, accountId.dto.toByteArray)).map(
+      connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! accountState
+            ref ! StateResponse(accountId, accountState)
           else
             log.error("Update rowsAffected=" + queryResult.rowsAffected)
       )
 
     case UpdateUserInfo(accountId, userInfo) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("UPDATE account_state SET userInfo=? WHERE id=?;", Seq(userInfo.toByteArray, accountId.dto.toByteArray)).map(
+      connection.sendPreparedStatement("UPDATE account_state SET userInfo=? WHERE id=?;", Seq(userInfo.toByteArray, accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             ref ! userInfo
@@ -80,7 +80,7 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
 
     case Get(accountId) ⇒
       val ref = sender()
-      connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.dto.toByteArray)).map(
+      connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             if (resultSet.size == 0) {
@@ -91,7 +91,7 @@ class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with
               val byteArray = row(0).asInstanceOf[Array[Byte]]
               val state = AccountStateDTO.parseFrom(byteArray)
 
-              ref ! state
+              ref ! StateResponse(accountId, state)
             } else
               log.error("Update rows=" + resultSet.size)
 

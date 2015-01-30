@@ -25,12 +25,15 @@ class StartLocation(val slots: Map[SlotId, StartLocationSlot]) {
     count
   }
 
+  def set(id: SlotId, buildingPrototype: BuildingPrototype) =
+    update(id, slots(id).set(buildingPrototype))
+
   def remove(id: SlotId) = {
     assert(buildingsCount > 1)
     update(id, slots(id).remove)
   }
 
-  def buy(id: SlotId, buildingType: BuildingType) =
+  def build(id: SlotId, buildingType: BuildingType) =
     update(id, slots(id).build(buildingType))
 
   def upgrade(id: SlotId) =

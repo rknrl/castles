@@ -6,10 +6,10 @@ import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType, SlotId}
 class StartLocationSlot(val id: SlotId,
                         val buildingPrototype: Option[BuildingPrototype]) {
 
-  def remove = {
-    assert(buildingPrototype.isDefined)
-    new StartLocationSlot(id, None)
-  }
+  def set(buildingPrototype: BuildingPrototype) =
+    new StartLocationSlot(id, Some(new BuildingPrototype(buildingPrototype.buildingType, buildingPrototype.level)))
+
+  def remove = new StartLocationSlot(id, None)
 
   def build(buildingType: BuildingType) = {
     assert(buildingPrototype.isEmpty)

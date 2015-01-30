@@ -9,24 +9,26 @@ class AccountState(val startLocation: StartLocation,
                    val items: Items,
                    val gold: Int,
                    val rating: Double,
-                   val gamesCount: Int,
-                   val config: AccountConfig) {
+                   val gamesCount: Int) {
 
   def swapSlots(id1: SlotId, id2: SlotId): AccountState =
     copy(newStartLocation = startLocation.swap(id1, id2))
 
-  def buyBuilding(id: SlotId, buildingType: BuildingType): AccountState = {
+  def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig): AccountState = {
     val price = config.buildingPrices(BuildingLevel.LEVEL_1)
     assert(price <= gold)
-    copy(newStartLocation = startLocation.buy(id, buildingType), newGold = gold - price)
+    copy(newStartLocation = startLocation.build(id, buildingType), newGold = gold - price)
   }
 
-  def upgradeBuilding(id: SlotId): AccountState = {
+  def upgradeBuilding(id: SlotId, config: AccountConfig): AccountState = {
     val level = BuildingPrototype.getNextLevel(startLocation.getLevel(id))
     val price = config.buildingPrices(level)
     assert(price <= gold)
     copy(newStartLocation = startLocation.upgrade(id), newGold = gold - price)
   }
+
+  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype) =
+    copy(newStartLocation = startLocation.set(id, buildingPrototype))
 
   def removeBuilding(id: SlotId): AccountState =
     copy(newStartLocation = startLocation.remove(id))
@@ -37,7 +39,10 @@ class AccountState(val startLocation: StartLocation,
     copy(newSkills = skills.upgrade(skillType), newGold = gold - price)
   }
 
-  def buyItem(itemType: ItemType) = {
+  def setSkill(skillType: SkillType, skillLevel: SkillLevel) =
+    copy(newSkills = skills.set(skillType, skillLevel))
+
+  def buyItem(itemType: ItemType, config: AccountConfig) = {
     val price = config.itemPrice
     assert(price <= gold)
     copy(newItems = items.add(itemType, 1), newGold = gold - price)
@@ -47,10 +52,8 @@ class AccountState(val startLocation: StartLocation,
     copy(newItems = items.add(itemType, count))
   }
 
-  def addGold(value: Int) = {
-    assert(gold + value >= 0)
-    copy(newGold = gold + value)
-  }
+  def addGold(value: Int) =
+    copy(newGold = Math.max(0, gold + value))
 
   def incGamesCount = copy(newGamesCount = gamesCount + 1)
 
@@ -62,7 +65,7 @@ class AccountState(val startLocation: StartLocation,
                    newGold: Int = gold,
                    newRating: Double = rating,
                    newGamesCount: Int = gamesCount) =
-    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount, config)
+    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount)
 
   def dto = AccountStateDTO.newBuilder()
     .setStartLocation(startLocation.dto)
@@ -108,17 +111,15 @@ object AccountState {
     items = initItems(config),
     gold = config.initGold,
     rating = initRating,
-    gamesCount = 0,
-    config = config
+    gamesCount = 0
   )
 
-  def fromDto(dto: AccountStateDTO, config: AccountConfig) = new AccountState(
+  def fromDto(dto: AccountStateDTO) = new AccountState(
     startLocation = StartLocation.fromDto(dto.getStartLocation),
     skills = Skills.fromDto(dto.getSkills),
     items = Items.fromDto(dto.getItems),
     gold = dto.getGold,
     rating = dto.getRating,
-    gamesCount = dto.getGamesCount,
-    config = config
+    gamesCount = dto.getGamesCount
   )
 }

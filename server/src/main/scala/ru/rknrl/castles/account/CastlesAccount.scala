@@ -3,8 +3,8 @@ package ru.rknrl.castles.account
 import akka.actor.ActorRef
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.account.Account
-import ru.rknrl.castles._
 import ru.rknrl.base.database.AccountStateDb.Update
+import ru.rknrl.castles._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
@@ -41,28 +41,27 @@ class CastlesAccount(accountId: AccountId,
   override def receive = {
     super.receive orElse {
       case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
-        state = state.swapSlots(swap.getId1, swap.getId2)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.swapSlots(swap.getId1, swap.getId2))
 
       case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
-        state = state.buyBuilding(buy.getId, buy.getBuildingType)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
 
       case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
-        state = state.upgradeBuilding(dto.getId)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.upgradeBuilding(dto.getId, config.account))
 
       case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
-        state = state.removeBuilding(dto.getId)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.removeBuilding(dto.getId))
 
       case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
-        state = state.upgradeSkill(upgrade.getType, config.account)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.upgradeSkill(upgrade.getType, config.account))
 
       case BuyItemMsg(buy: BuyItemDTO) ⇒
-        state = state.buyItem(buy.getType)
-        accountStateDb ! Update(accountId, state.dto)
+        updateState(state.buyItem(buy.getType, config.account))
     }
+  }
+
+  private def updateState(newState: AccountState) = {
+    state = newState
+    accountStateDb ! Update(accountId.dto, state.dto)
   }
 }

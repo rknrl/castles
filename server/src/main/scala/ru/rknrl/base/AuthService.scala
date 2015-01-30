@@ -3,13 +3,12 @@ package ru.rknrl.base
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.account.Account.GetAuthenticationSuccess
+import ru.rknrl.base.database.AccountStateDb.{Get, Insert, NoExist, StateResponse}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountState, CastlesAccount}
-import ru.rknrl.base.database.AccountStateDb.{Insert, Get, NoExist}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
-import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 
@@ -19,12 +18,11 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   config: Config,
                   name: String) extends EscalateStrategyActor with ActorLogging {
 
-  private val authRmi = context.actorOf(Props(classOf[AuthRMI], tcpSender, self), "auth-rmi" + name)
-
   private var accountId: Option[AccountId] = None
   private var deviceType: Option[DeviceType] = None
   private var userInfo: Option[UserInfoDTO] = None
 
+  private val authRmi = context.actorOf(Props(classOf[AuthRMI], tcpSender, self), "auth-rmi" + name)
   tcpReceiver ! RegisterReceiver(authRmi)
 
   def checkSecret(authenticate: AuthenticateDTO) =
@@ -59,17 +57,17 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
         accountId = Some(new AccountId(authenticate.getUserInfo.getAccountId))
         deviceType = Some(authenticate.getDeviceType)
         userInfo = Some(authenticate.getUserInfo)
-        accountStateDb ! Get(accountId.get)
+        accountStateDb ! Get(accountId.get.dto)
       } else
         reject()
 
     /** from AccountStateDb */
     case NoExist ⇒
-      accountStateDb ! Insert(accountId.get, AccountState.initAccount(config.account).dto, userInfo.get)
+      accountStateDb ! Insert(accountId.get.dto, AccountState.initAccount(config.account).dto, userInfo.get)
 
     /** from AccountStateDb */
-    case dto: AccountStateDTO ⇒
-      val state = AccountState.fromDto(dto, config.account)
+    case StateResponse(id, dto) ⇒
+      val state = AccountState.fromDto(dto)
       val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
       accountRef ! GetAuthenticationSuccess
 
@@ -78,8 +76,4 @@ class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
       authRmi ! AuthenticationSuccessMsg(dto)
       tcpReceiver ! UnregisterReceiver(authRmi)
   }
-
-  override def preStart(): Unit = log.info("AuthService start " + name)
-
-  override def postStop(): Unit = log.info("AuthService stop " + name)
 }

@@ -6,15 +6,14 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
-import ru.rknrl.base.database.AccountStateDb.{UpdateUserInfo, Update}
+import ru.rknrl.base.database.AccountStateDb.{StateResponse, Update}
 import ru.rknrl.base.game.Game.{Join, Offline}
-import ru.rknrl.base.payments.PaymentsServer.{DatabaseError, AddProduct, ProductAdded}
+import ru.rknrl.base.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
-import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AuthDTO.{TopUserInfoDTO, AuthenticationSuccessDTO}
+import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
 import scala.concurrent.Await
@@ -49,7 +48,7 @@ abstract class Account(accountId: AccountId,
 
   private var reenterGame: Boolean = true
 
-  private var top: Option[Iterable[TopUserInfoDTO]]= None
+  private var top: Option[Iterable[TopUserInfoDTO]] = None
 
   private var enterGameRmiRegistered: Boolean = false
 
@@ -70,7 +69,7 @@ abstract class Account(accountId: AccountId,
     case EnterGameMsg() ⇒ placeGameOrder()
 
     /** from AccountStateDb, ответ на Update */
-    case accountStateDto: AccountStateDTO ⇒
+    case StateResponse(_, accountStateDto) ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
     case AddProduct(accountId, orderId, product, count) ⇒
@@ -80,11 +79,11 @@ abstract class Account(accountId: AccountId,
         case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
       }
 
-      val future = Patterns.ask(accountStateDb, Update(accountId, state.dto), 5 seconds)
+      val future = Patterns.ask(accountStateDb, Update(accountId.dto, state.dto), 5 seconds)
       val result = Await.result(future, 5 seconds)
 
       result match {
-        case accountStateDto: AccountStateDTO ⇒
+        case StateResponse(_, accountStateDto) ⇒
           if (accountStateDto.getGold == state.gold) {
             sender ! ProductAdded(orderId)
             accountRmi ! AccountStateUpdatedMsg(accountStateDto)
@@ -92,7 +91,7 @@ abstract class Account(accountId: AccountId,
             log.info("invalid gold=" + accountStateDto.getGold + ", but expected " + state.gold)
             sender ! DatabaseError
           }
-        case invalid ⇒ // send error
+        case invalid ⇒
           log.info("invalid result=" + invalid)
           sender ! DatabaseError
       }
@@ -174,7 +173,7 @@ abstract class Account(accountId: AccountId,
       gameRmi = None
       gameRmiRegistered = false
 
-      accountStateDb ! Update(accountId, state.dto)
+      accountStateDb ! Update(accountId.dto, state.dto)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
     case DuplicateAccount ⇒ tcpReceiver ! CloseConnection
@@ -213,10 +212,5 @@ abstract class Account(accountId: AccountId,
         accountRmi ! EnteredGameMsg(gameAddress)
     }
 
-  override def preStart(): Unit = log.info("AccountService start " + name)
-
-  override def postStop(): Unit = {
-    if (game.isDefined) game.get ! Offline(accountId)
-    log.info("AccountService stop " + name)
-  }
+  override def postStop() = if (game.isDefined) game.get ! Offline(accountId)
 }

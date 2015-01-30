@@ -281,8 +281,4 @@ abstract class Game(players: Map[PlayerId, Player],
 
     if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
-
-  override def preStart(): Unit = log.info("Game start")
-
-  override def postStop(): Unit = log.info("Game stop")
 }

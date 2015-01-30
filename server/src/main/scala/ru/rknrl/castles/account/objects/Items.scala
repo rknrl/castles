@@ -10,7 +10,7 @@ class Item(val itemType: ItemType,
 
   assert(count >= 0)
 
-  def add(value: Int) = new Item(itemType, count + value)
+  def add(value: Int) = new Item(itemType, Math.max(0, count + value))
 
   def dto = ItemDTO.newBuilder()
     .setType(itemType)
@@ -38,7 +38,7 @@ class Items(val items: Map[ItemType, Item]) {
 
 object Items {
   def fromDto(dto: ItemsDTO) = {
-    val items = for(itemDto ← dto.getItemsList.asScala) yield itemDto.getType → Item.fromDto(itemDto)
+    val items = for (itemDto ← dto.getItemsList.asScala) yield itemDto.getType → Item.fromDto(itemDto)
     new Items(items.toMap)
   }
 }

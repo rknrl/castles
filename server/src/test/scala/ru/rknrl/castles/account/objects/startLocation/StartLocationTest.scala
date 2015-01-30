@@ -70,7 +70,7 @@ class StartLocationTest extends FlatSpec with Matchers {
   }
 
   "buy" should "change slot & not change other" in {
-    val updated = startLocation2.buy(SlotId.SLOT_3, BuildingType.CHURCH)
+    val updated = startLocation2.build(SlotId.SLOT_3, BuildingType.CHURCH)
     updated.slots(SlotId.SLOT_3).buildingPrototype.get should be(new BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
     updated.slots(SlotId.SLOT_1).buildingPrototype should be(prototype1)
     updated.slots(SlotId.SLOT_2).buildingPrototype should be(prototype2)

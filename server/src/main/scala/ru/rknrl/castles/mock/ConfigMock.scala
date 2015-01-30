@@ -9,6 +9,7 @@ object ConfigMock {
     "127.0.0.1",
     123,
     124,
+    125,
     8080,
     new DbConfiguration("username", "host", 213, "pass", "database"),
     List.empty,

@@ -9,6 +9,9 @@ import scala.collection.JavaConverters._
 class Skills(val levels: Map[SkillType, SkillLevel]) {
   for (skillType ← SkillType.values()) assert(levels.contains(skillType))
 
+  def set(skillType: SkillType, skillLevel: SkillLevel) =
+    new Skills(levels.updated(skillType, skillLevel))
+
   def upgrade(skillType: SkillType) = {
     val nextLevel = Skills.getNextLevel(levels(skillType))
     new Skills(levels.updated(skillType, nextLevel))

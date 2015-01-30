@@ -28,6 +28,8 @@ public class Button extends Sprite {
     }
 
     public function set layout(value:Layout):void {
+        lockView.scaleX = lockView.scaleY = value.scale;
+
         textField.scaleX = textField.scaleY = value.scale;
         centerize(textField);
 

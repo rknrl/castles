@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+          verticalAlign="middle">
+
+    <s:Label id="nameLabel" fontWeight="bold"/>
+    <s:Label id="buildingLabel"/>
+
+    <s:DropDownList id="typeComboBox"
+                    width="100"
+                    dataProvider="{Utils.buildingTypes}"
+                    labelFunction="{Utils.enumLabelFunction}"
+                    selectedIndex="0"/>
+
+    <s:DropDownList id="levelComboBox"
+                    width="100"
+                    visible="{typeComboBox.selectedItem != Utils.NO_BUILDING}"
+                    dataProvider="{Utils.buildingLevels}"
+                    labelFunction="{Utils.enumLabelFunction}"
+                    selectedIndex="0"/>
+
+    <s:Button label="Set" click="onClick(event)"/>
+
+    <fx:Script><![CDATA[
+        import ru.rknrl.castles.events.SetSlotEvent;
+        import ru.rknrl.dto.BuildingPrototypeDTO;
+        import ru.rknrl.dto.SlotDTO;
+        import ru.rknrl.dto.SlotId;
+
+        private var slotId:SlotId;
+
+        public function init(slotId:SlotId, buildingPrototype:BuildingPrototypeDTO) {
+            this.slotId = slotId;
+            nameLabel.text = slotId.name();
+            buildingLabel.text = buildingPrototype ? buildingPrototype.type.name() + " " + buildingPrototype.level.name() : "None";
+        }
+
+        private function onClick(event:MouseEvent):void {
+            const dto:SlotDTO = new SlotDTO();
+            dto.id = slotId;
+            if (typeComboBox.selectedItem != Utils.NO_BUILDING) {
+                dto.buildingPrototype = new BuildingPrototypeDTO();
+                dto.buildingPrototype.type = typeComboBox.selectedItem;
+                dto.buildingPrototype.level = levelComboBox.selectedItem;
+            }
+
+            dispatchEvent(new SetSlotEvent(dto));
+        }
+        ]]></fx:Script>
+</s:HGroup>

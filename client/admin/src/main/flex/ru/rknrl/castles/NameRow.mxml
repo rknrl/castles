@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+
+    <s:HGroup verticalAlign="middle">
+        <s:Label text="id:" fontWeight="bold"/>
+        <s:Label id="idLabel"/>
+    </s:HGroup>
+
+    <s:HGroup verticalAlign="middle">
+        <s:Label text="type:" fontWeight="bold"/>
+        <s:Label id="typeLabel"/>
+    </s:HGroup>
+
+    <fx:Script><![CDATA[
+        import ru.rknrl.dto.AccountIdDTO;
+
+        public function init(accountId:AccountIdDTO) {
+            idLabel.text = accountId.id;
+            typeLabel.text = accountId.type.name();
+        }
+        ]]></fx:Script>
+</s:VGroup>

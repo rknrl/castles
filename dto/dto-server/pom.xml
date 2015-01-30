@@ -30,6 +30,7 @@
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/common.proto"/>
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/account.proto"/>
                                     <arg value="${project.basedir}/../dto-proto/src/main/proto/game.proto"/>
+                                    <arg value="${project.basedir}/../dto-proto/src/main/proto/admin.proto"/>
                                 </exec>
                             </tasks>
                         </configuration>

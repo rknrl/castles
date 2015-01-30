@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+          verticalAlign="middle">
+
+    <s:Label id="typeLabel" fontWeight="bold"/>
+
+    <s:Label id="countLabel"/>
+
+    <s:TextInput id="numericStepper"
+                 width="100"
+                 restrict="0-9\-"
+                 text="0"/>
+
+    <s:Button label="+" click="onClick(event)"/>
+
+    <fx:Script><![CDATA[
+        import ru.rknrl.castles.events.AddMagicItemEvent;
+        import ru.rknrl.dto.ItemType;
+
+        private var itemType:ItemType;
+
+        public function init(itemType:ItemType, count:int) {
+            this.itemType = itemType;
+            typeLabel.text = itemType.name();
+            countLabel.text = count.toString();
+        }
+
+        private function onClick(event:MouseEvent):void {
+            const value:int = int(numericStepper.text);
+            if (value != 0) dispatchEvent(new AddMagicItemEvent(itemType, value));
+        }
+        ]]></fx:Script>
+</s:HGroup>

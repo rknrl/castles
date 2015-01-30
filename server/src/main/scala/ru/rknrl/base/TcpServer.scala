@@ -39,8 +39,4 @@ class CastlesTcpReceiver(tcpSender: ActorRef,
                          name: String) extends TcpReceiver(name) with ActorLogging {
 
   context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
-
-  override def preStart(): Unit = log.info("TcpReceiver start " + name)
-
-  override def postStop(): Unit = log.info("TcpReceiver stop " + name)
 }

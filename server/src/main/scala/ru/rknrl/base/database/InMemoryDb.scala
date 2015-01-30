@@ -5,9 +5,10 @@ import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.TopItem
 import ru.rknrl.base.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
+import ru.rknrl.dto.CommonDTO.AccountIdDTO
 
 class InMemoryDb(config: Any) extends StoppingStrategyActor {
-  private var map = Map[AccountId, Array[Byte]]()
+  private var map = Map[AccountIdDTO, Array[Byte]]()
 
   override def receive = {
     case GetTop ⇒ sender() ! List.empty[TopItem]
@@ -30,7 +31,7 @@ class InMemoryDb(config: Any) extends StoppingStrategyActor {
       if (map.contains(accountId)) {
         val byteArray = map(accountId)
         val accountStateDto = AccountStateDTO.parseFrom(byteArray)
-        sender ! accountStateDto
+        sender ! StateResponse(accountId, accountStateDto)
       } else
         sender ! NoExist
   }
