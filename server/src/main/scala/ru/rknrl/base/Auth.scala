@@ -12,7 +12,7 @@ import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 
-class AuthService(tcpSender: ActorRef, tcpReceiver: ActorRef,
+class Auth(tcpSender: ActorRef, tcpReceiver: ActorRef,
                   matchmaking: ActorRef,
                   accountStateDb: ActorRef,
                   config: Config,

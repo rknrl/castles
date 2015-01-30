@@ -38,5 +38,5 @@ class CastlesTcpReceiver(tcpSender: ActorRef,
                          config: Config,
                          name: String) extends TcpReceiver(name) with ActorLogging {
 
-  context.actorOf(Props(classOf[AuthService], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
+  context.actorOf(Props(classOf[Auth], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
 }
