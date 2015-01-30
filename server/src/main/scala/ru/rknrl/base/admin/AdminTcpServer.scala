@@ -7,7 +7,13 @@ import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi._
 import ru.rknrl.{EscalateStrategyActor, StoppingStrategyActor}
 
-class AdminTcpServer(tcp: ActorRef, host: String, port: Int, login: String, password: String, accountStateDb: ActorRef) extends StoppingStrategyActor with ActorLogging {
+class AdminTcpServer(tcp: ActorRef,
+                     host: String,
+                     port: Int,
+                     login: String,
+                     password: String,
+                     accountStateDb: ActorRef,
+                     matchmaking: ActorRef) extends StoppingStrategyActor with ActorLogging {
 
   import akka.io.Tcp._
 
@@ -26,23 +32,25 @@ class AdminTcpServer(tcp: ActorRef, host: String, port: Int, login: String, pass
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       val tcpSender = sender()
-      val tcpReceiver = context.actorOf(Props(classOf[AuthTcpReceiver], tcpSender, accountStateDb, login, password, name), "admin-tcp-receiver" + name)
+      val tcpReceiver = context.actorOf(Props(classOf[AuthTcpReceiver], tcpSender, accountStateDb, matchmaking, login, password, name), "admin-tcp-receiver" + name)
       tcpSender ! Register(tcpReceiver)
   }
 }
 
 class AuthTcpReceiver(tcpSender: ActorRef,
                       accountStateDb: ActorRef,
+                      matchmaking: ActorRef,
                       login: String,
                       password: String,
                       name: String) extends TcpReceiver(name) with ActorLogging {
 
-  context.actorOf(Props(classOf[AdminAuth], tcpSender, self, accountStateDb, login, password, name), "admin-auth" + name)
+  context.actorOf(Props(classOf[AdminAuth], tcpSender, self, accountStateDb, matchmaking, login, password, name), "admin-auth" + name)
 }
 
 class AdminAuth(tcpSender: ActorRef,
                 tcpReceiver: ActorRef,
                 accountStateDb: ActorRef,
+                matchmaking: ActorRef,
                 login: String,
                 password: String,
                 name: String) extends EscalateStrategyActor with ActorLogging {
@@ -57,7 +65,7 @@ class AdminAuth(tcpSender: ActorRef,
     /** from player */
     case AuthenticateAsAdminMsg(authenticate) ⇒
       if (authenticate.getLogin == login && authenticate.getPassword == password) {
-        context.actorOf(Props(classOf[Admin], tcpSender, tcpReceiver, accountStateDb, name), "admin" + name)
+        context.actorOf(Props(classOf[Admin], tcpSender, tcpReceiver, accountStateDb, matchmaking, name), "admin" + name)
         sender ! AuthenticatedAsAdminMsg()
       } else {
         log.info("reject")

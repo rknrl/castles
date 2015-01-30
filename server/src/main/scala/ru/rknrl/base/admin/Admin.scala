@@ -1,9 +1,11 @@
 package ru.rknrl.base.admin
 
-import akka.actor.{Props, ActorLogging, ActorRef}
+import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.database.AccountStateDb.{Update, Get, NoExist, StateResponse}
+import ru.rknrl.base.AccountId
+import ru.rknrl.base.MatchMaking.AdminSetAccountState
+import ru.rknrl.base.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.objects.BuildingPrototype
 import ru.rknrl.castles.rmi._
@@ -15,7 +17,11 @@ import ru.rknrl.dto.CommonDTO.AccountIdDTO
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class Admin(tcpSender: ActorRef, tcpReceiver: ActorRef, accountStateDb: ActorRef, name: String) extends EscalateStrategyActor with ActorLogging {
+class Admin(tcpSender: ActorRef,
+            tcpReceiver: ActorRef,
+            accountStateDb: ActorRef,
+            matchmaking: ActorRef,
+            name: String) extends EscalateStrategyActor with ActorLogging {
 
   private val rmi = context.actorOf(Props(classOf[AdminRMI], tcpSender, self), "admin-rmi" + name)
   tcpReceiver ! RegisterReceiver(rmi)
@@ -24,12 +30,7 @@ class Admin(tcpSender: ActorRef, tcpReceiver: ActorRef, accountStateDb: ActorRef
     case ReceiverRegistered(ref) ⇒
 
     /** from AccountStateDb */
-    case StateResponse(accountId, accountState) ⇒
-      rmi ! AccountStateMsg(
-        AdminAccountStateDTO.newBuilder()
-          .setAccountId(accountId)
-          .setAccountState(accountState)
-          .build())
+    case StateResponse(accountId, accountState) ⇒ sendToClient(accountId, accountState)
 
     /** from AccountStateDb */
     case NoExist ⇒ log.info("account does not exist")
@@ -38,40 +39,58 @@ class Admin(tcpSender: ActorRef, tcpReceiver: ActorRef, accountStateDb: ActorRef
       accountStateDb ! Get(dto.getAccountId)
 
     case AddGoldMsg(dto) ⇒
-      update(dto.getAccountId,
-        (accountId, accountStateDto) ⇒ {
-          accountStateDb ! Update(accountId, AccountState.fromDto(accountStateDto).addGold(dto.getAmount).dto)
-        })
+      getState(dto.getAccountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.getAmount))
+      )
 
     case AddItemMsg(dto) ⇒
-      update(dto.getAccountId,
-        (accountId, accountStateDto) ⇒ {
-          accountStateDb ! Update(accountId, AccountState.fromDto(accountStateDto).addItem(dto.getItemType, dto.getAmount).dto)
-        })
+      getState(dto.getAccountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.getItemType, dto.getAmount))
+      )
 
     case SetSkillMsg(dto) ⇒
-      update(dto.getAccountId,
-        (accountId, accountStateDto) ⇒ {
-          accountStateDb ! Update(accountId, AccountState.fromDto(accountStateDto).setSkill(dto.getSkilType, dto.getSkillLevel).dto)
-        })
+      getState(dto.getAccountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.getSkilType, dto.getSkillLevel))
+      )
 
     case SetSlotMsg(dto) ⇒
-      update(dto.getAccountId,
-        (accountId, accountStateDto) ⇒ {
+      getState(dto.getAccountId,
+        (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
-            accountStateDb ! Update(accountId, AccountState.fromDto(accountStateDto).setBuilding(dto.getSlot.getId, BuildingPrototype.fromDto(dto.getSlot.getBuildingPrototype)).dto)
+            update(accountId, accountState.setBuilding(dto.getSlot.getId, BuildingPrototype.fromDto(dto.getSlot.getBuildingPrototype)))
           else
-            accountStateDb ! Update(accountId, AccountState.fromDto(accountStateDto).removeBuilding(dto.getSlot.getId).dto)
-        })
+            update(accountId, accountState.removeBuilding(dto.getSlot.getId))
+      )
   }
 
-  private def update(accountId: AccountIdDTO, f: (AccountIdDTO, AccountStateDTO) ⇒ Unit) = {
+  private def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
+    rmi ! AccountStateMsg(
+      AdminAccountStateDTO.newBuilder()
+        .setAccountId(accountId)
+        .setAccountState(accountState)
+        .build())
+
+  private def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
     val future = Patterns.ask(accountStateDb, Get(accountId), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
       case StateResponse(accountId, accountStateDto) ⇒
-        f(accountId, accountStateDto)
+        f(accountId, AccountState.fromDto(accountStateDto))
+
+      case invalid ⇒
+        log.info("invalid result=" + invalid)
+    }
+  }
+
+  private def update(accountId: AccountIdDTO, newAccountState: AccountState): Unit = {
+    val future = Patterns.ask(accountStateDb, Update(accountId, newAccountState.dto), 5 seconds)
+    val result = Await.result(future, 5 seconds)
+
+    result match {
+      case StateResponse(accountId, accountStateDto) ⇒
+        matchmaking ! AdminSetAccountState(new AccountId(accountId), accountStateDto)
+        sendToClient(accountId, accountStateDto)
 
       case invalid ⇒
         log.info("invalid result=" + invalid)

@@ -28,7 +28,7 @@ object PaymentsServer {
   case class ProductAdded(orderId: String)
 
   /** Matchmaking -> Payments */
-  case object AccountNotExists
+  case object AccountNotOnline
 
   /** Account -> Payments */
   case object DatabaseError
@@ -116,7 +116,7 @@ class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStra
                   complete(callback.databaseError)
                 }
 
-              case AccountNotExists ⇒
+              case AccountNotOnline ⇒
                 log.info("account not found " + accountId)
                 complete(callback.accountNotFoundError)
 

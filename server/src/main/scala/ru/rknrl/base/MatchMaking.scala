@@ -5,10 +5,11 @@ import akka.actor.{Actor, ActorRef, OneForOneStrategy}
 import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.base.game.Game.StopGame
-import ru.rknrl.base.payments.PaymentsServer.{AccountNotExists, AddProduct}
+import ru.rknrl.base.payments.PaymentsServer.{AccountNotOnline, AddProduct}
 import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
@@ -39,11 +40,15 @@ object MatchMaking {
                   val gamesCount: Int,
                   val isBot: Boolean)
 
+  // admin -> matchmakin
+
+  case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
+
   // account -> matchmaking
 
   case class PlaceGameOrder(gameOrder: GameOrder)
 
-  case class InGame(externalAccountId: AccountId, deviceType: DeviceType)
+  case class InGame(externalAccountId: AccountId)
 
   // matchmaking -> account
 
@@ -104,17 +109,22 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
   protected def tryCreateGames(gameOrders: List[GameOrder]): Iterable[GameInfo]
 
   def receive = {
+    /** from Admin */
+    case msg@AdminSetAccountState(accountId, _) ⇒
+      if (accountIdToAccountRef.contains(accountId))
+        accountIdToAccountRef(accountId) forward msg
+
     /** from PaymentServer */
     case msg@AddProduct(accountId, _, _, _) ⇒
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
       else
-        sender ! AccountNotExists
+        sender ! AccountNotOnline
 
     /** Аккаунт спрашивает находится ли он сейчас в игре?
-      * В ответ отпарвялем InGameState
+      * В ответ отправляем InGameResponse
       */
-    case InGame(accountId, deviceType: DeviceType) ⇒
+    case InGame(accountId) ⇒
       if (accountIdToAccountRef.contains(accountId)) {
         val oldAccountRef = accountIdToAccountRef(accountId)
         oldAccountRef ! DuplicateAccount

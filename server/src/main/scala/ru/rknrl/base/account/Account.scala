@@ -72,6 +72,11 @@ abstract class Account(accountId: AccountId,
     case StateResponse(_, accountStateDto) ⇒
       accountRmi ! AccountStateUpdatedMsg(accountStateDto)
 
+    /** from Admin */
+    case AdminSetAccountState(_, accountStateDto) ⇒
+      this.state = AccountState.fromDto(accountStateDto)
+      accountRmi ! AccountStateUpdatedMsg(accountStateDto)
+
     case AddProduct(accountId, orderId, product, count) ⇒
       log.info("AddProduct")
       product.id match {
@@ -100,7 +105,7 @@ abstract class Account(accountId: AccountId,
       * Спрашиваем матчмейкинг находится ли этот игрок в бою
       */
     case GetAuthenticationSuccess ⇒
-      matchmaking ! InGame(accountId, deviceType)
+      matchmaking ! InGame(accountId)
 
     /** Matchmaking ответил на InGame
       * Отправляем Auth accountState
