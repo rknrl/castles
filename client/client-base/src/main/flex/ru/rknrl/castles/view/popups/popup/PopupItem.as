@@ -13,16 +13,14 @@ import ru.rknrl.castles.view.utils.createTextField;
 
 public class PopupItem extends Sprite {
     private var icon:DisplayObject;
+    private var mouseHolder:Bitmap;
     private var textField:TextField;
     private var priceTextField:AnimatedTextField;
 
     public function PopupItem(layout:Layout, icon:DisplayObject, text:String, price:int) {
         mouseChildren = false;
 
-        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
-        mouseHolder.width = layout.popupItemWidth;
-        mouseHolder.height = layout.popupItemSize;
-        addChild(mouseHolder);
+        addChild(mouseHolder = new Bitmap(Colors.transparent));
 
         addChild(this.icon = icon);
 
@@ -37,6 +35,9 @@ public class PopupItem extends Sprite {
 
     public function set layout(value:Layout):void {
         icon.scaleX = icon.scaleY = value.scale;
+
+        mouseHolder.width = value.popupItemWidth;
+        mouseHolder.height = value.popupItemSize;
 
         const iconPos:Point = value.popupIconPos;
         icon.x = iconPos.x;

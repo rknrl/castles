@@ -1,10 +1,10 @@
 package ru.rknrl.utils {
 import flash.display.Sprite;
-import flash.geom.Point;
 
 import org.flexunit.asserts.assertEquals;
 
-import ru.rknrl.Points;
+import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.model.points.Points;
 
 public class PointsTest extends Sprite {
 
@@ -15,7 +15,7 @@ public class PointsTest extends Sprite {
 
     [Test(expects="Error")]
     public function onePoint():void {
-        new Points(new <Point>[new Point()])
+        new Points(new <Point>[new Point(0, 0)])
     }
 
     [Test]

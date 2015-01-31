@@ -9,6 +9,7 @@ import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 
 public class Colors {
+//    public static const transparent:BitmapData = new BitmapData(1, 1, true, 0x44444444);
     public static const transparent:BitmapData = new BitmapData(1, 1, true, 0);
 
     public static const flaskFillColor:uint = 0xcccccc;

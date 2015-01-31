@@ -15,8 +15,8 @@ public class GameMouseEvent extends Event {
     }
 
     public function GameMouseEvent(type:String, mousePos:Point) {
-        super(type);
         _mousePos = mousePos;
+        super(type);
     }
 }
 }

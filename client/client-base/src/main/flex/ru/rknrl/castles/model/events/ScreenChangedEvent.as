@@ -4,6 +4,7 @@ import flash.events.Event;
 public class ScreenChangedEvent extends Event {
     public static const SCREEN_CHANGED:String = "screenChanged";
 
+    // todo: индексы никак не синхронизированы с скрин навигатором
     public static const ALL:Vector.<int> = new <int>[SCREEN_MAIN, SCREEN_TOP, SCREEN_SHOP, SCREEN_SKILLS, SCREEN_BANK];
     public static const SCREEN_MAIN:int = 0;
     public static const SCREEN_TOP:int = 1;

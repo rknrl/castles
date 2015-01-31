@@ -5,7 +5,7 @@ import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.SlotId;
 
 public class BuildEvent extends Event {
-    public static const BUILD:String = "Build";
+    public static const BUILD:String = "build";
 
     private var _slotId:SlotId;
 
@@ -21,8 +21,8 @@ public class BuildEvent extends Event {
 
     public function BuildEvent(slotId:SlotId, buildingType:BuildingType) {
         _slotId = slotId;
-        super(BUILD, true);
         _buildingType = buildingType;
+        super(BUILD, true);
     }
 }
 }
