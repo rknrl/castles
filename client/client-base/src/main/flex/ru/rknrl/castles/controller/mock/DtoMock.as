@@ -285,10 +285,15 @@ public class DtoMock {
 
     private static var buildingId:int = 0;
 
+    public static function buildingIdDto(id:int):BuildingIdDTO {
+        const dto:BuildingIdDTO = new BuildingIdDTO();
+        dto.id = id;
+        return dto;
+    }
+
     public static function building(buildingType:BuildingType, level:BuildingLevel, ownerId:int, i:int, j:int):BuildingDTO {
         const dto:BuildingDTO = new BuildingDTO();
-        dto.id = new BuildingIdDTO();
-        dto.id.id = buildingId++;
+        dto.id = buildingIdDto(buildingId++);
         dto.building = new BuildingPrototypeDTO();
         dto.building.type = buildingType;
         dto.building.level = level;

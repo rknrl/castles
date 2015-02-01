@@ -1,33 +1,16 @@
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
 
-public class Fireball {
-    private var startPos:Point;
-    private var endPos:Point;
-    private var startTime:int;
-    private var duration:int;
-
-    public function Fireball(id:int, startPos:Point, endPos:Point, startTime:int, duration:int) {
-        _id = id;
-        this.startPos = startPos;
-        this.endPos = endPos;
-        this.startTime = startTime;
-        this.duration = duration;
-    }
-
+public class Fireball extends Movable {
     private var _id:int;
 
     public function get id():int {
         return _id;
     }
 
-    public function pos(time:int):Point {
-        const progress:Number = (time - startTime) / duration;
-        return startPos.lerp(endPos, progress);
-    }
-
-    public function needRemove(time:int):Boolean {
-        return time - startTime > duration;
+    public function Fireball(id:int, startPos:Point, endPos:Point, startTime:int, duration:int) {
+        _id = id;
+        super(startPos, endPos, startTime, duration);
     }
 }
 }

@@ -5,6 +5,8 @@ import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.PlayerIdDTO;
 
 public class Buildings {
+    private static const mouseAreaRadius:Number = CellSize.SIZE.id() * 2 / 3;
+
     private var buildings:Vector.<Building>;
 
     public function Buildings(buildings:Vector.<Building>) {
@@ -19,10 +21,8 @@ public class Buildings {
     }
 
     public function inXy(pos:Point):Building {
-        const area:Number = CellSize.SIZE.id() * 2 / 3;
-
         for each(var building:Building in buildings) {
-            if (building.pos.distance(pos) < area) return building;
+            if (building.pos.distance(pos) < mouseAreaRadius) return building;
         }
         return null;
     }
@@ -30,6 +30,16 @@ public class Buildings {
     public function selfInXy(selfId:PlayerIdDTO, pos:Point):Building {
         const building:Building = inXy(pos);
         return building && building.owner.equalsId(selfId) ? building : null;
+    }
+
+    // tutorial:
+
+    private function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
+        const selfBuildings:Vector.<Building> = new <Building>[];
+        for each(var building:Building in buildings) {
+            if (building.owner.equalsId(selfId)) selfBuildings.push(building);
+        }
+        return selfBuildings;
     }
 
     public function getSelfBuildingPos(selfId:PlayerIdDTO):Point {
@@ -45,14 +55,6 @@ public class Buildings {
             selfBuildings[1].pos,
             selfBuildings[2].pos
         ];
-    }
-
-    private function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
-        const selfBuildings:Vector.<Building> = new <Building>[];
-        for each(var building:Building in buildings) {
-            if (building.owner.equalsId(selfId)) selfBuildings.push(building);
-        }
-        return selfBuildings;
     }
 
     public function getUnstrengthenedSelfBuildingPos(selfId:PlayerIdDTO):Point {
