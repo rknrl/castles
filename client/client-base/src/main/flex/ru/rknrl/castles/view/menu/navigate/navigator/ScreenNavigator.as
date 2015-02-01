@@ -74,8 +74,8 @@ public class ScreenNavigator extends Sprite {
         }
     }
 
-    public function animatePrices():void {
-        screens[currentScreenIndex].animatePrices();
+    public function animatePrice():void {
+        screens[currentScreenIndex].animatePrice();
         _balanceTextField.elastic();
     }
 

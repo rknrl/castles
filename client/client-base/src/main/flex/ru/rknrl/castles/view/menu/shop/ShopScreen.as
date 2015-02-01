@@ -95,7 +95,7 @@ public class ShopScreen extends Screen {
         getMagicItem(itemType).bounce();
     }
 
-    override public function animatePrices():void {
+    override public function animatePrice():void {
         titleTextField.elastic();
     }
 }

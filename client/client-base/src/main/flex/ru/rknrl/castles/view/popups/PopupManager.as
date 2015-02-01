@@ -7,8 +7,6 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.test;
 
-use namespace test;
-
 public class PopupManager extends Sprite {
     public function PopupManager(layout:Layout) {
         this.layout = layout;
@@ -93,8 +91,8 @@ public class PopupManager extends Sprite {
         if (nextTransition == 0 && transition == 0 && popup) removePopup();
     }
 
-    public function animatePrices():void {
-        if (popup) popup.animatePrices();
+    public function animatePrice():void {
+        if (popup) popup.animatePrice();
     }
 }
 }

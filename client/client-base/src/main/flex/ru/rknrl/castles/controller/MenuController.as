@@ -117,7 +117,7 @@ public class MenuController {
 
     private function onBuild(event:BuildEvent):void {
         if (model.gold < model.buildingPrices.buildPrice) {
-            view.animatePrices();
+            view.animatePrice();
         } else {
             const dto:BuyBuildingDTO = new BuyBuildingDTO();
             dto.id = event.slotId;
@@ -136,7 +136,7 @@ public class MenuController {
         const price:int = model.buildingPrices.getPrice(nextLevel);
 
         if (model.gold < price) {
-            view.animatePrices();
+            view.animatePrice();
         } else {
             const dto:UpgradeBuildingDTO = new UpgradeBuildingDTO();
             dto.id = event.slotId;
@@ -168,7 +168,7 @@ public class MenuController {
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {
         if (model.gold < model.itemPrice) {
-            view.animatePrices();
+            view.animatePrice();
         } else {
             if (!tutorState.magicItem) {
                 tutorState.magicItem = true;
@@ -187,7 +187,7 @@ public class MenuController {
     private function onUpgradeClick(event:UpgradeClickEvent):void {
         if (model.skillLevels.getLevel(event.skillType) != SkillLevel.SKILL_LEVEL_3) {
             if (model.gold < model.upgradePrices.getPrice(model.skillLevels.totalLevel + 1)) {
-                view.animatePrices();
+                view.animatePrice();
             } else {
                 if (!tutorState.skills) {
                     tutorState.skills = true;

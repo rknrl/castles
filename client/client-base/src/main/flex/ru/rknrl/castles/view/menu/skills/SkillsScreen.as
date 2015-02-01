@@ -108,7 +108,7 @@ public class SkillsScreen extends Screen {
         getFlask(skillType).bounce();
     }
 
-    override public function animatePrices():void {
+    override public function animatePrice():void {
         titleTextField.elastic();
     }
 }

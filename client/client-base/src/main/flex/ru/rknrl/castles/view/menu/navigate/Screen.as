@@ -21,7 +21,7 @@ public class Screen extends Sprite {
     public function set lock(value:Boolean):void {
     }
 
-    public function animatePrices():void {
+    public function animatePrice():void {
     }
 }
 }

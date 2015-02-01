@@ -40,7 +40,7 @@ public class BuildPopup extends Popup {
         dispatchEvent(new BuildEvent(slotId, item.buildingType));
     }
 
-    override public function animatePrices():void {
+    override public function animatePrice():void {
         for each(var item:PopupItem in items) item.animatePrices();
     }
 }

@@ -91,9 +91,9 @@ public class MenuView extends Sprite {
         screenNavigator.gold = value;
     }
 
-    public function animatePrices():void {
-        screenNavigator.animatePrices();
-        popupManager.animatePrices();
+    public function animatePrice():void {
+        screenNavigator.animatePrice();
+        popupManager.animatePrice();
     }
 
     public function animateMagicItem(itemType:ItemType):void {

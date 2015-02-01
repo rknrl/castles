@@ -53,7 +53,7 @@ public class UpgradePopup extends Popup {
         dispatchEvent(new RemoveBuildingEvent(slotId));
     }
 
-    override public function animatePrices():void {
+    override public function animatePrice():void {
         if (upgradeItem) upgradeItem.animatePrices();
     }
 }
