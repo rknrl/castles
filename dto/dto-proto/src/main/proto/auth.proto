@@ -29,7 +29,7 @@ message AuthenticationSuccessDTO {
     repeated ProductDTO products = 4;
 
     // Клиент находится в процессе поиска противников для игры
-    required bool enterGame = 5;
+    required bool searchOpponents = 5;
 
     // Клиент находится в игре
     optional NodeLocator game = 6;

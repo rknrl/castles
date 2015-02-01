@@ -27,7 +27,7 @@ import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.StartLocationPosDTO;
+import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.loaders.BitmapLoader;
 import ru.rknrl.loaders.ILoader;
 import ru.rknrl.loaders.ParallelLoader;
@@ -91,7 +91,7 @@ public class ViewReport extends Sprite {
     layouts["iPad"] = new LayoutLandscape(1024, 768, 1);
     layouts["iPad2"] = new LayoutLandscape(2048, 1536, 1);
 
-    private var localeLoader: TextLoader;
+    private var localeLoader:TextLoader;
 
     public function ViewReport() {
         const loaders:Vector.<ILoader> = new <ILoader>[];
@@ -209,9 +209,9 @@ public class ViewReport extends Sprite {
         for each(var b:BuildingDTO in  buildings) {
             gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
         }
-        const startLocations:Vector.<StartLocationPosDTO> = layout is LayoutPortrait ? DtoMock.startLocationsPosPortrait() : DtoMock.startLocationsPosLandscape();
-        for each(var s:StartLocationPosDTO in startLocations) {
-            gameView.area.addStartLocation(s);
+        const slotsPos:Vector.<SlotsPosDTO> = layout is LayoutPortrait ? DtoMock.slotsPosPortrait() : DtoMock.slotsPosLandscape();
+        for each(var s:SlotsPosDTO in slotsPos) {
+            gameView.area.addSlots(s);
         }
 
         screenshot(folder, device, "GameScreen", bg);

@@ -80,7 +80,7 @@ public class MenuController {
 
     public function onAccountStateUpdated(accountState:AccountStateDTO):void {
         model.mergeAccountStateDto(accountState);
-        view.startLocation = model.startLocation;
+        view.slots = model.slots;
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;
         view.skillLevels = model.skillLevels;
@@ -88,10 +88,10 @@ public class MenuController {
     }
 
     private function onSlotClick(event:SlotClickEvent):void {
-        const slot:SlotDTO = model.startLocation.getSlot(event.slotId);
+        const slot:SlotDTO = model.slots.getSlot(event.slotId);
         if (slot.hasBuildingPrototype) {
             const canUpgrade:Boolean = slot.buildingPrototype.level != BuildingLevel.LEVEL_3;
-            const canRemove:Boolean = model.startLocation.buildingsCount > 1;
+            const canRemove:Boolean = model.slots.buildingsCount > 1;
             if (canUpgrade) {
                 const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
                 const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
@@ -130,7 +130,7 @@ public class MenuController {
     }
 
     private function onUpgradeBuilding(event:UpgradeBuildingEvent):void {
-        const slot:SlotDTO = model.startLocation.getSlot(event.slotId);
+        const slot:SlotDTO = model.slots.getSlot(event.slotId);
         if (!slot.hasBuildingPrototype) throw new Error();
         const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
         const price:int = model.buildingPrices.getPrice(nextLevel);
@@ -244,10 +244,10 @@ public class MenuController {
                         view.playSwipeTutor();
                     } else if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
                         tutorShows[screenIndex] = true;
-                        view.playSlotTutor(model.startLocation.getNotEmptySlot());
-                    } else if (!tutorState.emptySlot && model.startLocation.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
+                        view.playSlotTutor(model.slots.getNotEmptySlot());
+                    } else if (!tutorState.emptySlot && model.slots.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
                         tutorShows[screenIndex] = true;
-                        view.playEmptySlotTutor(model.startLocation.getEmptySlot());
+                        view.playEmptySlotTutor(model.slots.getEmptySlot());
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SHOP:

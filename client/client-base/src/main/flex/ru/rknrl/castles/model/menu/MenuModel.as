@@ -1,7 +1,7 @@
 package ru.rknrl.castles.model.menu {
 import ru.rknrl.castles.model.menu.bank.Products;
 import ru.rknrl.castles.model.menu.main.BuildingPrices;
-import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
 import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
@@ -12,10 +12,10 @@ import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.ProductDTO;
 
 public class MenuModel {
-    private var _startLocation:StartLocation;
+    private var _slots:Slots;
 
-    public function get startLocation():StartLocation {
-        return _startLocation;
+    public function get slots():Slots {
+        return _slots;
     }
 
     private var _gold:int;
@@ -74,7 +74,7 @@ public class MenuModel {
     }
 
     public function mergeAccountStateDto(dto:AccountStateDTO):void {
-        _startLocation = new StartLocation(dto.startLocation);
+        _slots = new Slots(dto.slots);
         _gold = dto.gold;
         _itemsCount = new ItemsCount(dto.items);
         _skillLevels = new SkillLevels(dto.skills);

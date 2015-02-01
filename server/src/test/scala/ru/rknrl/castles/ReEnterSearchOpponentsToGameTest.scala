@@ -174,7 +174,7 @@ class ReEnterSearchOpponentsToGameTest
       expectMsgPF(1000 millis) {
         case AuthenticationSuccessMsg(state) ⇒
           state.hasGame should be(true)
-          state.getEnterGame should be(false)
+          state.getSearchOpponents should be(false)
           true
       }
 

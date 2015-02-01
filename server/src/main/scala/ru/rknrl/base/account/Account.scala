@@ -60,10 +60,10 @@ abstract class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticationSuccessDTO
+  protected def authenticationSuccessDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticationSuccessDTO
 
   private def placeGameOrder() =
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.startLocation, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
   override def receive = {
     case EnterGameMsg() ⇒ placeGameOrder()
@@ -110,18 +110,18 @@ abstract class Account(accountId: AccountId,
     /** Matchmaking ответил на InGame
       * Отправляем Auth accountState
       */
-    case InGameResponse(gameRef, enterGame, top) ⇒
+    case InGameResponse(gameRef, searchOpponents, top) ⇒
       this.top = Some(top)
       if (gameRef.isDefined) {
         reenterGame = true
         connectToGame(gameRef.get)
-      } else if (!enterGame && state.gamesCount == 0) {
+      } else if (!searchOpponents && state.gamesCount == 0) {
         placeGameOrder(); // При первом заходе сразу попадаем в бой
         reenterGame = false
-        auth ! authenticationSuccessDto(enterGame = true, None, top)
+        auth ! authenticationSuccessDto(searchOpponents = true, None, top)
       } else {
         reenterGame = false
-        auth ! authenticationSuccessDto(enterGame, None, top)
+        auth ! authenticationSuccessDto(searchOpponents, None, top)
       }
 
     /** Matchmaking говорит к какой игре коннектится */
@@ -210,7 +210,7 @@ abstract class Account(accountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! authenticationSuccessDto(enterGame = false, Some(gameAddress), top.get)
+        auth ! authenticationSuccessDto(searchOpponents = false, Some(gameAddress), top.get)
 
         reenterGame = false
       } else

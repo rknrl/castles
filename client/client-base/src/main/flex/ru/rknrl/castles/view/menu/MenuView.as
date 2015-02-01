@@ -4,7 +4,7 @@ import flash.display.Sprite;
 import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.bank.Products;
-import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
 import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
@@ -50,7 +50,7 @@ public class MenuView extends Sprite {
         _layout = layout;
         this.locale = locale;
 
-        mainScreen = new MainScreen(model.startLocation, layout, locale);
+        mainScreen = new MainScreen(model.slots, layout, locale);
         topScreen = new TopScreen(model.top, layout, locale, loadImageManager);
         shopScreen = new ShopScreen(model.itemsCount, model.itemPrice, layout, locale);
         skillScreen = new SkillsScreen(model.skillLevels, model.upgradePrices, layout, locale);
@@ -104,8 +104,8 @@ public class MenuView extends Sprite {
         skillScreen.animate(skillType);
     }
 
-    public function set startLocation(value:StartLocation):void {
-        mainScreen.startLocation = value;
+    public function set slots(value:Slots):void {
+        mainScreen.slots = value;
     }
 
     public function set itemsCount(value:ItemsCount):void {

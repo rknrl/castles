@@ -31,7 +31,7 @@ object GameState {
 
   def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
     for (player ← players;
-         (slotId, slot) ← player.startLocation.slots
+         (slotId, slot) ← player.slots.slots
          if slot.buildingPrototype.isDefined)
     yield {
       val ij = playersSlotsPositions(player.id.id)(slotId)
@@ -49,12 +49,12 @@ object GameState {
         lastShootTime = 0)
     }
 
-  def startLocationsDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, StartLocationOrientation]) =
+  def slotsPosDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, SlotsOrientation]) =
     for (player ← players)
     yield {
       val id = player.id.id
       val pos = positions(id)
-      StartLocationPosDTO.newBuilder()
+      SlotsPosDTO.newBuilder()
         .setPlayerId(player.id.dto)
         .setPos(pos.toXY.dto)
         .setOrientation(orientations(id))
@@ -89,9 +89,9 @@ object GameState {
 
     val gameArea = GameArea(big)
 
-    val startLocationPositions = gameArea.randomStartLocationPositions
+    val slotsPositions = gameArea.randomSlotsPositions
 
-    val playersSlotsPositions = gameArea.getPlayersSlotPositions(startLocationPositions)
+    val playersSlotsPositions = gameArea.getPlayersSlotPositions(slotsPositions)
 
     val buildingIdIterator = new BuildingIdIterator
 
@@ -111,7 +111,7 @@ object GameState {
 
     val buildings = playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
 
-    val startLocations = startLocationsDto(players, startLocationPositions, gameArea.playerIdToOrientation)
+    val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 
     val playerStates = for (player ← players) yield player.id → new PlayerState(player.skills.stat, 0)
 
@@ -128,7 +128,7 @@ object GameState {
       new Bullets(List.empty),
       new GameItems(players.map(p ⇒ p.id → GameItems.init(p.id, p.items)).toMap),
       new UnitIdIterator,
-      startLocations,
+      slotsPos,
       new PlayerStates(playerStates.toMap),
       config
     )
@@ -147,7 +147,7 @@ class GameState(val time: Long,
                 val bullets: Bullets,
                 val gameItems: GameItems,
                 val unitIdIterator: UnitIdIterator,
-                val startLocations: Iterable[StartLocationPosDTO],
+                val slotsPos: Iterable[SlotsPosDTO],
                 val playerStates: PlayerStates,
                 val config: GameConfig) {
 
@@ -253,7 +253,7 @@ class GameState(val time: Long,
       newBullets,
       newGameItems,
       unitIdIterator,
-      startLocations,
+      slotsPos,
       newPlayerStates,
       config
     )
@@ -276,7 +276,7 @@ class GameState(val time: Long,
       .setHeight(height)
       .setSelfId(id.dto)
       .addAllPlayers(players.dto.asJava)
-      .addAllStartLocations(startLocations.asJava)
+      .addAllSlots(slotsPos.asJava)
       .addAllBuildings(buildings.dto.asJava)
       .addAllUnits(units.dto(time).asJava)
       .addAllVolcanoes(volcanoes.dto(time).asJava)

@@ -17,8 +17,8 @@ import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.StartLocationOrientation;
-import ru.rknrl.dto.StartLocationPosDTO;
+import ru.rknrl.dto.SlotsOrientation;
+import ru.rknrl.dto.SlotsPosDTO;
 
 public class GameArea extends Sprite {
     public var ground:Ground;
@@ -32,13 +32,13 @@ public class GameArea extends Sprite {
     public var explosions:ExplosionsView;
     public var tornadoPath:TornadoPathView;
 
-    private var _h: int;
+    private var _h:int;
 
     public function get h():int {
         return _h;
     }
 
-    private var _v: int;
+    private var _v:int;
 
     public function get v():int {
         return _v;
@@ -77,13 +77,13 @@ public class GameArea extends Sprite {
         buildings.setBuildingStrengthened(id, strengthened);
     }
 
-    public function addStartLocation(dto:StartLocationPosDTO):void {
+    public function addSlots(dto:SlotsPosDTO):void {
         const cellSize:int = CellSize.SIZE.id();
         for each(var slotId:SlotId in SlotId.values) {
             const pos:Point = getSlotPos(slotId);
-            const orientation:StartLocationOrientation = dto.orientation;
-            const isMirrorH:Boolean = orientation == StartLocationOrientation.TOP_RIGHT || orientation == StartLocationOrientation.BOTTOM_RIGHT;
-            const isMirrorV:Boolean = orientation == StartLocationOrientation.TOP_LEFT || orientation == StartLocationOrientation.TOP_RIGHT;
+            const orientation:SlotsOrientation = dto.orientation;
+            const isMirrorH:Boolean = orientation == SlotsOrientation.TOP_RIGHT || orientation == SlotsOrientation.BOTTOM_RIGHT;
+            const isMirrorV:Boolean = orientation == SlotsOrientation.TOP_LEFT || orientation == SlotsOrientation.TOP_RIGHT;
             const x:Number = isMirrorH ? dto.pos.x - pos.x * cellSize : dto.pos.x + pos.x * cellSize;
             const y:Number = isMirrorV ? dto.pos.y - pos.y * cellSize : dto.pos.y + pos.y * cellSize;
             ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));

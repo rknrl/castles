@@ -1,16 +1,16 @@
-package ru.rknrl.castles.account.objects.startLocation
+package ru.rknrl.castles.account.objects.slots
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.account.objects.{BuildingPrototype, StartLocationSlot}
+import ru.rknrl.castles.account.objects.{BuildingPrototype, Slot}
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType, SlotId}
 
-class StartLocationSlotTest extends FlatSpec with Matchers {
+class SlotTest extends FlatSpec with Matchers {
 
   val id1 = SlotId.SLOT_1
-  val emptySlot = new StartLocationSlot(id1, None)
+  val emptySlot = new Slot(id1, None)
 
   val id2 = SlotId.SLOT_2
-  val slot = new StartLocationSlot(id2,
+  val slot = new Slot(id2,
     Some(new BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_2))
   )
 
@@ -44,7 +44,7 @@ class StartLocationSlotTest extends FlatSpec with Matchers {
 
   "upgrade" should "throw Exception on last level slot" in {
     a[Exception] should be thrownBy {
-      new StartLocationSlot(
+      new Slot(
         id2,
         Some(new BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_3))
       ).upgrade

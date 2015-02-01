@@ -6,7 +6,7 @@ import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.base.game.Game.StopGame
 import ru.rknrl.base.payments.PaymentsServer.{AccountNotOnline, AddProduct}
-import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
+import ru.rknrl.castles.account.objects.{Slots, Items, Skills, Slots$}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.objects.players.PlayerId
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
@@ -33,7 +33,7 @@ object MatchMaking {
   class GameOrder(val accountId: AccountId,
                   val deviceType: DeviceType,
                   val userInfo: UserInfoDTO,
-                  val startLocation: StartLocation,
+                  val slots: Slots,
                   val skills: Skills,
                   val items: Items,
                   val rating: Double,
@@ -52,7 +52,7 @@ object MatchMaking {
 
   // matchmaking -> account
 
-  case class InGameResponse(gameRef: Option[ActorRef], enterGame: Boolean, top: Iterable[TopUserInfoDTO])
+  case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Iterable[TopUserInfoDTO])
 
   case class ConnectToGame(game: ActorRef)
 
@@ -133,9 +133,9 @@ abstract class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gam
 
       val gameInfo = accountIdToGameInfo.get(accountId)
       if (gameInfo.isEmpty)
-        sender ! InGameResponse(None, enterGame = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId), topDto)
+        sender ! InGameResponse(None, searchOpponents = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId), topDto)
       else
-        sender ! InGameResponse(Some(gameInfo.get.gameRef), enterGame = false, topDto)
+        sender ! InGameResponse(Some(gameInfo.get.gameRef), searchOpponents = false, topDto)
 
     /** Аккаунт присылает заявку на игру */
     case PlaceGameOrder(gameOrder) ⇒ placeGameOrder(gameOrder, sender)

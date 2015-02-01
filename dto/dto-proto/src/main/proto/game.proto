@@ -42,7 +42,7 @@ message GameStateDTO {
     required int32 width = 1;
     required int32 height = 2;
     repeated PlayerDTO players = 3;
-    repeated StartLocationPosDTO startLocations = 4;
+    repeated SlotsPosDTO slots = 4;
     required PlayerIdDTO selfId = 5;
     repeated BuildingDTO buildings = 6;
     repeated UnitDTO units = 7;
@@ -55,17 +55,17 @@ message GameStateDTO {
     repeated PlayerInfoDTO playerInfos = 14;
 }
 
-enum StartLocationOrientation {
+enum SlotsOrientation {
     TOP_LEFT = 1;
     TOP_RIGHT = 2;
     BOTTOM_LEFT = 3;
     BOTTOM_RIGHT = 4;
 }
 
-message StartLocationPosDTO {
+message SlotsPosDTO {
     required PlayerIdDTO playerId = 1;
     required PointDTO pos = 2;
-    required StartLocationOrientation orientation = 3;
+    required SlotsOrientation orientation = 3;
 }
 
 message BuildingDTO {

@@ -1,7 +1,7 @@
 package ru.rknrl.castles.game.objects.players
 
 import ru.rknrl.base.AccountId
-import ru.rknrl.castles.account.objects.{Items, Skills, StartLocation}
+import ru.rknrl.castles.account.objects.{Items, Skills, Slots}
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO.{PlayerDTO, PlayerIdDTO}
 
@@ -19,7 +19,7 @@ class PlayerId(val id: Int) {
 class Player(val id: PlayerId,
              val accountId: AccountId,
              val userInfo: UserInfoDTO,
-             val startLocation: StartLocation,
+             val slots: Slots,
              val skills: Skills,
              val items: Items,
              val isBot: Boolean) {

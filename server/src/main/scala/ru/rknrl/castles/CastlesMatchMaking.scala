@@ -48,7 +48,7 @@ class CastlesMatchMaking(interval: FiniteDuration, top: List[TopItem], gameConfi
       val accountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
 
-      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.startLocation, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
+      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
@@ -77,7 +77,7 @@ class CastlesMatchMaking(interval: FiniteDuration, top: List[TopItem], gameConfi
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      playerId → new Player(playerId, order.accountId, order.userInfo, order.startLocation, order.skills, order.items, isBot = order.isBot)
+      playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.skills, order.items, isBot = order.isBot)
     }
 
     val game = context.actorOf(Props(classOf[CastlesGame], players.toMap, big, gameConfig, self), gameIdIterator.next)

@@ -4,7 +4,7 @@ import ru.rknrl.castles.account.objects._
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.CommonDTO._
 
-class AccountState(val startLocation: StartLocation,
+class AccountState(val slots: Slots,
                    val skills: Skills,
                    val items: Items,
                    val gold: Int,
@@ -14,21 +14,21 @@ class AccountState(val startLocation: StartLocation,
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig): AccountState = {
     val price = config.buildingPrices(BuildingLevel.LEVEL_1)
     assert(price <= gold)
-    copy(newStartLocation = startLocation.build(id, buildingType), newGold = gold - price)
+    copy(newSlots = slots.build(id, buildingType), newGold = gold - price)
   }
 
   def upgradeBuilding(id: SlotId, config: AccountConfig): AccountState = {
-    val level = BuildingPrototype.getNextLevel(startLocation.getLevel(id))
+    val level = BuildingPrototype.getNextLevel(slots.getLevel(id))
     val price = config.buildingPrices(level)
     assert(price <= gold)
-    copy(newStartLocation = startLocation.upgrade(id), newGold = gold - price)
+    copy(newSlots = slots.upgrade(id), newGold = gold - price)
   }
 
   def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype) =
-    copy(newStartLocation = startLocation.set(id, buildingPrototype))
+    copy(newSlots = slots.set(id, buildingPrototype))
 
   def removeBuilding(id: SlotId): AccountState =
-    copy(newStartLocation = startLocation.remove(id))
+    copy(newSlots = slots.remove(id))
 
   def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
     val price = config.skillUpgradePrices(skills.nextTotalLevel)
@@ -56,16 +56,16 @@ class AccountState(val startLocation: StartLocation,
 
   def setNewRating(newRating: Double) = copy(newRating = newRating)
 
-  private def copy(newStartLocation: StartLocation = startLocation,
+  private def copy(newSlots: Slots = slots,
                    newSkills: Skills = skills,
                    newItems: Items = items,
                    newGold: Int = gold,
                    newRating: Double = rating,
                    newGamesCount: Int = gamesCount) =
-    new AccountState(newStartLocation, newSkills, newItems, newGold, newRating, newGamesCount)
+    new AccountState(newSlots, newSkills, newItems, newGold, newRating, newGamesCount)
 
   def dto = AccountStateDTO.newBuilder()
-    .setStartLocation(startLocation.dto)
+    .setSlots(slots.dto)
     .setSkills(skills.dto)
     .setItems(items.dto)
     .setGold(gold)
@@ -84,11 +84,11 @@ object AccountState {
       SlotId.SLOT_5 → Some(new BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
     )
 
-  private def initSlots =
+  private def initSlotsList =
     for ((slotId, building) ← initSlotBuildings)
-    yield slotId → new StartLocationSlot(slotId, building)
+    yield slotId → new Slot(slotId, building)
 
-  private def initStartLocation = new StartLocation(initSlots)
+  private def initSlots = new Slots(initSlotsList)
 
   private def initSkillLevels =
     for (skillType ← SkillType.values())
@@ -103,7 +103,7 @@ object AccountState {
   private val initRating = 1400
 
   def initAccount(config: AccountConfig) = new AccountState(
-    startLocation = initStartLocation,
+    slots = initSlots,
     skills = initSkills,
     items = initItems(config),
     gold = config.initGold,
@@ -112,7 +112,7 @@ object AccountState {
   )
 
   def fromDto(dto: AccountStateDTO) = new AccountState(
-    startLocation = StartLocation.fromDto(dto.getStartLocation),
+    slots = Slots.fromDto(dto.getSlots),
     skills = Skills.fromDto(dto.getSkills),
     items = Items.fromDto(dto.getItems),
     gold = dto.getGold,

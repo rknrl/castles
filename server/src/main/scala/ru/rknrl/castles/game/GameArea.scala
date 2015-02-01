@@ -1,9 +1,9 @@
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.account.objects.{IJ, StartLocation}
+import ru.rknrl.castles.account.objects.{IJ, Slots}
 import ru.rknrl.castles.game.GameArea._
 import ru.rknrl.dto.CommonDTO.SlotId
-import ru.rknrl.dto.GameDTO.{CellSize, StartLocationOrientation}
+import ru.rknrl.dto.GameDTO.{CellSize, SlotsOrientation}
 import ru.rknrl.utils.Point
 
 object GameArea {
@@ -25,9 +25,9 @@ trait GameArea {
 
   def height = v * CellSize.SIZE_VALUE
 
-  def randomStartLocationPositions: Map[Int, IJ]
+  def randomSlotsPositions: Map[Int, IJ]
 
-  def playerIdToOrientation: Map[Int, StartLocationOrientation]
+  def playerIdToOrientation: Map[Int, SlotsOrientation]
 
   def mirrorH(pos: Point) = new Point(width - pos.x, pos.y)
 
@@ -37,21 +37,21 @@ trait GameArea {
 
   protected def mirrorV(pos: IJ) = new IJ(pos.i, v - 1 - pos.j)
 
-  private def getPlayerSlotsPositions(playerId: Int, startLocationPos: IJ) =
+  private def getPlayerSlotsPositions(playerId: Int, slotsPos: IJ) =
     for (slotId ← SlotId.values();
-         slotPos = StartLocation.positions(slotId);
+         slotPos = Slots.positions(slotId);
 
          orientation = playerIdToOrientation(playerId);
-         isMirrorH = orientation == StartLocationOrientation.TOP_RIGHT || orientation == StartLocationOrientation.BOTTOM_RIGHT;
-         isMirrorV = orientation == StartLocationOrientation.TOP_LEFT || orientation == StartLocationOrientation.TOP_RIGHT;
+         isMirrorH = orientation == SlotsOrientation.TOP_RIGHT || orientation == SlotsOrientation.BOTTOM_RIGHT;
+         isMirrorV = orientation == SlotsOrientation.TOP_LEFT || orientation == SlotsOrientation.TOP_RIGHT;
 
-         i = if (isMirrorH) startLocationPos.i - slotPos.i else startLocationPos.i + slotPos.i;
-         j = if (isMirrorV) startLocationPos.j - slotPos.j else startLocationPos.j + slotPos.j)
+         i = if (isMirrorH) slotsPos.i - slotPos.i else slotsPos.i + slotPos.i;
+         j = if (isMirrorV) slotsPos.j - slotPos.j else slotsPos.j + slotPos.j)
     yield slotId → new IJ(i, j)
 
 
-  def getPlayersSlotPositions(startLocationPositions: Map[Int, IJ]): PlayerIdToSlotsPositions =
-    for ((playerId, pos) ← startLocationPositions)
+  def getPlayersSlotPositions(slotsPos: Map[Int, IJ]): PlayerIdToSlotsPositions =
+    for ((playerId, pos) ← slotsPos)
     yield playerId → getPlayerSlotsPositions(playerId, pos).toMap
 }
 
@@ -62,12 +62,12 @@ class GameAreaSmall extends GameArea {
   val h = 8
   val v = 11
 
-  private val hForRandom = h - 1 - StartLocation.left - StartLocation.right
-  private val vForRandom = Math.floor((v - 1) / 2).toInt - StartLocation.top - StartLocation.bottom
+  private val hForRandom = h - 1 - Slots.left - Slots.right
+  private val vForRandom = Math.floor((v - 1) / 2).toInt - Slots.top - Slots.bottom
 
-  def randomStartLocationPositions = {
+  def randomSlotsPositions = {
     val pos = new IJ(
-      i = Math.round(Math.random() * hForRandom).toInt + StartLocation.left, // [2,5]
+      i = Math.round(Math.random() * hForRandom).toInt + Slots.left, // [2,5]
       j = 0
     )
 
@@ -78,8 +78,8 @@ class GameAreaSmall extends GameArea {
   }
 
   val playerIdToOrientation = Map(
-    0 → StartLocationOrientation.TOP_LEFT,
-    1 → StartLocationOrientation.BOTTOM_RIGHT
+    0 → SlotsOrientation.TOP_LEFT,
+    1 → SlotsOrientation.BOTTOM_RIGHT
   )
 }
 
@@ -90,7 +90,7 @@ class GameAreaBig extends GameArea {
   val h = 15
   val v = 15
 
-  def randomStartLocationPositions = {
+  def randomSlotsPositions = {
     val pos = new IJ(
       i = 2,
       j = 0
@@ -105,9 +105,9 @@ class GameAreaBig extends GameArea {
   }
 
   val playerIdToOrientation = Map(
-    0 → StartLocationOrientation.TOP_LEFT,
-    1 → StartLocationOrientation.TOP_RIGHT,
-    2 → StartLocationOrientation.BOTTOM_LEFT,
-    3 → StartLocationOrientation.BOTTOM_RIGHT
+    0 → SlotsOrientation.TOP_LEFT,
+    1 → SlotsOrientation.TOP_RIGHT,
+    2 → SlotsOrientation.BOTTOM_LEFT,
+    3 → SlotsOrientation.BOTTOM_RIGHT
   )
 }

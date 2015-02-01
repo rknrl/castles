@@ -7,7 +7,7 @@ import flash.events.MouseEvent;
 import flash.text.TextField;
 
 import ru.rknrl.castles.model.events.ViewEvents;
-import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
@@ -20,12 +20,12 @@ public class MainScreen extends Screen {
     private static const mouseHolderW:Number = 200;
     private static const mouseHolderH:Number = 64;
 
-    private var startLocationView:StartLocationView;
+    private var slotsView:SlotsView;
 
     private var playHolder:Sprite;
 
-    public function MainScreen(startLocation:StartLocation, layout:Layout, locale:CastlesLocale) {
-        addChild(startLocationView = new StartLocationView(startLocation));
+    public function MainScreen(slots:Slots, layout:Layout, locale:CastlesLocale) {
+        addChild(slotsView = new SlotsView(slots));
 
         addChild(playHolder = new Sprite());
         playHolder.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -45,14 +45,14 @@ public class MainScreen extends Screen {
         this.layout = layout;
     }
 
-    public function set startLocation(value:StartLocation):void {
-        startLocationView.startLocation = value;
+    public function set slots(value:Slots):void {
+        slotsView.slots = value;
     }
 
     override public function set layout(value:Layout):void {
-        startLocationView.scaleX = startLocationView.scaleY = value.scale * Layout.startLocationScale;
-        startLocationView.x = value.startLocation.x;
-        startLocationView.y = value.startLocation.y;
+        slotsView.scaleX = slotsView.scaleY = value.scale * Layout.slotsScale;
+        slotsView.x = value.slots.x;
+        slotsView.y = value.slots.y;
 
         playHolder.scaleX = playHolder.scaleY = value.scale;
         playHolder.x = value.screenCenterX;
@@ -64,7 +64,7 @@ public class MainScreen extends Screen {
     }
 
     override public function set lock(value:Boolean):void {
-        startLocationView.lock = value;
+        slotsView.lock = value;
     }
 
     private function onClick(event:MouseEvent):void {

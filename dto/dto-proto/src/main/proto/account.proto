@@ -7,7 +7,7 @@ option optimize_for = SPEED;
 import "common.proto";
 
 message AccountStateDTO {
-    required StartLocationDTO startLocation = 1;
+    required SlotsDTO slots = 1;
     required SkillsDTO skills = 2;
     required ItemsDTO items = 3;
     required int32 gold = 4;
@@ -17,7 +17,7 @@ message AccountStateDTO {
 
 // start location
 
-message StartLocationDTO {
+message SlotsDTO {
     repeated SlotDTO slots = 1;
 }
 

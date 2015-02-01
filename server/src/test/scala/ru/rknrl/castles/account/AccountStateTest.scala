@@ -3,20 +3,20 @@ package ru.rknrl.castles.account
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.account.objects.items.ItemsTest
 import ru.rknrl.castles.account.objects.skills.SkillsTest
-import ru.rknrl.castles.account.objects.startLocation.StartLocationTest
-import ru.rknrl.castles.account.objects.{BuildingPrototype, Items, Skills, StartLocation}
+import ru.rknrl.castles.account.objects.slots.SlotsTest
+import ru.rknrl.castles.account.objects._
 import ru.rknrl.castles.mock.AccountConfigMock
 import ru.rknrl.dto.CommonDTO._
 
 object AccountStateTest {
-  def accountState(startLocation: StartLocation = StartLocationTest.startLocation1,
+  def accountState(slots: Slots = SlotsTest.slots,
                    skills: Skills = SkillsTest.skills,
                    items: Items = ItemsTest.items,
                    gold: Int = 666,
                    rating: Int = 666,
                    gamesCount: Int = 0) =
     new AccountState(
-      startLocation,
+      slots,
       skills,
       items,
       gold,
@@ -37,11 +37,11 @@ class AccountStateTest extends FlatSpec with Matchers {
     }
   }
 
-  "buyBuilding" should "change startLocation and gold & not change others" in {
+  "buyBuilding" should "change slots and gold & not change others" in {
     val state = accountState(gold = 666)
     val updated = state.buyBuilding(SlotId.SLOT_2, BuildingType.HOUSE, config)
-    updated.startLocation.slots(SlotId.SLOT_1).buildingPrototype should be(state.startLocation.slots(SlotId.SLOT_1).buildingPrototype)
-    updated.startLocation.slots(SlotId.SLOT_2).buildingPrototype.get should be(new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1))
+    updated.slots.slots(SlotId.SLOT_1).buildingPrototype should be(state.slots.slots(SlotId.SLOT_1).buildingPrototype)
+    updated.slots.slots(SlotId.SLOT_2).buildingPrototype.get should be(new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1))
 
     updated.gold should be(666 - config.buildingPrices(BuildingLevel.LEVEL_1))
 
@@ -55,10 +55,10 @@ class AccountStateTest extends FlatSpec with Matchers {
     }
   }
 
-  "upgradeBuilding" should "change startLocation and gold & not change others" in {
+  "upgradeBuilding" should "change slots and gold & not change others" in {
     val state = accountState(gold = 666)
     val updated = state.upgradeBuilding(SlotId.SLOT_1, config)
-    updated.startLocation.slots(SlotId.SLOT_1).buildingPrototype.get.level should be(BuildingLevel.LEVEL_3)
+    updated.slots.slots(SlotId.SLOT_1).buildingPrototype.get.level should be(BuildingLevel.LEVEL_3)
 
     updated.gold should be(666 - config.buildingPrices(BuildingLevel.LEVEL_3))
 
@@ -66,10 +66,10 @@ class AccountStateTest extends FlatSpec with Matchers {
     updated.items should be(state.items)
   }
 
-  "removeBuilding" should "change startLocation & not change others" in {
-    val state = accountState(startLocation = StartLocationTest.startLocation2)
+  "removeBuilding" should "change slots & not change others" in {
+    val state = accountState(slots = SlotsTest.slots2)
     val updated = state.removeBuilding(SlotId.SLOT_1)
-    updated.startLocation.slots(SlotId.SLOT_1).buildingPrototype should be(None)
+    updated.slots.slots(SlotId.SLOT_1).buildingPrototype should be(None)
 
     updated.skills should be(state.skills)
     updated.items should be(state.items)
@@ -83,14 +83,14 @@ class AccountStateTest extends FlatSpec with Matchers {
     }
   }
 
-  "upgradeSkill" should "change startLocation and gold & not change others" in {
+  "upgradeSkill" should "change slots and gold & not change others" in {
     val state = accountState(gold = 666)
     val updated = state.upgradeSkill(SkillType.ATTACK, config)
     updated.skills.levels(SkillType.ATTACK) should be(SkillLevel.SKILL_LEVEL_2)
 
     updated.gold should be(666 - config.skillUpgradePrices(state.skills.nextTotalLevel))
 
-    updated.startLocation should be(state.startLocation)
+    updated.slots should be(state.slots)
     updated.items should be(state.items)
   }
 
@@ -107,7 +107,7 @@ class AccountStateTest extends FlatSpec with Matchers {
     updated.items.items(ItemType.TORNADO).count should be(state.items.items(ItemType.TORNADO).count + 1)
     updated.gold should be(666 - config.itemPrice)
 
-    updated.startLocation should be(state.startLocation)
+    updated.slots should be(state.slots)
     updated.skills should be(state.skills)
   }
 
@@ -123,7 +123,7 @@ class AccountStateTest extends FlatSpec with Matchers {
 
     updated.gold should be(30)
 
-    updated.startLocation should be(state.startLocation)
+    updated.slots should be(state.slots)
     updated.skills should be(state.skills)
     updated.items should be(state.items)
   }

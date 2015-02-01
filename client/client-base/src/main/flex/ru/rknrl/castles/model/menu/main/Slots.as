@@ -2,12 +2,12 @@ package ru.rknrl.castles.model.menu.main {
 import ru.rknrl.dto.BuildingPrototypeDTO;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.StartLocationDTO;
+import ru.rknrl.dto.SlotsDTO;
 
-public class StartLocation {
-    private var dto:StartLocationDTO;
+public class Slots {
+    private var dto:SlotsDTO;
 
-    public function StartLocation(dto:StartLocationDTO) {
+    public function Slots(dto:SlotsDTO) {
         this.dto = dto;
 
         var buildingsCount:int = 0;

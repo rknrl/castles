@@ -29,7 +29,7 @@ import ru.rknrl.dto.ItemsStateDTO;
 import ru.rknrl.dto.MoveDTO;
 import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.PlayerInfoDTO;
-import ru.rknrl.dto.StartLocationPosDTO;
+import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
@@ -102,7 +102,7 @@ public class GameController implements IGameFacade {
 
         onUpdateItemStates(gameState.itemsState);
 
-        for each(var startLocationPos:StartLocationPosDTO in gameState.startLocations) view.area.addStartLocation(startLocationPos);
+        for each(var slotsPos:SlotsPosDTO in gameState.slots) view.area.addSlots(slotsPos);
 
         var buildingList:Vector.<Building> = new <Building>[];
         for each(var b:BuildingDTO in gameState.buildings) {

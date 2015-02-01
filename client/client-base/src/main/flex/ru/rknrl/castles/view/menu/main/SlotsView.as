@@ -4,19 +4,19 @@ import flash.events.MouseEvent;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.SlotClickEvent;
-import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
-public class StartLocationView extends Sprite {
+public class SlotsView extends Sprite {
 
     private const idToSlot:Dictionary = new Dictionary();
 
-    public function StartLocationView(startLocation:StartLocation) {
+    public function SlotsView(slots:Slots) {
         for each(var slotId: SlotId in SlotId.values) {
-            const slotDto:SlotDTO = startLocation.getSlot(slotId);
+            const slotDto:SlotDTO = slots.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
             slot.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
             const pos:Point = Layout.slotPos(slotId);
@@ -27,7 +27,7 @@ public class StartLocationView extends Sprite {
         }
     }
 
-    public function set startLocation(value:StartLocation):void {
+    public function set slots(value:Slots):void {
         for each(var slotId:SlotId in SlotId.values) {
             const slotDto:SlotDTO = value.getSlot(slotId);
             const slot:SlotView = idToSlot[slotId];

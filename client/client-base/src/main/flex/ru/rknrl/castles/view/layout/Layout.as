@@ -24,7 +24,7 @@ public class Layout {
         return Math.min(widthScale, heightScale);
     }
 
-    public static const startLocationScale:Number = 1.5;
+    public static const slotsScale:Number = 1.5;
     private static const slotGapX:Number = 20;
     private static const slotGapY:Number = 40;
 
@@ -33,13 +33,13 @@ public class Layout {
         return new Point(pos.x * slotGapX, pos.y * slotGapY);
     }
 
-    public function get startLocation():Point {
-        return new Point(screenCenterX, startLocationY);
+    public function get slots():Point {
+        return new Point(screenCenterX, slotsY);
     }
 
     public function slotPosGlobal(slotId:SlotId):Point {
         const slot:Point = slotPos(slotId);
-        return new Point(startLocation.x + slot.x * scale * startLocationScale, startLocation.y + slot.y * scale * startLocationScale);
+        return new Point(slots.x + slot.x * scale * slotsScale, slots.y + slot.y * scale * slotsScale);
     }
 
     public function get firstMagicItem():Point {
@@ -153,7 +153,7 @@ public class Layout {
         return itemSize * scale;
     }
 
-    public function get startLocationY():Number {
+    public function get slotsY():Number {
         return contentCenterY + shadowDistance * scale;
     }
 

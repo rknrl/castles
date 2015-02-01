@@ -62,7 +62,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         const menuView:MenuView = view.addMenu(model);
         menu = new MenuController(menuView, sender, model, social, localStorage);
 
-        if (authenticationSuccess.enterGame) {
+        if (authenticationSuccess.searchOpponents) {
             view.hideMenu();
             view.addSearchOpponentScreen();
         } else if (authenticationSuccess.hasGame) {

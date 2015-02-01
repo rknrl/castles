@@ -3,7 +3,7 @@ import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 
-import ru.rknrl.castles.model.menu.main.StartLocation;
+import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.utils.Animated;
@@ -49,7 +49,7 @@ public class SlotView extends Animated {
     private var _dto:SlotDTO;
 
     public function set dto(value:SlotDTO):void {
-        if (_dto && StartLocation.equals(_dto, value)) return;
+        if (_dto && Slots.equals(_dto, value)) return;
         _dto = value;
 
         if (building) {

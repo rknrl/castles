@@ -166,7 +166,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var slot:SlotDTO in state.startLocation.slots) {
+            for each(var slot:SlotDTO in state.slots.slots) {
                 const slotRow:SlotRow = new SlotRow();
                 slotRow.init(slot.id, slot.buildingPrototype);
                 stateHolder.addElement(slotRow);

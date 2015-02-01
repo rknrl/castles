@@ -1,13 +1,13 @@
 package ru.rknrl.castles.account.objects
 
-import ru.rknrl.dto.AccountDTO.StartLocationDTO
+import ru.rknrl.dto.AccountDTO.SlotsDTO
 import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.dto.GameDTO.CellSize
 import ru.rknrl.utils.Point
 
 import scala.collection.JavaConverters._
 
-class StartLocation(val slots: Map[SlotId, StartLocationSlot]) {
+class Slots(val slots: Map[SlotId, Slot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
   assert(buildingsCount > 0)
 
@@ -35,12 +35,12 @@ class StartLocation(val slots: Map[SlotId, StartLocationSlot]) {
 
   def getLevel(id: SlotId) = slots(id).buildingPrototype.get.level
 
-  private def update(id: SlotId, newSlot: StartLocationSlot) =
-    new StartLocation(slots.updated(id, newSlot))
+  private def update(id: SlotId, newSlot: Slot) =
+    new Slots(slots.updated(id, newSlot))
 
   private def slotsDto = for ((id, slot) ← slots) yield slot.dto
 
-  def dto = StartLocationDTO.newBuilder().addAllSlots(slotsDto.asJava).build()
+  def dto = SlotsDTO.newBuilder().addAllSlots(slotsDto.asJava).build()
 }
 
 class IJ(val i: Int, val j: Int) {
@@ -72,7 +72,7 @@ class IJ(val i: Int, val j: Int) {
     down == that || downLeft == that || downRight == that
 }
 
-object StartLocation {
+object Slots {
   val positions = Map(
     SlotId.SLOT_1 → new IJ(Slot1Pos.SLOT_1_X_VALUE, Slot1Pos.SLOT_1_Y_VALUE),
     SlotId.SLOT_2 → new IJ(Slot2Pos.SLOT_2_X_VALUE, Slot2Pos.SLOT_2_Y_VALUE),
@@ -85,9 +85,9 @@ object StartLocation {
   val top = Math.abs(-1)
   val bottom = 0
 
-  def fromDto(dto: StartLocationDTO) = {
-    val slots = for (slotDto ← dto.getSlotsList.asScala) yield slotDto.getId → StartLocationSlot.fromDto(slotDto)
+  def fromDto(dto: SlotsDTO) = {
+    val slots = for (slotDto ← dto.getSlotsList.asScala) yield slotDto.getId → Slot.fromDto(slotDto)
 
-    new StartLocation(slots.toMap)
+    new Slots(slots.toMap)
   }
 }

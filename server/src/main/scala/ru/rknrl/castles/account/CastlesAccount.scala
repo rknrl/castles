@@ -25,13 +25,13 @@ class CastlesAccount(accountId: AccountId,
 
   override var state = accountState
 
-  override protected def authenticationSuccessDto(enterGame: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
+  override protected def authenticationSuccessDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
     val builder = AuthenticationSuccessDTO.newBuilder()
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
       .addAllTop(top.asJava)
       .addAllProducts(config.productsDto(accountId.accountType).asJava)
-      .setEnterGame(enterGame)
+      .setSearchOpponents(searchOpponents)
 
     if (gameAddress.isDefined) builder.setGame(gameAddress.get)
 

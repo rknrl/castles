@@ -25,9 +25,9 @@ import ru.rknrl.dto.SkillUpgradePriceDTO;
 import ru.rknrl.dto.SkillsDTO;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.StartLocationDTO;
-import ru.rknrl.dto.StartLocationOrientation;
-import ru.rknrl.dto.StartLocationPosDTO;
+import ru.rknrl.dto.SlotsDTO;
+import ru.rknrl.dto.SlotsOrientation;
+import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
 import ru.rknrl.dto.UserInfoDTO;
 
@@ -58,8 +58,8 @@ public class DtoMock {
         return dto;
     }
 
-    public static function startLocation():StartLocationDTO {
-        const dto:StartLocationDTO = new StartLocationDTO();
+    public static function slots():SlotsDTO {
+        const dto:SlotsDTO = new SlotsDTO();
         dto.slots.push(slot(SlotId.SLOT_1, buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)));
         dto.slots.push(slot(SlotId.SLOT_2, buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)));
         dto.slots.push(slot(SlotId.SLOT_3, buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1)));
@@ -100,7 +100,7 @@ public class DtoMock {
 
     public static function accountState():AccountStateDTO {
         const dto:AccountStateDTO = new AccountStateDTO();
-        dto.startLocation = startLocation();
+        dto.slots = slots();
         dto.skills = skills();
         dto.items = items();
         dto.gold = 100;
@@ -179,7 +179,7 @@ public class DtoMock {
         dto.config = config();
         dto.top = top();
         dto.products = new <ProductDTO>[product()];
-        dto.enterGame = false;
+        dto.searchOpponents = false;
         return dto;
     }
 
@@ -199,7 +199,7 @@ public class DtoMock {
         throw new Error("can't find item " + itemType)
     }
 
-    public static function findSlot(dto:StartLocationDTO, slotId:SlotId):SlotDTO {
+    public static function findSlot(dto:SlotsDTO, slotId:SlotId):SlotDTO {
         for each(var slot:SlotDTO in dto.slots) {
             if (slot.id == slotId) return slot;
         }
@@ -261,8 +261,8 @@ public class DtoMock {
         return dto;
     }
 
-    public static function startLocationPos(playerId:int, orientation:StartLocationOrientation, i:int, j:int):StartLocationPosDTO {
-        const dto:StartLocationPosDTO = new StartLocationPosDTO();
+    public static function slotsPos(playerId:int, orientation:SlotsOrientation, i:int, j:int):SlotsPosDTO {
+        const dto:SlotsPosDTO = new SlotsPosDTO();
         dto.playerId = playerIdDto(playerId);
         dto.orientation = orientation;
         dto.pos = new PointDTO();
@@ -271,15 +271,15 @@ public class DtoMock {
         return dto;
     }
 
-    public static function startLocationsPosLandscape():Vector.<StartLocationPosDTO> {
-        return new <StartLocationPosDTO>[
-            startLocationPos(3, StartLocationOrientation.BOTTOM_RIGHT, 12, 14)
+    public static function slotsPosLandscape():Vector.<SlotsPosDTO> {
+        return new <SlotsPosDTO>[
+            slotsPos(3, SlotsOrientation.BOTTOM_RIGHT, 12, 14)
         ];
     }
 
-    public static function startLocationsPosPortrait():Vector.<StartLocationPosDTO> {
-        return new <StartLocationPosDTO>[
-            startLocationPos(1, StartLocationOrientation.BOTTOM_LEFT, 2, 10)
+    public static function slotsPosPortrait():Vector.<SlotsPosDTO> {
+        return new <SlotsPosDTO>[
+            slotsPos(1, SlotsOrientation.BOTTOM_LEFT, 2, 10)
         ];
     }
 
