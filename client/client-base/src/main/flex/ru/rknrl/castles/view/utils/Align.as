@@ -6,6 +6,7 @@ public class Align {
      * @return total width
      */
     public static function horizontal(displayObjects:Vector.<DisplayObject>, itemWidth:Number, gap:Number):Number {
+        if (displayObjects.length == 0) return 0;
         var x:Number = 0;
         for each(var displayObject:DisplayObject in displayObjects) {
             displayObject.x = x + itemWidth / 2;

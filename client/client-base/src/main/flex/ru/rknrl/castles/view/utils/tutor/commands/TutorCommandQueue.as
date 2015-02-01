@@ -20,10 +20,12 @@ public class TutorCommandQueue extends EventDispatcher implements ITutorCommand 
         next();
     }
 
-    public function enterFrame():void {
-        if (running) {
-            const command:ITutorCommand = commands[completed];
-            command.enterFrame();
+    private function next():void {
+        if (isComplete) {
+            running = false;
+            dispatchEvent(new Event(Event.COMPLETE));
+        } else {
+            executeNext();
         }
     }
 
@@ -41,17 +43,15 @@ public class TutorCommandQueue extends EventDispatcher implements ITutorCommand 
         next();
     }
 
-    private function next():void {
-        if (isComplete) {
-            running = false;
-            dispatchEvent(new Event(Event.COMPLETE));
-        } else {
-            executeNext();
-        }
-    }
-
     private function get isComplete():Boolean {
         return completed == commands.length;
+    }
+
+    public function enterFrame():void {
+        if (running) {
+            const command:ITutorCommand = commands[completed];
+            command.enterFrame();
+        }
     }
 }
 }

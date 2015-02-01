@@ -17,7 +17,7 @@ public class AnimatedTextField extends Animated {
         centerize(textField);
     }
 
-    public function set textScale(value: Number):void {
+    public function set textScale(value:Number):void {
         textField.scaleX = textField.scaleY = value;
         centerize(textField);
     }

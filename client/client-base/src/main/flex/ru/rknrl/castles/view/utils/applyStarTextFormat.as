@@ -2,7 +2,6 @@ package ru.rknrl.castles.view.utils {
 import flash.text.TextField;
 
 import ru.rknrl.castles.view.Fonts;
-
 import ru.rknrl.utils.getCharIndices;
 
 public function applyStarTextFormat(textField:TextField):void {

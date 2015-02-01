@@ -1,6 +1,5 @@
 package ru.rknrl.castles.view.utils {
 import flash.display.DisplayObject;
-import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
 public class Fly {
