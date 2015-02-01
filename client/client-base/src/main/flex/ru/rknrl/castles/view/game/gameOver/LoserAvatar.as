@@ -35,6 +35,8 @@ public class LoserAvatar extends Sprite {
     }
 
     private function onBitmapDataLoad(url:String, bitmapData:BitmapData):void {
+        if(movieClip) throw new Error("movieClip already on stage");
+
         if (!bitmapData) {
             bitmapData = new DefaultAvatarBitmapData();
             bitmapData.colorTransform(bitmapData.rect, Colors.transform(color));

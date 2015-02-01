@@ -126,6 +126,7 @@ public class Main extends Sprite implements IAuthFacade {
         locale = new CastlesLocale(data);
 
         loadImageManager = new LoadImageManager(cachedAvatarsLimit);
+        if(view) throw new Error("view already on stage");
         addChild(view = new View(_layout, locale, loadImageManager, deviceFactory));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();

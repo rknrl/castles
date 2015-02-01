@@ -5,6 +5,7 @@ import flash.utils.getTimer;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
+import ru.rknrl.castles.view.utils.Tweener;
 
 public class ScreenNavigatorCanvas extends ScreenNavigator {
     public function ScreenNavigatorCanvas(screens:Vector.<Screen>, gold:int, layout:Layout, locale:CastlesLocale) {
@@ -22,7 +23,7 @@ public class ScreenNavigatorCanvas extends ScreenNavigator {
     private function onChangeScreen(event:ChangeScreenEvent):void {
         const index:Number = screens.indexOf(event.screen);
         if (nextScreenIndex != index) {
-            nextX = index > nextScreenIndex ? -layout.screenWidth : layout.screenWidth;
+            tweener.nextValue = index > nextScreenIndex ? -layout.screenWidth : layout.screenWidth;
             nextScreenIndex = index;
             updateScreensPos();
         }
@@ -38,33 +39,23 @@ public class ScreenNavigatorCanvas extends ScreenNavigator {
         }
     }
 
-    private static const epsilon:Number = 0.5;
-    private var lastTime:int;
     private static const tweenSpeed:Number = 150;
-    private var nextX:Number = 0;
+    private const tweener:Tweener = new Tweener(tweenSpeed);
 
     private function onEnterFrame(event:Event):void {
-        const time:int = getTimer();
-        const deltaTime:int = time - lastTime;
-        lastTime = time;
-
-        const delta:Number = nextX - holder.x;
-
-        if (Math.abs(delta) < epsilon) {
-            holder.x = nextX;
-        } else {
-            holder.x += delta * (deltaTime / tweenSpeed);
-        }
+        tweener.update(getTimer());
 
         if (holder.x >= layout.screenCenterX) {
             currentScreenIndex = nextScreenIndex;
-            holder.x -= layout.screenWidth;
-            nextX = 0;
+            tweener.value -= layout.screenWidth;
+            tweener.nextValue = 0;
         } else if (holder.x <= -layout.screenCenterX) {
             currentScreenIndex = nextScreenIndex;
-            holder.x += layout.screenWidth;
-            nextX = 0;
+            tweener.value += layout.screenWidth;
+            tweener.nextValue = 0;
         }
+
+        holder.x = tweener.value;
 
         screens[currentScreenIndex].transition = 1 - Math.abs(holder.x) / layout.screenCenterX;
     }

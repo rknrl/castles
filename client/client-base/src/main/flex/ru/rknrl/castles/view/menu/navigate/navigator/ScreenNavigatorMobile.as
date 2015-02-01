@@ -8,6 +8,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
+import ru.rknrl.castles.view.utils.Tweener;
 
 public class ScreenNavigatorMobile extends ScreenNavigator {
     private var mouseHolder:Bitmap;
@@ -56,22 +57,19 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
 
     // mouse
 
-    private static const epsilon:Number = 0.5;
+    private const tweener:Tweener = new Tweener(tweenSpeed);
 
     private static const lastXInterval:int = 100;
     private static const inertiaFactor:Number = 100;
 
-    private var lastTime:int;
     private var lastX:Number;
     private var lastXTime:int;
 
     private static const mouseMoveSpeed:Number = 50;
     private static const tweenSpeed:Number = 150;
-    private var nextX:Number = 0;
 
     private var mouseDown:Boolean;
     private var mouseDeltaX:Number;
-    private var speed:Number;
 
     private function onMouseDown(event:MouseEvent):void {
         mouseDown = true;
@@ -86,22 +84,20 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
             if (inertia > layout.screenCenterX) inertia = layout.screenCenterX;
             if (inertia < -layout.screenCenterX) inertia = -layout.screenCenterX;
 
-            if (holder.x + inertia >= layout.screenCenterX) nextX = layout.screenWidth;
-            else if (holder.x + inertia <= -layout.screenCenterX) nextX = -layout.screenWidth;
-            else nextX = 0;
+            if (holder.x + inertia >= layout.screenCenterX) tweener.nextValue = layout.screenWidth;
+            else if (holder.x + inertia <= -layout.screenCenterX) tweener.nextValue = -layout.screenWidth;
+            else tweener.nextValue = 0;
 
-            speed = tweenSpeed;
+            tweener.speed = tweenSpeed;
         }
     }
 
     private function onEnterFrame(event:Event):void {
         const time:int = getTimer();
-        const deltaTime:int = time - lastTime;
-        lastTime = time;
 
         if (mouseDown) {
-            nextX = mouseX + mouseDeltaX;
-            speed = mouseMoveSpeed;
+            tweener.nextValue = mouseX + mouseDeltaX;
+            tweener.speed = mouseMoveSpeed;
 
             if (time - lastXTime > lastXInterval) {
                 lastX = holder.x;
@@ -109,29 +105,25 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
             }
         }
 
-        const delta:Number = nextX - holder.x;
-
-        if (Math.abs(delta) < epsilon) {
-            holder.x = nextX;
-        } else {
-            holder.x += delta * (deltaTime / speed);
-        }
+        tweener.update(time);
 
         if (holder.x >= layout.screenCenterX) {
             currentScreenIndex = getNextIndex(currentScreenIndex);
-            holder.x -= layout.screenWidth;
             mouseDeltaX -= layout.screenWidth;
-            nextX = 0;
+            tweener.value -= layout.screenWidth;
+            tweener.nextValue = 0;
             lastX = holder.x;
-            speed = tweenSpeed;
+            tweener.speed = tweenSpeed;
         } else if (holder.x <= -layout.screenCenterX) {
             currentScreenIndex = getPrevIndex(currentScreenIndex);
-            holder.x += layout.screenWidth;
             mouseDeltaX += layout.screenWidth;
-            nextX = 0;
+            tweener.value += layout.screenWidth;
+            tweener.nextValue = 0;
             lastX = holder.x;
-            speed = tweenSpeed;
+            tweener.speed = tweenSpeed;
         }
+
+        holder.x = tweener.value;
 
         screens[currentScreenIndex].transition = 1 - Math.abs(holder.x) / layout.screenCenterX;
     }

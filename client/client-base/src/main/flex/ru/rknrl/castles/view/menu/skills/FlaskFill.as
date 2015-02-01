@@ -4,6 +4,7 @@ import flash.display.Sprite;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.Colors;
+import ru.rknrl.castles.view.utils.Tweener;
 import ru.rknrl.dto.SkillLevel;
 
 public class FlaskFill extends Sprite {
@@ -11,6 +12,7 @@ public class FlaskFill extends Sprite {
     private static const fillBottom:int = 36;
     private static const levelHeight:int = 24;
     private static const speed:int = 200;
+    private const tweener:Tweener = new Tweener(speed);
 
     private var bitmap:Bitmap;
     private var waterLine:FlaskWaterLine;
@@ -26,19 +28,13 @@ public class FlaskFill extends Sprite {
     }
 
     public function set skillLevel(value:SkillLevel):void {
-        nextHeight = value.id() * levelHeight;
+        tweener.nextValue = value.id() * levelHeight;
     }
 
-    private var nextHeight:Number = 0;
-    private var lastTime:int;
-
     public function onEnterFrame(fraction:Number):void {
-        const time:int = getTimer();
-        const deltaTime:int = time - lastTime;
-        lastTime = time;
+        tweener.update(getTimer());
 
-        const deltaHeight:Number = nextHeight - bitmap.height;
-        bitmap.height += deltaHeight * Math.min(1, deltaTime / speed);
+        bitmap.height = tweener.value;
         bitmap.y = waterLine.y = fillBottom - bitmap.height + 1;
 
         waterLine.onEnterFrame(fraction);

@@ -5,9 +5,13 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.Popup;
+import ru.rknrl.castles.view.utils.Tweener;
 import ru.rknrl.test;
 
 public class PopupManager extends Sprite {
+    private static const speed:Number = 100;
+    private const tweener:Tweener = new Tweener(speed);
+
     public function PopupManager(layout:Layout) {
         this.layout = layout;
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -30,8 +34,8 @@ public class PopupManager extends Sprite {
         addChild(modalScreen = new ModalScreen(_layout));
         addChild(this.popup = popup);
 
-        transition = 0;
-        nextTransition = 1;
+        tweener.value = 0;
+        tweener.nextValue = 1;
         updateTransition();
 
         mouseChildren = true;
@@ -39,11 +43,11 @@ public class PopupManager extends Sprite {
 
     public function close(event:Event = null):void {
         mouseChildren = false;
-        nextTransition = 0;
+        tweener.nextValue = 0;
     }
 
     test function openImmediate():void {
-        transition = nextTransition = 1;
+        tweener.value = tweener.nextValue = 1;
         updateTransition();
     }
 
@@ -61,34 +65,17 @@ public class PopupManager extends Sprite {
         modalScreen = null;
     }
 
-    private static const epsilon:Number = 0.005;
-    private static const speed:Number = 100;
-    private var transition:Number = 0;
-    private var nextTransition:Number = 0;
-
-    private var lastTime:int;
-
     private function onEnterFrame(event:Event):void {
         updateTransition();
     }
 
     private function updateTransition():void {
-        const time:int = getTimer();
-        const deltaTime:int = time - lastTime;
-        lastTime = time;
+        tweener.update(getTimer());
 
-        const delta:Number = nextTransition - transition;
+        if (modalScreen) modalScreen.transition = tweener.value;
+        if (popup) popup.transition = tweener.value;
 
-        if (Math.abs(delta) < epsilon) {
-            transition = nextTransition;
-        } else {
-            transition += delta * Math.min(1, deltaTime / speed);
-        }
-
-        if (modalScreen) modalScreen.transition = transition;
-        if (popup) popup.transition = transition;
-
-        if (nextTransition == 0 && transition == 0 && popup) removePopup();
+        if (tweener.nextValue == 0 && tweener.value == 0 && popup) removePopup();
     }
 
     public function animatePrice():void {
