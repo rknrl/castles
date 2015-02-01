@@ -38,15 +38,15 @@ public class CastlesLocale extends Locale {
     }
 
     public function bankButton(count:int, price:int, currency:String):String {
-        return translate(BANK_BUTTON).replace("$1", count).replace("$2", price).replace("$3", currency);
+        return translate(BANK_BUTTON, count, price, currency);
     }
 
     public function balance(value:int):String {
-        return translate(BALANCE).replace("$1", value);
+        return translate(BALANCE, value);
     }
 
     public function shopTitle(price:int):String {
-        return translate(SHOP_TITLE).replace("$1", price);
+        return translate(SHOP_TITLE, price);
     }
 
     public function get upgradesComplete():String {
@@ -54,7 +54,7 @@ public class CastlesLocale extends Locale {
     }
 
     public function upgradesTitle(price:int):String {
-        return translate(UPGRADES_TITLE).replace("$1", price);
+        return translate(UPGRADES_TITLE, price);
     }
 
     public function get topTitle():String {
@@ -102,11 +102,11 @@ public class CastlesLocale extends Locale {
     }
 
     public function win(reward:int):String {
-        return translate(WIN).replace("$1", reward);
+        return translate(WIN, reward);
     }
 
     public function lose(reward:int):String {
-        return translate(LOST).replace("$1", reward);
+        return translate(LOST, reward);
     }
 
     public function get defaultName():String {
