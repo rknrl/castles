@@ -11,12 +11,6 @@ class StartLocation(val slots: Map[SlotId, StartLocationSlot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
   assert(buildingsCount > 0)
 
-  def swap(id1: SlotId, id2: SlotId) = {
-    val slot1 = new StartLocationSlot(id2, slots(id1).buildingPrototype)
-    val slot2 = new StartLocationSlot(id1, slots(id2).buildingPrototype)
-    new StartLocation(slots.updated(id1, slot2).updated(id2, slot1))
-  }
-
   def buildingsCount = {
     var count = 0
     for ((id, slot) ← slots) {

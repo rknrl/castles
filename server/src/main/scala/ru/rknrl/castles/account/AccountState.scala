@@ -11,9 +11,6 @@ class AccountState(val startLocation: StartLocation,
                    val rating: Double,
                    val gamesCount: Int) {
 
-  def swapSlots(id1: SlotId, id2: SlotId): AccountState =
-    copy(newStartLocation = startLocation.swap(id1, id2))
-
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig): AccountState = {
     val price = config.buildingPrices(BuildingLevel.LEVEL_1)
     assert(price <= gold)

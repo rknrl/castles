@@ -31,17 +31,6 @@ class AccountStateTest extends FlatSpec with Matchers {
 
   val config = AccountConfigMock.config;
 
-  "swapSlots" should "change startLocation & not change others" in {
-    val state = accountState()
-    val updated = state.swapSlots(SlotId.SLOT_1, SlotId.SLOT_2)
-    updated.startLocation.slots(SlotId.SLOT_1).buildingPrototype should be(state.startLocation.slots(SlotId.SLOT_2).buildingPrototype)
-    updated.startLocation.slots(SlotId.SLOT_2).buildingPrototype should be(state.startLocation.slots(SlotId.SLOT_1).buildingPrototype)
-
-    updated.skills should be(state.skills)
-    updated.items should be(state.items)
-    updated.gold should be(state.gold)
-  }
-
   "buyBuilding" should "throw AssertionError if price < gold" in {
     a[AssertionError] should be thrownBy {
       accountState(gold = 0).buyBuilding(SlotId.SLOT_2, BuildingType.HOUSE, config)

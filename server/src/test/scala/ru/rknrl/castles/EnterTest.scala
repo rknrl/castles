@@ -146,14 +146,6 @@ class EnterTest
         case AccountStateUpdatedMsg(dto) ⇒ true
       }
 
-      // swap slots
-
-      accountRmiClientMock ! SwapSlotsMsg(SwapSlotsDTO.newBuilder().setId1(SlotId.SLOT_1).setId2(SlotId.SLOT_2).build())
-
-      expectMsgPF(1000 millis) {
-        case AccountStateUpdatedMsg(dto) ⇒ true
-      }
-
       // remove building
 
       accountRmiClientMock ! RemoveBuildingMsg(RemoveBuildingDTO.newBuilder().setId(SlotId.SLOT_1).build())

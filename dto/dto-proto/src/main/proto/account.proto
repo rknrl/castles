@@ -68,11 +68,6 @@ message BuildingPriceDTO {
 
 // client->server actions
 
-message SwapSlotsDTO {
-    required SlotId id1 = 1;
-    required SlotId id2 = 2;
-}
-
 message BuyBuildingDTO {
     required SlotId id = 1;
     required BuildingType buildingType = 2;

@@ -8,7 +8,6 @@ import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
 import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.events.SlotClickEvent;
-import ru.rknrl.castles.model.events.SlotSwapEvent;
 import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
 import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
@@ -27,7 +26,6 @@ import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
-import ru.rknrl.dto.SwapSlotsDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
 
@@ -68,7 +66,6 @@ public class MenuController {
         social.addEventListener(PaymentDialogEvent.PAYMENT_FAIL, onPaymentFail);
 
         view.addEventListener(SlotClickEvent.SLOT_CLICK, onSlotClick);
-        view.addEventListener(SlotSwapEvent.SLOT_SWAP, onSlotSwap);
 
         view.addEventListener(BuildEvent.BUILD, onBuild);
         view.addEventListener(UpgradeBuildingEvent.UPGRADE_BUILDING, onUpgradeBuilding);
@@ -116,15 +113,6 @@ public class MenuController {
 
             view.openBuildPopup(event.slotId, model.buildingPrices.buildPrice);
         }
-    }
-
-    private function onSlotSwap(event:SlotSwapEvent):void {
-        const dto:SwapSlotsDTO = new SwapSlotsDTO();
-        dto.id1 = event.slotId1;
-        dto.id2 = event.slotId2;
-        sender.swapSlots(dto);
-
-        view.lock = true;
     }
 
     private function onBuild(event:BuildEvent):void {

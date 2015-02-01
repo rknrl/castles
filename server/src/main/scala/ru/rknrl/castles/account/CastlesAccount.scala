@@ -40,9 +40,6 @@ class CastlesAccount(accountId: AccountId,
 
   override def receive = {
     super.receive orElse {
-      case SwapSlotsMsg(swap: SwapSlotsDTO) ⇒
-        updateState(state.swapSlots(swap.getId1, swap.getId2))
-
       case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
         updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
 
