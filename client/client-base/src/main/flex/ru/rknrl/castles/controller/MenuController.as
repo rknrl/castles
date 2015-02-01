@@ -247,7 +247,7 @@ public class MenuController {
                         view.playSlotTutor(model.slots.getNotEmptySlot());
                     } else if (!tutorState.emptySlot && model.slots.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
                         tutorShows[screenIndex] = true;
-                        view.playEmptySlotTutor(model.slots.getEmptySlot());
+                        view.playSlotTutor(model.slots.getEmptySlot());
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SHOP:
