@@ -77,7 +77,7 @@ public class LayoutPortrait extends Layout {
                 return new Point(0, 0);
             case 2:
             case 3:
-                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
+                return new Point(0, 0); // Хак: чтобы не упасть когда человек играл на компе, а потом перезашел на мобиле в бой
         }
         throw new Error("invalid avatar playerId " + playerId.id);
     }
@@ -92,7 +92,7 @@ public class LayoutPortrait extends Layout {
                 return new Point(notScaledGameAvatarSize / 2 + gap, y);
             case 2:
             case 3:
-                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
+                return new Point(0, 0); // Хак: чтобы не упасть когда человек играл на компе, а потом перезашел на мобиле в бой
         }
         throw new Error("invalid avatar playerId " + playerId.id);
     }
@@ -118,7 +118,7 @@ public class LayoutPortrait extends Layout {
                 return new Point(areaLeft + gameAvatarSize / 2, areaBottom + gap + gameAvatarSize / 2);
             case 2:
             case 3:
-                return new Point(0, 0); // Человек мог играть на компе, а потом перезайти в бой на мобиле
+                return new Point(0, 0); // Хак: чтобы не упасть когда человек играл на компе, а потом перезашел на мобиле в бой
         }
         throw new Error("invalid avatar number " + playerId.id);
     }

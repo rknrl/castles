@@ -50,7 +50,7 @@ public class MainScreen extends Screen {
     }
 
     override public function set layout(value:Layout):void {
-        slotsView.scaleX = slotsView.scaleY = value.scale * Layout.slotsScale;
+        slotsView.scaleX = slotsView.scaleY = value.scale * Layout.menuSlotsScale;
         slotsView.x = value.slots.x;
         slotsView.y = value.slots.y;
 

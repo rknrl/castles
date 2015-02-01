@@ -18,48 +18,16 @@ public class Layout {
     public static const shadowDistance:int = 36;
     public static const popupFlyIconShadowY:Number = 8;
 
+    public static const menuSlotsScale:Number = 1.5;
+    private static const slotGapX:Number = 20;
+    private static const slotGapY:Number = 40;
+    public static const flaskWidth:Number = 38;
+    public static const flaskGap:Number = 16;
+
     protected static function getScale(stageWidth:int, stageHeight:int, originalWidth:int, originalHeight:int):Number {
         const widthScale:Number = stageWidth / originalWidth;
         const heightScale:Number = stageHeight / originalHeight;
         return Math.min(widthScale, heightScale);
-    }
-
-    public static const slotsScale:Number = 1.5;
-    private static const slotGapX:Number = 20;
-    private static const slotGapY:Number = 40;
-
-    public static function slotPos(slotId:SlotId):Point {
-        const pos:Point = getSlotPos(slotId);
-        return new Point(pos.x * slotGapX, pos.y * slotGapY);
-    }
-
-    public function get slots():Point {
-        return new Point(screenCenterX, slotsY);
-    }
-
-    public function slotPosGlobal(slotId:SlotId):Point {
-        const slot:Point = slotPos(slotId);
-        return new Point(slots.x + slot.x * scale * slotsScale, slots.y + slot.y * scale * slotsScale);
-    }
-
-    public function get firstMagicItem():Point {
-        return new Point(screenCenterX - (itemSize + itemGap) * 2 * scale, contentCenterY);
-    }
-
-    public static const flaskWidth:Number = 38;
-    public static const flaskGap:Number = 16;
-
-    public function get firstFlask():Point {
-        return new Point(screenCenterX - (flaskWidth + flaskGap) * scale, contentCenterY);
-    }
-
-    public function get middleNavigationPoint():Point {
-        return new Point(screenCenterX, navigationPointsY);
-    }
-
-    public function gameMagicItem(index:int):Point {
-        const i:int = index - 2;
-        return new Point(screenCenterX + (itemSize + itemGap) * i * scale, gameMagicItemsY);
     }
 
     public function Layout(stageWidth:int, stageHeight:int, scale:Number, contentsScaleFactor:Number) {
@@ -71,33 +39,33 @@ public class Layout {
 
     private var _contentsScaleFactor:Number;
 
-    public function get contentsScaleFactor():Number {
+    public final function get contentsScaleFactor():Number {
         return _contentsScaleFactor;
     }
 
     private var _scale:Number;
 
-    public function get scale():Number {
+    public final function get scale():Number {
         return _scale;
     }
 
-    public function get bitmapDataScale():Number {
+    public final function get bitmapDataScale():Number {
         return _scale * _contentsScaleFactor;
     }
 
     private var _screenWidth:Number;
 
-    public function get screenWidth():Number {
+    public final function get screenWidth():Number {
         return _screenWidth;
     }
 
     private var _screenHeight:Number;
 
-    public function get screenHeight():Number {
+    public final function get screenHeight():Number {
         return _screenHeight;
     }
 
-    public function get screenCenterX():Number {
+    public final function get screenCenterX():Number {
         return screenWidth / 2;
     }
 
@@ -105,11 +73,11 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public function get navigationPointsY():Number {
+    public final function get navigationPointsY():Number {
         return screenHeight - footerHeight - 8 * scale;
     }
 
-    public function get footerCenterY():Number {
+    public final function get footerCenterY():Number {
         return screenHeight - footerHeight / 2;
     }
 
@@ -145,15 +113,11 @@ public class Layout {
         throw OverrideMe();
     }
 
-    public function get corner():Number {
+    public final function get corner():Number {
         return 8 * scale;
     }
 
-    public function get topAvatarSize():int {
-        return itemSize * scale;
-    }
-
-    public function get slotsY():Number {
+    public final function get slotsY():Number {
         return contentCenterY + shadowDistance * scale;
     }
 
@@ -169,13 +133,46 @@ public class Layout {
         throw OverrideMe();
     }
 
+    // tutor
+
+    public static function slotPos(slotId:SlotId):Point {
+        const pos:Point = getSlotPos(slotId);
+        return new Point(pos.x * slotGapX, pos.y * slotGapY);
+    }
+
+    public final function get slots():Point {
+        return new Point(screenCenterX, slotsY);
+    }
+
+    public final function slotPosGlobal(slotId:SlotId):Point {
+        const slot:Point = slotPos(slotId);
+        return new Point(slots.x + slot.x * scale * menuSlotsScale, slots.y + slot.y * scale * menuSlotsScale);
+    }
+
+    public final function get firstMagicItem():Point {
+        return new Point(screenCenterX - (itemSize + itemGap) * 2 * scale, contentCenterY);
+    }
+
+    public final function get firstFlask():Point {
+        return new Point(screenCenterX - (flaskWidth + flaskGap) * scale, contentCenterY);
+    }
+
+    public final function get middleNavigationPoint():Point {
+        return new Point(screenCenterX, navigationPointsY);
+    }
+
+    public final function gameMagicItem(index:int):Point {
+        const i:int = index - 2;
+        return new Point(screenCenterX + (itemSize + itemGap) * i * scale, gameMagicItemsY);
+    }
+
     // game avatar
 
     public function get notScaledGameAvatarSize():Number {
         throw OverrideMe()
     }
 
-    public function get gameAvatarSize():Number {
+    public final function get gameAvatarSize():Number {
         return notScaledGameAvatarSize * scale;
     }
 
