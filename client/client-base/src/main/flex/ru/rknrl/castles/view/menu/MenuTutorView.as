@@ -7,15 +7,15 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.SlotId;
 
 public class MenuTutorView extends TutorialView {
-    private var swipe:Boolean;
+    private var touchable:Boolean;
 
     public function MenuTutorView(layout:Layout, deviceFactory:DeviceFactory) {
-        swipe = deviceFactory.swipe();
+        touchable = deviceFactory.touchable();
         super(layout, deviceFactory);
     }
 
     public function playSwipe():void {
-        if (swipe) {
+        if (touchable) {
             playMobileSwipe();
         } else {
             tweenAndClick(layout.middleNavigationPoint);
@@ -33,19 +33,20 @@ public class MenuTutorView extends TutorialView {
         arrow.y = y;
         itemsLayer.addChild(arrow);
 
-        function onComplete():void {
+        function removeArrow():void {
             itemsLayer.removeChild(arrow);
         }
 
         play(new <ITutorCommand>[
             wait(500),
             open,
-            pos(startPos),
+            cursorPos(startPos),
             wait(500),
             tween(startPos, endPos),
             wait(1000),
-            close
-        ], onComplete);
+            close,
+            exec(removeArrow)
+        ]);
     }
 
     public function playSlot(slotId:SlotId):void {

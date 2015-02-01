@@ -15,7 +15,7 @@ public class MobileFactory implements DeviceFactory {
         return new HandMC();
     }
 
-    public function swipe():Boolean {
+    public function touchable():Boolean {
         return true;
     }
 }

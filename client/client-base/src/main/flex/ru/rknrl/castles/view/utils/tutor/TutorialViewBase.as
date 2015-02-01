@@ -1,7 +1,6 @@
 package ru.rknrl.castles.view.utils.tutor {
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.layout.Layout;
@@ -30,7 +29,7 @@ public class TutorialViewBase extends Sprite {
         modalScreen.layout = _layout;
     }
 
-    protected function openImpl():void {
+    protected final function openImpl():void {
         if (visible) throw new Error("tutor already visible");
         visible = true;
 
@@ -39,7 +38,7 @@ public class TutorialViewBase extends Sprite {
         updateTransition();
     }
 
-    protected function closeImpl(event:Event = null):void {
+    protected final function closeImpl(event:Event = null):void {
         nextTransition = 0;
     }
 
@@ -48,7 +47,7 @@ public class TutorialViewBase extends Sprite {
         visible = false;
     }
 
-    public function get playing():Boolean {
+    public final function get playing():Boolean {
         return visible;
     }
 

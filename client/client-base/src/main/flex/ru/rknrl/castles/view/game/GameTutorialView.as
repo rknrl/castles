@@ -122,6 +122,7 @@ public class GameTutorialView extends TutorialView {
         ]);
     }
 
+    private var tornado:Boolean;
     private var tornadoStartTime:int;
     private var tornadoPoints:Points;
 
@@ -159,7 +160,6 @@ public class GameTutorialView extends TutorialView {
     }
 
     private static const easer:IEaser = new Linear(0, 1);
-    private var tornado:Boolean;
 
     private function onEnterFrame(event:Event):void {
         arrows.orientArrows(new Point((cursor.x - _areaPos.x) / layout.scale, (cursor.y - _areaPos.y) / layout.scale));

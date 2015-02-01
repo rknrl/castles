@@ -15,7 +15,7 @@ public class CanvasFactory implements DeviceFactory {
         return new CursorMC();
     }
 
-    public function swipe():Boolean {
+    public function touchable():Boolean {
         return false;
     }
 }

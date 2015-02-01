@@ -8,10 +8,10 @@ import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.easers.interpolate;
 
-public class CursorAnimation extends Sprite {
-    private static const NONE:int = 0;
-    private static const IN:int = 1;
-    private static const OUT:int = 2;
+public class CursorHalo extends Sprite {
+    private static const MODE_NONE:int = 0;
+    private static const MODE_MOUSE_DOWN:int = 1;
+    private static const MODE_MOUSE_UP:int = 2;
 
     private static const radius:int = 48;
     private static const easer:IEaser = new Linear(0, 1);
@@ -34,7 +34,7 @@ public class CursorAnimation extends Sprite {
     private var border:Shape;
     private var startTime:int;
 
-    public function CursorAnimation() {
+    public function CursorHalo() {
         circle = new Shape();
         circle.graphics.beginFill(0xffffff, 0.5);
         circle.graphics.drawCircle(0, 0, radius);
@@ -51,11 +51,11 @@ public class CursorAnimation extends Sprite {
     }
 
     public function mouseDown():void {
-        play(IN);
+        play(MODE_MOUSE_DOWN);
     }
 
     public function mouseUp():void {
-        play(OUT);
+        play(MODE_MOUSE_UP);
     }
 
     private function play(mode:int):void {
@@ -67,12 +67,12 @@ public class CursorAnimation extends Sprite {
     private function onEnterFrame(event:Event = null):void {
         const time:int = getTimer();
 
-        if (mode == IN) {
+        if (mode == MODE_MOUSE_DOWN) {
             border.alpha = 0;
 
             circle.scaleX = circle.scaleY = interpolate(startScale, endScale, time, startTime, duration, easer);
             circle.alpha = interpolate(startAlpha, endAlpha, time, startTime, duration, easer);
-        } else if (mode == OUT) {
+        } else if (mode == MODE_MOUSE_UP) {
             circle.alpha = interpolate(endAlpha, 0, time, startTime, duration, easer);
 
             border.scaleX = border.scaleY = interpolate(borderStartScale, borderEndScale, time, startTime, duration, easer);
