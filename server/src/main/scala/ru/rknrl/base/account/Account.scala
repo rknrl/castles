@@ -10,7 +10,7 @@ import ru.rknrl.base.database.AccountStateDb.{StateResponse, Update}
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState
+import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}

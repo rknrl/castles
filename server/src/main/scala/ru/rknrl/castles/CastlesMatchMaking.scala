@@ -3,10 +3,10 @@ package ru.rknrl.castles
 import akka.actor.Props
 import ru.rknrl.base.MatchMaking.{TopItem, GameOrder}
 import ru.rknrl.base._
-import ru.rknrl.castles.account.objects.{Item, Items}
+import ru.rknrl.castles.account.state.{Item, Items}
 import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.game._
-import ru.rknrl.castles.game.objects.players.Player
+import ru.rknrl.castles.game.state.players.Player
 import ru.rknrl.dto.CommonDTO.{DeviceType, UserInfoDTO}
 
 import scala.concurrent.duration.FiniteDuration

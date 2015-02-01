@@ -6,8 +6,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.AdminSetAccountState
 import ru.rknrl.base.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
-import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.account.objects.BuildingPrototype
+import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver}
 import ru.rknrl.dto.AccountDTO.AccountStateDTO

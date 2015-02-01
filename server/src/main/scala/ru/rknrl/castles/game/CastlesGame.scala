@@ -2,8 +2,9 @@ package ru.rknrl.castles.game
 
 import akka.actor.ActorRef
 import ru.rknrl.base.game.Game
-import ru.rknrl.castles.game.objects.buildings.BuildingId
-import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
+import ru.rknrl.castles.game.state.GameState
+import ru.rknrl.castles.game.state.buildings.BuildingId
+import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.GameDTO._
 

@@ -1,11 +1,12 @@
 package ru.rknrl.castles.game
 
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.objects.BuildingPrototype
+import ru.rknrl.castles.account.state.BuildingPrototype
 import Config.{BuildingLevelToFactor, BuildingsConfig}
-import ru.rknrl.castles.game.objects.buildings.Building
-import ru.rknrl.castles.game.objects.players.PlayerState
-import ru.rknrl.castles.game.objects.units.GameUnit
+import ru.rknrl.castles.game.state.Stat
+import ru.rknrl.castles.game.state.buildings.Building
+import ru.rknrl.castles.game.state.players.PlayerState
+import ru.rknrl.castles.game.state.units.GameUnit
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 class Constants(val unitToExitFactor: Double,

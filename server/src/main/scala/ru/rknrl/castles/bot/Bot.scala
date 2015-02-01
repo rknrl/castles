@@ -4,9 +4,10 @@ import akka.actor.{Actor, ActorRef}
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.ConnectToGame
 import ru.rknrl.base.game.Game.Join
-import ru.rknrl.castles.game.objects.buildings.{Building, BuildingId}
-import ru.rknrl.castles.game.objects.players.PlayerId
-import ru.rknrl.castles.game.{GameConfig, GameState}
+import ru.rknrl.castles.game.state.GameState
+import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
+import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.{GameStateDTO, MoveDTO}

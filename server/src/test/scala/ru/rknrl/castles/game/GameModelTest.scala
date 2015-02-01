@@ -2,12 +2,12 @@ package ru.rknrl.castles.game
 
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.base.AccountId
-import ru.rknrl.castles.account.objects.items.ItemsTest
-import ru.rknrl.castles.account.objects.skills.SkillsTest
-import ru.rknrl.castles.account.objects.slots.SlotsTest
-import ru.rknrl.castles.game.objects.buildings.BuildingId
-import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
-import ru.rknrl.castles.game.objects.units.UnitId
+import ru.rknrl.castles.account.state.items.ItemsTest
+import ru.rknrl.castles.account.state.skills.SkillsTest
+import ru.rknrl.castles.account.state.slots.SlotsTest
+import ru.rknrl.castles.game.state.buildings.BuildingId
+import ru.rknrl.castles.game.state.players.{Player, PlayerId}
+import ru.rknrl.castles.game.state.units.UnitId
 import ru.rknrl.dto.CommonDTO.{AccountType, UserInfoDTO}
 
 class GameModelTest extends FlatSpec with Matchers {

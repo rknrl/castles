@@ -5,8 +5,8 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
 import ru.rknrl.base.game.Game.{Join, Offline, StopGame}
-import ru.rknrl.castles.game.GameState
-import ru.rknrl.castles.game.objects.players.{Player, PlayerId}
+import ru.rknrl.castles.game.state.GameState
+import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._

@@ -6,9 +6,9 @@ import ru.rknrl.base.MatchMaking._
 import ru.rknrl.base.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.base.game.Game.StopGame
 import ru.rknrl.base.payments.PaymentsServer.{AccountNotOnline, AddProduct}
-import ru.rknrl.castles.account.objects.{Slots, Items, Skills, Slots$}
+import ru.rknrl.castles.account.state.{Slots, Items, Skills, Slots$}
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.objects.players.PlayerId
+import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
