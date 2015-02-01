@@ -1,24 +1,53 @@
 package ru.rknrl.castles.controller.mock {
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.utils.Dictionary;
 import flash.utils.setTimeout;
 
+import ru.rknrl.loaders.BitmapLoader;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.loaders.ILoader;
+import ru.rknrl.loaders.ParallelLoader;
 
-public class LoadImageManagerMock implements ILoadImageManager {
+public class LoadImageManagerMock extends EventDispatcher implements ILoadImageManager {
+    private static const urls:Vector.<String> = new <String>[
+        "default_avatars/1.png",
+        "default_avatars/2.png",
+        "default_avatars/3.png",
+        "default_avatars/4.png",
+        "default_avatars/5.png"
+    ];
+    private var loader:ParallelLoader;
+    private const data:Dictionary = new Dictionary();
+
     private var delay:int;
     private var error:Boolean;
 
     public function LoadImageManagerMock(delay:int, error:Boolean = false) {
         this.delay = delay;
         this.error = error;
+
+        const loaders:Vector.<ILoader> = new <ILoader>[];
+        for each(var url:String in urls) {
+            loaders.push(new BitmapLoader(url));
+        }
+        loader = new ParallelLoader(loaders);
+        loader.addEventListener(Event.COMPLETE, onComplete);
+        loader.load();
+    }
+
+    private function onComplete(event:Event):void {
+        for (var i:int = 0; i < urls.length; i++) {
+            const key:String = (i + 1).toString();
+            data[key] = loader.data[urls[i]];
+        }
+        dispatchEvent(new Event(Event.COMPLETE));
     }
 
     public function load(url:String, callback:Function):void {
         if (url == null) {
             callback(url, null);
-            return;
-        }
-
-        if (error) {
+        } else if (error) {
             if (delay) {
                 setTimeout(function ():void {
                     callback(url, null);
@@ -26,55 +55,12 @@ public class LoadImageManagerMock implements ILoadImageManager {
             } else {
                 callback(url, null);
             }
-            return;
-        }
-
-        switch (url) {
-            case "1":
-                if (delay) {
-                    setTimeout(function ():void {
-                        callback(url, new BitmapData1());
-                    }, delay);
-                } else {
-                    callback(url, new BitmapData1());
-                }
-                break;
-            case "2":
-                if (delay) {
-                    setTimeout(function ():void {
-                        callback(url, new BitmapData2());
-                    }, delay);
-                } else {
-                    callback(url, new BitmapData2());
-                }
-                break;
-            case "3":
-                if (delay) {
-                    setTimeout(function ():void {
-                        callback(url, new BitmapData3());
-                    }, delay);
-                } else {
-                    callback(url, new BitmapData3());
-                }
-                break;
-            case "4":
-                if (delay) {
-                    setTimeout(function ():void {
-                        callback(url, new BitmapData4());
-                    }, delay);
-                } else {
-                    callback(url, new BitmapData4());
-                }
-                break;
-            case "5":
-                if (delay) {
-                    setTimeout(function ():void {
-                        callback(url, new BitmapData5());
-                    }, delay);
-                } else {
-                    callback(url, new BitmapData5());
-                }
-                break;
+        } else if (delay) {
+            setTimeout(function ():void {
+                callback(url, data[url]);
+            }, delay);
+        } else {
+            callback(url, data[url]);
         }
     }
 }

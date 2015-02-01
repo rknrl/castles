@@ -139,7 +139,7 @@ public class DtoMock {
         return dto;
     }
 
-    public static function accountId(type:AccountType, id:String) {
+    public static function accountId(type:AccountType, id:String): AccountIdDTO {
         const dto:AccountIdDTO = new AccountIdDTO();
         dto.id = id;
         dto.type = type;

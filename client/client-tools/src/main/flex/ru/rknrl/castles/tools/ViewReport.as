@@ -107,9 +107,16 @@ public class ViewReport extends Sprite {
     }
 
     private var references:Dictionary;
+    private var loadImageManager:LoadImageManagerMock;
 
     private function onComplete(event:Event):void {
         references = ParallelLoader(event.target).data;
+
+        loadImageManager = new LoadImageManagerMock(0);
+        loadImageManager.addEventListener(Event.COMPLETE, onLoadImageManagerComplete);
+    }
+
+    private function onLoadImageManagerComplete(event:Event):void {
         createViewReport();
         createViewMergers();
         trace("complete");
@@ -148,7 +155,6 @@ public class ViewReport extends Sprite {
     private function render(folder:String, device:String, layout:Layout, locale:CastlesLocale, merge:Boolean):void {
         use namespace test;
 
-        const loadImageManager:LoadImageManagerMock = new LoadImageManagerMock(0);
         const bg:BitmapData = new BitmapData(layout.screenWidth, layout.screenHeight, false, 0xffffff);
         const view:View = new View(layout, locale, loadImageManager, new MobileFactory());
         addChild(view);
