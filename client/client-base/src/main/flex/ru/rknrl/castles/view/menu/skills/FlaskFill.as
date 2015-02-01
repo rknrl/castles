@@ -1,6 +1,5 @@
 package ru.rknrl.castles.view.menu.skills {
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.utils.getTimer;
 
@@ -17,12 +16,11 @@ public class FlaskFill extends Sprite {
     private var waterLine:FlaskWaterLine;
 
     public function FlaskFill(skillLevel:SkillLevel) {
-        addChild(bitmap = new Bitmap(new BitmapData(1, 1, false, Colors.flaskFillColor)));
+        addChild(bitmap = new Bitmap(Colors.flaskFillBitmapData));
         bitmap.width = fillWidth;
         bitmap.x = -fillWidth / 2;
 
         addChild(waterLine = new FlaskWaterLine(fillWidth));
-
         this.skillLevel = skillLevel;
         onEnterFrame(0);
     }

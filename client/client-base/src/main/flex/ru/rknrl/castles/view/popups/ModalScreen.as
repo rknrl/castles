@@ -1,17 +1,17 @@
 package ru.rknrl.castles.view.popups {
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 
 public class ModalScreen extends Sprite {
     private var bitmap:Bitmap;
 
     public function ModalScreen(layout:Layout) {
-        addChild(bitmap = new Bitmap(new BitmapData(1, 1, true, 0x44000000)));
+        addChild(bitmap = new Bitmap(Colors.modalBitmapData));
         this.layout = layout;
         addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }

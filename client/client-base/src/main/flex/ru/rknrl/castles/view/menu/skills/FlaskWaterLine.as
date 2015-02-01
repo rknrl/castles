@@ -1,6 +1,5 @@
 package ru.rknrl.castles.view.menu.skills {
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Sprite;
 
 import ru.rknrl.castles.view.Colors;
@@ -10,7 +9,7 @@ public class FlaskWaterLine extends Sprite {
     private var bitmap:Bitmap;
 
     public function FlaskWaterLine(width:int) {
-        addChild(bitmap = new Bitmap(new BitmapData(1, 1, false, Colors.flaskFillColor)));
+        addChild(bitmap = new Bitmap(Colors.flaskFillBitmapData));
         bitmap.width = width;
         bitmap.x = -width / 2;
     }

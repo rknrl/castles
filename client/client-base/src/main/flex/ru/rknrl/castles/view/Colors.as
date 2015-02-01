@@ -78,13 +78,17 @@ public class Colors {
         return transform;
     }
 
-    // bitmap datas
+    // bitmap dates
+
+    public static const flaskFillBitmapData:BitmapData = new BitmapData(1, 1, false, flaskFillColor);
+
+    public static const modalBitmapData:BitmapData = new BitmapData(1, 1, true, 0x44000000);
 
     public static const grassBitmapData:BitmapData = new BitmapData(1, 1, false, 0xc2ffa6);
 
-    private static const lightBitmapDatas:Dictionary = createLightBitmapDatas();
+    private static const lightBitmapDates:Dictionary = createLightBitmapDates();
 
-    private static function createLightBitmapDatas():Dictionary {
+    private static function createLightBitmapDates():Dictionary {
         const result:Dictionary = new Dictionary();
         for each(var color:uint in all) {
             result[color] = new BitmapData(1, 1, false, light(color));
@@ -93,7 +97,7 @@ public class Colors {
     }
 
     public static function lightBitmapData(color:uint):BitmapData {
-        const bitmapData:BitmapData = lightBitmapDatas[color];
+        const bitmapData:BitmapData = lightBitmapDates[color];
         if (!bitmapData) throw new Error("no bitmapData for color " + color);
         return bitmapData;
     }
