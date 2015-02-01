@@ -173,5 +173,9 @@ public class MenuView extends Sprite {
     public function playFlaskTutor():void {
         tutor.playFlask();
     }
+
+    public function get tutorPlaying():Boolean {
+        return tutor.playing;
+    }
 }
 }

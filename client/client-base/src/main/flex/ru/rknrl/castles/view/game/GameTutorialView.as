@@ -60,8 +60,7 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             tween(pos, toGlobal(buildingPos)),
             click,
-            wait(400),
-            close
+            wait(400)
         ]);
     }
 
@@ -94,8 +93,7 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             mouseUp,
             exec(arrows.removeArrows),
-            wait(400),
-            close
+            wait(400)
         ]);
     }
 
@@ -117,8 +115,7 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             mouseUp,
             exec(arrows.removeArrows),
-            wait(400),
-            close
+            wait(400)
         ]);
     }
 
@@ -154,8 +151,7 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             mouseUp,
             exec(removeTornadoPath),
-            wait(400),
-            close
+            wait(400)
         ]);
     }
 

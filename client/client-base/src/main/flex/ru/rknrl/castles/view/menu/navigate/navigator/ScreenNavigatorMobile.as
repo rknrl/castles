@@ -57,6 +57,8 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
 
     // mouse
 
+    private static const mouseMoveSpeed:Number = 50;
+    private static const tweenSpeed:Number = 150;
     private const tweener:Tweener = new Tweener(tweenSpeed);
 
     private static const lastXInterval:int = 100;
@@ -64,9 +66,6 @@ public class ScreenNavigatorMobile extends ScreenNavigator {
 
     private var lastX:Number;
     private var lastXTime:int;
-
-    private static const mouseMoveSpeed:Number = 50;
-    private static const tweenSpeed:Number = 150;
 
     private var mouseDown:Boolean;
     private var mouseDeltaX:Number;

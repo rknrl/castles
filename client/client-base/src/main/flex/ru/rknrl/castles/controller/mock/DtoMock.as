@@ -104,6 +104,8 @@ public class DtoMock {
         dto.skills = skills();
         dto.items = items();
         dto.gold = 100;
+        dto.rating = 1400;
+        dto.gamesCount = 0;
         return dto;
     }
 
@@ -137,11 +139,16 @@ public class DtoMock {
         return dto;
     }
 
+    public static function accountId(type:AccountType, id:String) {
+        const dto:AccountIdDTO = new AccountIdDTO();
+        dto.id = id;
+        dto.type = type;
+        return dto;
+    }
+
     public static function userInfo(firstName:String, lastName:String, photoUrl:String):UserInfoDTO {
         const dto:UserInfoDTO = new UserInfoDTO();
-        dto.accountId = new AccountIdDTO();
-        dto.accountId.id = "1";
-        dto.accountId.type = AccountType.DEV;
+        dto.accountId = accountId(AccountType.DEV, "1");
         dto.firstName = firstName;
         dto.lastName = lastName;
         dto.photo256 = photoUrl;
@@ -255,7 +262,7 @@ public class DtoMock {
         ];
     }
 
-    public static function playerIdDto(id:int):PlayerIdDTO {
+    public static function playerId(id:int):PlayerIdDTO {
         const dto:PlayerIdDTO = new PlayerIdDTO();
         dto.id = id;
         return dto;
@@ -263,7 +270,7 @@ public class DtoMock {
 
     public static function slotsPos(playerId:int, orientation:SlotsOrientation, i:int, j:int):SlotsPosDTO {
         const dto:SlotsPosDTO = new SlotsPosDTO();
-        dto.playerId = playerIdDto(playerId);
+        dto.playerId = DtoMock.playerId(playerId);
         dto.orientation = orientation;
         dto.pos = new PointDTO();
         dto.pos.x = i * CellSize.SIZE.id();
@@ -283,26 +290,30 @@ public class DtoMock {
         ];
     }
 
-    private static var buildingId:int = 0;
+    private static var buildingIdIterator:int = 0;
 
-    public static function buildingIdDto(id:int):BuildingIdDTO {
+    public static function buildingId(id:int):BuildingIdDTO {
         const dto:BuildingIdDTO = new BuildingIdDTO();
         dto.id = id;
         return dto;
     }
 
+    public static function point(x:Number, y:Number):PointDTO {
+        const dto:PointDTO = new PointDTO();
+        dto.x = x;
+        dto.y = y;
+        return dto;
+    }
+
     public static function building(buildingType:BuildingType, level:BuildingLevel, ownerId:int, i:int, j:int):BuildingDTO {
         const dto:BuildingDTO = new BuildingDTO();
-        dto.id = buildingIdDto(buildingId++);
-        dto.building = new BuildingPrototypeDTO();
-        dto.building.type = buildingType;
-        dto.building.level = level;
-        if (ownerId > -1) dto.owner = playerIdDto(ownerId);
+        dto.id = buildingId(buildingIdIterator++);
+        dto.building = buildingPrototype(buildingType, level);
+        if (ownerId > -1) dto.owner = playerId(ownerId);
         dto.population = 47;
         dto.strengthened = false;
-        dto.pos = new PointDTO();
-        dto.pos.x = i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
-        dto.pos.y = j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2;
+        dto.pos = point(i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2,
+                j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2);
         return dto;
     }
 
@@ -410,7 +421,6 @@ public class DtoMock {
 
             building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 1, 2),
             building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 0, 0)
-
         ];
     }
 }

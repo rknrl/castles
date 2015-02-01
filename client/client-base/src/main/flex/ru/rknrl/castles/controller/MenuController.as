@@ -236,7 +236,7 @@ public class MenuController {
             }
         }
 
-        if (appRunCount >= 3 && !tutorShows[screenIndex]) {
+        if (appRunCount >= 3 && !tutorShows[screenIndex] && !view.tutorPlaying) {
             switch (screenIndex) {
                 case ScreenChangedEvent.SCREEN_MAIN:
                     if (!tutorState.navigate) {

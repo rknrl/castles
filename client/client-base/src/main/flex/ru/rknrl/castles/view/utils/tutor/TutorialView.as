@@ -59,6 +59,7 @@ public class TutorialView extends TutorialViewBase {
     private function onTutorComplete(event:Event = null):void {
         command.removeEventListener(Event.COMPLETE, onTutorComplete);
         command = null;
+        closeImpl();
     }
 
     private function onEnterFrame(event:Event):void {
@@ -83,10 +84,6 @@ public class TutorialView extends TutorialViewBase {
 
     protected function get open():ITutorCommand {
         return exec(openImpl);
-    }
-
-    protected function get close():ITutorCommand {
-        return exec(closeImpl);
     }
 
     protected function cursorPos(point:Point):ITutorCommand {

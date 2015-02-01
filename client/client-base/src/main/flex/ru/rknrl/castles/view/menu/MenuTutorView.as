@@ -44,7 +44,6 @@ public class MenuTutorView extends TutorialView {
             wait(500),
             tween(startPos, endPos),
             wait(1000),
-            close,
             exec(removeArrow)
         ]);
     }
@@ -68,8 +67,7 @@ public class MenuTutorView extends TutorialView {
             tween(screenCorner, clickPos),
             wait(100),
             click,
-            wait(1000),
-            close
+            wait(1000)
         ]);
     }
 }

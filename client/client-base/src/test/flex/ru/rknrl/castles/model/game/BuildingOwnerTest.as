@@ -14,27 +14,27 @@ public class BuildingOwnerTest {
     [Test(description="Пустой BuildingOwner должен быть НЕ равен непустому BuildingOwner")]
     public function t2():void {
         const owner:BuildingOwner = new BuildingOwner(false);
-        assertFalse(owner.equals(new BuildingOwner(true, DtoMock.playerIdDto(0))));
-        assertFalse(owner.equalsId(DtoMock.playerIdDto(0)));
+        assertFalse(owner.equals(new BuildingOwner(true, DtoMock.playerId(0))));
+        assertFalse(owner.equalsId(DtoMock.playerId(0)));
     }
 
     [Test(description="Непустой BuildingOwner должен быть равен другому BuildingOwner с таким же playerId")]
     public function t3():void {
-        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerIdDto(0));
-        assertTrue(owner.equals(new BuildingOwner(true, DtoMock.playerIdDto(0))));
-        assertTrue(owner.equalsId(DtoMock.playerIdDto(0)));
+        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerId(0));
+        assertTrue(owner.equals(new BuildingOwner(true, DtoMock.playerId(0))));
+        assertTrue(owner.equalsId(DtoMock.playerId(0)));
     }
 
     [Test(description="Непустой BuildingOwner должен быть НЕ равен другому BuildingOwner с различным playerId")]
     public function t4():void {
-        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerIdDto(0));
-        assertFalse(owner.equals(new BuildingOwner(true, DtoMock.playerIdDto(1))));
-        assertFalse(owner.equalsId(DtoMock.playerIdDto(2)));
+        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerId(0));
+        assertFalse(owner.equals(new BuildingOwner(true, DtoMock.playerId(1))));
+        assertFalse(owner.equalsId(DtoMock.playerId(2)));
     }
 
     [Test(description="Непустой BuildingOwner должен быть НЕ равен пустому BuildingOwner")]
     public function t5():void {
-        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerIdDto(7));
+        const owner:BuildingOwner = new BuildingOwner(true, DtoMock.playerId(7));
         assertFalse(owner.equals(new BuildingOwner(false)))
     }
 }

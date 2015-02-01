@@ -7,20 +7,20 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.PlayerIdDTO;
 
 public class BuildingsTest {
-    private static const selfId:PlayerIdDTO = DtoMock.playerIdDto(2);
-    private static const b0:Building = new Building(DtoMock.buildingIdDto(0), new Point(0, 0), new BuildingOwner(false), false);
-    private static const b1:Building = new Building(DtoMock.buildingIdDto(1), new Point(100, 0), new BuildingOwner(true, selfId), false);
-    private static const b2:Building = new Building(DtoMock.buildingIdDto(2), new Point(0, 100), new BuildingOwner(true, DtoMock.playerIdDto(0)), true);
+    private static const selfId:PlayerIdDTO = DtoMock.playerId(2);
+    private static const b0:Building = new Building(DtoMock.buildingId(0), new Point(0, 0), new BuildingOwner(false), false);
+    private static const b1:Building = new Building(DtoMock.buildingId(1), new Point(100, 0), new BuildingOwner(true, selfId), false);
+    private static const b2:Building = new Building(DtoMock.buildingId(2), new Point(0, 100), new BuildingOwner(true, DtoMock.playerId(0)), true);
     private static const buildings:Buildings = new Buildings(new <Building>[b0, b1, b2]);
 
     [Test(description="Поиск по id возвращает верный домик")]
     public function t1():void {
-        assertTrue(buildings.byId(DtoMock.buildingIdDto(1)) == b1)
+        assertTrue(buildings.byId(DtoMock.buildingId(1)) == b1)
     }
 
     [Test(expects="Error", description="Поиск по id кидает эксепшн если домика нет")]
     public function t2():void {
-        buildings.byId(DtoMock.buildingIdDto(3));
+        buildings.byId(DtoMock.buildingId(3));
     }
 
     [Test(description="Поиск по xy возвращает верный домик")]
