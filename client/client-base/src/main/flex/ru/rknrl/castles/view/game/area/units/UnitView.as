@@ -23,7 +23,7 @@ public class UnitView extends Sprite {
         shadow.height = 2;
         addChild(shadow);
 
-        const unit:DisplayObject = Fla.unit(buildingType);
+        const unit:DisplayObject = Fla.unit(buildingType, buildingLevel);
         unit.transform.colorTransform = Colors.playerTransform(ownerId);
         addChild(unit);
 

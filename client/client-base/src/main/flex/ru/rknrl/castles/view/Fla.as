@@ -40,7 +40,7 @@ public class Fla {
         throw new Error("unknown building type " + buildingType);
     }
 
-    public static const strengtheningScale:Number = 1.2;
+    public static const strengtheningScale:Number = 1.5;
 
     public static function buildingLevelToScale(buildingLevel:BuildingLevel):Number {
         switch (buildingLevel) {
@@ -54,7 +54,7 @@ public class Fla {
         throw new Error("unknown building level " + buildingLevel);
     }
 
-    public static function unit(buildingType:BuildingType):DisplayObject {
+    public static function unit(buildingType:BuildingType, buildingLevel:BuildingLevel):DisplayObject {
         return new UnitMC();
     }
 }

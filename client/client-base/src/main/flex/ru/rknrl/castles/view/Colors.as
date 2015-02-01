@@ -1,6 +1,7 @@
 package ru.rknrl.castles.view {
 import flash.display.BitmapData;
 import flash.geom.ColorTransform;
+import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.dto.ItemType;
@@ -9,6 +10,9 @@ import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 
 public class Colors {
+
+    // color values
+
 //    public static const transparent:BitmapData = new BitmapData(1, 1, true, 0x44444444);
     public static const transparent:BitmapData = new BitmapData(1, 1, true, 0);
 
@@ -46,12 +50,55 @@ public class Colors {
         throw new Error("unknown color " + color)
     }
 
-    public static function transform(color:uint):ColorTransform {
+    private static const all:Vector.<uint> = new <uint>[red, yellow, grey, cyan, magenta];
+
+    // color transforms
+
+    private static const transforms:Dictionary = createTransforms();
+
+    private static function transformImpl(color:uint):ColorTransform {
         const r:Number = ((color >> 16) & 0xFF) / 0xFF;
         const g:Number = ((color >> 8) & 0xFF) / 0xFF;
         const b:Number = (color & 0xFF) / 0xFF;
         return new ColorTransform(r, g, b, 1)
     }
+
+    private static function createTransforms():Dictionary {
+        const result:Dictionary = new Dictionary();
+        for each(var color:uint in all) {
+            result[color] = transformImpl(color);
+            result[light(color)] = transformImpl(light(color));
+        }
+        return result;
+    }
+
+    public static function transform(color:uint):ColorTransform {
+        const transform:ColorTransform = transforms[color];
+        if (!transform) throw new Error("no transform for color " + color);
+        return transform;
+    }
+
+    // bitmap datas
+
+    public static const grassBitmapData:BitmapData = new BitmapData(1, 1, false, 0xc2ffa6);
+
+    private static const lightBitmapDatas:Dictionary = createLightBitmapDatas();
+
+    private static function createLightBitmapDatas():Dictionary {
+        const result:Dictionary = new Dictionary();
+        for each(var color:uint in all) {
+            result[color] = new BitmapData(1, 1, false, light(color));
+        }
+        return result;
+    }
+
+    public static function lightBitmapData(color:uint):BitmapData {
+        const bitmapData:BitmapData = lightBitmapDatas[color];
+        if (!bitmapData) throw new Error("no bitmapData for color " + color);
+        return bitmapData;
+    }
+
+    // menu objects colors
 
     public static function slot(slotId:SlotId):uint {
         switch (slotId) {
@@ -113,10 +160,7 @@ public class Colors {
         throw new Error("unknown place " + place);
     }
 
-    // game
-
-    private static const grass:uint = 0xc2ffa6;
-    public static const grassBitmapData:BitmapData = new BitmapData(1, 1, false, grass);
+    // game objects colors
 
     private static const noOwnerColor:uint = grey;
 
@@ -127,36 +171,24 @@ public class Colors {
         red
     ];
 
-    public static function buildingTransform(owner:BuildingOwner):ColorTransform {
-        return owner.hasOwner ? playerTransform(owner.ownerId) : transform(noOwnerColor);
+    public static function playerColor(playerId:PlayerIdDTO):uint {
+        return playerColors[playerId.id];
     }
 
     public static function playerTransform(playerId:PlayerIdDTO):ColorTransform {
         return transform(playerColor(playerId));
     }
 
-    public static function playerColor(playerId:PlayerIdDTO):uint {
-        return playerColors[playerId.id];
-    }
-
-    private static const noOwnerGroundBitmapData:BitmapData = new BitmapData(1, 1, false, lightGrey);
-
-    private static const groundBitmapDatas:Vector.<BitmapData> = createGroundBitmapDatas(playerColors);
-
-    private static function createGroundBitmapDatas(playerColors:Vector.<uint>):Vector.<BitmapData> {
-        const result:Vector.<BitmapData> = new <BitmapData>[];
-        for each(var color:uint in playerColors) {
-            result.push(new BitmapData(1, 1, false, light(color)));
-        }
-        return result;
-    }
-
-    public static function groundBitmapData(owner:BuildingOwner):BitmapData {
-        return owner.hasOwner ? groundBitmapDataById(owner.ownerId) : noOwnerGroundBitmapData;
+    public static function buildingTransform(owner:BuildingOwner):ColorTransform {
+        return owner.hasOwner ? playerTransform(owner.ownerId) : transform(noOwnerColor);
     }
 
     public static function groundBitmapDataById(playerId:PlayerIdDTO):BitmapData {
-        return groundBitmapDatas[playerId.id];
+        return lightBitmapData(playerColor(playerId));
+    }
+
+    public static function groundBitmapData(owner:BuildingOwner):BitmapData {
+        return owner.hasOwner ? groundBitmapDataById(owner.ownerId) : lightBitmapData(noOwnerColor);
     }
 }
 }
