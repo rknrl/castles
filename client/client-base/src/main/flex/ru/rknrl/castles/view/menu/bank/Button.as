@@ -33,10 +33,10 @@ public class Button extends Sprite {
         textField.scaleX = textField.scaleY = value.scale;
         centerize(textField);
 
-        rect.graphics.clear();
-        rect.graphics.beginFill(Colors.magenta);
         const buttonWidth:Number = value.buttonWidth(textField.width);
         const buttonHeight:Number = value.buttonHeight;
+        rect.graphics.clear();
+        rect.graphics.beginFill(Colors.magenta);
         rect.graphics.drawRoundRect(-buttonWidth / 2, -buttonHeight / 2, buttonWidth, buttonHeight, value.corner, value.corner);
         rect.graphics.endFill();
     }

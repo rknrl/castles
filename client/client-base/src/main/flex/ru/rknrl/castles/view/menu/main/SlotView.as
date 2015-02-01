@@ -15,7 +15,7 @@ import ru.rknrl.dto.SlotId;
 
 public class SlotView extends Animated {
     private static const lockViewY:Number = -8;
-    private static const mouseHolderSize: Number = 40;
+    private static const mouseHolderSize:Number = 40;
 
     private var shadow:Shadow;
     private var buildingLayer:Sprite;
@@ -25,9 +25,9 @@ public class SlotView extends Animated {
         _id = slotId;
         mouseChildren = false;
 
-        const mouseHolder: Bitmap = new Bitmap(Colors.transparent);
+        const mouseHolder:Bitmap = new Bitmap(Colors.transparent);
         mouseHolder.width = mouseHolder.height = mouseHolderSize;
-        mouseHolder.x = mouseHolder.y = -mouseHolderSize/2;
+        mouseHolder.x = mouseHolder.y = -mouseHolderSize / 2;
         addChild(mouseHolder);
 
         addChild(shadow = new Shadow());

@@ -25,8 +25,8 @@ public class PopupManager extends Sprite {
     private var popup:Popup;
 
     public function open(popup:Popup):void {
-        if (this.popup) throw new Error(this.popup + " already exists");
         if (modalScreen) throw new Error("modalScreen already exists");
+        if (this.popup) throw new Error(this.popup + " already exists");
         addChild(modalScreen = new ModalScreen(_layout));
         addChild(this.popup = popup);
 
@@ -82,7 +82,7 @@ public class PopupManager extends Sprite {
         if (Math.abs(delta) < epsilon) {
             transition = nextTransition;
         } else {
-            transition += delta * (deltaTime / speed);
+            transition += delta * Math.min(1, deltaTime / speed);
         }
 
         if (modalScreen) modalScreen.transition = transition;

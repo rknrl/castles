@@ -12,8 +12,8 @@ import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.createTextField;
 
 public class PopupItem extends Sprite {
-    private var icon:DisplayObject;
     private var mouseHolder:Bitmap;
+    private var icon:DisplayObject;
     private var textField:TextField;
     private var priceTextField:AnimatedTextField;
 

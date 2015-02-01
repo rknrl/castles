@@ -21,7 +21,7 @@ public class FlaskView extends Sprite {
     private static const textHeight:Number = 22;
     private static const textY:Number = -flaskHeight / 2 - textFlaskGap - textHeight;
 
-    private static const mouseHolderW:Number = 38 + 16;
+    private static const mouseHolderW:Number = Layout.flaskWidth + Layout.flaskGap;
     private static const mouseHolderH:Number = 200;
 
     private static function skillTypeToTextFieldX(skillType:SkillType, width:Number):Number {

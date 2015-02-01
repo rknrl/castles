@@ -14,6 +14,9 @@ public class FlaskWaterLine extends Sprite {
         bitmap.x = -width / 2;
     }
 
+    /**
+     * @param fraction  from -1 to 1
+     * */
     public function onEnterFrame(fraction:Number):void {
         const unit:Number = (fraction + 1) / 2; // from 0 to 1
         const height:Number = unit * maxHeight;

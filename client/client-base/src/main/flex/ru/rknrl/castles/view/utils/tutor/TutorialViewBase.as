@@ -72,7 +72,7 @@ public class TutorialViewBase extends Sprite {
         if (Math.abs(delta) < epsilon) {
             transition = nextTransition;
         } else {
-            transition += delta * (deltaTime / speed);
+            transition += delta * Math.min(1, deltaTime / speed);
         }
 
         if (modalScreen) alpha = transition;

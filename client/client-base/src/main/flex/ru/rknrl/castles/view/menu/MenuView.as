@@ -71,7 +71,7 @@ public class MenuView extends Sprite {
 
     override public function set visible(value:Boolean):void {
         super.visible = value;
-        if (value) dispatchEvent(new ScreenChangedEvent(ScreenChangedEvent.SCREEN_MAIN));
+        if (value) dispatchEvent(new ScreenChangedEvent(ScreenChangedEvent.SCREEN_MAIN)); // return to menu after game
     }
 
     private var _layout:Layout;
@@ -163,10 +163,6 @@ public class MenuView extends Sprite {
     }
 
     public function playSlotTutor(slotId:SlotId):void {
-        tutor.playSlot(slotId);
-    }
-
-    public function playEmptySlotTutor(slotId:SlotId):void {
         tutor.playSlot(slotId);
     }
 
