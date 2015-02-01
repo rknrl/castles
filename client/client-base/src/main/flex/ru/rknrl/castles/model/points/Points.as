@@ -44,7 +44,7 @@ public class Points {
         const index:int = getIndex(distance, distances);
         const p1:Point = points[index];
         const p2:Point = points[index + 1];
-        if(p1.equals(p2)) return p1;
+        if (p1.equals(p2)) return p1;
         const progress:Number = (distance - distances[index]) / (distances[index + 1] - distances[index]);
         return p1.lerp(p2, progress)
     }

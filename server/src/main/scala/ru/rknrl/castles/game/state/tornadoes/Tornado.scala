@@ -1,8 +1,8 @@
 package ru.rknrl.castles.game.state.tornadoes
 
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.utils.{PeriodObject, Points}
 import ru.rknrl.dto.GameDTO.TornadoDTO
+import ru.rknrl.utils.{PeriodObject, Points}
 
 import scala.collection.JavaConverters._
 

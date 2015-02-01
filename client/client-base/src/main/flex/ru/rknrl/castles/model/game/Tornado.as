@@ -9,7 +9,7 @@ public class Tornado {
     private var points:Points;
     private var speed:Number;
 
-    public function Tornado(id: int, startTime:int, millisFromStart:int, millisTillEnd:int, points:Points, speed:Number) {
+    public function Tornado(id:int, startTime:int, millisFromStart:int, millisTillEnd:int, points:Points, speed:Number) {
         _id = id;
         this.startTime = startTime;
         this.millisFromStart = millisFromStart;

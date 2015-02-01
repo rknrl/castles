@@ -57,7 +57,7 @@ public class BuildingView extends Sprite {
     }
 
     private var _owner:BuildingOwner;
-    
+
     public function set owner(value:BuildingOwner):void {
         building.transform.colorTransform = Colors.buildingTransform(value);
         if (_owner && !_owner.equals(value)) buildingHolder.bounce();

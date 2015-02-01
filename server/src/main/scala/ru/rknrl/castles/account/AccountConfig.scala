@@ -15,6 +15,7 @@ object AccountConfig {
   class SkillUpgradePrices(val map: Map[Int, Int]) {
     def apply(totalLevel: Int) = map(totalLevel)
   }
+
 }
 
 class AccountConfig(val initGold: Int,

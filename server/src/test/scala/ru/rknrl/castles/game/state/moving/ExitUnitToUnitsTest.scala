@@ -1,10 +1,9 @@
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.account.state.BuildingPrototype
-import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Moving.ExitUnit
 import ru.rknrl.castles.game.state.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.castles.game.state.{UnitIdIterator, Moving, PlayerStateTest}
+import ru.rknrl.castles.game.state.{Moving, PlayerStateTest, UnitIdIterator}
 import ru.rknrl.castles.mock.GameConfigMock
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 

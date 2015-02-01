@@ -1,8 +1,8 @@
 package ru.rknrl.castles.game.state.volcanoes
 
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.utils.{PeriodObject, Point}
 import ru.rknrl.dto.GameDTO.VolcanoDTO
+import ru.rknrl.utils.{PeriodObject, Point}
 
 class Volcano(val playerId: PlayerId,
               val pos: Point,

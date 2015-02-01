@@ -1,9 +1,9 @@
 package ru.rknrl.castles.game.state
 
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.rmi.RemoveUnitMsg
 import ru.rknrl.dto.GameDTO.MoveDTO
 

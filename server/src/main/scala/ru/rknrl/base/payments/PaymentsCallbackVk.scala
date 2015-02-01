@@ -166,12 +166,12 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     val appOrderIdStr = if (appOrderId.isDefined) s""", "app_order_id":${appOrderId.get}""" else ""
 
     s"""
-    |{
-    |  "response": {
-    |    "order_id":$orderId
-    |    $appOrderIdStr
-    |  }
-    |}""".stripMargin
+       |{
+       | "response": {
+       |   "order_id":$orderId
+        |   $appOrderIdStr
+        | }
+        |}""".stripMargin
   }
 
   /**
@@ -193,15 +193,15 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     val expirationStr = if (expiration.isDefined) s""""item_id":"${expiration.get}",""" else ""
 
     s"""
-     |{
-     |  "response": {
-     |    "title":"$title",
-     |    $photoUrlStr
-     |    $itemIdStr
-     |    $expirationStr
-     |    "price": $price
-     |  }
-     |}""".stripMargin
+       |{
+       | "response": {
+       |   "title":"$title",
+                            |   $photoUrlStr
+        |   $itemIdStr
+        |   $expirationStr
+        |   "price": $price
+        | }
+        |}""".stripMargin
   }
 }
 
@@ -225,13 +225,13 @@ private class VkPaymentsError private(val errorCode: Int,
 
   override def toString =
     s"""
-      |{
-      |  "error": {
-      |    "error_code": $errorCode,
-      |    "error_msg": "$description",
-      |    "critical": $criticalToString
-      |  }
-      |}
+       |{
+       | "error": {
+       |   "error_code": $errorCode,
+                                     |   "error_msg": "$description",
+                                                                     |   "critical": $criticalToString
+        | }
+        |}
     """.stripMargin
 }
 

@@ -14,10 +14,10 @@ import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 
 class Auth(tcpSender: ActorRef, tcpReceiver: ActorRef,
-                  matchmaking: ActorRef,
-                  accountStateDb: ActorRef,
-                  config: Config,
-                  name: String) extends EscalateStrategyActor with ActorLogging {
+           matchmaking: ActorRef,
+           accountStateDb: ActorRef,
+           config: Config,
+           name: String) extends EscalateStrategyActor with ActorLogging {
 
   private var accountId: Option[AccountId] = None
   private var deviceType: Option[DeviceType] = None

@@ -1,6 +1,5 @@
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerState, PlayerStates}
 
 object PlayerStateTest {

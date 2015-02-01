@@ -2,7 +2,7 @@ package ru.rknrl.castles.game.state.moving
 
 import org.scalatest.{FlatSpec, Matchers}
 import ru.rknrl.castles.account.state.BuildingPrototype
-import ru.rknrl.castles.game.state.{PlayerStateTest, Moving}
+import ru.rknrl.castles.game.state.Moving
 import ru.rknrl.castles.game.state.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.mock.GameConfigMock

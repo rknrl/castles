@@ -1,6 +1,5 @@
 package ru.rknrl.castles.view.game.ui.magicItems {
 import flash.display.DisplayObject;
-import flash.display.Sprite;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 

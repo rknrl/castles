@@ -1,8 +1,8 @@
 package ru.rknrl.castles.game
 
 import ru.rknrl.castles.Config
+import ru.rknrl.castles.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.account.state.BuildingPrototype
-import Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.castles.game.state.players.PlayerState

@@ -1,7 +1,7 @@
 package ru.rknrl.castles
 
 import akka.actor.Props
-import ru.rknrl.base.MatchMaking.{TopItem, GameOrder}
+import ru.rknrl.base.MatchMaking.{GameOrder, TopItem}
 import ru.rknrl.base._
 import ru.rknrl.castles.account.state.{Item, Items}
 import ru.rknrl.castles.bot.Bot

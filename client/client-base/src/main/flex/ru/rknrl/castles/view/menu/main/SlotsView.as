@@ -15,7 +15,7 @@ public class SlotsView extends Sprite {
     private const idToSlot:Dictionary = new Dictionary();
 
     public function SlotsView(slots:Slots) {
-        for each(var slotId: SlotId in SlotId.values) {
+        for each(var slotId:SlotId in SlotId.values) {
             const slotDto:SlotDTO = slots.getSlot(slotId);
             const slot:SlotView = new SlotView(slotId, slotDto);
             slot.addEventListener(MouseEvent.MOUSE_DOWN, onClick);

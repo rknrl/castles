@@ -1,10 +1,10 @@
 package ru.rknrl.castles.account
 
 import org.scalatest.{FlatSpec, Matchers}
+import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.account.state.items.ItemsTest
 import ru.rknrl.castles.account.state.skills.SkillsTest
 import ru.rknrl.castles.account.state.slots.SlotsTest
-import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.mock.AccountConfigMock
 import ru.rknrl.dto.CommonDTO._
 

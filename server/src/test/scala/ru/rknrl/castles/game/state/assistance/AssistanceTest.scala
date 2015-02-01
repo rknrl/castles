@@ -1,10 +1,9 @@
 package ru.rknrl.castles.game.state.assistance
 
 import org.scalatest.{FlatSpec, Matchers}
-import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.buildings.{BuildingId, BuildingTest, Buildings}
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.castles.game.state.{UnitIdIterator, Assistance, PlayerStateTest}
+import ru.rknrl.castles.game.state.{Assistance, PlayerStateTest, UnitIdIterator}
 import ru.rknrl.castles.mock.GameConfigMock
 
 class AssistanceTest extends FlatSpec with Matchers {

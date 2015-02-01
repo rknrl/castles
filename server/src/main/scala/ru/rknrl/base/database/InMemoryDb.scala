@@ -1,7 +1,6 @@
 package ru.rknrl.base.database
 
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking.TopItem
 import ru.rknrl.base.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO

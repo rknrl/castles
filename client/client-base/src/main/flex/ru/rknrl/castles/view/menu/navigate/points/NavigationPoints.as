@@ -18,7 +18,7 @@ public class NavigationPoints extends Sprite {
         _pointsWidth = Align.horizontal(Vector.<DisplayObject>(points), Layout.navigationPointSize, Layout.navigationPointGap);
     }
 
-    private var _pointsWidth: Number;
+    private var _pointsWidth:Number;
 
     public function get pointsWidth():Number {
         return _pointsWidth * scaleX;

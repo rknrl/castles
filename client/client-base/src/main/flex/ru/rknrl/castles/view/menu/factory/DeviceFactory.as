@@ -11,6 +11,6 @@ public interface DeviceFactory {
 
     function cursor():DisplayObject;
 
-    function touchable(): Boolean;
+    function touchable():Boolean;
 }
 }

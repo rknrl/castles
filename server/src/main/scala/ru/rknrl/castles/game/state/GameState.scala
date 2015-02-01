@@ -1,9 +1,10 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.account.state.IJ
-import ru.rknrl.castles.game.state.area.{MapGenerator, GameArea}
-import GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Moving._
+import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.state.area.{GameArea, MapGenerator}
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
 import ru.rknrl.castles.game.state.bullets.Bullets._
 import ru.rknrl.castles.game.state.fireballs.Fireballs._
@@ -12,7 +13,6 @@ import ru.rknrl.castles.game.state.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.state.units.GameUnits.{getUpdateMessages, _}
 import ru.rknrl.castles.game.state.units.{GameUnits, UnitId}
 import ru.rknrl.castles.game.state.volcanoes.Volcanoes._
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO._

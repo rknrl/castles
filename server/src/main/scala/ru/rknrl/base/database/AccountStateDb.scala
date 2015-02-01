@@ -4,6 +4,7 @@ import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
 
 object AccountStateDb {
+
   /** Ответом будет StateResponse */
   case class Insert(accountId: AccountIdDTO, accountState: AccountStateDTO, userInfo: UserInfoDTO)
 

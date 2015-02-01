@@ -14,7 +14,7 @@ public class GameMagicItem extends Sprite {
     private static const mouseHolderH:Number = 96;
 
     private var fly:Fly;
-    private var holder: Sprite;
+    private var holder:Sprite;
     private var magicItem:GameMagicItemIcon;
     private var shadow:AnimatedShadow;
 
