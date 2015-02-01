@@ -11,11 +11,11 @@ import ru.rknrl.loaders.ParallelLoader;
 
 public class LoadImageManagerMock extends EventDispatcher implements ILoadImageManager {
     private static const urls:Vector.<String> = new <String>[
-        "default_avatars/1.png",
-        "default_avatars/2.png",
-        "default_avatars/3.png",
-        "default_avatars/4.png",
-        "default_avatars/5.png"
+        "mock_avatars/1.png",
+        "mock_avatars/2.png",
+        "mock_avatars/3.png",
+        "mock_avatars/4.png",
+        "mock_avatars/5.png"
     ];
     private var loader:ParallelLoader;
     private const data:Dictionary = new Dictionary();
