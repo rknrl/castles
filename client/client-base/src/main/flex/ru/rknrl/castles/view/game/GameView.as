@@ -22,24 +22,38 @@ public class GameView extends Sprite {
     private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
 
-    public var area:GameArea;
-    private var ui:Sprite;
+    private var _area:GameArea;
 
-    private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
-    public var magicItems:MagicItemsView;
-    public var tutor:GameTutorialView;
+    public function get area():GameArea {
+        return _area;
+    }
+
+    private var _magicItems:MagicItemsView;
+
+    public function get magicItems():MagicItemsView {
+        return _magicItems;
+    }
+
+    private var _tutor:GameTutorialView;
+
+    public function get tutor():GameTutorialView {
+        return _tutor;
+    }
 
     public function get supportedPlayersCount():int {
         return _layout.supportedPlayersCount;
     }
 
+    private var ui:Sprite;
+    private const avatars:Vector.<GameAvatar> = new <GameAvatar>[];
+
     public function GameView(playerInfos:Vector.<PlayerInfo>, h:int, v:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager, deviceFactory:DeviceFactory) {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
-        addChild(area = new GameArea(h, v));
+        addChild(_area = new GameArea(h, v));
         addChild(ui = new Sprite());
-        ui.addChild(magicItems = new MagicItemsView(layout));
-        addChild(tutor = new GameTutorialView(layout, deviceFactory));
+        ui.addChild(_magicItems = new MagicItemsView(layout));
+        addChild(_tutor = new GameTutorialView(layout, deviceFactory));
 
         for (var i:int = 0; i < playerInfos.length; i++) {
             const playerInfo:PlayerInfo = playerInfos[i];
@@ -68,11 +82,11 @@ public class GameView extends Sprite {
     }
 
     private function onEnterFrame(event:Event):void {
-        dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(area.mouseX, area.mouseY)))
+        dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(_area.mouseX, _area.mouseY)))
     }
 
     private function onMouseEvent(event:MouseEvent):void {
-        dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(area.mouseX, area.mouseY)))
+        dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(_area.mouseX, _area.mouseY)))
     }
 
     private static function getMouseEventType(eventType:String):String {
@@ -90,31 +104,31 @@ public class GameView extends Sprite {
     public function set layout(value:Layout):void {
         _layout = value;
 
-        area.scaleX = area.scaleY = value.scale;
-        const areaPos:Point = value.gameAreaPos(area.h, area.v);
-        area.x = areaPos.x;
-        area.y = areaPos.y;
+        _area.scaleX = _area.scaleY = value.scale;
+        const areaPos:Point = value.gameAreaPos(_area.h, _area.v);
+        _area.x = areaPos.x;
+        _area.y = areaPos.y;
 
-        magicItems.layout = value;
+        _magicItems.layout = value;
 
         for each(var avatar:GameAvatar in avatars) {
             avatar.bitmapDataScale = value.bitmapDataScale;
             avatar.scaleX = avatar.scaleY = value.scale;
-            const avatarPos:Point = value.gameAvatarPos(avatar.playerId, area.h, area.v);
+            const avatarPos:Point = value.gameAvatarPos(avatar.playerId, _area.h, _area.v);
             avatar.x = avatarPos.x;
             avatar.y = avatarPos.y;
         }
 
         if (gameOverScreen) gameOverScreen.layout = value;
-        if (tutor) {
-            tutor.layout = value;
-            tutor.areaPos = areaPos;
+        if (_tutor) {
+            _tutor.layout = value;
+            _tutor.areaPos = areaPos;
         }
     }
 
     private function onKeyUp(event:KeyboardEvent):void {
         if (event.keyCode == Keyboard.ESCAPE) {
-            dispatchEvent(new Event(GameViewEvents.SURRENDER, true));
+            dispatchEvent(new Event(GameViewEvents.SURRENDER));
         }
     }
 
@@ -122,8 +136,7 @@ public class GameView extends Sprite {
 
     public function openGameOverScreen(winners:Vector.<PlayerInfo>, losers:Vector.<PlayerInfo>, win:Boolean, reward:int):void {
         if (gameOverScreen) throw new Error("gameOverScreen already open");
-        area.visible = false;
-        ui.visible = false;
+        _area.visible = ui.visible = _tutor.visible = false;
         addChild(gameOverScreen = new GameOverScreen(winners, losers, win, reward, _layout, locale, loadImageManager))
     }
 }

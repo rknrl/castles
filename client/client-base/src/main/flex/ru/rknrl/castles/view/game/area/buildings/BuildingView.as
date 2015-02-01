@@ -1,7 +1,6 @@
 package ru.rknrl.castles.view.game.area.buildings {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
@@ -9,12 +8,11 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Animated;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.utils.centerize;
 
 public class BuildingView extends Sprite {
     private static const textFieldHeight:int = 24;
@@ -23,8 +21,7 @@ public class BuildingView extends Sprite {
 
     private var buildingHolder:Animated;
     private var building:DisplayObject;
-    private var textFieldHolder:Animated;
-    private var textField:TextField;
+    private var textField:AnimatedTextField;
     private var scale:Number;
 
     public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
@@ -37,9 +34,8 @@ public class BuildingView extends Sprite {
         buildingHolder.addChild(new Shadow());
         buildingHolder.addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
 
-        buildingHolder.addChild(textFieldHolder = new Animated());
-        textFieldHolder.y = textFieldCenterY;
-        textFieldHolder.addChild(textField = createTextField(Fonts.buildingNumber));
+        buildingHolder.addChild(textField = new AnimatedTextField(Fonts.buildingNumber));
+        textField.y = textFieldCenterY;
 
         scale = Fla.buildingLevelToScale(buildingLevel);
 
@@ -61,11 +57,7 @@ public class BuildingView extends Sprite {
     }
 
     private var _owner:BuildingOwner;
-
-    public function get owner():BuildingOwner {
-        return _owner;
-    }
-
+    
     public function set owner(value:BuildingOwner):void {
         building.transform.colorTransform = Colors.buildingTransform(value);
         if (_owner && !_owner.equals(value)) buildingHolder.bounce();
@@ -76,8 +68,7 @@ public class BuildingView extends Sprite {
         const newText:String = value.toString();
         if (textField.text != newText) {
             textField.text = newText;
-            centerize(textField);
-            textFieldHolder.bounce();
+            textField.bounce();
         }
     }
 

@@ -4,8 +4,8 @@ import flash.utils.getTimer;
 import ru.rknrl.castles.model.game.Explosion;
 import ru.rknrl.castles.model.game.Fireball;
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.view.game.area.explosions.ExplosionsView;
-import ru.rknrl.castles.view.game.area.fireballs.FireballsView;
+import ru.rknrl.castles.view.game.area.ExplosionsView;
+import ru.rknrl.castles.view.game.area.FireballsView;
 import ru.rknrl.dto.FireballDTO;
 
 public class Fireballs {
@@ -53,14 +53,14 @@ public class Fireballs {
     public function update(time:int):void {
         const fireballsToRemove:Vector.<Fireball> = new <Fireball>[];
         for each(var fireball:Fireball in fireballs) {
-            view.setFireballPos(fireball.id, fireball.pos(time));
+            view.setPos(fireball.id, fireball.pos(time));
             if (fireball.needRemove(time)) fireballsToRemove.push(fireball);
         }
 
         for each(fireball in fireballsToRemove) {
             const index:int = fireballs.indexOf(fireball);
             fireballs.splice(index, 1);
-            view.removeFireball(fireball.id);
+            view.remove(fireball.id);
             addExplosion(fireball.pos(time), time);
         }
 
@@ -71,7 +71,7 @@ public class Fireballs {
 
         for each(explosion in explosionsToRemove) {
             explosions.splice(explosions.indexOf(explosion), 1);
-            explosionsView.removeExplosion(explosion.id);
+            explosionsView.remove(explosion.id);
         }
     }
 }

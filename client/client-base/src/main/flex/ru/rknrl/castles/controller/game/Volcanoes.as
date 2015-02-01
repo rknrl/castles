@@ -34,7 +34,7 @@ public class Volcanoes {
         for each(volcano in toRemove) {
             const index:int = volcanoes.indexOf(volcano);
             volcanoes.splice(index, 1);
-            view.removeVolcano(volcano.id);
+            view.remove(volcano.id);
         }
     }
 }

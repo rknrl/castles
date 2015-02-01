@@ -6,10 +6,6 @@ import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
-import ru.rknrl.castles.view.game.area.bullets.BulletsView;
-import ru.rknrl.castles.view.game.area.explosions.ExplosionsView;
-import ru.rknrl.castles.view.game.area.fireballs.FireballsView;
-import ru.rknrl.castles.view.game.area.tornadoes.TornadoesView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.castles.view.game.area.volcanoes.VolcanoesView;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -21,16 +17,7 @@ import ru.rknrl.dto.SlotsOrientation;
 import ru.rknrl.dto.SlotsPosDTO;
 
 public class GameArea extends Sprite {
-    public var ground:Ground;
-    public var volcanoes:VolcanoesView;
-    public var arrows:ArrowsView;
-    public var units:UnitsView;
     private var buildings:BuildingsView;
-    public var tornadoes:TornadoesView;
-    public var bullets:BulletsView;
-    public var fireballs:FireballsView;
-    public var explosions:ExplosionsView;
-    public var tornadoPath:TornadoPathView;
 
     private var _h:int;
 
@@ -44,23 +31,77 @@ public class GameArea extends Sprite {
         return _v;
     }
 
+    private var _ground:Ground;
+
+    public function get ground():Ground {
+        return _ground;
+    }
+
+    private var _volcanoes:VolcanoesView;
+
+    public function get volcanoes():VolcanoesView {
+        return _volcanoes;
+    }
+
+    private var _arrows:ArrowsView;
+
+    public function get arrows():ArrowsView {
+        return _arrows;
+    }
+
+    private var _units:UnitsView;
+
+    public function get units():UnitsView {
+        return _units;
+    }
+
+    private var _tornadoes:TornadoesView;
+
+    public function get tornadoes():TornadoesView {
+        return _tornadoes;
+    }
+
+    private var _bullets:BulletsView;
+
+    public function get bullets():BulletsView {
+        return _bullets;
+    }
+
+    private var _fireballs:FireballsView;
+
+    public function get fireballs():FireballsView {
+        return _fireballs;
+    }
+
+    private var _explosions:ExplosionsView;
+
+    public function get explosions():ExplosionsView {
+        return _explosions;
+    }
+
+    private var _tornadoPath:TornadoPathView;
+
+    public function get tornadoPath():TornadoPathView {
+        return _tornadoPath;
+    }
+
     public function GameArea(h:int, v:int) {
         _h = h;
         _v = v;
-        addChild(ground = new Ground(h, v));
-        addChild(volcanoes = new VolcanoesView());
-        addChild(arrows = new ArrowsView());
-        addChild(units = new UnitsView());
+        addChild(_ground = new Ground(h, v));
+        addChild(_volcanoes = new VolcanoesView());
+        addChild(_arrows = new ArrowsView());
+        addChild(_units = new UnitsView());
         addChild(buildings = new BuildingsView());
-        addChild(tornadoes = new TornadoesView());
-        addChild(bullets = new BulletsView());
-        addChild(fireballs = new FireballsView());
-        addChild(explosions = new ExplosionsView());
-        addChild(tornadoPath = new TornadoPathView());
+        addChild(_tornadoes = new TornadoesView());
+        addChild(_bullets = new BulletsView());
+        addChild(_fireballs = new FireballsView());
+        addChild(_explosions = new ExplosionsView());
+        addChild(_tornadoPath = new TornadoPathView());
     }
 
     public function addBuilding(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {
-        ground.updateGroundColor(pos, owner);
+        _ground.updateGroundColor(pos, owner);
         buildings.addBuilding(id, buildingType, buildingLevel, owner, count, strengthened, pos);
     }
 
@@ -70,7 +111,7 @@ public class GameArea extends Sprite {
 
     public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
         buildings.setBuildingOwner(id, owner);
-        ground.updateGroundColor(buildings.byId(id).pos, owner);
+        _ground.updateGroundColor(buildings.byId(id).pos, owner);
     }
 
     public function setBuildingStrengthened(id:BuildingIdDTO, strengthened:Boolean):void {
@@ -86,7 +127,7 @@ public class GameArea extends Sprite {
             const isMirrorV:Boolean = orientation == SlotsOrientation.TOP_LEFT || orientation == SlotsOrientation.TOP_RIGHT;
             const x:Number = isMirrorH ? dto.pos.x - pos.x * cellSize : dto.pos.x + pos.x * cellSize;
             const y:Number = isMirrorV ? dto.pos.y - pos.y * cellSize : dto.pos.y + pos.y * cellSize;
-            ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
+            _ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
         }
     }
 }

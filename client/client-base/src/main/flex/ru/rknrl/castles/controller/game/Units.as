@@ -37,18 +37,18 @@ public class Units {
         getUnit(dto.id).update(getTimer(), new Point(dto.pos.x, dto.pos.y), dto.speed);
 
         view.setUnitCount(dto.id, dto.count);
-        view.setUnitPos(dto.id, new Point(dto.pos.x, dto.pos.y));
+        view.setPos(dto.id.id, new Point(dto.pos.x, dto.pos.y));
     }
 
     public function remove(id:UnitIdDTO):void {
         const index:int = units.indexOf(getUnit(id));
         units.splice(index, 1);
-        view.removeUnit(id);
+        view.remove(id.id);
     }
 
     public function update(time:int):void {
         for each(var unit:Unit in units) {
-            view.setUnitPos(unit.id, unit.pos(time));
+            view.setPos(unit.id.id, unit.pos(time));
         }
     }
 }

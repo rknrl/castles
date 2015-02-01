@@ -15,7 +15,7 @@ public class MagicItemsView extends Sprite {
 
     private function getMagicItem(itemType:ItemType):GameMagicItem {
         for each(var item:GameMagicItem in magicItems) {
-            if (item.itemType == itemType)return item;
+            if (item.itemType == itemType) return item;
         }
         throw new Error("can't find magic item " + itemType);
     }
@@ -67,7 +67,9 @@ public class MagicItemsView extends Sprite {
     }
 
     public function useItem(itemType:ItemType):void {
-        getMagicItem(itemType).animate();
+        var item:GameMagicItem = getMagicItem(itemType);
+        item.animate();
+        item.cooldownProgress = 0;
     }
 }
 }

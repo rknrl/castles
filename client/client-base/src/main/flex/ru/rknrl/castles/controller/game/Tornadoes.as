@@ -3,7 +3,7 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.game.Tornado;
 import ru.rknrl.castles.model.points.Points;
-import ru.rknrl.castles.view.game.area.tornadoes.TornadoesView;
+import ru.rknrl.castles.view.game.area.TornadoesView;
 import ru.rknrl.dto.TornadoDTO;
 
 public class Tornadoes {
@@ -27,14 +27,14 @@ public class Tornadoes {
         const toRemove:Vector.<Tornado> = new <Tornado>[];
 
         for each(var tornado:Tornado in tornadoes) {
-            view.setTornadoPos(tornado.id, tornado.pos(time));
+            view.setPos(tornado.id, tornado.pos(time));
             if (tornado.needRemove(time)) toRemove.push(tornado);
         }
 
         for each(tornado in toRemove) {
             const index:int = tornadoes.indexOf(tornado);
             tornadoes.splice(index, 1);
-            view.removeTornado(tornado.id);
+            view.remove(tornado.id);
         }
     }
 

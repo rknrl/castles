@@ -1,7 +1,7 @@
 package ru.rknrl.castles.controller.game {
 import ru.rknrl.castles.model.game.Bullet;
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.view.game.area.bullets.BulletsView;
+import ru.rknrl.castles.view.game.area.BulletsView;
 
 public class Bullets {
     private var view:BulletsView;
@@ -23,16 +23,15 @@ public class Bullets {
         const toRemove:Vector.<Bullet> = new <Bullet>[];
 
         for each(var bullet:Bullet in bullets) {
-            view.setBulletPos(bullet.id, bullet.pos(time));
+            view.setPos(bullet.id, bullet.pos(time));
             if (bullet.needRemove(time)) toRemove.push(bullet);
         }
 
         for each(bullet in toRemove) {
             const index:int = bullets.indexOf(bullet);
             bullets.splice(index, 1);
-            view.removeBullet(bullet.id);
+            view.remove(bullet.id);
         }
     }
-
 }
 }
