@@ -5,8 +5,8 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.Popup;
-import ru.rknrl.castles.view.utils.Tweener;
 import ru.rknrl.test;
+import ru.rknrl.utils.Tweener;
 
 public class PopupManager extends Sprite {
     private static const speed:Number = 100;

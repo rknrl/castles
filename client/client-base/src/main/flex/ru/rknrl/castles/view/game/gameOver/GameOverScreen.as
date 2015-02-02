@@ -14,8 +14,8 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.top.FlyAvatar;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.utils.createTextField;
 
 public class GameOverScreen extends Sprite {
     private static const winnerLooserGap:int = 24;

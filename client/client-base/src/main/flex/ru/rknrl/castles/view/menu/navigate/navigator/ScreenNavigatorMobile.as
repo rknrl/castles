@@ -8,7 +8,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
-import ru.rknrl.castles.view.utils.Tweener;
+import ru.rknrl.utils.Tweener;
 
 public class ScreenNavigatorMobile extends ScreenNavigator {
     private var mouseHolder:Bitmap;

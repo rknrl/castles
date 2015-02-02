@@ -4,8 +4,8 @@ import flash.display.Sprite;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.castles.view.utils.Tweener;
 import ru.rknrl.dto.SkillLevel;
+import ru.rknrl.utils.Tweener;
 
 public class FlaskFill extends Sprite {
     private static const fillWidth:int = 32;

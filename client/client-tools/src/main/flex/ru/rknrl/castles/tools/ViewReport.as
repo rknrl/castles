@@ -9,8 +9,7 @@ import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.controller.mock.DtoMock;
-import ru.rknrl.castles.controller.mock.LoadImageManagerMock;
+import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.points.Point;
@@ -30,6 +29,7 @@ import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.loaders.BitmapLoader;
 import ru.rknrl.loaders.ILoader;
+import ru.rknrl.loaders.LoadImageManagerMock;
 import ru.rknrl.loaders.ParallelLoader;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.test;

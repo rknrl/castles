@@ -3,6 +3,7 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 
 import ru.rknrl.utils.centerize;
+import ru.rknrl.utils.createTextField;
 
 public class AnimatedTextField extends Animated {
     private var textField:TextField;

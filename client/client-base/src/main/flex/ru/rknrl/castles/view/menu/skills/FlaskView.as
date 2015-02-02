@@ -11,9 +11,9 @@ import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.AnimatedShadow;
 import ru.rknrl.castles.view.utils.Fly;
 import ru.rknrl.castles.view.utils.LockView;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillType;
+import ru.rknrl.utils.createTextField;
 
 public class FlaskView extends Sprite {
     private static const flaskHeight:Number = 104;

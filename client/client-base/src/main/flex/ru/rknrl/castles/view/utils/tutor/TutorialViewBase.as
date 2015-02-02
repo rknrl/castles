@@ -5,7 +5,7 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.ModalScreen;
-import ru.rknrl.castles.view.utils.Tweener;
+import ru.rknrl.utils.Tweener;
 
 public class TutorialViewBase extends Sprite {
     private var modalScreen:ModalScreen;

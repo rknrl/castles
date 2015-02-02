@@ -13,8 +13,8 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.utils.centerize;
+import ru.rknrl.utils.createTextField;
 
 public class MainScreen extends Screen {
     private static const mouseHolderW:Number = 200;

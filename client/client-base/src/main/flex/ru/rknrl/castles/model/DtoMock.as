@@ -1,4 +1,4 @@
-package ru.rknrl.castles.controller.mock {
+package ru.rknrl.castles.model {
 import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountStateDTO;

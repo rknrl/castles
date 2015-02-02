@@ -10,9 +10,9 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
-import ru.rknrl.castles.view.utils.Align;
-import ru.rknrl.castles.view.utils.createTextField;
 import ru.rknrl.loaders.ILoadImageManager;
+import ru.rknrl.utils.Align;
+import ru.rknrl.utils.createTextField;
 
 public class TopScreen extends Screen {
     private static const topSize:int = 5;
