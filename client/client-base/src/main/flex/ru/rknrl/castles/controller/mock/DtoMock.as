@@ -32,6 +32,14 @@ import ru.rknrl.dto.TopUserInfoDTO;
 import ru.rknrl.dto.UserInfoDTO;
 
 public class DtoMock {
+    public static const mockAvatars:Vector.<String> = new <String>[
+        "mock_avatars/1.png",
+        "mock_avatars/2.png",
+        "mock_avatars/3.png",
+        "mock_avatars/4.png",
+        "mock_avatars/5.png"
+    ];
+
     public static function product():ProductDTO {
         const dto:ProductDTO = new ProductDTO();
         dto.id = 1;
@@ -139,7 +147,7 @@ public class DtoMock {
         return dto;
     }
 
-    public static function accountId(type:AccountType, id:String): AccountIdDTO {
+    public static function accountId(type:AccountType, id:String):AccountIdDTO {
         const dto:AccountIdDTO = new AccountIdDTO();
         dto.id = id;
         dto.type = type;
@@ -164,11 +172,11 @@ public class DtoMock {
 
     public static function top():Vector.<TopUserInfoDTO> {
         const dto:Vector.<TopUserInfoDTO> = new <TopUserInfoDTO>[];
-        dto.push(topUserInfo(1, "1", "1"));
-        dto.push(topUserInfo(2, "2", "2"));
-        dto.push(topUserInfo(3, "3", "3"));
-        dto.push(topUserInfo(4, "4", "4"));
-        dto.push(topUserInfo(5, "5", "5"));
+        dto.push(topUserInfo(1, "1", "mock_avatars/1.png"));
+        dto.push(topUserInfo(2, "2", "mock_avatars/2.png"));
+        dto.push(topUserInfo(3, "3", "mock_avatars/3.png"));
+        dto.push(topUserInfo(4, "4", "mock_avatars/4.png"));
+        dto.push(topUserInfo(5, "5", "mock_avatars/5.png"));
         return dto;
     }
 
@@ -221,12 +229,10 @@ public class DtoMock {
         return dto;
     }
 
-
-    public static const playerInfo1:PlayerInfoDTO = playerInfo(0, "Толя Янот", "1");
-    public static const playerInfo2:PlayerInfoDTO = playerInfo(1, "Sasha Serova", "2");
-    private static const playerInfo3:PlayerInfoDTO = playerInfo(2, "Napoleon1769", "3");
-    private static const playerInfo4:PlayerInfoDTO = playerInfo(3, "Виктория Викторовна", "4");
-
+    public static const playerInfo1:PlayerInfoDTO = playerInfo(0, "Толя Янот", "mock_avatars/1.png");
+    public static const playerInfo2:PlayerInfoDTO = playerInfo(1, "Sasha Serova", "mock_avatars/2.png");
+    private static const playerInfo3:PlayerInfoDTO = playerInfo(2, "Napoleon1769", "mock_avatars/3.png");
+    private static const playerInfo4:PlayerInfoDTO = playerInfo(3, "Виктория Викторовна", "mock_avatars/4.png");
 
     public static function playerInfosPortrait():Vector.<PlayerInfoDTO> {
         return new <PlayerInfoDTO>[

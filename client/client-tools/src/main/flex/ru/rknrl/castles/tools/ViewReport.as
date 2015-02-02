@@ -112,7 +112,7 @@ public class ViewReport extends Sprite {
     private function onComplete(event:Event):void {
         references = ParallelLoader(event.target).data;
 
-        loadImageManager = new LoadImageManagerMock(0);
+        loadImageManager = new LoadImageManagerMock(DtoMock.mockAvatars, 0);
         loadImageManager.addEventListener(Event.COMPLETE, onLoadImageManagerComplete);
     }
 
