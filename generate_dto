@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Generate java and action-script dto classes by protobuf
+
+project="/Users/tolyayanot/dev/rknrl/castles"
+rknrl_core="/Users/tolyayanot/dev/rknrl/core"
+
+proto_dir="${project}/dto/dto-proto/src/main/proto"
+java_out="${project}/dto/dto-server/src/main/java/"
+as3_out="${project}/dto/dto-client/src/main/flex/"
+
+rm -rf ${java_out}/ru/rknrl/dto/*
+
+protoc \
+--java_out=${java_out} \
+--proto_path=${proto_dir} \
+${proto_dir}/auth.proto \
+${proto_dir}/common.proto \
+${proto_dir}/account.proto \
+${proto_dir}/game.proto \
+${proto_dir}/admin.proto
+
+rm -rf ${as3_out}/ru/rknrl/dto/*
+
+protoc \
+--as3_out=${as3_out} \
+--plugin=protoc-gen-as3=${rknrl_core}/dto/protoc-gen-as3/protoc-gen-as3 \
+--proto_path=${proto_dir} \
+${proto_dir}/auth.proto \
+${proto_dir}/common.proto \
+${proto_dir}/account.proto \
+${proto_dir}/game.proto \
+${proto_dir}/admin.proto
+

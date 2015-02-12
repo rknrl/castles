@@ -14,7 +14,6 @@
 
     <modules>
         <module>dto-proto</module>
-        <module>dto-client-gen</module>
         <module>dto-server</module>
     </modules>
 </project>
