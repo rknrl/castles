@@ -1,8 +1,8 @@
-package ru.rknrl.base.payments
+package ru.rknrl.castles.payments
 
 import akka.util.Crypt
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.payments.PaymentsCallback.PaymentResponse
+import ru.rknrl.castles.AccountId
+import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.CommonDTO.AccountType
 import spray.http.{HttpResponse, Uri}

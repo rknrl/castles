@@ -1,4 +1,4 @@
-package ru.rknrl.base.database
+package ru.rknrl.castles.database
 
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}

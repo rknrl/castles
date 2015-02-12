@@ -1,10 +1,9 @@
-package ru.rknrl.base
+package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.Config
 import ru.rknrl.core.rmi.TcpReceiver
 
 // todo: tcp error handling

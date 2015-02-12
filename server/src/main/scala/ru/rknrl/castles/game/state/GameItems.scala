@@ -1,8 +1,7 @@
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.base.game.PersonalMessage
 import ru.rknrl.castles.account.state.Items
-import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.{PersonalMessage, GameConfig}
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.rmi.UpdateItemStatesMsg
 import ru.rknrl.dto.CommonDTO.ItemType

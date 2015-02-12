@@ -1,11 +1,12 @@
-package ru.rknrl.base.admin
+package ru.rknrl.castles.admin
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.MatchMaking.AdminSetAccountState
-import ru.rknrl.base.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
+import ru.rknrl.castles.{MatchMaking, AccountId}
+import MatchMaking.AdminSetAccountState
+import ru.rknrl.castles.AccountId
+import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver}

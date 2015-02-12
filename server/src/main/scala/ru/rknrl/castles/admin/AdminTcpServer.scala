@@ -1,4 +1,4 @@
-package ru.rknrl.base.admin
+package ru.rknrl.castles.admin
 
 import java.net.InetSocketAddress
 

@@ -1,6 +1,6 @@
 package ru.rknrl.castles.mock
 
-import ru.rknrl.base.database.DbConfiguration
+import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.Config
 import ru.rknrl.core.social.SocialConfigs
 

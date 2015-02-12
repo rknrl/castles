@@ -1,12 +1,11 @@
-package ru.rknrl.base
+package ru.rknrl.castles
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.account.Account.GetAuthenticated
-import ru.rknrl.base.database.AccountStateDb.{Get, Insert, NoExist, StateResponse}
-import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.CastlesAccount
+import ru.rknrl.castles.account.Account
+import ru.rknrl.castles.account.Account.GetAuthenticated
 import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.database.AccountStateDb.{Get, Insert, NoExist, StateResponse}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
@@ -69,7 +68,7 @@ class Auth(tcpSender: ActorRef, tcpReceiver: ActorRef,
     /** from AccountStateDb */
     case StateResponse(id, dto) ⇒
       val state = AccountState.fromDto(dto)
-      val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
+      val accountRef = context.actorOf(Props(classOf[Account], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
       accountRef ! GetAuthenticated
 
     /** from Account */

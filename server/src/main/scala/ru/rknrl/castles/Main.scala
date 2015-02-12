@@ -5,11 +5,10 @@ import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
 import ru.rknrl.PolicyServer
-import ru.rknrl.base.TcpServer
-import ru.rknrl.base.admin.AdminTcpServer
-import ru.rknrl.base.database.AccountStateDb.GetTop
-import ru.rknrl.base.database.MySqlDb
-import ru.rknrl.base.payments.PaymentsServer
+import ru.rknrl.castles.admin.AdminTcpServer
+import ru.rknrl.castles.database.AccountStateDb.GetTop
+import ru.rknrl.castles.database.MySqlDb
+import ru.rknrl.castles.payments.PaymentsServer
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -36,7 +35,7 @@ object Main {
     val future = Patterns.ask(accountStateDb, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
-    val matchmaking = system.actorOf(Props(classOf[CastlesMatchMaking], 3 seconds, top, config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, top, config.game), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[PaymentsServer], config, matchmaking), "payment-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)

@@ -1,6 +1,6 @@
 package ru.rknrl.castles.game.state.players
 
-import ru.rknrl.base.AccountId
+import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.account.state.{Items, Skills, Slots}
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO.PlayerIdDTO

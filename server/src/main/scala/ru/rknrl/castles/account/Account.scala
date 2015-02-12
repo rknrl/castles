@@ -1,21 +1,22 @@
-package ru.rknrl.base.account
+package ru.rknrl.castles.account
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticated, LeaveGame}
-import ru.rknrl.base.database.AccountStateDb.{StateResponse, Update}
-import ru.rknrl.base.game.Game.{Join, Offline}
-import ru.rknrl.base.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
-import ru.rknrl.castles.Config
+import ru.rknrl.castles.MatchMaking._
+import ru.rknrl.castles.account.Account.{DuplicateAccount, GetAuthenticated, LeaveGame}
 import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.database.AccountStateDb.{StateResponse, Update}
+import ru.rknrl.castles.game.Game.{Join, Offline}
+import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
 import ru.rknrl.castles.rmi._
+import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
+import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO.{AuthenticatedDTO, TopUserInfoDTO}
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -29,20 +30,21 @@ object Account {
 
 }
 
-abstract class Account(accountId: AccountId,
-                       deviceType: DeviceType,
-                       userInfo: UserInfoDTO,
-                       tcpSender: ActorRef, tcpReceiver: ActorRef,
-                       matchmaking: ActorRef,
-                       accountStateDb: ActorRef,
-                       auth: ActorRef,
-                       config: Config,
-                       name: String) extends EscalateStrategyActor with ActorLogging {
+class Account(accountId: AccountId,
+              accountState: AccountState,
+              deviceType: DeviceType,
+              userInfo: UserInfoDTO,
+              tcpSender: ActorRef, tcpReceiver: ActorRef,
+              matchmaking: ActorRef,
+              accountStateDb: ActorRef,
+              auth: ActorRef,
+              config: Config,
+              name: String) extends EscalateStrategyActor with ActorLogging {
 
   private val accountRmi = context.actorOf(Props(classOf[AccountRMI], tcpSender, self), "account-rmi" + name)
   tcpReceiver ! RegisterReceiver(accountRmi)
 
-  protected var state: AccountState
+  private var state = accountState
 
   private var accountRmiRegistered: Boolean = false
 
@@ -60,12 +62,38 @@ abstract class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  protected def authenticatedDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticatedDTO
+  private def authenticatedDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
+    val builder = AuthenticatedDTO.newBuilder()
+      .setAccountState(state.dto)
+      .setConfig(config.account.dto)
+      .addAllTop(top.asJava)
+      .addAllProducts(config.productsDto(accountId.accountType).asJava)
+      .setSearchOpponents(searchOpponents)
+
+    if (gameAddress.isDefined) builder.setGame(gameAddress.get)
+
+    builder.build
+  }
 
   private def placeGameOrder() =
     matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
   override def receive = {
+    case BuyBuildingMsg(buy: BuyBuildingDTO) ⇒
+      updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
+
+    case UpgradeBuildingMsg(dto: UpgradeBuildingDTO) ⇒
+      updateState(state.upgradeBuilding(dto.getId, config.account))
+
+    case RemoveBuildingMsg(dto: RemoveBuildingDTO) ⇒
+      updateState(state.removeBuilding(dto.getId))
+
+    case UpgradeSkillMsg(upgrade: UpgradeSkillDTO) ⇒
+      updateState(state.upgradeSkill(upgrade.getType, config.account))
+
+    case BuyItemMsg(buy: BuyItemDTO) ⇒
+      updateState(state.buyItem(buy.getType, config.account))
+
     case EnterGameMsg() ⇒ placeGameOrder()
 
     /** from AccountStateDb, ответ на Update */
@@ -216,6 +244,11 @@ abstract class Account(accountId: AccountId,
       } else
         accountRmi ! EnteredGameMsg(gameAddress)
     }
+
+  private def updateState(newState: AccountState) = {
+    state = newState
+    accountStateDb ! Update(accountId.dto, state.dto)
+  }
 
   override def postStop() = if (game.isDefined) game.get ! Offline(accountId)
 }

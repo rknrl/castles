@@ -1,11 +1,12 @@
-package ru.rknrl.base.game
+package ru.rknrl.castles.game
 
 import akka.actor.{ActorLogging, ActorRef}
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
-import ru.rknrl.base.game.Game.{Join, Offline, StopGame}
+import ru.rknrl.castles.AccountId
+import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
+import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.state.GameState
+import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.Msg
@@ -61,11 +62,12 @@ object PlayerState extends Enumeration {
  * Когда все игроки перешли в состояние leaved отправляем Matchmaking сообщение GameOver, а он нам в ответ StopGame, удаляем актор игры
  *
  */
-abstract class Game(players: Map[PlayerId, Player],
-                    matchmaking: ActorRef,
-                    winReward: Int) extends EscalateStrategyActor with ActorLogging {
+class Game(players: Map[PlayerId, Player],
+           big: Boolean,
+           config: GameConfig,
+           matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
-  protected val playersList = for ((id, player) ← players) yield player
+  private val playersList = for ((id, player) ← players) yield player
 
   private val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -118,7 +120,7 @@ abstract class Game(players: Map[PlayerId, Player],
       .build
 
   private def placeToReward(place: Int) =
-    if (place == 1) winReward else 0
+    if (place == 1) config.winReward else 0
 
   private def getReward(playerId: PlayerId) =
     placeToReward(gameOvers(playerId))
@@ -156,13 +158,45 @@ abstract class Game(players: Map[PlayerId, Player],
          if players(playerId).isBot)
       ref ! gameState
 
-  protected def senderPlayerId = `gameRmi→playerId`(sender)
+  private def senderPlayerId = `gameRmi→playerId`(sender)
 
-  protected def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
+  private def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  protected var gameState: GameState
+  private var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, config)
 
-  protected def updateGameState: (GameState, Iterable[Msg], Iterable[PersonalMessage])
+  private var moveActions = Map[PlayerId, MoveDTO]()
+  private var fireballCasts = Map[PlayerId, PointDTO]()
+  private var strengtheningCasts = Map[PlayerId, BuildingId]()
+  private var volcanoCasts = Map[PlayerId, PointDTO]()
+  private var tornadoCasts = Map[PlayerId, CastTorandoDTO]()
+  private var assistanceCasts = Map[PlayerId, BuildingId]()
+
+  private def clearMaps(): Unit = {
+    moveActions = Map.empty
+    fireballCasts = Map.empty
+    strengtheningCasts = Map.empty
+    volcanoCasts = Map.empty
+    tornadoCasts = Map.empty
+    assistanceCasts = Map.empty
+  }
+
+  private def updateGameState = {
+    val time = System.currentTimeMillis()
+
+    val (newGameState, messages, personalMessages) = gameState.update(
+      time,
+      moveActions,
+      fireballCasts,
+      strengtheningCasts,
+      volcanoCasts,
+      tornadoCasts,
+      assistanceCasts
+    )
+
+    clearMaps()
+
+    (newGameState, messages, personalMessages)
+  }
 
   override def receive = {
     /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
@@ -224,6 +258,26 @@ abstract class Game(players: Map[PlayerId, Player],
       val newLosers = getNewLosers
       val place = getPlace
       for (playerId ← newLosers) addLoser(playerId, place)
+
+
+    case MoveMsg(dto: MoveDTO) ⇒
+      if (senderCanPlay) moveActions = moveActions + (senderPlayerId → dto)
+
+    case CastFireballMsg(point: PointDTO) ⇒
+      if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
+
+    case CastStrengtheningMsg(buildingId: BuildingIdDTO) ⇒
+      if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+
+    case CastVolcanoMsg(point: PointDTO) ⇒
+      if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
+
+    case CastTornadoMsg(dto: CastTorandoDTO) ⇒
+      if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
+
+    case CastAssistanceMsg(buildingId: BuildingIdDTO) ⇒
+      if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+
   }
 
   private def addLoser(playerId: PlayerId, place: Int) {
@@ -250,7 +304,7 @@ abstract class Game(players: Map[PlayerId, Player],
     GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
       .setPlace(1)
-      .setReward(winReward)
+      .setReward(config.winReward)
       .build()
 
   private def getLoseDto(playerId: PlayerId, place: Int) =

@@ -1,4 +1,4 @@
-package ru.rknrl.base
+package ru.rknrl.castles
 
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 

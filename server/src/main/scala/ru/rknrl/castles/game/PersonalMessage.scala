@@ -1,4 +1,4 @@
-package ru.rknrl.base.game
+package ru.rknrl.castles.game
 
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.core.rmi.Msg

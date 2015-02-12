@@ -1,6 +1,6 @@
 package ru.rknrl.castles
 
-import ru.rknrl.base.database.DbConfiguration
+import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.{Product, SocialConfigs}

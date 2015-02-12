@@ -1,4 +1,4 @@
-package ru.rknrl.base.payments
+package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
@@ -6,10 +6,9 @@ import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.payments.PaymentsCallback.{PaymentResponse, Response}
-import ru.rknrl.base.payments.PaymentsServer._
-import ru.rknrl.castles.Config
+import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
+import ru.rknrl.castles.payments.PaymentsServer._
+import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.social.{Product, SocialConfig}
 import spray.http.MediaTypes._
 import spray.http._

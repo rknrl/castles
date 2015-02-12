@@ -1,8 +1,9 @@
-package ru.rknrl.base.database
+package ru.rknrl.castles.database
 
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.base.MatchMaking.TopItem
-import ru.rknrl.base.database.AccountStateDb._
+import ru.rknrl.castles.MatchMaking
+import MatchMaking.TopItem
+import ru.rknrl.castles.database.AccountStateDb._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
 

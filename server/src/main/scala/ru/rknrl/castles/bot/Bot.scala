@@ -1,9 +1,11 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.base.AccountId
-import ru.rknrl.base.MatchMaking.ConnectToGame
-import ru.rknrl.base.game.Game.Join
+import ru.rknrl.castles.game.{Game, GameConfig}
+import ru.rknrl.castles.{MatchMaking, AccountId}
+import MatchMaking.ConnectToGame
+import Game.Join
+import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
