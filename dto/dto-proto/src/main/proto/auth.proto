@@ -19,7 +19,7 @@ message AuthenticateDTO {
     required AuthenticationSecretDTO secret = 3;
 }
 
-message AuthenticationSuccessDTO {
+message AuthenticatedDTO {
     required AccountStateDTO accountState = 1;
 
     required AccountConfigDTO config = 2;

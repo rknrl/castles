@@ -1,10 +1,8 @@
 package ru.rknrl.castles.account.state
 
 import ru.rknrl.castles.game.state.Stat
-import ru.rknrl.dto.AccountDTO.{SkillLevelDTO, SkillsDTO}
+import ru.rknrl.dto.AccountDTO.SkillLevelDTO
 import ru.rknrl.dto.CommonDTO.{SkillLevel, SkillType}
-
-import scala.collection.JavaConverters._
 
 class Skills(val levels: Map[SkillType, SkillLevel]) {
   for (skillType ← SkillType.values()) assert(levels.contains(skillType))
@@ -30,16 +28,12 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
     totalLevel + 1
   }
 
-  private def levelsDto =
+  def dto =
     for ((skillType, level) ← levels)
     yield SkillLevelDTO.newBuilder()
       .setType(skillType)
       .setLevel(level)
       .build()
-
-  def dto = SkillsDTO.newBuilder()
-    .addAllLevels(levelsDto.asJava)
-    .build()
 
   val levelsCount = SkillLevel.values().size - 1
   val maxAttack = 1.0
@@ -65,8 +59,8 @@ object Skills {
 
   def levelToInt(level: SkillLevel) = level.getNumber
 
-  def fromDto(dto: SkillsDTO) = {
-    val skills = for (skillDto ← dto.getLevelsList.asScala) yield skillDto.getType → skillDto.getLevel
+  def fromDto(dto: Iterable[SkillLevelDTO]) = {
+    val skills = for (skillDto ← dto) yield skillDto.getType → skillDto.getLevel
 
     new Skills(skills.toMap)
   }

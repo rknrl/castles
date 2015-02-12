@@ -7,18 +7,12 @@ option optimize_for = SPEED;
 import "common.proto";
 
 message AccountStateDTO {
-    required SlotsDTO slots = 1;
-    required SkillsDTO skills = 2;
-    required ItemsDTO items = 3;
+    repeated SlotDTO slots = 1;
+    repeated SkillLevelDTO skills = 2;
+    repeated ItemDTO items = 3;
     required int32 gold = 4;
     required double rating = 5;
     required int32 gamesCount = 6;
-}
-
-// start location
-
-message SlotsDTO {
-    repeated SlotDTO slots = 1;
 }
 
 message SlotDTO {
@@ -26,21 +20,9 @@ message SlotDTO {
     optional BuildingPrototypeDTO buildingPrototype = 2;
 }
 
-// skills
-
-message SkillsDTO {
-    repeated SkillLevelDTO levels = 1;
-}
-
 message SkillLevelDTO {
     required SkillType type = 1;
     required SkillLevel level = 2;
-}
-
-// items
-
-message ItemsDTO {
-    repeated ItemDTO items = 1;
 }
 
 message ItemDTO {

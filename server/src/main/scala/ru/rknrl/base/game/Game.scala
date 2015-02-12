@@ -110,9 +110,9 @@ abstract class Game(players: Map[PlayerId, Player],
   private def allLeaved =
     playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
 
-  private def playerInfos =
+  private def playersDto =
     for ((id, player) ← players)
-    yield PlayerInfoDTO.newBuilder()
+    yield PlayerDTO.newBuilder()
       .setId(id.dto)
       .setInfo(player.userInfo)
       .build
@@ -194,7 +194,7 @@ abstract class Game(players: Map[PlayerId, Player],
       online = online + playerId
       val builder = gameState.dtoBuilder(playerId)
       val dto = builder
-        .addAllPlayerInfos(playerInfos.asJava)
+        .addAllPlayers(playersDto.asJava)
         .addAllGameOvers(gameOverDto.asJava)
         .build
       sender ! JoinGameMsg(dto)

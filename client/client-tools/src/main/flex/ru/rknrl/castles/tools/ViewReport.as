@@ -163,7 +163,7 @@ public class ViewReport extends Sprite {
         screenshot(folder, device, "LoadingScreen", bg);
 
         view.removeLoadingScreen();
-        const menuView:MenuView = view.addMenu(new MenuModel(DtoMock.authenticationSuccess()));
+        const menuView:MenuView = view.addMenu(new MenuModel(DtoMock.authenticated()));
         menuView.setScreen(0);
         const mainBg:BitmapData = screenshot(folder, device, "MainScreen", bg);
 

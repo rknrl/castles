@@ -27,8 +27,8 @@ import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.ItemsStateDTO;
 import ru.rknrl.dto.MoveDTO;
+import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerIdDTO;
-import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
@@ -54,22 +54,22 @@ public class GameController implements IGameFacade {
     private var tornadoPath:TornadoPath;
     private var magicItems:MagicItems;
 
-    private var players:Vector.<PlayerInfoDTO>;
+    private var players:Vector.<PlayerDTO>;
 
-    public function getPlayerInfo(playerId:PlayerIdDTO):PlayerInfoDTO {
-        for each(var playerInfo:PlayerInfoDTO in players) {
+    public function getPlayerInfo(playerId:PlayerIdDTO):PlayerDTO {
+        for each(var playerInfo:PlayerDTO in players) {
             if (playerInfo.id.id == playerId.id) return playerInfo;
         }
         throw new Error("can't find playerInfo " + playerId.id);
     }
 
-    public function getSelfPlayerInfo():PlayerInfoDTO {
+    public function getSelfPlayerInfo():PlayerDTO {
         return getPlayerInfo(selfId);
     }
 
-    public function getEnemiesPlayerInfos():Vector.<PlayerInfoDTO> {
-        const result:Vector.<PlayerInfoDTO> = new <PlayerInfoDTO>[];
-        for each(var playerInfo:PlayerInfoDTO in players) {
+    public function getEnemiesPlayerInfos():Vector.<PlayerDTO> {
+        const result:Vector.<PlayerDTO> = new <PlayerDTO>[];
+        for each(var playerInfo:PlayerDTO in players) {
             if (playerInfo.id.id != selfId.id) result.push(playerInfo);
         }
         return result;
@@ -89,7 +89,7 @@ public class GameController implements IGameFacade {
         height = gameState.height;
 
         selfId = gameState.selfId;
-        players = gameState.playerInfos;
+        players = gameState.players;
 
         bullets = new Bullets(view.area.bullets);
         fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
@@ -250,8 +250,8 @@ public class GameController implements IGameFacade {
 
     public function onGameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
-            const winners:Vector.<PlayerInfoDTO> = dto.place == 1 ? new <PlayerInfoDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
-            const losers:Vector.<PlayerInfoDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerInfoDTO>[getSelfPlayerInfo()];
+            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
+            const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerDTO>[getSelfPlayerInfo()];
             view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         }
     }

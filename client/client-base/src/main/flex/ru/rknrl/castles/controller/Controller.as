@@ -23,7 +23,7 @@ import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountStateDTO;
-import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
@@ -41,7 +41,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
     private var localStorage:CastlesLocalStorage;
 
     public function Controller(view:View,
-                               authenticationSuccess:AuthenticationSuccessDTO,
+                               authenticated:AuthenticatedDTO,
                                connection:Connection,
                                policyPort:int,
                                sender:AccountFacadeSender,
@@ -58,17 +58,17 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
-        const model:MenuModel = new MenuModel(authenticationSuccess);
+        const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
         menu = new MenuController(menuView, sender, model, social, localStorage);
 
-        if (authenticationSuccess.searchOpponents) {
+        if (authenticated.searchOpponents) {
             view.hideMenu();
             view.addSearchOpponentScreen();
-        } else if (authenticationSuccess.hasGame) {
+        } else if (authenticated.hasGame) {
             view.hideMenu();
             view.addLoadingScreen();
-            onEnteredGame(authenticationSuccess.game);
+            onEnteredGame(authenticated.game);
         }
     }
 
@@ -126,7 +126,7 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         const h:int = Math.round(gameState.width / CellSize.SIZE.id());
         const v:int = Math.round(gameState.height / CellSize.SIZE.id());
 
-        const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.playerInfos);
+        const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.addGame(playerInfos, h, v);
         game = new GameController(gameView, new GameFacadeSender(connection), gameState, localStorage);
 

@@ -24,16 +24,12 @@ message PlayerIdDTO {
 
 message PlayerDTO {
     required PlayerIdDTO id = 1;
+    required UserInfoDTO info = 2;
 }
 
 message PointDTO {
     required float x = 1;
     required float y = 2;
-}
-
-message PlayerInfoDTO {
-    required PlayerIdDTO id = 1;
-    required UserInfoDTO info = 2;
 }
 
 // server -> client
@@ -52,7 +48,6 @@ message GameStateDTO {
     repeated BulletDTO bullets = 11;
     required ItemsStateDTO itemsState = 12;
     repeated GameOverDTO gameOvers = 13;
-    repeated PlayerInfoDTO playerInfos = 14;
 }
 
 enum SlotsOrientation {

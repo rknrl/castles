@@ -2,7 +2,7 @@ package ru.rknrl.base
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.base.account.Account.GetAuthenticationSuccess
+import ru.rknrl.base.account.Account.GetAuthenticated
 import ru.rknrl.base.database.AccountStateDb.{Get, Insert, NoExist, StateResponse}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.CastlesAccount
@@ -10,7 +10,7 @@ import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
 import ru.rknrl.core.social.SocialAuth
-import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticationSuccessDTO}
+import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticatedDTO}
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, UserInfoDTO}
 
 class Auth(tcpSender: ActorRef, tcpReceiver: ActorRef,
@@ -70,11 +70,11 @@ class Auth(tcpSender: ActorRef, tcpReceiver: ActorRef,
     case StateResponse(id, dto) ⇒
       val state = AccountState.fromDto(dto)
       val accountRef = context.actorOf(Props(classOf[CastlesAccount], accountId.get, state, deviceType.get, userInfo.get, tcpSender, tcpReceiver, matchmaking, accountStateDb, self, config, name), "account" + name)
-      accountRef ! GetAuthenticationSuccess
+      accountRef ! GetAuthenticated
 
     /** from Account */
-    case dto: AuthenticationSuccessDTO ⇒
-      authRmi ! AuthenticationSuccessMsg(dto)
+    case dto: AuthenticatedDTO ⇒
+      authRmi ! AuthenticatedMsg(dto)
       tcpReceiver ! UnregisterReceiver(authRmi)
   }
 }

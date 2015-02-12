@@ -1,6 +1,6 @@
 package ru.rknrl.castles.model.userInfo {
+import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerIdDTO;
-import ru.rknrl.dto.PlayerInfoDTO;
 
 public class PlayerInfo {
     private var _playerId:PlayerIdDTO;
@@ -20,13 +20,13 @@ public class PlayerInfo {
         _info = info;
     }
 
-    public static function fromDto(dto:PlayerInfoDTO):PlayerInfo {
+    public static function fromDto(dto:PlayerDTO):PlayerInfo {
         return new PlayerInfo(dto.id, CastlesUserInfo.fromDto(dto.info));
     }
 
-    public static function fromDtoVector(vector:Vector.<PlayerInfoDTO>):Vector.<PlayerInfo> {
+    public static function fromDtoVector(vector:Vector.<PlayerDTO>):Vector.<PlayerInfo> {
         const result:Vector.<PlayerInfo> = new <PlayerInfo>[];
-        for each(var dto:PlayerInfoDTO in vector) {
+        for each(var dto:PlayerDTO in vector) {
             result.push(fromDto(dto))
         }
         return result;

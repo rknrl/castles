@@ -276,7 +276,6 @@ class GameState(val time: Long,
       .setWidth(width)
       .setHeight(height)
       .setSelfId(id.dto)
-      .addAllPlayers(players.dto.asJava)
       .addAllSlots(slotsPos.asJava)
       .addAllBuildings(buildings.dto.asJava)
       .addAllUnits(units.dto(time).asJava)

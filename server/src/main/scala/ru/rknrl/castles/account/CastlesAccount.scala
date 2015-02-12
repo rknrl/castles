@@ -8,7 +8,7 @@ import ru.rknrl.castles._
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.AccountDTO._
-import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
+import ru.rknrl.dto.AuthDTO.{AuthenticatedDTO, TopUserInfoDTO}
 import ru.rknrl.dto.CommonDTO._
 
 import scala.collection.JavaConverters._
@@ -26,8 +26,8 @@ class CastlesAccount(accountId: AccountId,
 
   override var state = accountState
 
-  override protected def authenticationSuccessDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
-    val builder = AuthenticationSuccessDTO.newBuilder()
+  override protected def authenticatedDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
+    val builder = AuthenticatedDTO.newBuilder()
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
       .addAllTop(top.asJava)

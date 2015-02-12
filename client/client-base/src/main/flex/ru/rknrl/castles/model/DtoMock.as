@@ -3,7 +3,7 @@ import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
@@ -13,19 +13,16 @@ import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemDTO;
 import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.ItemsDTO;
+import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerIdDTO;
-import ru.rknrl.dto.PlayerInfoDTO;
 import ru.rknrl.dto.PointDTO;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillLevelDTO;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SkillUpgradePriceDTO;
-import ru.rknrl.dto.SkillsDTO;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.SlotsDTO;
 import ru.rknrl.dto.SlotsOrientation;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
@@ -66,14 +63,14 @@ public class DtoMock {
         return dto;
     }
 
-    public static function slots():SlotsDTO {
-        const dto:SlotsDTO = new SlotsDTO();
-        dto.slots.push(slot(SlotId.SLOT_1, buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)));
-        dto.slots.push(slot(SlotId.SLOT_2, buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)));
-        dto.slots.push(slot(SlotId.SLOT_3, buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1)));
-        dto.slots.push(slot(SlotId.SLOT_4, buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)));
-        dto.slots.push(slot(SlotId.SLOT_5, buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)));
-        return dto;
+    public static function slots():Vector.<SlotDTO> {
+        return new <SlotDTO>[
+            slot(SlotId.SLOT_1, buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
+            slot(SlotId.SLOT_2, buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
+            slot(SlotId.SLOT_3, buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1)),
+            slot(SlotId.SLOT_4, buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
+            slot(SlotId.SLOT_5, buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1))
+        ];
     }
 
     public static function skillLevel(skillType:SkillType, level:SkillLevel):SkillLevelDTO {
@@ -83,12 +80,12 @@ public class DtoMock {
         return dto;
     }
 
-    public static function skills():SkillsDTO {
-        const dto:SkillsDTO = new SkillsDTO();
-        dto.levels.push(skillLevel(SkillType.ATTACK, SkillLevel.SKILL_LEVEL_0));
-        dto.levels.push(skillLevel(SkillType.DEFENCE, SkillLevel.SKILL_LEVEL_3));
-        dto.levels.push(skillLevel(SkillType.SPEED, SkillLevel.SKILL_LEVEL_1));
-        return dto;
+    public static function skills():Vector.<SkillLevelDTO> {
+        return new <SkillLevelDTO>[
+            skillLevel(SkillType.ATTACK, SkillLevel.SKILL_LEVEL_0),
+            skillLevel(SkillType.DEFENCE, SkillLevel.SKILL_LEVEL_3),
+            skillLevel(SkillType.SPEED, SkillLevel.SKILL_LEVEL_1)
+        ];
     }
 
     public static function item(itemType:ItemType, count:int):ItemDTO {
@@ -98,10 +95,10 @@ public class DtoMock {
         return dto;
     }
 
-    public static function items():ItemsDTO {
-        const dto:ItemsDTO = new ItemsDTO();
+    public static function items():Vector.<ItemDTO> {
+        const dto:Vector.<ItemDTO> = new <ItemDTO>[];
         for each(var itemType:ItemType in ItemType.values) {
-            dto.items.push(item(itemType, 2))
+            dto.push(item(itemType, 2))
         }
         return dto;
     }
@@ -188,8 +185,8 @@ public class DtoMock {
         return dto;
     }
 
-    public static function authenticationSuccess():AuthenticationSuccessDTO {
-        const dto:AuthenticationSuccessDTO = new AuthenticationSuccessDTO();
+    public static function authenticated():AuthenticatedDTO {
+        const dto:AuthenticatedDTO = new AuthenticatedDTO();
         dto.accountState = accountState();
         dto.config = config();
         dto.top = top();
@@ -200,49 +197,49 @@ public class DtoMock {
 
     // utils
 
-    public static function findSkillLevel(dto:SkillsDTO, skillType:SkillType):SkillLevelDTO {
-        for each(var skillLevel:SkillLevelDTO in dto.levels) {
+    public static function findSkillLevel(dto:Vector.<SkillLevelDTO>, skillType:SkillType):SkillLevelDTO {
+        for each(var skillLevel:SkillLevelDTO in dto) {
             if (skillLevel.type == skillType) return skillLevel;
         }
         throw new Error("can't find skill level " + skillType)
     }
 
-    public static function findItem(dto:ItemsDTO, itemType:ItemType):ItemDTO {
-        for each(var item:ItemDTO in dto.items) {
+    public static function findItem(dto:Vector.<ItemDTO>, itemType:ItemType):ItemDTO {
+        for each(var item:ItemDTO in dto) {
             if (item.type == itemType) return item;
         }
         throw new Error("can't find item " + itemType)
     }
 
-    public static function findSlot(dto:SlotsDTO, slotId:SlotId):SlotDTO {
-        for each(var slot:SlotDTO in dto.slots) {
+    public static function findSlot(dto:Vector.<SlotDTO>, slotId:SlotId):SlotDTO {
+        for each(var slot:SlotDTO in dto) {
             if (slot.id == slotId) return slot;
         }
         throw new Error("can't find slot " + slotId)
     }
 
-    private static function playerInfo(id:int, name:String, photoUrl:String):PlayerInfoDTO {
-        const dto:PlayerInfoDTO = new PlayerInfoDTO();
+    private static function player(id:int, name:String, photoUrl:String):PlayerDTO {
+        const dto:PlayerDTO = new PlayerDTO();
         dto.id = new PlayerIdDTO();
         dto.id.id = id;
         dto.info = userInfo(name, null, photoUrl);
         return dto;
     }
 
-    public static const playerInfo1:PlayerInfoDTO = playerInfo(0, "Толя Янот", "mock_avatars/1.png");
-    public static const playerInfo2:PlayerInfoDTO = playerInfo(1, "Sasha Serova", "mock_avatars/2.png");
-    private static const playerInfo3:PlayerInfoDTO = playerInfo(2, "Napoleon1769", "mock_avatars/3.png");
-    private static const playerInfo4:PlayerInfoDTO = playerInfo(3, "Виктория Викторовна", "mock_avatars/4.png");
+    public static const playerInfo1:PlayerDTO = player(0, "Толя Янот", "mock_avatars/1.png");
+    public static const playerInfo2:PlayerDTO = player(1, "Sasha Serova", "mock_avatars/2.png");
+    private static const playerInfo3:PlayerDTO = player(2, "Napoleon1769", "mock_avatars/3.png");
+    private static const playerInfo4:PlayerDTO = player(3, "Виктория Викторовна", "mock_avatars/4.png");
 
-    public static function playerInfosPortrait():Vector.<PlayerInfoDTO> {
-        return new <PlayerInfoDTO>[
+    public static function playerInfosPortrait():Vector.<PlayerDTO> {
+        return new <PlayerDTO>[
             playerInfo1,
             playerInfo2
         ];
     }
 
-    public static function playerInfosLandscape():Vector.<PlayerInfoDTO> {
-        return new <PlayerInfoDTO>[
+    public static function playerInfosLandscape():Vector.<PlayerDTO> {
+        return new <PlayerDTO>[
             playerInfo1,
             playerInfo2,
             playerInfo3,
@@ -250,18 +247,18 @@ public class DtoMock {
         ];
     }
 
-    public static function winner():PlayerInfoDTO {
+    public static function winner():PlayerDTO {
         return playerInfo1;
     }
 
-    public static function losersPortrait():Vector.<PlayerInfoDTO> {
-        return new <PlayerInfoDTO>[
+    public static function losersPortrait():Vector.<PlayerDTO> {
+        return new <PlayerDTO>[
             playerInfo2
         ];
     }
 
-    public static function losersLandscape():Vector.<PlayerInfoDTO> {
-        return new <PlayerInfoDTO>[
+    public static function losersLandscape():Vector.<PlayerDTO> {
+        return new <PlayerDTO>[
             playerInfo2,
             playerInfo3,
             playerInfo4

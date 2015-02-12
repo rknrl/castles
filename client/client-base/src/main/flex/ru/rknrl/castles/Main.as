@@ -28,8 +28,8 @@ import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
+import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.AuthenticationSuccessDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.LoadImageManager;
@@ -126,7 +126,7 @@ public class Main extends Sprite implements IAuthFacade {
         locale = new CastlesLocale(data);
 
         loadImageManager = new LoadImageManager(cachedAvatarsLimit);
-        if(view) throw new Error("view already on stage");
+        if (view) throw new Error("view already on stage");
         addChild(view = new View(_layout, locale, loadImageManager, deviceFactory));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
@@ -180,13 +180,13 @@ public class Main extends Sprite implements IAuthFacade {
         authFacadeSender.authenticate(authenticate);
     }
 
-    public function onAuthenticationSuccess(authenticationSuccess:AuthenticationSuccessDTO):void {
+    public function onAuthenticated(authenticated:AuthenticatedDTO):void {
         log.add("onAuthenticationResult");
 
         connection.unregisterReceiver(authFacadeReceiver);
 
         view.removeLoadingScreen();
-        controller = new Controller(view, authenticationSuccess, connection, policyPort, new AccountFacadeSender(connection), log, social);
+        controller = new Controller(view, authenticated, connection, policyPort, new AccountFacadeSender(connection), log, social);
 
         accountFacadeReceiver = new AccountFacadeReceiver(controller);
         connection.registerReceiver(accountFacadeReceiver);

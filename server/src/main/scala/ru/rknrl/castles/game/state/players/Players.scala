@@ -3,7 +3,7 @@ package ru.rknrl.castles.game.state.players
 import ru.rknrl.base.AccountId
 import ru.rknrl.castles.account.state.{Items, Skills, Slots}
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
-import ru.rknrl.dto.GameDTO.{PlayerDTO, PlayerIdDTO}
+import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
 class PlayerId(val id: Int) {
   override def equals(obj: Any) = obj match {
@@ -22,12 +22,8 @@ class Player(val id: PlayerId,
              val slots: Slots,
              val skills: Skills,
              val items: Items,
-             val isBot: Boolean) {
-  def dto = PlayerDTO.newBuilder().setId(id.dto).build()
-}
+             val isBot: Boolean)
 
 class Players(val players: Map[PlayerId, Player]) {
   def apply(id: PlayerId) = players(id)
-
-  def dto = for ((id, player) ← players) yield player.dto
 }

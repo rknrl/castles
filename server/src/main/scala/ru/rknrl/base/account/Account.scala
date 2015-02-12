@@ -5,7 +5,7 @@ import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.base.AccountId
 import ru.rknrl.base.MatchMaking._
-import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticationSuccess, LeaveGame}
+import ru.rknrl.base.account.Account.{DuplicateAccount, GetAuthenticated, LeaveGame}
 import ru.rknrl.base.database.AccountStateDb.{StateResponse, Update}
 import ru.rknrl.base.game.Game.{Join, Offline}
 import ru.rknrl.base.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
@@ -13,7 +13,7 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.{CloseConnection, ReceiverRegistered, RegisterReceiver, UnregisterReceiver}
-import ru.rknrl.dto.AuthDTO.{AuthenticationSuccessDTO, TopUserInfoDTO}
+import ru.rknrl.dto.AuthDTO.{AuthenticatedDTO, TopUserInfoDTO}
 import ru.rknrl.dto.CommonDTO.{DeviceType, ItemType, NodeLocator, UserInfoDTO}
 
 import scala.concurrent.Await
@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 
 object Account {
 
-  case object GetAuthenticationSuccess
+  case object GetAuthenticated
 
   case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
 
@@ -60,7 +60,7 @@ abstract class Account(accountId: AccountId,
 
   private var game: Option[ActorRef] = None
 
-  protected def authenticationSuccessDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticationSuccessDTO
+  protected def authenticatedDto(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]): AuthenticatedDTO
 
   private def placeGameOrder() =
     matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
@@ -104,7 +104,7 @@ abstract class Account(accountId: AccountId,
     /** Auth спрашивает accountState
       * Спрашиваем матчмейкинг находится ли этот игрок в бою
       */
-    case GetAuthenticationSuccess ⇒
+    case GetAuthenticated ⇒
       matchmaking ! InGame(accountId)
 
     /** Matchmaking ответил на InGame
@@ -118,10 +118,10 @@ abstract class Account(accountId: AccountId,
       } else if (!searchOpponents && state.gamesCount == 0) {
         placeGameOrder(); // При первом заходе сразу попадаем в бой
         reenterGame = false
-        auth ! authenticationSuccessDto(searchOpponents = true, None, top)
+        auth ! authenticatedDto(searchOpponents = true, None, top)
       } else {
         reenterGame = false
-        auth ! authenticationSuccessDto(searchOpponents, None, top)
+        auth ! authenticatedDto(searchOpponents, None, top)
       }
 
     /** Matchmaking говорит к какой игре коннектится */
@@ -210,7 +210,7 @@ abstract class Account(accountId: AccountId,
         .build()
 
       if (reenterGame) {
-        auth ! authenticationSuccessDto(searchOpponents = false, Some(gameAddress), top.get)
+        auth ! authenticatedDto(searchOpponents = false, Some(gameAddress), top.get)
 
         reenterGame = false
       } else

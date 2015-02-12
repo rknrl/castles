@@ -8,7 +8,7 @@ import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
 import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
-import ru.rknrl.dto.AuthenticationSuccessDTO;
+import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.ProductDTO;
 
 public class MenuModel {
@@ -66,11 +66,11 @@ public class MenuModel {
         return _products;
     }
 
-    public function MenuModel(authenticationSuccess:AuthenticationSuccessDTO) {
-        mergeAccountStateDto(authenticationSuccess.accountState);
-        mergeConfigDto(authenticationSuccess.config);
-        mergeProductsDto(authenticationSuccess.products);
-        _top = new Top(authenticationSuccess.top);
+    public function MenuModel(authenticated:AuthenticatedDTO) {
+        mergeAccountStateDto(authenticated.accountState);
+        mergeConfigDto(authenticated.config);
+        mergeProductsDto(authenticated.products);
+        _top = new Top(authenticated.top);
     }
 
     public function mergeAccountStateDto(dto:AccountStateDTO):void {

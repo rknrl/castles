@@ -4,6 +4,8 @@ import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.CommonDTO._
 
+import scala.collection.JavaConverters._
+
 class AccountState(val slots: Slots,
                    val skills: Skills,
                    val items: Items,
@@ -65,9 +67,9 @@ class AccountState(val slots: Slots,
     new AccountState(newSlots, newSkills, newItems, newGold, newRating, newGamesCount)
 
   def dto = AccountStateDTO.newBuilder()
-    .setSlots(slots.dto)
-    .setSkills(skills.dto)
-    .setItems(items.dto)
+    .addAllSlots(slots.dto.asJava)
+    .addAllSkills(skills.dto.asJava)
+    .addAllItems(items.dto.asJava)
     .setGold(gold)
     .setRating(rating)
     .setGamesCount(gamesCount)
@@ -112,9 +114,9 @@ object AccountState {
   )
 
   def fromDto(dto: AccountStateDTO) = new AccountState(
-    slots = Slots.fromDto(dto.getSlots),
-    skills = Skills.fromDto(dto.getSkills),
-    items = Items.fromDto(dto.getItems),
+    slots = Slots.fromDto(dto.getSlotsList.asScala),
+    skills = Skills.fromDto(dto.getSkillsList.asScala),
+    items = Items.fromDto(dto.getItemsList.asScala),
     gold = dto.getGold,
     rating = dto.getRating,
     gamesCount = dto.getGamesCount

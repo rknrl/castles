@@ -1,11 +1,9 @@
 package ru.rknrl.castles.account.state
 
-import ru.rknrl.dto.AccountDTO.SlotsDTO
+import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.dto.GameDTO.CellSize
 import ru.rknrl.utils.Point
-
-import scala.collection.JavaConverters._
 
 class Slots(val slots: Map[SlotId, Slot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
@@ -38,9 +36,7 @@ class Slots(val slots: Map[SlotId, Slot]) {
   private def update(id: SlotId, newSlot: Slot) =
     new Slots(slots.updated(id, newSlot))
 
-  private def slotsDto = for ((id, slot) ← slots) yield slot.dto
-
-  def dto = SlotsDTO.newBuilder().addAllSlots(slotsDto.asJava).build()
+  def dto = for ((id, slot) ← slots) yield slot.dto
 }
 
 class IJ(val i: Int, val j: Int) {
@@ -85,8 +81,8 @@ object Slots {
   val top = Math.abs(-1)
   val bottom = 0
 
-  def fromDto(dto: SlotsDTO) = {
-    val slots = for (slotDto ← dto.getSlotsList.asScala) yield slotDto.getId → Slot.fromDto(slotDto)
+  def fromDto(dto: Iterable[SlotDTO]) = {
+    val slots = for (slotDto ← dto) yield slotDto.getId → Slot.fromDto(slotDto)
 
     new Slots(slots.toMap)
   }

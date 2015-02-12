@@ -2,16 +2,15 @@ package ru.rknrl.castles.model.menu.skills {
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SkillLevelDTO;
 import ru.rknrl.dto.SkillType;
-import ru.rknrl.dto.SkillsDTO;
 
 public class SkillLevels {
-    private var skills:SkillsDTO;
+    private var skills:Vector.<SkillLevelDTO>;
 
-    public function SkillLevels(skills:SkillsDTO) {
+    public function SkillLevels(skills:Vector.<SkillLevelDTO>) {
         this.skills = skills;
 
         var totalLevel:int = 0;
-        for each(var level:SkillLevelDTO in skills.levels) {
+        for each(var level:SkillLevelDTO in skills) {
             totalLevel += level.level.id();
         }
         _totalLevel = totalLevel;
@@ -33,7 +32,7 @@ public class SkillLevels {
     }
 
     public function getLevel(skillType:SkillType):SkillLevel {
-        for each(var level:SkillLevelDTO in skills.levels) {
+        for each(var level:SkillLevelDTO in skills) {
             if (level.type == skillType) return level.level;
         }
         throw new Error("can't found skill level " + skillType);
