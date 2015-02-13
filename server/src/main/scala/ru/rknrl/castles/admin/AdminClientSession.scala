@@ -6,17 +6,16 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles
+package ru.rknrl.castles.admin
 
 import akka.actor.{ActorRef, Props}
-import ru.rknrl.castles.account.Account
 import ru.rknrl.rmi.Client
 
-class CastlesClient(tcpSender: ActorRef,
-                    matchmaking: ActorRef,
-                    database: ActorRef,
-                    config: Config,
-                    name: String) extends Client(tcpSender, name) {
-
-  val handler = context.actorOf(Props(classOf[Account], matchmaking, database, config, name), "account" + name)
+class AdminClientSession(tcpSender: ActorRef,
+                         database: ActorRef,
+                         matchmaking: ActorRef,
+                         login: String,
+                         password: String,
+                         name: String) extends Client(tcpSender, name) {
+  val handler = context.actorOf(Props(classOf[Admin], database, matchmaking, login, password, name), "admin" + name)
 }

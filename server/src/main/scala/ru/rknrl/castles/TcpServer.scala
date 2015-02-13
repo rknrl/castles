@@ -4,7 +4,7 @@ import java.net.InetSocketAddress
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.account.Account
+import ru.rknrl.castles.account.{AccountClientSession, Account}
 import ru.rknrl.rmi.Client
 
 class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef) extends StoppingStrategyActor with ActorLogging {
@@ -25,7 +25,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: 
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val client = context.actorOf(Props(classOf[CastlesClient], sender, matchmaking, database, config, name), "client" + name)
+      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, database, config, name), "client" + name)
       sender ! Register(client)
   }
 }
