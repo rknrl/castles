@@ -4,8 +4,8 @@ import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.GameDTO.{UnitDTO, UnitIdDTO, UnitUpdateDTO}
-import ru.rknrl.utils.Point
 
 class UnitId(val id: Int) {
   override def equals(obj: Any) = obj match {

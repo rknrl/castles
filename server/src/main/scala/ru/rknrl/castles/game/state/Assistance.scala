@@ -4,7 +4,7 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.utils.Point
+import ru.rknrl.castles.game.points.Point
 
 object Assistance {
   def `casts→units`(casts: Map[PlayerId, BuildingId],

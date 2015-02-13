@@ -3,8 +3,8 @@ package ru.rknrl.castles.game.state.buildings
 import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.GameDTO.{BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
-import ru.rknrl.utils.Point
 
 class BuildingId(val id: Int) {
   override def equals(obj: Any) = obj match {

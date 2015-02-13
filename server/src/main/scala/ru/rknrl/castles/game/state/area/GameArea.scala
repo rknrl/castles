@@ -2,9 +2,9 @@ package ru.rknrl.castles.game.state.area
 
 import ru.rknrl.castles.account.state.{IJ, Slots}
 import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.CommonDTO.SlotId
 import ru.rknrl.dto.GameDTO.{CellSize, SlotsOrientation}
-import ru.rknrl.utils.Point
 
 object GameArea {
   type SlotsPositions = Map[SlotId, IJ]

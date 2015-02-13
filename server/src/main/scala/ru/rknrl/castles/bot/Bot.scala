@@ -1,6 +1,7 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.{AccountId, MatchMaking}
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
@@ -12,7 +13,6 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.{GameStateDTO, MoveDTO}
-import ru.rknrl.utils.Point
 
 import scala.collection.JavaConverters._
 

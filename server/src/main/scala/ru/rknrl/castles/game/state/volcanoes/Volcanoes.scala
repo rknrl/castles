@@ -2,9 +2,10 @@ package ru.rknrl.castles.game.state.volcanoes
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.rmi.B2C.AddVolcano
 import ru.rknrl.dto.GameDTO.{PointDTO, VolcanoDTO}
-import ru.rknrl.utils.{PeriodObjectCollection, Point}
+import ru.rknrl.utils.PeriodObjectCollection
 
 object Volcanoes {
   type Volcanoes = PeriodObjectCollection[VolcanoDTO, Volcano]

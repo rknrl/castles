@@ -2,9 +2,10 @@ package ru.rknrl.castles.game.state.tornadoes
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
+import ru.rknrl.castles.game.points.{Point, Points}
 import ru.rknrl.castles.rmi.B2C.AddTornado
 import ru.rknrl.dto.GameDTO.{CastTorandoDTO, TornadoDTO}
-import ru.rknrl.utils.{PeriodObjectCollection, Point, Points}
+import ru.rknrl.utils.PeriodObjectCollection
 
 import scala.collection.JavaConverters._
 

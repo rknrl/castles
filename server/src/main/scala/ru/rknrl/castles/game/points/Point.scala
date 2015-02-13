@@ -1,4 +1,4 @@
-package ru.rknrl.utils
+package ru.rknrl.castles.game.points
 
 import ru.rknrl.dto.GameDTO.PointDTO
 

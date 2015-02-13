@@ -4,9 +4,10 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.{Building, Buildings}
 import ru.rknrl.castles.game.state.players.PlayerStates
 import ru.rknrl.castles.game.state.units.{GameUnit, GameUnits}
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.rmi.B2C.AddBullet
 import ru.rknrl.dto.GameDTO.BulletDTO
-import ru.rknrl.utils.{PeriodObjectCollection, Point}
+import ru.rknrl.utils.PeriodObjectCollection
 
 object Bullets {
   type Bullets = PeriodObjectCollection[BulletDTO, Bullet]

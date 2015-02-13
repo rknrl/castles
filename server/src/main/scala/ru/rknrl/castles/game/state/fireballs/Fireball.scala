@@ -1,8 +1,9 @@
 package ru.rknrl.castles.game.state.fireballs
 
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.GameDTO.FireballDTO
-import ru.rknrl.utils.{PeriodObject, Point}
+import ru.rknrl.utils.PeriodObject
 
 class Fireball(val playerId: PlayerId,
                val pos: Point,

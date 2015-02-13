@@ -1,9 +1,9 @@
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.dto.GameDTO.CellSize
-import ru.rknrl.utils.Point
 
 class Slots(val slots: Map[SlotId, Slot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
