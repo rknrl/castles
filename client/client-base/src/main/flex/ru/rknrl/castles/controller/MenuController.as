@@ -212,7 +212,7 @@ public class MenuController {
     private function onBuy(event:Event):void {
         const product:ProductDTO = model.products.product;
         social.showPaymentDialog(new PaymentDialogData(product.id, product.title, product.description, product.price));
-        view.lock = true;
+        // todo temp view.lock = true;
     }
 
     private function onPaymentDialogClosed(event:PaymentDialogEvent):void {
