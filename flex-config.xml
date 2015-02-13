@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<flex-config>
+    <target-player>10.1</target-player>
+    <swf-version>10</swf-version>
+
+    <compiler>
+        <debug>false</debug>
+        <incremental>false</incremental>
+  	</compiler>
+</flex-config>

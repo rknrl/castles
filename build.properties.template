@@ -1,0 +1,3 @@
+rknrl = ${user.home}/dev/rknrl/core
+castles = ${user.home}/dev/rknrl/castles
+FLEX_HOME = ${user.home}/dev/sdk/flex
