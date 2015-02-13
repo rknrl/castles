@@ -24,6 +24,7 @@ public class MainWeb extends MainWebBase {
         const host:String = flashVars.rknrlHost;
         const gamePort:int = flashVars.rknrlGamePort;
         const policyPort:int = flashVars.rknrlPolicyPort;
+        const httpPort:int = flashVars.rknrlHttpPort;
 
         const accountType:AccountType = getAccountType(flashVars.rknrlAccountType);
         const social:SocialWeb = createSocial(accountType, log, flashVars);
@@ -36,7 +37,7 @@ public class MainWeb extends MainWebBase {
         authenticationSecret.body = social.flashVars.authenticationSecret;
         authenticationSecret.params = social.flashVars.authenticationParams;
 
-        super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
+        super(log, host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
     }
 
     private static function getAccountType(name:String):AccountType {

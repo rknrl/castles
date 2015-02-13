@@ -14,6 +14,7 @@ public class MainWebStandalone extends MainWebBase {
     private static const host:String = "127.0.0.1";
     private static const gamePort:int = 2335;
     private static const policyPort:int = 2336;
+    private static const httpPort:int = 8080;
 
     public function MainWebStandalone() {
         Security.allowDomain("*");
@@ -30,7 +31,7 @@ public class MainWebStandalone extends MainWebBase {
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = "body";
 
-        super(log, host, gamePort, policyPort, accountId, authenticationSecret, social);
+        super(log, host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
     }
 }
 }

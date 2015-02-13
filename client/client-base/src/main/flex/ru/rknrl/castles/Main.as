@@ -32,8 +32,9 @@ import ru.rknrl.rmi.AuthenticatedEvent;
 import ru.rknrl.rmi.Server;
 
 public class Main extends Sprite {
-    private static const errorsUrl:String = "http://127.0.0.1:8080/bug";
     private static const cachedAvatarsLimit:int = 10;
+
+    private var bugsLogUrl:String;
 
     private var host:String;
     private var gamePort:int;
@@ -61,10 +62,11 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
+    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
+        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
@@ -209,7 +211,7 @@ public class Main extends Sprite {
         const error:Error = event.error as Error;
         const stackTrace:String = error ? error.getStackTrace() : "";
         log.error(event.error.toString(), stackTrace);
-        log.send(errorsUrl);
+        log.send(bugsLogUrl);
         destroy();
     }
 }
