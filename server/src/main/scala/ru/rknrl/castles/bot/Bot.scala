@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.bot
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
@@ -25,7 +25,7 @@ import ru.rknrl.dto.GameDTO.MoveDTO
 
 import scala.collection.JavaConverters._
 
-class Bot(accountId: AccountId, config: GameConfig) extends Actor {
+class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogging {
   val interval = 2000L
   var lastTime = 0L
 
@@ -54,9 +54,6 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
     case B2C.JoinedGame(gameState) ⇒
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
-
-    case GameOver(dto) ⇒
-      if (dto.getPlayerId.getId == playerId.get.id) sender ! C2B.LeaveGame
 
     case newGameState: GameState ⇒
       gameState = Some(newGameState)
@@ -155,4 +152,6 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
   def populationWeight(population: Double) = population * 3 / config.maxPopulation
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
+
+  override def postStop() = log.info("bot stop")
 }

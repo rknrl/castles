@@ -295,7 +295,12 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
       .setInfo(top(i).info)
       .build
 
-  def onGameOver(gameRef: ActorRef) =
+  def onGameOver(gameRef: ActorRef) = {
+    val gameInfo = gameRefToGameInfo(gameRef)
+    for (order ← gameInfo.orders if order.isBot) {
+      val bot = accountIdToAccountRef(order.accountId)
+      context stop bot
+    }
     gameRefToGameInfo = gameRefToGameInfo - gameRef
-
+  }
 }

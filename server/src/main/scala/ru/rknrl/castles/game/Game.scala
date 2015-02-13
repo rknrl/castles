@@ -114,9 +114,9 @@ class Game(players: Map[PlayerId, Player],
 
   def getPlace = playersInGame.size
 
-  /** Все вышли из игры */
+  /** Все люди вышли из игры */
   def allLeaved =
-    playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
+    playerStates.count { case (playerId, playerState) ⇒ !players(playerId).isBot && playerState != PlayerState.LEAVED} == 0
 
   def playersDto =
     for ((id, player) ← players)
@@ -338,4 +338,6 @@ class Game(players: Map[PlayerId, Player],
 
     if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
+
+  override def postStop() = log.info("game stop")
 }
