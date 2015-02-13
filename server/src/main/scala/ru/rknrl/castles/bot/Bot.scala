@@ -66,11 +66,11 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
         lastTime = time
 
         val myBuildings = buildings.filter(my).toList
-
         val fromBuildings = myBuildings.filter(_.population > 5)
 
-        if (fromBuildings.size > 0) {
-          val enemyBuildings = buildings.filterNot(my).toList
+        val enemyBuildings = buildings.filterNot(my).toList
+
+        if (fromBuildings.size > 0 && enemyBuildings.size > 0) {
 
           if (toBuildingId.isEmpty ||
             my(gameState.get.buildings.map(toBuildingId.get)) ||
@@ -109,20 +109,22 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
                 itemState.itemType != ItemType.TORNADO &&
                 newGameState.gameItems.canCast(playerId.get, itemState.itemType, config, time))
 
-            val rnd = Math.floor(Math.random() * availableCast.size).toInt
-            val itemType = availableCast.toList(rnd).itemType
+            if (availableCast.size > 0) {
+              val rnd = Math.floor(Math.random() * availableCast.size).toInt
+              val itemType = availableCast.toList(rnd).itemType
 
-            val ownedEnemyBuildings = enemyBuildings.filter(_.owner.isDefined)
+              val ownedEnemyBuildings = enemyBuildings.filter(_.owner.isDefined)
 
-            itemType match {
-              case ItemType.FIREBALL ⇒
-                sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
-              case ItemType.VOLCANO ⇒
-                sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
-              case ItemType.STRENGTHENING ⇒
-                sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
-              case ItemType.ASSISTANCE ⇒
-                sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
+              itemType match {
+                case ItemType.FIREBALL ⇒
+                  sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                case ItemType.VOLCANO ⇒
+                  sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                case ItemType.STRENGTHENING ⇒
+                  sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
+                case ItemType.ASSISTANCE ⇒
+                  sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
+              }
             }
           }
         }

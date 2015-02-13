@@ -21,11 +21,11 @@ object AddHeaders {
                  |//     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
                  |//      \|__|     \|__|     \/__/     \|__|     \/__/
                  |
-                 |""".stripMargin
+                 | """.stripMargin
 
   val headerFirstLine = header.takeWhile(_ != '\n')
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]) = {
     val dir = "/Users/tolyayanot/dev/rknrl/core/"
     val files = recursiveListFiles(new File(dir))
     for (f ← files) {
