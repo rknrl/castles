@@ -6,14 +6,14 @@ import ru.rknrl.castles.game.state.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.state.players.PlayerStates
 import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
-import ru.rknrl.castles.rmi.{AddUnitMsg, RemoveUnitMsg, UpdateUnitMsg}
+import ru.rknrl.castles.rmi.B2C.{AddUnit, RemoveUnit, UpdateUnit}
 
 class GameUnits(val units: Iterable[GameUnit]) {
   def add(newUnits: Iterable[GameUnit]) =
     new GameUnits(units ++ newUnits)
 
-  def applyRemoveMessages(messages: Iterable[RemoveUnitMsg]) =
-    new GameUnits(units.filter(u ⇒ !messages.exists(_.unitIdDTO.getId == u.id.id)))
+  def applyRemoveMessages(messages: Iterable[RemoveUnit]) =
+    new GameUnits(units.filter(u ⇒ !messages.exists(_.id.getId == u.id.id)))
 
   def dto(time: Long) =
     for (unit ← units) yield unit.dto(time)
@@ -73,17 +73,17 @@ class GameUnits(val units: Iterable[GameUnit]) {
     )
 
   def `killed→removeMessages` =
-    for (unit ← units if unit.floorCount <= 0) yield new RemoveUnitMsg(unit.id.dto)
+    for (unit ← units if unit.floorCount <= 0) yield new RemoveUnit(unit.id.dto)
 }
 
 object GameUnits {
   def `units→addMessages`(units: Iterable[GameUnit], time: Long) =
-    for (unit ← units) yield AddUnitMsg(unit.dto(time))
+    for (unit ← units) yield AddUnit(unit.dto(time))
 
   def getUpdateMessages(oldUnits: Iterable[GameUnit], newUnits: Iterable[GameUnit], time: Long) =
     for (newUnit ← newUnits;
          oldUnit = oldUnits.find(_.id == newUnit.id)
          if oldUnit.isDefined
          if oldUnit.get differentWith newUnit
-    ) yield new UpdateUnitMsg(newUnit.updateDto(time))
+    ) yield new UpdateUnit(newUnit.updateDto(time))
 }

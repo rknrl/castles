@@ -91,13 +91,13 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     def big = orders.size == 4
   }
 
-  private var gameOrders = List[GameOrder]()
+  var gameOrders = List[GameOrder]()
 
-  private var accountIdToGameInfo = Map[AccountId, GameInfo]()
+  var accountIdToGameInfo = Map[AccountId, GameInfo]()
 
-  private var gameRefToGameInfo = Map[ActorRef, GameInfo]()
+  var gameRefToGameInfo = Map[ActorRef, GameInfo]()
 
-  private var accountIdToAccountRef = Map[AccountId, ActorRef]()
+  var accountIdToAccountRef = Map[AccountId, ActorRef]()
 
   case object TryCreateGames
 
@@ -107,14 +107,14 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
 
   /** Создать игры из имеющихся заявок
     */
-  private def tryCreateGames(gameOrders: List[GameOrder]) = {
+  def tryCreateGames(gameOrders: List[GameOrder]) = {
     val (smallGameOrders, bigGameOrders) = gameOrders.span(_.deviceType == DeviceType.PHONE)
 
     createGames(big = false, playersCount = 2, smallGameOrders) ++
       createGames(big = true, playersCount = 4, bigGameOrders)
   }
 
-  private def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
+  def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
     var sorted = orders.sortBy(_.rating)(Ordering.Double.reverse)
     var createdGames = List.empty[GameInfo]
 
@@ -129,9 +129,9 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     createdGames
   }
 
-  private val botIdIterator = new BotIdIterator
+  val botIdIterator = new BotIdIterator
 
-  private def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder]) = {
+  def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder]) = {
     val botsCount = if (big) playerCount - orders.size else playerCount - orders.size
     assert(botsCount >= 1, botsCount)
 
@@ -150,12 +150,12 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     createGame(big, result)
   }
 
-  private def botItems(playerItems: Items) =
+  def botItems(playerItems: Items) =
     new Items(playerItems.items.map {
       case (itemType, item) ⇒ (itemType, new Item(itemType, item.count * 2))
     })
 
-  private def botUserInfo(accountId: AccountId, number: Int) =
+  def botUserInfo(accountId: AccountId, number: Int) =
     UserInfoDTO.newBuilder()
       .setAccountId(accountId.dto)
       .setFirstName("Бот")
@@ -164,9 +164,9 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
       .setPhoto256("1")
       .build()
 
-  private val gameIdIterator = new GameIdIterator
+  val gameIdIterator = new GameIdIterator
 
-  private def createGame(big: Boolean, orders: Iterable[GameOrder]) = {
+  def createGame(big: Boolean, orders: Iterable[GameOrder]) = {
     val playerIdIterator = new PlayerIdIterator
 
     val players = for (order ← orders) yield {
@@ -224,7 +224,7 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
       tryCreateGames(gameOrders).map(registerGame)
   }
 
-  private def getSA(big: Boolean, place: Int) =
+  def getSA(big: Boolean, place: Int) =
     if (big)
       place match {
         case 1 ⇒ 1.0
@@ -236,7 +236,7 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     if (place == 1) 1.0 else 0.0
 
   /** http://en.wikipedia.org/wiki/Elo_rating_system */
-  private def getNewRating(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {
+  def getNewRating(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {
     val eA: Double = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400))
 
     val k: Double = if (ratingA > 2400) 10 else if (gamesCountA <= 30) 30 else 15
@@ -244,13 +244,13 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     ratingA + k * (sA - eA)
   }
 
-  protected final def placeGameOrder(gameOrder: GameOrder, accountRef: ActorRef) = {
+  def placeGameOrder(gameOrder: GameOrder, accountRef: ActorRef) = {
     assert(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
     accountIdToAccountRef = accountIdToAccountRef.updated(gameOrder.accountId, accountRef)
     gameOrders = gameOrders :+ gameOrder
   }
 
-  protected final def registerGame(info: GameInfo) = {
+  def registerGame(info: GameInfo) = {
     gameRefToGameInfo = gameRefToGameInfo + (info.gameRef → info)
 
     for (order ← info.orders) {
@@ -260,7 +260,7 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     }
   }
 
-  private def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
+  def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
     accountIdToGameInfo = accountIdToGameInfo - accountId
 
     val gameInfo = gameRefToGameInfo(sender)
@@ -277,17 +277,17 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating)
   }
 
-  private def insert(list: List[TopItem], item: TopItem) =
+  def insert(list: List[TopItem], item: TopItem) =
     (top.filter(_.accountId != item.accountId) :+ item).sortBy(_.rating).take(5)
 
-  private def topDto =
+  def topDto =
     for (i ← 0 until top.size)
     yield TopUserInfoDTO.newBuilder()
       .setPlace(i + 1)
       .setInfo(top(i).info)
       .build
 
-  private def onGameOver(gameRef: ActorRef) =
+  def onGameOver(gameRef: ActorRef) =
     gameRefToGameInfo = gameRefToGameInfo - gameRef
 
 }

@@ -35,14 +35,14 @@ object PaymentsServer {
 }
 
 class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
-  private val bugLog = LoggerFactory.getLogger("client")
+  val bugLog = LoggerFactory.getLogger("client")
 
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
       ctx.marshalTo(HttpEntity(contentType, value))
     }
 
-  private val paymentsCallbacks =
+  val paymentsCallbacks =
     path("bug") {
       post {
         entity(as[String]) { log =>

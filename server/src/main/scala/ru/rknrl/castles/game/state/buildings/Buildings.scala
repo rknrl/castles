@@ -7,7 +7,7 @@ import ru.rknrl.castles.game.state.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
-import ru.rknrl.castles.rmi.UpdateBuildingMsg
+import ru.rknrl.castles.rmi.B2C.UpdateBuilding
 
 class Buildings(val map: Map[BuildingId, Building]) {
   def apply(id: BuildingId) = map(id)
@@ -139,5 +139,5 @@ object Buildings {
     for ((id, newBuilding) ← newBuildings
          if oldBuildings contains id
          if oldBuildings(id) differentWith newBuilding
-    ) yield new UpdateBuildingMsg(newBuilding.updateDto)
+    ) yield new UpdateBuilding(newBuilding.updateDto)
 }

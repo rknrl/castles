@@ -1,39 +1,28 @@
 package ru.rknrl.castles.controller {
 import flash.events.Event;
-import flash.events.IOErrorEvent;
-import flash.events.SecurityErrorEvent;
-import flash.net.Socket;
-import flash.system.Security;
 
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.rmi.EnterGameFacadeReceiver;
-import ru.rknrl.castles.rmi.EnterGameFacadeSender;
-import ru.rknrl.castles.rmi.GameFacadeReceiver;
-import ru.rknrl.castles.rmi.GameFacadeSender;
-import ru.rknrl.castles.rmi.IAccountFacade;
-import ru.rknrl.castles.rmi.IEnterGameFacade;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Social;
-import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.log.Log;
+import ru.rknrl.rmi.EnteredGameEvent;
+import ru.rknrl.rmi.JoinedGameEvent;
+import ru.rknrl.rmi.LeavedGameEvent;
+import ru.rknrl.rmi.Server;
 
-public class Controller implements IAccountFacade, IEnterGameFacade {
+public class Controller {
     private var view:View;
-    private var connection:Connection;
-    private var policyPort:int;
-    private var sender:AccountFacadeSender;
+    private var server:Server;
     private var log:Log;
     private var social:Social;
 
@@ -42,25 +31,22 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
-                               connection:Connection,
-                               policyPort:int,
-                               sender:AccountFacadeSender,
+                               server:Server,
                                log:Log,
                                social:Social) {
         this.view = view;
-        this.connection = connection;
-        this.policyPort = policyPort;
-        this.sender = sender;
+        this.server = server;
         this.log = log;
         this.social = social;
 
         localStorage = new CastlesLocalStorage(log);
 
+        server.addEventListener(EnteredGameEvent.ENTEREDGAME, onEnteredGame);
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
         const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, sender, model, social, localStorage);
+        menu = new MenuController(menuView, server, model, social, localStorage);
 
         if (authenticated.searchOpponents) {
             view.hideMenu();
@@ -68,58 +54,34 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
         } else if (authenticated.hasGame) {
             view.hideMenu();
             view.addLoadingScreen();
-            onEnteredGame(authenticated.game);
+            joinGame(authenticated.game);
         }
-    }
-
-
-    public function onAccountStateUpdated(dto:AccountStateDTO):void {
-        menu.onAccountStateUpdated(dto);
     }
 
     private function onPlay(event:Event):void {
         view.hideMenu();
         view.addSearchOpponentScreen();
-        sender.enterGame();
+        server.enterGame();
     }
 
     private var game:GameController;
-    private var gameConnection:Connection;
-    private var gameFacadeReceiver:GameFacadeReceiver;
 
-    public function onEnteredGame(nodeLocator:NodeLocator):void {
+    private function onEnteredGame(e:EnteredGameEvent):void {
         log.add("onEnteredGame");
-
-        if (connection.host == nodeLocator.host && connection.port == nodeLocator.port) {
-            gameConnection = connection;
-            onGameConnect()
-        } else {
-            Security.loadPolicyFile("xmlsocket://" + connection.host + ":" + policyPort);
-
-            gameConnection = new Connection(new Socket());
-            gameConnection.addEventListener(Event.CONNECT, onGameConnect);
-            gameConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onGameConnectionError);
-            gameConnection.addEventListener(IOErrorEvent.IO_ERROR, onGameConnectionError);
-            gameConnection.addEventListener(Event.CLOSE, onGameConnectionError);
-            gameConnection.connect(nodeLocator.host, nodeLocator.port);
-        }
+        joinGame(e.node);
     }
 
-    private var enterGameFacadeSender:EnterGameFacadeSender;
-    private var enterGameFacadeReceiver:EnterGameFacadeReceiver;
-
-    private function onGameConnect(event:Event = null):void {
-        log.add("onGameConnect");
-
-        enterGameFacadeSender = new EnterGameFacadeSender(gameConnection);
-        enterGameFacadeReceiver = new EnterGameFacadeReceiver(this);
-        gameConnection.registerReceiver(enterGameFacadeReceiver);
-
-        enterGameFacadeSender.join();
+    private function joinGame(nodeLocator:NodeLocator):void {
+        server.addEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
+        server.joinGame();
     }
 
-    public function onJoinGame(gameState:GameStateDTO):void {
-        log.add("onJoinGame");
+    private function onJoinedGame(e:JoinedGameEvent):void {
+        log.add("onJoinedGame");
+        server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
+        server.addEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
+
+        const gameState:GameStateDTO = e.gameState;
 
         view.removeAnyLoadingScreen();
 
@@ -128,42 +90,26 @@ public class Controller implements IAccountFacade, IEnterGameFacade {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.addGame(playerInfos, h, v);
-        game = new GameController(gameView, new GameFacadeSender(connection), gameState, localStorage);
-
-        gameFacadeReceiver = new GameFacadeReceiver(game);
-        gameConnection.registerReceiver(gameFacadeReceiver);
+        game = new GameController(gameView, server, gameState, localStorage);
     }
 
-    public function onLeaveGame():void {
-        log.add("onLeaveGame");
+    private function onLeavedGame(e:LeavedGameEvent):void {
+        log.add("onLeavedGame");
 
         view.removeGame();
         view.showMenuAndLock();
 
+        game.destroy();
         game = null;
 
-        gameConnection.unregisterReceiver(gameFacadeReceiver);
-        gameConnection.unregisterReceiver(enterGameFacadeReceiver);
-
-        gameConnection.removeEventListener(Event.CONNECT, onGameConnect);
-        gameConnection.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onGameConnectionError);
-        gameConnection.removeEventListener(IOErrorEvent.IO_ERROR, onGameConnectionError);
-        gameConnection.removeEventListener(Event.CLOSE, onGameConnectionError);
-
-        if (gameConnection.host != connection.host || gameConnection.port != connection.port) {
-            gameConnection.close();
-        }
-
-        gameConnection = null;
-    }
-
-    private function onGameConnectionError(event:Event):void {
-        throw new Error(event.toString);
+        server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
+        server.removeEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
     }
 
     public function destroy():void {
         if (game) {
             view.removeGame();
+            game.destroy();
             game = null;
         }
     }

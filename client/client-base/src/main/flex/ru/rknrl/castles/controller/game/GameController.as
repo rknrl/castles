@@ -13,8 +13,6 @@ import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.tutor.GameTutorState;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
-import ru.rknrl.castles.rmi.GameFacadeSender;
-import ru.rknrl.castles.rmi.IGameFacade;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -35,12 +33,23 @@ import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
+import ru.rknrl.rmi.AddBulletEvent;
+import ru.rknrl.rmi.AddFireballEvent;
+import ru.rknrl.rmi.AddTornadoEvent;
+import ru.rknrl.rmi.AddUnitEvent;
+import ru.rknrl.rmi.AddVolcanoEvent;
+import ru.rknrl.rmi.GameOverEvent;
+import ru.rknrl.rmi.RemoveUnitEvent;
+import ru.rknrl.rmi.Server;
+import ru.rknrl.rmi.UpdateBuildingEvent;
+import ru.rknrl.rmi.UpdateItemStatesEvent;
+import ru.rknrl.rmi.UpdateUnitEvent;
 
-public class GameController implements IGameFacade {
+public class GameController {
     private var width:Number;
     private var height:Number;
     private var view:GameView;
-    private var sender:GameFacadeSender;
+    private var server:Server;
     private var selfId:PlayerIdDTO;
     private var tutorState:GameTutorState;
     private var localStorage:CastlesLocalStorage;
@@ -76,11 +85,11 @@ public class GameController implements IGameFacade {
     }
 
     public function GameController(view:GameView,
-                                   sender:GameFacadeSender,
+                                   server:Server,
                                    gameState:GameStateDTO,
                                    localStorage:CastlesLocalStorage) {
         this.view = view;
-        this.sender = sender;
+        this.server = server;
         this.localStorage = localStorage;
 
         tutorState = localStorage.gameTutorState;
@@ -100,7 +109,7 @@ public class GameController implements IGameFacade {
         tornadoPath = new TornadoPath(view.area.tornadoPath);
         magicItems = new MagicItems(view.magicItems);
 
-        onUpdateItemStates(gameState.itemsState);
+        updateItemStates(gameState.itemsState);
 
         for each(var slotsPos:SlotsPosDTO in gameState.slots) view.area.addSlots(slotsPos);
 
@@ -113,12 +122,12 @@ public class GameController implements IGameFacade {
         }
         buildings = new Buildings(buildingList);
 
-        for each(var unit:UnitDTO in gameState.units) onAddUnit(unit);
-        for each(var fireball:FireballDTO in gameState.fireballs) onAddFireball(fireball);
-        for each(var tornado:TornadoDTO in gameState.tornadoes) onAddTornado(tornado);
-        for each(var volcano:VolcanoDTO in gameState.volcanoes) onAddVolcano(volcano);
-        for each(var bullet:BulletDTO in gameState.bullets) onAddBullet(bullet);
-        for each(var gameOver:GameOverDTO in gameState.gameOvers) onGameOver(gameOver);
+        for each(var unit:UnitDTO in gameState.units) addUnit(unit);
+        for each(var fireball:FireballDTO in gameState.fireballs) addFireball(fireball);
+        for each(var tornado:TornadoDTO in gameState.tornadoes) addTornado(tornado);
+        for each(var volcano:VolcanoDTO in gameState.volcanoes) addVolcano(volcano);
+        for each(var bullet:BulletDTO in gameState.bullets) addBullet(bullet);
+        for each(var gameOverDto:GameOverDTO in gameState.gameOvers) gameOver(gameOverDto);
 
         view.addEventListener(GameViewEvents.SURRENDER, onSurrender);
         view.addEventListener(GameViewEvents.LEAVE_BUTTON_CLICK, onLeaveButtonClick);
@@ -128,10 +137,34 @@ public class GameController implements IGameFacade {
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
 
+        server.addEventListener(UpdateBuildingEvent.UPDATEBUILDING, onUpdateBuilding);
+        server.addEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
+        server.addEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
+        server.addEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
+        server.addEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
+        server.addEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
+        server.addEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
+        server.addEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
+        server.addEventListener(AddBulletEvent.ADDBULLET, onAddBullet);
+        server.addEventListener(GameOverEvent.GAMEOVER, onGameOver);
+
         // Человек мог играть на компе, а потом перезайти в бой на мобиле
         if (gameState.players.length > view.supportedPlayersCount) onSurrender()
     }
 
+    public function destroy():void {
+        server.removeEventListener(UpdateBuildingEvent.UPDATEBUILDING, onUpdateBuilding);
+        server.removeEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
+        server.removeEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
+        server.removeEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
+        server.removeEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
+        server.removeEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
+        server.removeEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
+        server.removeEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
+        server.removeEventListener(AddBulletEvent.ADDBULLET, onAddBullet);
+        server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
+    }
+    
     private static const tutorInterval:int = 10000;
     private var tutorLastTime:int = -8000;
 
@@ -180,32 +213,60 @@ public class GameController implements IGameFacade {
         }
     }
 
-    public function onAddUnit(dto:UnitDTO):void {
+    private function onAddUnit(e:AddUnitEvent):void {
+        addUnit(e.unit);
+    }
+
+    private function addUnit(dto:UnitDTO):void {
         const endPos:Point = buildings.byId(dto.targetBuildingId).pos;
         units.add(endPos, dto);
     }
 
-    public function onUpdateUnit(dto:UnitUpdateDTO):void {
+    private function onUpdateUnit(e:UpdateUnitEvent):void {
+        updateUnit(e.unitUpdate);
+    }
+
+    private function updateUnit(dto:UnitUpdateDTO):void {
         units.updateUnit(dto);
     }
 
-    public function onRemoveUnit(id:UnitIdDTO):void {
+    private function onRemoveUnit(e:RemoveUnitEvent):void {
+        removeUnit(e.id);
+    }
+
+    private function removeUnit(id:UnitIdDTO):void {
         units.remove(id);
     }
 
-    public function onAddFireball(dto:FireballDTO):void {
+    private function onAddFireball(e:AddFireballEvent):void {
+        addFireball(e.fireball);
+    }
+
+    private function addFireball(dto:FireballDTO):void {
         fireballs.add(dto);
     }
 
-    public function onAddVolcano(dto:VolcanoDTO):void {
+    private function onAddVolcano(e:AddVolcanoEvent):void {
+        addVolcano(e.volcano);
+    }
+
+    private function addVolcano(dto:VolcanoDTO):void {
         volcanoes.add(dto);
     }
 
-    public function onAddTornado(dto:TornadoDTO):void {
+    private function onAddTornado(e:AddTornadoEvent):void {
+        addTornado(e.tornado);
+    }
+
+    private function addTornado(dto:TornadoDTO):void {
         tornadoes.add(dto);
     }
 
-    public function onAddBullet(dto:BulletDTO):void {
+    private function onAddBullet(e:AddBulletEvent):void {
+        addBullet(e.bullet);
+    }
+
+    private function addBullet(dto:BulletDTO):void {
         const time:int = getTimer();
         const startPos:Point = buildings.byId(dto.buildingId).pos;
         const endPos:Point = units.getUnit(dto.unitId).pos(time + dto.duration);
@@ -214,7 +275,11 @@ public class GameController implements IGameFacade {
 
     private var buildings:Buildings;
 
-    public function onUpdateBuilding(dto:BuildingUpdateDTO):void {
+    private function onUpdateBuilding(e:UpdateBuildingEvent):void {
+        updateBuilding(e.building);
+    }
+
+    private function updateBuilding(dto:BuildingUpdateDTO):void {
         const owner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
         buildings.byId(dto.id).update(owner, dto.strengthened);
 
@@ -227,7 +292,11 @@ public class GameController implements IGameFacade {
 
     private var magicItemStates:GameMagicItems;
 
-    public function onUpdateItemStates(dto:ItemsStateDTO):void {
+    private function onUpdateItemStates(e:UpdateItemStatesEvent):void {
+        updateItemStates(e.states);
+    }
+
+    private function updateItemStates(dto:ItemsStateDTO):void {
         magicItemStates = new GameMagicItems(dto);
 
         for each(var itemType:ItemType in ItemType.values) {
@@ -248,7 +317,11 @@ public class GameController implements IGameFacade {
 
     // game over
 
-    public function onGameOver(dto:GameOverDTO):void {
+    private function onGameOver(e:GameOverEvent):void {
+        gameOver(e.gameOver);
+    }
+
+    private function gameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
             const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
             const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerDTO>[getSelfPlayerInfo()];
@@ -258,11 +331,11 @@ public class GameController implements IGameFacade {
 
     private function onSurrender(event:Event = null):void {
         view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
-        sender.surrender();
+        server.surrender();
     }
 
     private function onLeaveButtonClick(event:Event):void {
-        sender.leave();
+        server.leaveGame();
     }
 
     // mouse
@@ -290,7 +363,7 @@ public class GameController implements IGameFacade {
 
                     const gameState:CastTorandoDTO = new CastTorandoDTO();
                     gameState.points = Point.pointsToDto(tornadoPath.points);
-                    sender.castTornado(gameState);
+                    server.castTornado(gameState);
                     magicItems.useItem();
                 }
                 tornadoPath.endDraw()
@@ -325,7 +398,7 @@ public class GameController implements IGameFacade {
                         const dto:MoveDTO = new MoveDTO();
                         dto.toBuilding = toBuilding.id;
                         dto.fromBuildings = filteredIds;
-                        sender.move(dto);
+                        server.move(dto);
                     }
                 }
 
@@ -343,7 +416,7 @@ public class GameController implements IGameFacade {
                     tutorLastTime = getTimer();
                 }
 
-                sender.castFireball(mousePos.dto());
+                server.castFireball(mousePos.dto());
                 magicItems.useItem();
                 break;
             case ItemType.STRENGTHENING:
@@ -355,7 +428,7 @@ public class GameController implements IGameFacade {
                         tutorLastTime = getTimer();
                     }
 
-                    sender.castStrengthening(strBuilding.id);
+                    server.castStrengthening(strBuilding.id);
                     magicItems.useItem();
                 }
                 break;
@@ -366,7 +439,7 @@ public class GameController implements IGameFacade {
                     tutorLastTime = getTimer();
                 }
 
-                sender.castVolcano(mousePos.dto());
+                server.castVolcano(mousePos.dto());
                 magicItems.useItem();
                 break;
             case ItemType.TORNADO:
@@ -381,7 +454,7 @@ public class GameController implements IGameFacade {
                         tutorLastTime = getTimer();
                     }
 
-                    sender.castAssistance(building.id);
+                    server.castAssistance(building.id);
                     magicItems.useItem();
                 }
                 break;

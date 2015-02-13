@@ -1,15 +1,14 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
+import ru.rknrl.castles.{AccountId, MatchMaking}
+import ru.rknrl.castles.MatchMaking.ConnectToGame
+import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.{Game, GameConfig}
-import ru.rknrl.castles.{MatchMaking, AccountId}
-import MatchMaking.ConnectToGame
-import Game.Join
-import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.{GameStateDTO, MoveDTO}
@@ -18,32 +17,32 @@ import ru.rknrl.utils.Point
 import scala.collection.JavaConverters._
 
 class Bot(accountId: AccountId, config: GameConfig) extends Actor {
-  private val interval = 2000L
-  private var lastTime = 0L
+  val interval = 2000L
+  var lastTime = 0L
 
-  private var mapDiagonal = Double.NaN
+  var mapDiagonal = Double.NaN
 
-  private var game: Option[ActorRef] = None
-  private var gameState: Option[GameState] = None
-  private var playerId: Option[PlayerId] = None
+  var game: Option[ActorRef] = None
+  var gameState: Option[GameState] = None
+  var playerId: Option[PlayerId] = None
 
-  private var toBuildingId: Option[BuildingId] = None
-  private var myBuildingsSize = 0
+  var toBuildingId: Option[BuildingId] = None
+  var myBuildingsSize = 0
 
-  private var toBuildingSetTime = 0L
-  private val timeout = 10000L
+  var toBuildingSetTime = 0L
+  val timeout = 10000L
 
-  private var lastCastTime = 0L
+  var lastCastTime = 0L
 
   case class Weight(id: BuildingId, weight: Double)
 
   override def receive: Receive = {
     case ConnectToGame(gameRef) ⇒
       game = Some(gameRef)
-      gameRef ! Join(accountId, self, self)
-      gameRef ! JoinMsg()
+      gameRef ! Join(accountId, self)
+      gameRef ! C2B.JoinGame
 
-    case JoinGameMsg(gameState: GameStateDTO) ⇒
+    case B2C.JoinedGame(gameState: GameStateDTO) ⇒
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
@@ -81,7 +80,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
           myBuildingsSize = myBuildings.size
 
-          sender ! MoveMsg(
+          sender ! Move(
             MoveDTO.newBuilder()
               .addAllFromBuildings(fromBuildings.map(_.id.dto).asJava)
               .setToBuilding(toBuildingId.get.dto)
@@ -105,13 +104,13 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
             itemType match {
               case ItemType.FIREBALL ⇒
-                sender() ! CastFireballMsg(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.VOLCANO ⇒
-                sender() ! CastVolcanoMsg(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.STRENGTHENING ⇒
-                sender() ! CastStrengtheningMsg(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
+                sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
               case ItemType.ASSISTANCE ⇒
-                sender() ! CastAssistanceMsg(myBuildings.sortBy(_.population).head.id.dto)
+                sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
             }
           }
         }

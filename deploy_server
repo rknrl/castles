@@ -1,0 +1,14 @@
+#!/bin/sh
+
+mvn clean install &&
+cp server/src/main/resources/dev.json ~/dev/rknrl/castles-deploy/castles-server/dev.json &&
+cp server/target/server-1.0-SNAPSHOT-allinone.jar ~/dev/rknrl/castles-deploy/castles-server/server.jar &&
+cd ~/dev/rknrl/castles-deploy/castles-server/ &&
+git add dev.json server.jar &&
+git commit -m "update version" &&
+git push
+
+#ssh castles@castles@rknrl.ru
+#cd /var/castles/server/
+#sudo -E git pull
+#sudo service castles restart

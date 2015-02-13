@@ -3,12 +3,12 @@ package ru.rknrl.castles.database
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.MatchMaking
 import MatchMaking.TopItem
-import ru.rknrl.castles.database.AccountStateDb._
+import ru.rknrl.castles.database.Database._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
 
 class InMemoryDb(config: Any) extends StoppingStrategyActor {
-  private var map = Map[AccountIdDTO, Array[Byte]]()
+  var map = Map[AccountIdDTO, Array[Byte]]()
 
   override def receive = {
     case GetTop ⇒ sender() ! List.empty[TopItem]

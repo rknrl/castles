@@ -4,7 +4,7 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.castles.rmi.RemoveUnitMsg
+import ru.rknrl.castles.rmi.B2C.RemoveUnit
 import ru.rknrl.dto.GameDTO.MoveDTO
 
 import scala.collection.JavaConverters._
@@ -52,5 +52,5 @@ object Moving {
     for (unit ← units if unit.getPos(time) == unit.endPos) yield EnterUnit(unit)
 
   def `enterUnit→removeUnitMsg`(enterUnits: Iterable[EnterUnit]) =
-    for (enterUnit ← enterUnits) yield RemoveUnitMsg(enterUnit.unit.id.dto)
+    for (enterUnit ← enterUnits) yield RemoveUnit(enterUnit.unit.id.dto)
 }

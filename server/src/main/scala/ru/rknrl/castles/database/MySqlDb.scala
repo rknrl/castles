@@ -5,10 +5,9 @@ import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.{MatchMaking, AccountId}
-import MatchMaking.TopItem
-import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.database.AccountStateDb._
+import ru.rknrl.castles.{AccountId, MatchMaking}
+import ru.rknrl.castles.MatchMaking.TopItem
+import ru.rknrl.castles.database.Database._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
 
@@ -24,11 +23,11 @@ class DbConfiguration(username: String,
 }
 
 class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with ActorLogging {
-  private val connection = new MySQLConnection(configuration.configuration)
+  val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)
 
-  private def rowDataToTopItem(rowData: RowData) = {
+  def rowDataToTopItem(rowData: RowData) = {
     val idByteArray = rowData(0).asInstanceOf[Array[Byte]]
     val id = AccountIdDTO.parseFrom(idByteArray)
     val rating = rowData(1).asInstanceOf[Double]

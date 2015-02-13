@@ -3,7 +3,7 @@ package ru.rknrl.castles.database
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
 
-object AccountStateDb {
+object Database {
 
   /** Ответом будет StateResponse */
   case class Insert(accountId: AccountIdDTO, accountState: AccountStateDTO, userInfo: UserInfoDTO)

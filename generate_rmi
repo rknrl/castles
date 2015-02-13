@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Generate scala and action-script rmi by rknrl-rmi
+
+project="/Users/tolyayanot/dev/rknrl/castles"
+rknrl_core="/Users/tolyayanot/dev/rknrl/core"
+
+interfaces_dir="${project}/rmi/rmi-interfaces/src/main/scala/ru/rknrl/castles/rmi/"
+scala_out="${project}/rmi/rmi-server/src/main/scala/"
+as3_out="${project}/rmi/rmi-client/src/main/flex/"
+package_out="ru.rknrl.rmi"
+
+rm -rf ${java_out}/ru/rknrl/rmi/*
+
+${rknrl_core}/rmi/rmi-gen/rmi-gen \
+scala \
+${scala_out} \
+${package_out} \
+${interfaces_dir}
+
+rm -rf ${as3_out}/ru/rknrl/rmi/*
+
+${rknrl_core}/rmi/rmi-gen/rmi-gen \
+as \
+${as3_out} \
+${package_out} \
+${interfaces_dir}
+
+${rknrl_core}/rmi/rmi-gen/rmi-gen \
+as-events \
+${as3_out} \
+${package_out} \
+${interfaces_dir}
+

@@ -4,10 +4,10 @@ import java.net.InetSocketAddress
 
 import akka.actor.{ActorLogging, ActorRef, Props}
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.core.rmi.TcpReceiver
+import ru.rknrl.castles.account.Account
+import ru.rknrl.rmi.Client
 
-// todo: tcp error handling
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountStateDb: ActorRef) extends StoppingStrategyActor with ActorLogging {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef) extends StoppingStrategyActor with ActorLogging {
 
   import akka.io.Tcp._
 
@@ -25,17 +25,8 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, accountSta
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val tcpSender = sender()
-      val tcpReceiver = context.actorOf(Props(classOf[CastlesTcpReceiver], tcpSender, matchmaking, accountStateDb, config, name), "tcp-receiver" + name)
-      tcpSender ! Register(tcpReceiver)
+      val account = context.actorOf(Props(classOf[Account], matchmaking, database, config, name), "account" + name)
+      val client = context.actorOf(Props(classOf[Client], sender, account, name), "client" + name)
+      sender ! Register(client)
   }
-}
-
-class CastlesTcpReceiver(tcpSender: ActorRef,
-                         matchmaking: ActorRef,
-                         accountStateDb: ActorRef,
-                         config: Config,
-                         name: String) extends TcpReceiver(name) with ActorLogging {
-
-  context.actorOf(Props(classOf[Auth], tcpSender, self, matchmaking, accountStateDb, config, name), "auth" + name)
 }

@@ -13,30 +13,25 @@ import flash.system.Security;
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
-import ru.rknrl.castles.rmi.AccountFacadeReceiver;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
-import ru.rknrl.castles.rmi.AuthFacadeReceiver;
-import ru.rknrl.castles.rmi.AuthFacadeSender;
-import ru.rknrl.castles.rmi.IAuthFacade;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.core.rmi.Connection;
 import ru.rknrl.core.social.Sex;
 import ru.rknrl.core.social.Social;
 import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
-import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.LoadImageManager;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
+import ru.rknrl.rmi.AuthenticatedEvent;
+import ru.rknrl.rmi.Server;
 
-public class Main extends Sprite implements IAuthFacade {
+public class Main extends Sprite {
     private static const errorsUrl:String = "http://127.0.0.1:8080/bug";
     private static const cachedAvatarsLimit:int = 10;
 
@@ -55,10 +50,7 @@ public class Main extends Sprite implements IAuthFacade {
 
     private var myUserInfo:UserInfo;
 
-    private var connection:Connection;
-    private var authFacadeReceiver:AuthFacadeReceiver;
-    private var authFacadeSender:AuthFacadeSender;
-    private var accountFacadeReceiver:AccountFacadeReceiver;
+    private var server:Server;
 
     private var localeLoader:TextLoader;
     private var locale:CastlesLocale;
@@ -151,53 +143,43 @@ public class Main extends Sprite implements IAuthFacade {
     }
 
     private function createConnection(host:String, port:int):void {
-        if (connection) throw new Error("already connected");
+        if (server) throw new Error("already connected");
 
         Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
 
-        connection = new Connection(new Socket());
-        connection.addEventListener(Event.CONNECT, onConnect);
-        connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
-        connection.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
-        connection.addEventListener(Event.CLOSE, onConnectionError);
-        connection.connect(host, port);
+        server = new Server(new Socket());
+        server.addEventListener(Event.CONNECT, onConnect);
+        server.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
+        server.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
+        server.addEventListener(Event.CLOSE, onConnectionError);
+        server.connect(host, port);
     }
 
     private function onConnect(event:Event):void {
         log.add("onConnect");
-
-        authFacadeReceiver = new AuthFacadeReceiver(this);
-        connection.registerReceiver(authFacadeReceiver);
-
-        authFacadeSender = new AuthFacadeSender(connection);
-    }
-
-    public function onAuthReady():void {
         const authenticate:AuthenticateDTO = new AuthenticateDTO();
         authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
         authenticate.secret = secret;
         authenticate.deviceType = deviceType;
-        authFacadeSender.authenticate(authenticate);
+        server.addEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
+        server.authenticate(authenticate);
     }
 
-    public function onAuthenticated(authenticated:AuthenticatedDTO):void {
+    private function onAuthenticated(e:AuthenticatedEvent):void {
+        server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
         log.add("onAuthenticationResult");
 
-        connection.unregisterReceiver(authFacadeReceiver);
-
         view.removeLoadingScreen();
-        controller = new Controller(view, authenticated, connection, policyPort, new AccountFacadeSender(connection), log, social);
-
-        accountFacadeReceiver = new AccountFacadeReceiver(controller);
-        connection.registerReceiver(accountFacadeReceiver);
+        controller = new Controller(view, e.success, server, log, social);
     }
 
     private function destroyConnection():void {
-        connection.removeEventListener(Event.CONNECT, onConnect);
-        connection.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
-        connection.removeEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
-        connection.removeEventListener(Event.CLOSE, onConnectionError);
-        connection = null;
+        server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
+        server.removeEventListener(Event.CONNECT, onConnect);
+        server.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
+        server.removeEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
+        server.removeEventListener(Event.CLOSE, onConnectionError);
+        server = null;
 
         if (controller) {
             view.removeMenu();

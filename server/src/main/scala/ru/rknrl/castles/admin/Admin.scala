@@ -1,15 +1,16 @@
 package ru.rknrl.castles.admin
 
-import akka.actor.{ActorLogging, ActorRef, Props}
+import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
-import ru.rknrl.castles.{MatchMaking, AccountId}
-import MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.database.AccountStateDb.{Get, NoExist, StateResponse, Update}
+import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
+import ru.rknrl.castles.database.Database.{Get, NoExist, StateResponse, Update}
+import ru.rknrl.castles.rmi.B2C.AuthenticatedAsAdmin
+import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
-import ru.rknrl.core.rmi.{ReceiverRegistered, RegisterReceiver}
+import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AdminDTO.AdminAccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
@@ -17,43 +18,55 @@ import ru.rknrl.dto.CommonDTO.AccountIdDTO
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class Admin(tcpSender: ActorRef,
-            tcpReceiver: ActorRef,
-            accountStateDb: ActorRef,
+class Admin(database: ActorRef,
             matchmaking: ActorRef,
+            login: String,
+            password: String,
             name: String) extends EscalateStrategyActor with ActorLogging {
 
-  private val rmi = context.actorOf(Props(classOf[AdminRMI], tcpSender, self), "admin-rmi" + name)
-  tcpReceiver ! RegisterReceiver(rmi)
+  var client: ActorRef = null
 
-  def receive = {
-    case ReceiverRegistered(ref) ⇒
+  override def receive = auth
 
-    /** from AccountStateDb */
+  def auth: Receive = {
+    /** from Client */
+    case AuthenticateAsAdmin(authenticate) ⇒
+      if (authenticate.getLogin == login && authenticate.getPassword == password) {
+        client = sender
+        client ! AuthenticatedAsAdmin
+        context become admin
+      } else {
+        log.info("reject")
+        sender ! CloseConnection
+      }
+  }
+
+  def admin: Receive = {
+    /** from Database */
     case StateResponse(accountId, accountState) ⇒ sendToClient(accountId, accountState)
 
-    /** from AccountStateDb */
+    /** from Database */
     case NoExist ⇒ log.info("account does not exist")
 
-    case GetAccountStateMsg(dto) ⇒
-      accountStateDb ! Get(dto.getAccountId)
+    case GetAccountState(dto) ⇒
+      database ! Get(dto.getAccountId)
 
-    case AddGoldMsg(dto) ⇒
+    case AddGold(dto) ⇒
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.getAmount))
       )
 
-    case AddItemMsg(dto) ⇒
+    case AddItem(dto) ⇒
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.getItemType, dto.getAmount))
       )
 
-    case SetSkillMsg(dto) ⇒
+    case SetSkill(dto) ⇒
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.getSkilType, dto.getSkillLevel))
       )
 
-    case SetSlotMsg(dto) ⇒
+    case SetSlot(dto) ⇒
       getState(dto.getAccountId,
         (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
@@ -63,15 +76,15 @@ class Admin(tcpSender: ActorRef,
       )
   }
 
-  private def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
-    rmi ! AccountStateMsg(
+  def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
+    client ! B2C.AccountState(
       AdminAccountStateDTO.newBuilder()
         .setAccountId(accountId)
         .setAccountState(accountState)
         .build())
 
-  private def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
-    val future = Patterns.ask(accountStateDb, Get(accountId), 5 seconds)
+  def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
+    val future = Patterns.ask(database, Get(accountId), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
@@ -83,8 +96,8 @@ class Admin(tcpSender: ActorRef,
     }
   }
 
-  private def update(accountId: AccountIdDTO, newAccountState: AccountState): Unit = {
-    val future = Patterns.ask(accountStateDb, Update(accountId, newAccountState.dto), 5 seconds)
+  def update(accountId: AccountIdDTO, newAccountState: AccountState): Unit = {
+    val future = Patterns.ask(database, Update(accountId, newAccountState.dto), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {

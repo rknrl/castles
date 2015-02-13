@@ -8,7 +8,9 @@ import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
-import ru.rknrl.castles.rmi._
+import ru.rknrl.castles.rmi.B2C.GameOver
+import ru.rknrl.castles.rmi.C2B._
+import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._
 
@@ -17,7 +19,7 @@ import scala.concurrent.duration._
 
 object Game {
 
-  case class Join(accountId: AccountId, enterGameRef: ActorRef, gameRef: ActorRef)
+  case class Join(accountId: AccountId, client: ActorRef)
 
   case class Offline(accountId: AccountId)
 
@@ -67,13 +69,13 @@ class Game(players: Map[PlayerId, Player],
            config: GameConfig,
            matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
-  private val playersList = for ((id, player) ← players) yield player
+  val playersList = for ((id, player) ← players) yield player
 
-  private val `accountId→playerId` =
+  val `accountId→playerId` =
     for ((playerId, player) ← players)
     yield player.accountId → playerId
 
-  private val `playerId→accountId` =
+  val `playerId→accountId` =
     for ((playerId, player) ← players)
     yield playerId → player.accountId
 
@@ -81,97 +83,93 @@ class Game(players: Map[PlayerId, Player],
     * Добавление происходит на сообщение JoinMsg
     * Удаление происходит при потере коннекта, на сообщение Offline
     */
-  private var online = Set[PlayerId]()
+  var online = Set[PlayerId]()
 
-  private var playerStates =
+  var playerStates =
     for ((playerId, player) ← players)
     yield playerId → PlayerState.GAME
 
   /** Игроки, которые завершили игру и их места */
-  private var gameOvers = Map[PlayerId, Int]()
+  var gameOvers = Map[PlayerId, Int]()
 
-  private var `playerId→account` = Map[PlayerId, ActorRef]()
+  var `playerId→account` = Map[PlayerId, ActorRef]()
 
-  private var `playerId→enterGameRmi` = Map[PlayerId, ActorRef]()
+  var `playerId→client` = Map[PlayerId, ActorRef]()
 
-  private var `enterGameRmi→playerId` = Map[ActorRef, PlayerId]()
-
-  private var `playerId→gameRmi` = Map[PlayerId, ActorRef]()
-
-  private var `gameRmi→playerId` = Map[ActorRef, PlayerId]()
+  var `client→playerId` = Map[ActorRef, PlayerId]()
 
   /** Игроки еще не завершившие игру */
-  private def playersInGame =
+  def playersInGame =
     for ((playerId, playerState) ← playerStates
          if playerState == PlayerState.GAME)
     yield playerId
 
-  private def getPlace = playersInGame.size
+  def getPlace = playersInGame.size
 
   /** Все вышли из игры */
-  private def allLeaved =
+  def allLeaved =
     playerStates.count { case (playerId, playerState) ⇒ playerState != PlayerState.LEAVED} == 0
 
-  private def playersDto =
+  def playersDto =
     for ((id, player) ← players)
     yield PlayerDTO.newBuilder()
       .setId(id.dto)
       .setInfo(player.userInfo)
       .build
 
-  private def placeToReward(place: Int) =
+  def placeToReward(place: Int) =
     if (place == 1) config.winReward else 0
 
-  private def getReward(playerId: PlayerId) =
+  def getReward(playerId: PlayerId) =
     placeToReward(gameOvers(playerId))
 
-  private def getNewLosers =
+  def getNewLosers =
     for ((playerId, playerState) ← playerStates
          if playerState == PlayerState.GAME
          if gameState.isPlayerLose(playerId))
     yield playerId
 
-  private val sendFps = 30
-  private val sendInterval = 1000 / sendFps
+  val sendFps = 30
+  val sendInterval = 1000 / sendFps
 
   case object UpdateGameState
 
   import context.dispatcher
 
-  private val scheduler = context.system.scheduler.schedule(0 seconds, sendInterval milliseconds, self, UpdateGameState)
+  val scheduler = context.system.scheduler.schedule(0 seconds, sendInterval milliseconds, self, UpdateGameState)
 
-  private def canSendMessage(playerId: PlayerId) =
+  def canSendMessage(playerId: PlayerId) =
     (online contains playerId) &&
       (playerStates(playerId) != PlayerState.LEAVED) &&
       !players(playerId).isBot
 
-  private def sendToPlayers(messages: Iterable[Msg], personalMessages: Iterable[PersonalMessage]): Unit =
-    for ((playerId, gameRmi) ← `playerId→gameRmi`
+  def sendToPlayers(messages: Iterable[Msg], personalMessages: Iterable[PersonalMessage]): Unit =
+    for ((playerId, client) ← `playerId→client`
          if canSendMessage(playerId)) {
       val all = messages ++ personalMessages.filter(_.playerId == playerId).map(_.msg)
-      gameRmi ! all
+      client ! all
     }
 
   /** Отправить игрокам-ботам геймстейт */
-  private def sendGameStateToBots() =
-    for ((playerId, ref) ← `playerId→gameRmi`
+  def sendGameStateToBots() =
+    for ((playerId, ref) ← `playerId→client`
          if players(playerId).isBot)
       ref ! gameState
 
-  private def senderPlayerId = `gameRmi→playerId`(sender)
+  def senderPlayerId = `client→playerId`(sender)
 
-  private def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
+  def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  private var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, config)
+  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, config)
 
-  private var moveActions = Map[PlayerId, MoveDTO]()
-  private var fireballCasts = Map[PlayerId, PointDTO]()
-  private var strengtheningCasts = Map[PlayerId, BuildingId]()
-  private var volcanoCasts = Map[PlayerId, PointDTO]()
-  private var tornadoCasts = Map[PlayerId, CastTorandoDTO]()
-  private var assistanceCasts = Map[PlayerId, BuildingId]()
+  var moveActions = Map[PlayerId, MoveDTO]()
+  var fireballCasts = Map[PlayerId, PointDTO]()
+  var strengtheningCasts = Map[PlayerId, BuildingId]()
+  var volcanoCasts = Map[PlayerId, PointDTO]()
+  var tornadoCasts = Map[PlayerId, CastTorandoDTO]()
+  var assistanceCasts = Map[PlayerId, BuildingId]()
 
-  private def clearMaps(): Unit = {
+  def clearMaps(): Unit = {
     moveActions = Map.empty
     fireballCasts = Map.empty
     strengtheningCasts = Map.empty
@@ -180,7 +178,7 @@ class Game(players: Map[PlayerId, Player],
     assistanceCasts = Map.empty
   }
 
-  private def updateGameState = {
+  def updateGameState = {
     val time = System.currentTimeMillis()
 
     val (newGameState, messages, personalMessages) = gameState.update(
@@ -202,15 +200,12 @@ class Game(players: Map[PlayerId, Player],
     /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
       * Добавляем/Обнавляем рефы в мапах
       */
-    case Join(accountId, enterGameRmiRef, gameRmiRef) ⇒
+    case Join(accountId, client) ⇒
       val playerId = `accountId→playerId`(accountId)
       `playerId→account` = `playerId→account` + (playerId → sender)
 
-      `playerId→enterGameRmi` = `playerId→enterGameRmi` + (playerId → enterGameRmiRef)
-      `enterGameRmi→playerId` = `enterGameRmi→playerId` + (enterGameRmiRef → playerId)
-
-      `playerId→gameRmi` = `playerId→gameRmi` + (playerId → gameRmiRef)
-      `gameRmi→playerId` = `gameRmi→playerId` + (gameRmiRef → playerId)
+      `playerId→client` = `playerId→client` + (playerId → client)
+      `client→playerId` = `client→playerId` + (client → playerId)
 
     /** Аккаунт говорит, что потеряли связь с игроком
       * Убираем из его мапы online
@@ -223,23 +218,23 @@ class Game(players: Map[PlayerId, Player],
       * Кладем его в мапу online
       * и отправляем стартовое сообщение JoinGameMsg
       */
-    case JoinMsg() ⇒
-      val playerId = `enterGameRmi→playerId`(sender)
+    case C2B.JoinGame ⇒
+      val playerId = `client→playerId`(sender)
       online = online + playerId
       val builder = gameState.dtoBuilder(playerId)
       val dto = builder
         .addAllPlayers(playersDto.asJava)
         .addAllGameOvers(gameOverDto.asJava)
         .build
-      sender ! JoinGameMsg(dto)
+      sender ! B2C.JoinedGame(dto)
 
     /** Игрок сдается */
-    case SurrenderMsg() ⇒
+    case Surrender ⇒
       assert(playerStates(senderPlayerId) == PlayerState.GAME)
       addLoser(senderPlayerId, getPlace)
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
-    case LeaveMsg() ⇒
+    case C2B.LeaveGame ⇒
       assert(playerStates(senderPlayerId) == PlayerState.GAME_OVER)
       addLeaved(senderPlayerId)
 
@@ -260,32 +255,32 @@ class Game(players: Map[PlayerId, Player],
       for (playerId ← newLosers) addLoser(playerId, place)
 
 
-    case MoveMsg(dto: MoveDTO) ⇒
+    case Move(dto: MoveDTO) ⇒
       if (senderCanPlay) moveActions = moveActions + (senderPlayerId → dto)
 
-    case CastFireballMsg(point: PointDTO) ⇒
+    case CastFireball(point: PointDTO) ⇒
       if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
 
-    case CastStrengtheningMsg(buildingId: BuildingIdDTO) ⇒
+    case CastStrengthening(buildingId: BuildingIdDTO) ⇒
       if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → new BuildingId(buildingId.getId))
 
-    case CastVolcanoMsg(point: PointDTO) ⇒
+    case CastVolcano(point: PointDTO) ⇒
       if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
 
-    case CastTornadoMsg(dto: CastTorandoDTO) ⇒
+    case CastTornado(dto: CastTorandoDTO) ⇒
       if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
 
-    case CastAssistanceMsg(buildingId: BuildingIdDTO) ⇒
+    case CastAssistance(buildingId: BuildingIdDTO) ⇒
       if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
 
   }
 
-  private def addLoser(playerId: PlayerId, place: Int) {
+  def addLoser(playerId: PlayerId, place: Int) {
     playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
 
     val dto = getLoseDto(playerId, place)
     gameOvers = gameOvers + (playerId → place)
-    sendToPlayers(List(GameOverMsg(dto)), List.empty)
+    sendToPlayers(List(GameOver(dto)), List.empty)
 
     // Если в бою остался один игрок - объявляем его победителем
 
@@ -295,26 +290,26 @@ class Game(players: Map[PlayerId, Player],
       playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
       gameOvers = gameOvers + (winnerId.get → 1)
-      sendToPlayers(List(GameOverMsg(winDto)), List.empty)
+      sendToPlayers(List(GameOver(winDto)), List.empty)
       scheduler.cancel()
     }
   }
 
-  private def getWinDto(playerId: PlayerId) =
+  def getWinDto(playerId: PlayerId) =
     GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
       .setPlace(1)
       .setReward(config.winReward)
       .build()
 
-  private def getLoseDto(playerId: PlayerId, place: Int) =
+  def getLoseDto(playerId: PlayerId, place: Int) =
     GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
       .setPlace(place)
       .setReward(0)
       .build()
 
-  private def gameOverDto =
+  def gameOverDto =
     for ((playerId, place) ← gameOvers)
     yield GameOverDTO.newBuilder()
       .setPlayerId(playerId.dto)
@@ -322,7 +317,7 @@ class Game(players: Map[PlayerId, Player],
       .setReward(placeToReward(place))
       .build()
 
-  private def addLeaved(playerId: PlayerId) {
+  def addLeaved(playerId: PlayerId) {
     playerStates = playerStates.updated(playerId, PlayerState.LEAVED)
 
     // Говорим матчмейкингу, что игрок вышел

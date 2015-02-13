@@ -13,12 +13,10 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.tutor.MenuTutorState;
-import ru.rknrl.castles.rmi.AccountFacadeSender;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.core.social.PaymentDialogData;
 import ru.rknrl.core.social.PaymentDialogEvent;
 import ru.rknrl.core.social.Social;
-import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuyBuildingDTO;
 import ru.rknrl.dto.BuyItemDTO;
@@ -28,10 +26,12 @@ import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
+import ru.rknrl.rmi.AccountStateUpdatedEvent;
+import ru.rknrl.rmi.Server;
 
 public class MenuController {
     private var view:MenuView;
-    private var sender:AccountFacadeSender;
+    private var server:Server;
     private var model:MenuModel;
     private var social:Social;
     private var tutorState:MenuTutorState;
@@ -51,15 +51,17 @@ public class MenuController {
         return result;
     }
 
-    public function MenuController(view:MenuView, sender:AccountFacadeSender, model:MenuModel, social:Social, localStorage:CastlesLocalStorage) {
+    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:Social, localStorage:CastlesLocalStorage) {
         this.view = view;
-        this.sender = sender;
+        this.server = server;
         this.model = model;
         this.social = social;
         this.localStorage = localStorage;
 
         tutorState = localStorage.menuTutorState;
         appRunCount = localStorage.incAndGetAppRunCount;
+
+        server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
 
         social.addEventListener(PaymentDialogEvent.PAYMENT_DIALOG_CLOSED, onPaymentDialogClosed);
         social.addEventListener(PaymentDialogEvent.PAYMENT_SUCCESS, onPaymentSuccess);
@@ -78,8 +80,8 @@ public class MenuController {
         view.addEventListener(ScreenChangedEvent.SCREEN_CHANGED, onScreenChanged);
     }
 
-    public function onAccountStateUpdated(accountState:AccountStateDTO):void {
-        model.mergeAccountStateDto(accountState);
+    private function onAccountStateUpdated(event:AccountStateUpdatedEvent):void {
+        model.mergeAccountStateDto(event.accountState);
         view.slots = model.slots;
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;
@@ -122,7 +124,7 @@ public class MenuController {
             const dto:BuyBuildingDTO = new BuyBuildingDTO();
             dto.id = event.slotId;
             dto.buildingType = event.buildingType;
-            sender.buyBuilding(dto);
+            server.buyBuilding(dto);
 
             view.closePopup();
             view.lock = true;
@@ -140,7 +142,7 @@ public class MenuController {
         } else {
             const dto:UpgradeBuildingDTO = new UpgradeBuildingDTO();
             dto.id = event.slotId;
-            sender.upgradeBuilding(dto);
+            server.upgradeBuilding(dto);
 
             view.closePopup();
             view.lock = true;
@@ -160,7 +162,7 @@ public class MenuController {
     private function onRemoveBuilding(event:RemoveBuildingEvent):void {
         const dto:RemoveBuildingDTO = new RemoveBuildingDTO();
         dto.id = event.slotId;
-        sender.removeBuilding(dto);
+        server.removeBuilding(dto);
 
         view.closePopup();
         view.lock = true;
@@ -177,7 +179,7 @@ public class MenuController {
 
             const dto:BuyItemDTO = new BuyItemDTO();
             dto.type = event.itemType;
-            sender.buyItem(dto);
+            server.buyItem(dto);
 
             view.animateMagicItem(event.itemType);
             view.lock = true;
@@ -196,7 +198,7 @@ public class MenuController {
 
                 const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
                 dto.type = event.skillType;
-                sender.upgradeSkill(dto);
+                server.upgradeSkill(dto);
 
                 view.animateFlask(event.skillType);
                 view.lock = true;

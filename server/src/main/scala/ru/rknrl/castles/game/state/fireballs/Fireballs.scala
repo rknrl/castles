@@ -2,7 +2,7 @@ package ru.rknrl.castles.game.state.fireballs
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
-import ru.rknrl.castles.rmi.AddFireballMsg
+import ru.rknrl.castles.rmi.B2C.AddFireball
 import ru.rknrl.dto.GameDTO.{FireballDTO, PointDTO}
 import ru.rknrl.utils.{PeriodObjectCollection, Point}
 
@@ -14,7 +14,7 @@ object Fireballs {
     yield new Fireball(playerId, new Point(dto.getX, dto.getY), config.fireballFlyDuration, time)
 
   def `fireballs→addMessages`(fireballs: Iterable[Fireball], time: Long) =
-    fireballs.map(f ⇒ AddFireballMsg(f.dto(time)))
+    fireballs.map(f ⇒ AddFireball(f.dto(time)))
 
   def inRadius(fireballs: Iterable[Fireball], pos: Point, config: GameConfig, playerStates: PlayerStates) =
     fireballs.filter(f ⇒ f.pos.distance(pos) < config.fireballSplashRadius(playerStates(f.playerId)))
