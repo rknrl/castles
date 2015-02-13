@@ -12,6 +12,7 @@ import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.AccountDTO.{BuyBuildingDTO, BuyItemDTO, RemoveBuildingDTO, UpgradeBuildingDTO, UpgradeSkillDTO}
 import ru.rknrl.dto.AdminDTO._
 import ru.rknrl.dto.AuthDTO.AuthenticateDTO
+import ru.rknrl.dto.CommonDTO.TutorStateDTO
 import ru.rknrl.dto.GameDTO._
 
 object C2B {
@@ -43,6 +44,8 @@ object C2B {
   case class BuyItem(buy: BuyItemDTO) extends Msg
 
   case object EnterGame extends Msg
+
+  case class UpdateTutorState(tutorState: TutorStateDTO) extends Msg
 
   // enter game
 

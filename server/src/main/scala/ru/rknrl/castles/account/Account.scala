@@ -13,6 +13,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game.Game
 import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
@@ -75,48 +76,55 @@ class Account(matchmaking: ActorRef,
         accountId = new AccountId(authenticate.getUserInfo.getAccountId)
         deviceType = authenticate.getDeviceType
         userInfo = authenticate.getUserInfo
-        database ! Get(accountId.dto)
+        database ! Database.GetAccountState(accountId.dto)
       } else {
         log.info("reject")
         sender ! CloseConnection
       }
 
     /** from Database */
-    case NoExist ⇒
-      database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo)
+    case AccountNoExists ⇒
+      val initTutorState = TutorStateDTO.newBuilder()
+        .setAppRunCount(0)
+        .build()
+      database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
 
     /** from Database */
-    case StateResponse(id, dto) ⇒
+    case AccountStateResponse(id, dto) ⇒
       state = AccountState.fromDto(dto)
+      database ! GetTutorState(accountId.dto)
+
+    case TutorStateResponse(id, tutorState) ⇒
       matchmaking ! InGame(accountId)
-      context become enterAccount
+      context become enterAccount(tutorState)
   }
 
-  def enterAccount: Receive = {
+  def enterAccount(tutorState: TutorStateDTO): Receive = {
     /** Matchmaking ответил на InGame */
     case InGameResponse(game, searchOpponents, top) ⇒
       this.top = top
       if (game.isDefined) {
-        client ! authenticated(searchOpponents = false, Some(gameAddress), top)
+        client ! authenticated(searchOpponents = false, Some(gameAddress), top, tutorState)
         connectToGame(game.get)
       } else if (searchOpponents) {
-        client ! authenticated(searchOpponents = true, None, top)
+        client ! authenticated(searchOpponents = true, None, top, tutorState)
         context become enterGame
       } else if (state.gamesCount == 0) {
         placeGameOrder(); // При первом заходе сразу попадаем в бой
-        client ! authenticated(searchOpponents = true, None, top)
+        client ! authenticated(searchOpponents = true, None, top, tutorState)
         context become enterGame
       } else {
-        client ! authenticated(searchOpponents = false, None, top)
+        client ! authenticated(searchOpponents = false, None, top, tutorState)
         context become account
       }
   }
 
-  def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO]) = {
+  def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO], tutorState: TutorStateDTO) = {
     val builder = AuthenticatedDTO.newBuilder()
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
       .addAllTop(top.asJava)
+      .setTutor(tutorState)
       .addAllProducts(config.productsDto(accountId.accountType).asJava)
       .setSearchOpponents(searchOpponents)
 
@@ -178,13 +186,16 @@ class Account(matchmaking: ActorRef,
 
   def persistent: Receive = {
     /** from Database, ответ на Update */
-    case StateResponse(_, accountStateDto) ⇒
+    case AccountStateResponse(_, accountStateDto) ⇒
       client ! AccountStateUpdated(accountStateDto)
 
     /** from Admin or Payments */
     case AdminSetAccountState(_, accountStateDto) ⇒
       state = AccountState.fromDto(accountStateDto)
       client ! AccountStateUpdated(accountStateDto)
+
+    case C2B.UpdateTutorState(state) ⇒
+      database ! Database.UpdateTutorState(accountId.dto, state)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
     case DuplicateAccount ⇒ client ! CloseConnection

@@ -216,10 +216,10 @@ class MatchMaking(interval: FiniteDuration,
       log.info("AddProduct")
       val payments = sender
 
-      val future = Patterns.ask(database, Get(accountId.dto), 5 seconds)
+      val future = Patterns.ask(database, GetAccountState(accountId.dto), 5 seconds)
       val result = Await.result(future, 5 seconds)
       result match {
-        case StateResponse(_, accountStateDto) ⇒
+        case AccountStateResponse(_, accountStateDto) ⇒
           val state = AccountState.fromDto(accountStateDto)
           val newState = state.applyProduct(product, count)
 
@@ -227,7 +227,7 @@ class MatchMaking(interval: FiniteDuration,
           val result = Await.result(future, 5 seconds)
 
           result match {
-            case msg@StateResponse(_, newAccountStateDto) ⇒
+            case msg@AccountStateResponse(_, newAccountStateDto) ⇒
               if (newAccountStateDto.getGold == newState.gold) {
                 payments ! ProductAdded(orderId)
                 accountIdToAccountRef(accountId) ! AdminSetAccountState(accountId, newAccountStateDto)
@@ -240,7 +240,7 @@ class MatchMaking(interval: FiniteDuration,
               payments ! DatabaseError
           }
 
-        case NoExist ⇒
+        case AccountNoExists ⇒
           log.info("account not found")
           payments ! AccountNotFound
 

@@ -10,7 +10,6 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -20,7 +19,6 @@ import ru.rknrl.castles.model.events.UpgradeBuildingEvent;
 import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
-import ru.rknrl.castles.model.tutor.MenuTutorState;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.core.social.PaymentDialogData;
 import ru.rknrl.core.social.PaymentDialogEvent;
@@ -32,6 +30,7 @@ import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
 import ru.rknrl.rmi.AccountStateUpdatedEvent;
@@ -42,11 +41,7 @@ public class MenuController {
     private var server:Server;
     private var model:MenuModel;
     private var social:Social;
-    private var tutorState:MenuTutorState;
-    private var localStorage:CastlesLocalStorage;
-
-    /** Какой это по счету запуск приложения */
-    private var appRunCount:int;
+    private var tutorState:TutorStateDTO;
 
     /** Показывался ли уже туториал для этого экрана за текущий запуск приложения */
     private const tutorShows:Dictionary = initTutorShows();
@@ -59,15 +54,13 @@ public class MenuController {
         return result;
     }
 
-    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:Social, localStorage:CastlesLocalStorage) {
+    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:Social, tutorState:TutorStateDTO) {
         this.view = view;
         this.server = server;
         this.model = model;
         this.social = social;
-        this.localStorage = localStorage;
 
-        tutorState = localStorage.menuTutorState;
-        appRunCount = localStorage.incAndGetAppRunCount;
+        this.tutorState = tutorState;
 
         server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
 
@@ -109,7 +102,7 @@ public class MenuController {
             if (canUpgrade || canRemove) {
                 if (!tutorState.slot) {
                     tutorState.slot = true;
-                    localStorage.saveMenuTutorState(tutorState);
+                    server.updateTutorState(tutorState);
                 }
 
                 view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
@@ -118,7 +111,7 @@ public class MenuController {
         } else {
             if (!tutorState.emptySlot) {
                 tutorState.emptySlot = true;
-                localStorage.saveMenuTutorState(tutorState);
+                server.updateTutorState(tutorState);
             }
 
             view.openBuildPopup(event.slotId, model.buildingPrices.buildPrice);
@@ -182,7 +175,7 @@ public class MenuController {
         } else {
             if (!tutorState.magicItem) {
                 tutorState.magicItem = true;
-                localStorage.saveMenuTutorState(tutorState);
+                server.updateTutorState(tutorState);
             }
 
             const dto:BuyItemDTO = new BuyItemDTO();
@@ -201,7 +194,7 @@ public class MenuController {
             } else {
                 if (!tutorState.skills) {
                     tutorState.skills = true;
-                    localStorage.saveMenuTutorState(tutorState);
+                    server.updateTutorState(tutorState);
                 }
 
                 const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
@@ -242,11 +235,11 @@ public class MenuController {
         if (screenIndex > 0) {
             if (!tutorState.navigate) {
                 tutorState.navigate = true;
-                localStorage.saveMenuTutorState(tutorState);
+                server.updateTutorState(tutorState);
             }
         }
 
-        if (appRunCount >= 3 && !tutorShows[screenIndex] && !view.tutorPlaying) {
+        if (tutorState.appRunCount >= 3 && !tutorShows[screenIndex] && !view.tutorPlaying) {
             switch (screenIndex) {
                 case ScreenChangedEvent.SCREEN_MAIN:
                     if (!tutorState.navigate) {
@@ -261,13 +254,13 @@ public class MenuController {
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SHOP:
-                    if (!tutorState.magicItem && appRunCount >= 4 && model.gold >= model.itemPrice) {
+                    if (!tutorState.magicItem && tutorState.appRunCount >= 4 && model.gold >= model.itemPrice) {
                         tutorShows[screenIndex] = true;
                         view.playMagicItemTutor();
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SKILLS:
-                    if (!tutorState.skills && appRunCount >= 4 && model.gold >= model.upgradePrices.firstUpgradePrice) {
+                    if (!tutorState.skills && tutorState.appRunCount >= 4 && model.gold >= model.upgradePrices.firstUpgradePrice) {
                         tutorShows[screenIndex] = true;
                         view.playFlaskTutor();
                     }

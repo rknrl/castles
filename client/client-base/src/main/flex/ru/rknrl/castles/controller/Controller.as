@@ -10,7 +10,6 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 
 import ru.rknrl.castles.controller.game.GameController;
-import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -22,6 +21,7 @@ import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.log.Log;
 import ru.rknrl.rmi.EnteredGameEvent;
 import ru.rknrl.rmi.JoinedGameEvent;
@@ -35,7 +35,7 @@ public class Controller {
     private var social:Social;
 
     private var menu:MenuController;
-    private var localStorage:CastlesLocalStorage;
+    private var tutorState:TutorStateDTO;
 
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
@@ -47,14 +47,16 @@ public class Controller {
         this.log = log;
         this.social = social;
 
-        localStorage = new CastlesLocalStorage(log);
+        tutorState = authenticated.tutor;
+        tutorState.appRunCount++;
+        server.updateTutorState(tutorState);
 
         server.addEventListener(EnteredGameEvent.ENTEREDGAME, onEnteredGame);
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
         const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, server, model, social, localStorage);
+        menu = new MenuController(menuView, server, model, social, tutorState);
 
         if (authenticated.searchOpponents) {
             view.hideMenu();
@@ -98,7 +100,7 @@ public class Controller {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.addGame(playerInfos, h, v);
-        game = new GameController(gameView, server, gameState, localStorage);
+        game = new GameController(gameView, server, gameState, tutorState);
     }
 
     private function onLeavedGame(e:LeavedGameEvent):void {

@@ -14,7 +14,8 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
-import ru.rknrl.castles.database.Database.{Get, NoExist, StateResponse, Update}
+import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.{GetAccountState, AccountNoExists, AccountStateResponse, Update}
 import ru.rknrl.castles.rmi.B2C.{AdminOnline, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
@@ -51,13 +52,13 @@ class Admin(database: ActorRef,
 
   def admin: Receive = {
     /** from Database */
-    case StateResponse(accountId, accountState) ⇒ sendToClient(accountId, accountState)
+    case AccountStateResponse(accountId, accountState) ⇒ sendToClient(accountId, accountState)
 
     /** from Database */
-    case NoExist ⇒ log.info("account does not exist")
+    case AccountNoExists ⇒ log.info("account does not exist")
 
-    case GetAccountState(dto) ⇒
-      database ! Get(dto.getAccountId)
+    case C2B.GetAccountState(dto) ⇒
+      database ! Database.GetAccountState(dto.getAccountId)
 
     case GetOnline ⇒
       log.info("getOnline")
@@ -100,11 +101,11 @@ class Admin(database: ActorRef,
         .build())
 
   def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
-    val future = Patterns.ask(database, Get(accountId), 5 seconds)
+    val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case StateResponse(accountId, accountStateDto) ⇒
+      case AccountStateResponse(accountId, accountStateDto) ⇒
         f(accountId, AccountState.fromDto(accountStateDto))
 
       case invalid ⇒
@@ -117,7 +118,7 @@ class Admin(database: ActorRef,
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case StateResponse(accountId, accountStateDto) ⇒
+      case AccountStateResponse(accountId, accountStateDto) ⇒
         matchmaking ! AdminSetAccountState(new AccountId(accountId), accountStateDto)
         sendToClient(accountId, accountStateDto)
 

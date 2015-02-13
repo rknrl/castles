@@ -10,7 +10,6 @@ package ru.rknrl.castles.controller.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.model.CastlesLocalStorage;
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -19,7 +18,6 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.model.tutor.GameTutorState;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.dto.BuildingDTO;
@@ -37,6 +35,7 @@ import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
+import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UnitDTO;
 import ru.rknrl.dto.UnitIdDTO;
 import ru.rknrl.dto.UnitUpdateDTO;
@@ -59,8 +58,7 @@ public class GameController {
     private var view:GameView;
     private var server:Server;
     private var selfId:PlayerIdDTO;
-    private var tutorState:GameTutorState;
-    private var localStorage:CastlesLocalStorage;
+    private var tutorState:TutorStateDTO;
 
     private var bullets:Bullets;
     private var fireballs:Fireballs;
@@ -95,12 +93,11 @@ public class GameController {
     public function GameController(view:GameView,
                                    server:Server,
                                    gameState:GameStateDTO,
-                                   localStorage:CastlesLocalStorage) {
+                                   tutorState:TutorStateDTO) {
         this.view = view;
         this.server = server;
-        this.localStorage = localStorage;
 
-        tutorState = localStorage.gameTutorState;
+        this.tutorState = tutorState;
 
         width = gameState.width;
         height = gameState.height;
@@ -172,7 +169,7 @@ public class GameController {
         server.removeEventListener(AddBulletEvent.ADDBULLET, onAddBullet);
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
-    
+
     private static const tutorInterval:int = 10000;
     private var tutorLastTime:int = -8000;
 
@@ -365,7 +362,7 @@ public class GameController {
                 if (tornadoPath.points.length >= 2) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
-                        localStorage.saveGameTutorState(tutorState);
+                        server.updateTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 
@@ -392,13 +389,13 @@ public class GameController {
                         if (filteredIds.length > 1 && tutorState.arrow) {
                             if (!tutorState.arrows) {
                                 tutorState.arrows = true;
-                                localStorage.saveGameTutorState(tutorState);
+                                server.updateTutorState(tutorState);
                                 tutorLastTime = getTimer();
                             }
                         } else {
                             if (!tutorState.arrow) {
                                 tutorState.arrow = true;
-                                localStorage.saveGameTutorState(tutorState);
+                                server.updateTutorState(tutorState);
                                 tutorLastTime = getTimer();
                             }
                         }
@@ -420,7 +417,7 @@ public class GameController {
             case ItemType.FIREBALL:
                 if (!tutorState.fireball) {
                     tutorState.fireball = true;
-                    localStorage.saveGameTutorState(tutorState);
+                    server.updateTutorState(tutorState);
                     tutorLastTime = getTimer();
                 }
 
@@ -432,7 +429,7 @@ public class GameController {
                 if (strBuilding) {
                     if (!tutorState.strengthened) {
                         tutorState.strengthened = true;
-                        localStorage.saveGameTutorState(tutorState);
+                        server.updateTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 
@@ -443,7 +440,7 @@ public class GameController {
             case ItemType.VOLCANO:
                 if (!tutorState.volcano) {
                     tutorState.volcano = true;
-                    localStorage.saveGameTutorState(tutorState);
+                    server.updateTutorState(tutorState);
                     tutorLastTime = getTimer();
                 }
 
@@ -458,7 +455,7 @@ public class GameController {
                 if (building) {
                     if (!tutorState.assistance) {
                         tutorState.assistance = true;
-                        localStorage.saveGameTutorState(tutorState);
+                        server.updateTutorState(tutorState);
                         tutorLastTime = getTimer();
                     }
 

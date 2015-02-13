@@ -17,7 +17,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO, UserInfoDTO}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -56,12 +56,19 @@ class MySqlDb(configuration: DbConfiguration) extends EscalateStrategyActor with
         }
       )
 
-    case Insert(accountId, accountState, userInfo) ⇒
+    case Insert(accountId, accountState, userInfo, tutorState) ⇒
       val ref = sender()
+
       connection.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.getRating, accountState.toByteArray, userInfo.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! StateResponse(accountId, accountState)
+            connection.sendPreparedStatement("INSERT INTO tutor_state (id,state) VALUES (?,?);", Seq(accountId.toByteArray, tutorState.toByteArray)).map(
+              queryResult ⇒
+                if (queryResult.rowsAffected == 1) {
+                  ref ! AccountStateResponse(accountId, accountState)
+                } else
+                  log.error("Insert tutorState rowsAffected=" + queryResult.rowsAffected)
+            )
           else
             log.error("Insert rowsAffected=" + queryResult.rowsAffected)
       )
@@ -71,7 +78,7 @@ class MySqlDb(configuration: DbConfiguration) extends EscalateStrategyActor with
       connection.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! StateResponse(accountId, accountState)
+            ref ! AccountStateResponse(accountId, accountState)
           else
             log.error("Update rowsAffected=" + queryResult.rowsAffected)
       )
@@ -86,20 +93,29 @@ class MySqlDb(configuration: DbConfiguration) extends EscalateStrategyActor with
             log.error("Update rowsAffected=" + queryResult.rowsAffected)
       )
 
-    case Get(accountId) ⇒
+    case UpdateTutorState(accountId, tutorState) ⇒
+      connection.sendPreparedStatement("UPDATE tutor_state SET state=? WHERE id=?;", Seq(tutorState.toByteArray, accountId.toByteArray)).map(
+        queryResult ⇒
+          if (queryResult.rowsAffected == 1) {
+            // ok
+          } else
+            log.error("Update tutorState rowsAffected=" + queryResult.rowsAffected)
+      )
+
+    case GetAccountState(accountId) ⇒
       val ref = sender()
       connection.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             if (resultSet.size == 0) {
-              ref ! NoExist
+              ref ! AccountNoExists
             } else if (resultSet.size == 1) {
               val row: RowData = resultSet.head
 
               val byteArray = row(0).asInstanceOf[Array[Byte]]
               val state = AccountStateDTO.parseFrom(byteArray)
 
-              ref ! StateResponse(accountId, state)
+              ref ! AccountStateResponse(accountId, state)
             } else
               log.error("Update rows=" + resultSet.size)
 
@@ -107,5 +123,26 @@ class MySqlDb(configuration: DbConfiguration) extends EscalateStrategyActor with
             log.error("Get response None")
         }
       )
+
+    case GetTutorState(accountId) ⇒
+      val ref = sender()
+      connection.sendPreparedStatement("SELECT state FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
+        queryResult ⇒ queryResult.rows match {
+          case Some(resultSet) ⇒
+            if (resultSet.size == 1) {
+              val row: RowData = resultSet.head
+
+              val byteArray = row(0).asInstanceOf[Array[Byte]]
+              val state = TutorStateDTO.parseFrom(byteArray)
+
+              ref ! TutorStateResponse(accountId, state)
+            } else
+              log.error("Get tutorState rows=" + resultSet.size)
+
+          case None ⇒
+            log.error("Get response None")
+        }
+      )
+
   }
 }
