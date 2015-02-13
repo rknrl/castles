@@ -1,13 +1,33 @@
 #!/bin/sh
 
-# build release client
-# js minification
-# replace 127.0.0.1 => castles.rknrl.ru in vk.html, ok.html, mm.html
+# build client-web.swf via ant
+
+ant castles-web-swf &&
+
+# clear out folder
+
+rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/* &&
+
+# copy client-web.swf to out folder
+
+cp ~/dev/rknrl/castles/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/game.swf &&
+
+# copy html files to out folder
 
 cp -a ~/dev/rknrl/castles/client/client-web/src/main/www/. ~/dev/rknrl/castles-deploy/castles-client/www &&
-cp ~/dev/rknrl/castles/client/client-web/target/castles-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/game.swf &&
+
+# replace 127.0.0.1 by castles.rknrl.ru in vk.html, ok.html, mm.html
 
 cd ~/dev/rknrl/castles-deploy/castles-client/www &&
+sed -i.bak 's/127\.0\.0\.1/castles\.rknrl\.ru/g' *.html &&
+rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/*.bak &&
+
+# print diff
+
+git diff --cached &&
+
+# commit changes
+
 git add * &&
 git commit -m "update version" &&
 git push

@@ -5,6 +5,8 @@
 
     <target name="castles-web-swf">
         <sequential>
+            <delete file="target/client-web.swf"/>
+
             <mxmlc file="${castles}/client/client-web/src/main/flex/ru/rknrl/castles/MainWeb.as"
                    output="target/client-web.swf">
                 <load-config filename="${FLEX_HOME}/frameworks/flex-config.xml"/>

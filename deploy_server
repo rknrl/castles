@@ -1,9 +1,28 @@
 #!/bin/sh
 
+# build server via maven
+
 mvn clean install &&
+
+# clear out folder
+
+rm -rf ~/dev/rknrl/castles-deploy/castles-server/* &&
+
+# copy config json to out folder
+
 cp server/src/main/resources/dev.json ~/dev/rknrl/castles-deploy/castles-server/dev.json &&
+
+# copy server jar to out folder
+
 cp server/target/server-1.0-SNAPSHOT-allinone.jar ~/dev/rknrl/castles-deploy/castles-server/server.jar &&
+
+# print diff
+
 cd ~/dev/rknrl/castles-deploy/castles-server/ &&
+git diff --cached &&
+
+# commit changes
+
 git add dev.json server.jar &&
 git commit -m "update version" &&
 git push
