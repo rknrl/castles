@@ -220,7 +220,7 @@ public class Main extends Sprite {
         const stackTrace:String = error ? error.getStackTrace() : "";
         log.error(event.error.toString(), stackTrace);
         log.send(bugsLogUrl);
-        destroy();
+//      todo temp  destroy();
     }
 }
 }
