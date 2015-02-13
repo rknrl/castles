@@ -4,8 +4,8 @@ import akka.actor.ActorLogging
 import com.github.mauricio.async.db.mysql.MySQLConnection
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
-import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.{AccountId, MatchMaking}
+import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
@@ -22,7 +22,7 @@ class DbConfiguration(username: String,
   def configuration = new Configuration(username, host, port, Some(password), Some(database))
 }
 
-class MySqlDb(configuration: DbConfiguration) extends StoppingStrategyActor with ActorLogging {
+class MySqlDb(configuration: DbConfiguration) extends EscalateStrategyActor with ActorLogging {
   val connection = new MySQLConnection(configuration.configuration)
 
   Await.result(connection.connect, 5 seconds)
