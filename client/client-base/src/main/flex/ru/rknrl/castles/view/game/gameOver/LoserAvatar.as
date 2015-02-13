@@ -7,9 +7,10 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.game.gameOver {
-import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.DisplayObject;
 import flash.display.MovieClip;
+import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.Event;
 
@@ -21,12 +22,11 @@ import ru.rknrl.loaders.ILoadImageManager;
 
 public class LoserAvatar extends Sprite {
     private static const avatarSize:int = Layout.itemSize;
-    private static const bitmapDataSize:int = 256; // размер битмапдаты, которая использована в анимации в fla
 
     private var loading:LockView;
     private var defaultAvatar:DefaultAvatarMC;
     private var movieClip:MovieClip;
-    private var bitmapData:BitmapData;
+    private var avatar:Sprite;
     private var color:uint;
 
     public function LoserAvatar(photoUrl:String, loadImageManager:ILoadImageManager, color:uint) {
@@ -43,7 +43,7 @@ public class LoserAvatar extends Sprite {
     }
 
     private function onBitmapDataLoad(url:String, bitmapData:BitmapData):void {
-        if(movieClip) throw new Error("movieClip already on stage");
+        if (movieClip) throw new Error("movieClip already on stage");
 
         if (!bitmapData) {
             bitmapData = new DefaultAvatarBitmapData();
@@ -52,17 +52,24 @@ public class LoserAvatar extends Sprite {
         defaultAvatar.visible = false;
         loading.visible = false;
 
-        this.bitmapData = BitmapUtils.createCircleBitmapData(BitmapUtils.square(bitmapData, bitmapDataSize));
-
         addChild(movieClip = new LoserMC());
         movieClip.addEventListener(Event.EXIT_FRAME, onExitFrame);
         movieClip.play();
+
+        avatar = new Sprite();
+        const shape:Shape = BitmapUtils.createCircleShape(BitmapUtils.square(bitmapData, avatarSize));
+        shape.x = -avatarSize / 2;
+        shape.y = -avatarSize / 2;
+        avatar.addChild(shape);
+        addChild(avatar);
     }
 
     private function onExitFrame(event:Event):void {
-        for (var i:int = 0; i < movieClip.numChildren; i++) {
-            const bitmap:Bitmap = movieClip.getChildAt(i) as Bitmap;
-            if (bitmap) bitmap.bitmapData = bitmapData;
+        const bitmap:DisplayObject = movieClip.getChildByName("avatar");
+        if (bitmap) {
+            avatar.x = bitmap.x;
+            avatar.y = bitmap.y;
+            avatar.rotation = bitmap.rotation;
         }
 
         if (movieClip.currentFrame == movieClip.totalFrames) {
