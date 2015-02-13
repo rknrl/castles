@@ -49,8 +49,6 @@ class Account(matchmaking: ActorRef,
   var state: AccountState = null
   var top: Iterable[TopUserInfoDTO] = null
 
-  var game: Option[ActorRef] = None
-
   def checkSecret(authenticate: AuthenticateDTO) =
     authenticate.getUserInfo.getAccountId.getType match {
       case AccountType.DEV ⇒
@@ -158,16 +156,13 @@ class Account(matchmaking: ActorRef,
     case ConnectToGame(game) ⇒
       client ! EnteredGame(gameAddress)
       connectToGame(game)
-      context become inGame
   }
 
-  def inGame: Receive = persistent.orElse {
-    case msg: GameMsg ⇒ game.get forward msg
+  def inGame(game: ActorRef): Receive = persistent.orElse {
+    case msg: GameMsg ⇒ game forward msg
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
     case LeaveGame(usedItems, reward, newRating) ⇒
-      assert(game.isDefined)
-
       client ! B2C.LeavedGame
 
       state = state.addGold(reward)
@@ -176,8 +171,6 @@ class Account(matchmaking: ActorRef,
 
       for ((itemType, count) ← usedItems)
         state = state.addItem(itemType, -count)
-
-      game = None
 
       database ! Update(accountId.dto, state.dto)
       context become account
@@ -201,10 +194,8 @@ class Account(matchmaking: ActorRef,
     matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
 
   def connectToGame(game: ActorRef) = {
-    assert(this.game.isEmpty)
     game ! Game.Join(accountId, client)
-    this.game = Some(game)
-    context become inGame
+    context become inGame(game)
   }
 
   def gameAddress = NodeLocator.newBuilder()
