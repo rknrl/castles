@@ -1,18 +1,19 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.castles.game.points.Point
-import ru.rknrl.castles.{AccountId, MatchMaking}
+import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.{Game, GameConfig}
+import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.rmi.B2C.GameOver
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
-import ru.rknrl.dto.GameDTO.{GameStateDTO, MoveDTO}
+import ru.rknrl.dto.GameDTO.MoveDTO
 
 import scala.collection.JavaConverters._
 
@@ -42,9 +43,12 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
       gameRef ! Join(accountId, self)
       gameRef ! C2B.JoinGame
 
-    case B2C.JoinedGame(gameState: GameStateDTO) ⇒
+    case B2C.JoinedGame(gameState) ⇒
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
+
+    case GameOver(dto) ⇒
+      if (dto.getPlayerId.getId == playerId.get.id) sender ! C2B.LeaveGame
 
     case newGameState: GameState ⇒
       gameState = Some(newGameState)
