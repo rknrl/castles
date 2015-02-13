@@ -9,14 +9,12 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{ActorLogging, ActorRef}
-import akka.pattern.Patterns
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game.Game
-import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
 import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -28,8 +26,6 @@ import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticatedDTO, TopUserInfoDTO}
 import ru.rknrl.dto.CommonDTO._
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Await
-import scala.concurrent.duration._
 
 object Account {
 
@@ -192,34 +188,10 @@ class Account(matchmaking: ActorRef,
     case StateResponse(_, accountStateDto) ⇒
       client ! AccountStateUpdated(accountStateDto)
 
-    /** from Admin */
+    /** from Admin or Payments */
     case AdminSetAccountState(_, accountStateDto) ⇒
-      this.state = AccountState.fromDto(accountStateDto)
+      state = AccountState.fromDto(accountStateDto)
       client ! AccountStateUpdated(accountStateDto)
-
-    case AddProduct(accountId, orderId, product, count) ⇒
-      log.info("AddProduct")
-      product.id match {
-        case 1 ⇒ state = state.addGold(count)
-        case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
-      }
-
-      val future = Patterns.ask(database, Update(accountId.dto, state.dto), 5 seconds)
-      val result = Await.result(future, 5 seconds)
-
-      result match {
-        case StateResponse(_, accountStateDto) ⇒
-          if (accountStateDto.getGold == state.gold) {
-            sender ! ProductAdded(orderId)
-            client ! AccountStateUpdated(accountStateDto)
-          } else {
-            log.info("invalid gold=" + accountStateDto.getGold + ", but expected " + state.gold)
-            sender ! DatabaseError
-          }
-        case invalid ⇒
-          log.info("invalid result=" + invalid)
-          sender ! DatabaseError
-      }
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
     case DuplicateAccount ⇒ client ! CloseConnection

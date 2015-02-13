@@ -28,16 +28,16 @@ import scala.concurrent.duration._
 
 object PaymentsServer {
 
-  /** Payments -> Matchmaking -> Account */
+  /** Payments -> Matchmaking */
   case class AddProduct(accountId: AccountId, oderId: String, product: Product, count: Int)
 
-  /** Account -> Payments response */
+  /** Matchmaking -> Payments */
   case class ProductAdded(orderId: String)
 
   /** Matchmaking -> Payments */
-  case object AccountNotOnline
+  case object AccountNotFound
 
-  /** Account -> Payments */
+  /** Matchmaking -> Payments */
   case object DatabaseError
 
 }
@@ -123,7 +123,7 @@ class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStra
                   complete(callback.databaseError)
                 }
 
-              case AccountNotOnline ⇒
+              case AccountNotFound ⇒
                 log.info("account not found " + accountId)
                 complete(callback.accountNotFoundError)
 

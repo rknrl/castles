@@ -9,6 +9,7 @@
 package ru.rknrl.castles.account.state
 
 import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.core.social.Product
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.CommonDTO._
 
@@ -73,6 +74,12 @@ class AccountState(val slots: Slots,
                    newRating: Double = rating,
                    newGamesCount: Int = gamesCount) =
     new AccountState(newSlots, newSkills, newItems, newGold, newRating, newGamesCount)
+
+  def applyProduct(product: Product, count: Int) =
+    product.id match {
+      case 1 ⇒ addGold(count)
+      case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
+    }
 
   def dto = AccountStateDTO.newBuilder()
     .addAllSlots(slots.dto.asJava)
