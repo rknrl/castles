@@ -187,7 +187,7 @@ public class GameController {
             }
         }
 
-        if (time - tutorLastTime > tutorInterval && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
+        if (time - tutorLastTime > tutorInterval && !isGameOver && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
             tutorLastTime = time;
             if (!tutorState.arrow)
                 playArrowTutor();
@@ -326,8 +326,12 @@ public class GameController {
         gameOver(e.gameOver);
     }
 
+    private var isGameOver: Boolean;
+
     private function gameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
+            view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
+            isGameOver = true;
             const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
             const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerDTO>[getSelfPlayerInfo()];
             view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
