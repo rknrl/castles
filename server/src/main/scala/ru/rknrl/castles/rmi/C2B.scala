@@ -28,6 +28,8 @@ object C2B {
 
   case class GetAccountState(dto: AdminGetAccountStateDTO) extends Msg
 
+  case object GetOnline extends Msg
+
   // account
 
   case class BuyBuilding(buy: BuyBuildingDTO) extends Msg

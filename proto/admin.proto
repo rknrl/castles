@@ -13,6 +13,11 @@ message AdminAuthenticateDTO {
     required string password = 2;
 }
 
+message AdminOnlineDTO {
+    required int32 accounts = 1;
+    required int32 games = 2;
+}
+
 message AdminGetAccountStateDTO {
     required AccountIdDTO accountId = 1;
 }
@@ -43,3 +48,4 @@ message AdminSetSlotDTO {
     required AccountIdDTO accountId = 1;
     required SlotDTO slot = 2;
 }
+

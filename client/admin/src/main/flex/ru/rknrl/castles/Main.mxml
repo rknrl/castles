@@ -23,6 +23,18 @@
 
     <s:VGroup id="adminGroup" width="100%" height="100%"
               includeInLayout="false" visible="false">
+
+        <s:Button label="Get online" click="server.getOnline()"/>
+
+        <s:Form>
+            <s:FormItem label="accounts">
+                <s:Label id="accountsOnlineLabel"/>
+            </s:FormItem>
+            <s:FormItem label="games">
+                <s:Label id="gamesOnlineLabel"/>
+            </s:FormItem>
+        </s:Form>
+
         <s:HGroup>
             <s:DropDownList id="accountTypeComboBox"
                             dataProvider="{Utils.accountTypes}"
@@ -60,6 +72,7 @@
         import ru.rknrl.dto.SkillLevelDTO;
         import ru.rknrl.dto.SlotDTO;
         import ru.rknrl.rmi.AccountStateEvent;
+        import ru.rknrl.rmi.AdminOnlineEvent;
         import ru.rknrl.rmi.AuthenticatedAsAdminEvent;
         import ru.rknrl.rmi.Server;
 
@@ -111,7 +124,8 @@
             server.removeEventListener(AuthenticatedAsAdminEvent.AUTHENTICATEDASADMIN, onAuthenticatedAsAdmin);
             loadingGroup.includeInLayout = loadingGroup.visible = false;
             adminGroup.includeInLayout = adminGroup.visible = true;
-            server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState)
+            server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState);
+            server.addEventListener(AdminOnlineEvent.ADMINONLINE, onOnline);
         }
 
         private function onGetClick(event:MouseEvent):void {
@@ -202,6 +216,11 @@
             dto.skilType = event.skillType;
             dto.skillLevel = event.skillLevel;
             server.setSkill(dto)
+        }
+
+        private function onOnline(event:AdminOnlineEvent):void {
+            accountsOnlineLabel.text = event.online.accounts.toString();
+            gamesOnlineLabel.text = event.online.games.toString();
         }
         ]]></fx:Script>
 </s:Application>

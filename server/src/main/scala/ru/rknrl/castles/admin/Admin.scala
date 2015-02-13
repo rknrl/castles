@@ -15,7 +15,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.database.Database.{Get, NoExist, StateResponse, Update}
-import ru.rknrl.castles.rmi.B2C.AuthenticatedAsAdmin
+import ru.rknrl.castles.rmi.B2C.{AdminOnline, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
@@ -58,6 +58,14 @@ class Admin(database: ActorRef,
 
     case GetAccountState(dto) ⇒
       database ! Get(dto.getAccountId)
+
+    case GetOnline ⇒
+      log.info("getOnline")
+      matchmaking ! GetOnline
+
+    case msg: AdminOnline ⇒
+      log.info("adminOnline")
+      client ! msg
 
     case AddGold(dto) ⇒
       getState(dto.getAccountId,

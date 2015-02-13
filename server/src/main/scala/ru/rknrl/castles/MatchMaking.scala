@@ -19,7 +19,10 @@ import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.payments.PaymentsServer._
+import ru.rknrl.castles.rmi.B2C.AdminOnline
+import ru.rknrl.castles.rmi.C2B.GetOnline
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
+import ru.rknrl.dto.AdminDTO.AdminOnlineDTO
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
@@ -200,6 +203,14 @@ class MatchMaking(interval: FiniteDuration,
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
 
+    /** from Admin */
+    case GetOnline ⇒
+      log.info("getOnline")
+      sender ! AdminOnline(AdminOnlineDTO.newBuilder()
+        .setAccounts(accountIdToAccountRef.size)
+        .setGames(gameRefToGameInfo.size)
+        .build())
+
     /** from PaymentServer */
     case AddProduct(accountId, orderId, product, count) ⇒
       log.info("AddProduct")
@@ -346,6 +357,7 @@ class MatchMaking(interval: FiniteDuration,
     val gameInfo = gameRefToGameInfo(gameRef)
     for (order ← gameInfo.orders if order.isBot) {
       val bot = accountIdToAccountRef(order.accountId)
+      accountIdToAccountRef = accountIdToAccountRef - order.accountId
       context stop bot
     }
     gameRefToGameInfo = gameRefToGameInfo - gameRef
