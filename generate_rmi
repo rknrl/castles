@@ -5,9 +5,9 @@
 project="/Users/tolyayanot/dev/rknrl/castles"
 rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 
-interfaces_dir="${project}/rmi/rmi-interfaces/src/main/scala/ru/rknrl/castles/rmi/"
-scala_out="${project}/rmi/rmi-server/src/main/scala/"
-as3_out="${project}/rmi/rmi-client/src/main/flex/"
+interfaces_dir="${project}/server/src/main/scala/ru/rknrl/castles/rmi/"
+scala_out="${project}/server/src/main/scala/"
+as3_out="${project}/client/client-base/src/main/flex/"
 package_out="ru.rknrl.rmi"
 
 rm -rf ${java_out}/ru/rknrl/rmi/*

@@ -35,7 +35,6 @@
     <orderEntry type="jdk" jdkName="Apache-Flex-Mac" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="client-base" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
     <orderEntry type="module" module-name="common-client" exported="" />
   </component>
 </module>

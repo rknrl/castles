@@ -64,7 +64,5 @@
     <orderEntry type="module" module-name="client-base" exported="" />
     <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module" module-name="social-client-web" exported="" />
-    <orderEntry type="module" module-name="rmi-client" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
   </component>
 </module>

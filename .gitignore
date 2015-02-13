@@ -1,4 +1,5 @@
 .DS_Store
+initializer.as.inc
 .idea/
 bin/
 target/

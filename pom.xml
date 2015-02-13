@@ -7,8 +7,6 @@
     <name>castles</name>
 
     <modules>
-        <module>dto</module>
-        <module>rmi</module>
         <module>server</module>
     </modules>
 

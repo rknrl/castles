@@ -5,9 +5,9 @@
 project="/Users/tolyayanot/dev/rknrl/castles"
 rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 
-proto_dir="${project}/dto/dto-proto/src/main/proto"
-java_out="${project}/dto/dto-server/src/main/java/"
-as3_out="${project}/dto/dto-client/src/main/flex/"
+proto_dir="${project}/proto"
+java_out="${project}/server/src/main/scala/"
+as3_out="${project}/client/client-base/src/main/flex/"
 
 rm -rf ${java_out}/ru/rknrl/dto/*
 

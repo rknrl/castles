@@ -94,8 +94,6 @@
     <orderEntry type="module" module-name="social-client-mobile" exported="" />
     <orderEntry type="module" module-name="social-client-base" exported="" />
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
-    <orderEntry type="module" module-name="rmi-client" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
     <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">

@@ -62,8 +62,6 @@
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
     <orderEntry type="module" module-name="social-client-base" exported="" />
     <orderEntry type="module" module-name="dto-core-client" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
-    <orderEntry type="module" module-name="rmi-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc" />
