@@ -1,3 +1,11 @@
+//       ___       ___       ___       ___       ___
+//      /\  \     /\__\     /\__\     /\  \     /\__\
+//     /::\  \   /:/ _/_   /:| _|_   /::\  \   /:/  /
+//    /::\:\__\ /::-"\__\ /::|/\__\ /::\:\__\ /:/__/
+//    \;:::/  / \;:;-",-" \/|::/  / \;:::/  / \:\  \
+//     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
+//      \|__|     \|__|     \/__/     \|__|     \/__/
+
 package ru.rknrl.castles.view.game.area.units {
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.MovableView;
