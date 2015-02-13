@@ -19,11 +19,11 @@ cp server/target/server-1.0-SNAPSHOT-allinone.jar ~/dev/rknrl/castles-deploy/cas
 # print diff
 
 cd ~/dev/rknrl/castles-deploy/castles-server/ &&
-git diff --cached &&
 
 # commit changes
 
 git add dev.json server.jar &&
+git diff --cached &&
 git commit -m "update version" &&
 git push
 

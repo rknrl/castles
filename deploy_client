@@ -22,13 +22,10 @@ cd ~/dev/rknrl/castles-deploy/castles-client/www &&
 sed -i.bak 's/127\.0\.0\.1/castles\.rknrl\.ru/g' *.html &&
 rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/*.bak &&
 
-# print diff
-
-git diff --cached &&
-
 # commit changes
 
 git add * &&
+git diff --cached &&
 git commit -m "update version" &&
 git push
 
