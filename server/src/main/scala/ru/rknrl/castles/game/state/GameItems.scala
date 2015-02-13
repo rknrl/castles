@@ -97,9 +97,8 @@ class GameItems(val states: Map[PlayerId, GameItemsState]) {
   def canCast(playerId: PlayerId, itemType: ItemType, config: GameConfig, time: Long) =
     time - states(playerId).items(itemType).lastUseTime >= config.constants.itemCooldown
 
-  def assertCasts(casts: Map[PlayerId, _], itemType: ItemType, config: GameConfig, time: Long) =
-    for ((playerId, _) ← casts)
-      assert(canCast(playerId, itemType, config, time))
+  def checkCasts[T](casts: Map[PlayerId, T], itemType: ItemType, config: GameConfig, time: Long) =
+    casts.filter { case (playerId, _) ⇒ canCast(playerId, itemType, config, time)}
 
   def dto(playerId: PlayerId, time: Long, config: GameConfig) = states(playerId).dto(time, config)
 }

@@ -234,13 +234,13 @@ class Game(players: Map[PlayerId, Player],
 
     /** Игрок сдается */
     case Surrender ⇒
-      assert(playerStates(senderPlayerId) == PlayerState.GAME)
-      addLoser(senderPlayerId, getPlace)
+      if (playerStates(senderPlayerId) == PlayerState.GAME)
+        addLoser(senderPlayerId, getPlace)
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case C2B.LeaveGame ⇒
-      assert(playerStates(senderPlayerId) == PlayerState.GAME_OVER)
-      addLeaved(senderPlayerId)
+      if (playerStates(senderPlayerId) == PlayerState.GAME_OVER)
+        addLeaved(senderPlayerId)
 
     /** Scheduler говорит, что пора обновить game state и отправить игрокам */
     case UpdateGameState ⇒

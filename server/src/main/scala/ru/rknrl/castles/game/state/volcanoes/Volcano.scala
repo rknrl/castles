@@ -18,13 +18,10 @@ class Volcano(val playerId: PlayerId,
               val startTime: Long,
               val duration: Long) extends PeriodObject[VolcanoDTO] {
 
-  def dto(time: Long) = {
-    timeAssert(time)
-
+  def dto(time: Long) =
     VolcanoDTO.newBuilder()
       .setPos(pos.dto)
       .setMillisTillEnd(millisTillEnd(time))
       .build()
-  }
 }
 

@@ -162,19 +162,19 @@ class GameState(val time: Long,
 
   def update(newTime: Long,
              moveActions: Map[PlayerId, MoveDTO],
-             fireballCasts: Map[PlayerId, PointDTO],
-             strengtheningCasts: Map[PlayerId, BuildingId],
-             volcanoCasts: Map[PlayerId, PointDTO],
-             tornadoCasts: Map[PlayerId, CastTorandoDTO],
-             assistanceCasts: Map[PlayerId, BuildingId]) = {
+             newFireballCasts: Map[PlayerId, PointDTO],
+             newStrengtheningCasts: Map[PlayerId, BuildingId],
+             newVolcanoCasts: Map[PlayerId, PointDTO],
+             newTornadoCasts: Map[PlayerId, CastTorandoDTO],
+             newAssistanceCasts: Map[PlayerId, BuildingId]) = {
 
     val deltaTime = newTime - time
 
-    gameItems.assertCasts(fireballCasts, ItemType.FIREBALL, config, time)
-    gameItems.assertCasts(strengtheningCasts, ItemType.STRENGTHENING, config, time)
-    gameItems.assertCasts(tornadoCasts, ItemType.TORNADO, config, time)
-    gameItems.assertCasts(volcanoCasts, ItemType.VOLCANO, config, time)
-    gameItems.assertCasts(assistanceCasts, ItemType.ASSISTANCE, config, time)
+    val fireballCasts = gameItems.checkCasts(newFireballCasts, ItemType.FIREBALL, config, time)
+    val strengtheningCasts = gameItems.checkCasts(newStrengtheningCasts, ItemType.STRENGTHENING, config, time)
+    val tornadoCasts = gameItems.checkCasts(newTornadoCasts, ItemType.TORNADO, config, time)
+    val volcanoCasts = gameItems.checkCasts(newVolcanoCasts, ItemType.VOLCANO, config, time)
+    val assistanceCasts = gameItems.checkCasts(newAssistanceCasts, ItemType.ASSISTANCE, config, time)
 
     val exitUnits = `moveActions→exitUnits`(moveActions, buildings, config)
     val assistanceUnits = Assistance.`casts→units`(assistanceCasts, buildings, config, playerStates, unitIdIterator, time)

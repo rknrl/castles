@@ -143,9 +143,10 @@ class GameConfig(val constants: Constants,
 
   /**
    * Сколько юнитов будет в здании после входа в него дружественного отряда
+   * todo: Юниты после фаербола например могут облатать отрицательным count, поэтому проверка на Math.max
    */
   def populationAfterFriendlyUnitEnter(buildingPopulation: Double, unitCount: Double) =
-    Math.min(buildingPopulation + unitCount, maxPopulation)
+   Math.max(0, Math.min(buildingPopulation + unitCount, maxPopulation))
 
   /**
    * Сколько юнитов будет в здании после входа в него вражеского отряда

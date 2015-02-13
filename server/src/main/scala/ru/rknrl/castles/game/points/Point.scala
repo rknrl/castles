@@ -26,9 +26,7 @@ class Point(val x: Double, val y: Double) {
     distance(endPos) / speed
 
   def lerp(endPos: Point, startTime: Long, currentTime: Long, speed: Double) = {
-    assert(currentTime >= startTime)
-
-    val progress = Math.min(1, (currentTime - startTime) / duration(endPos, speed))
+    val progress = Math.max(0, Math.min(1, (currentTime - startTime) / duration(endPos, speed)))
     new Point(x + (endPos.x - x) * progress, y + (endPos.y - y) * progress)
   }
 
