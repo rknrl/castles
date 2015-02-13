@@ -16,7 +16,6 @@ import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game.Game
-import ru.rknrl.castles.game.Game.Offline
 import ru.rknrl.castles.payments.PaymentsServer.{AddProduct, DatabaseError, ProductAdded}
 import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
 import ru.rknrl.castles.rmi.C2B._
@@ -241,5 +240,8 @@ class Account(matchmaking: ActorRef,
     .setPort(config.gamePort)
     .build()
 
-  override def postStop() = if (game.isDefined) game.get ! Offline(accountId)
+  override def postStop() = {
+    log.info("account stop")
+    matchmaking ! Offline(accountId)
+  }
 }

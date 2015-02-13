@@ -14,7 +14,6 @@ import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.Bot
-import ru.rknrl.castles.game.Game.StopGame
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.payments.PaymentsServer.{AccountNotOnline, AddProduct}
@@ -59,6 +58,8 @@ object MatchMaking {
 
   case class InGame(externalAccountId: AccountId)
 
+  case class Offline(accountId: AccountId)
+
   // matchmaking -> account
 
   case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Iterable[TopUserInfoDTO])
@@ -75,7 +76,7 @@ object MatchMaking {
 
 }
 
-class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: GameConfig) extends Actor {
+class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: GameConfig) extends Actor with ActorLogging {
   /** Если у бота случается ошибка - стопаем его
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
@@ -216,6 +217,15 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
       else
         sender ! InGameResponse(Some(gameInfo.get.gameRef), searchOpponents = false, topDto)
 
+    /** Аккаунт отсоединился */
+    case Offline(accountId) ⇒
+      log.info("account offline")
+      if (accountIdToAccountRef.contains(accountId) && accountIdToAccountRef(accountId) == sender) {
+        accountIdToAccountRef = accountIdToAccountRef - accountId
+        val gameInfo = accountIdToGameInfo.get(accountId)
+        if (gameInfo.isDefined) gameInfo.get.gameRef ! Offline(accountId)
+      }
+
     /** Аккаунт присылает заявку на игру */
     case PlaceGameOrder(gameOrder) ⇒ placeGameOrder(gameOrder, sender)
 
@@ -225,7 +235,7 @@ class MatchMaking(interval: FiniteDuration, var top: List[TopItem], gameConfig: 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
     case AllPlayersLeaveGame ⇒
       onGameOver(sender)
-      sender ! StopGame
+      context stop sender
 
     /** Scheduler говорит, что пора пробовать создавать игры из заявок */
     case TryCreateGames ⇒

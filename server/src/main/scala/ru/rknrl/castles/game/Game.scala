@@ -11,8 +11,8 @@ package ru.rknrl.castles.game
 import akka.actor.{ActorLogging, ActorRef}
 import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
-import ru.rknrl.castles.game.Game.{Join, Offline, StopGame}
+import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
+import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -28,10 +28,6 @@ import scala.concurrent.duration._
 object Game {
 
   case class Join(accountId: AccountId, client: ActorRef)
-
-  case class Offline(accountId: AccountId)
-
-  case object StopGame
 
 }
 
@@ -245,10 +241,6 @@ class Game(players: Map[PlayerId, Player],
     case C2B.LeaveGame ⇒
       assert(playerStates(senderPlayerId) == PlayerState.GAME_OVER)
       addLeaved(senderPlayerId)
-
-    /** Matchmaking завершает игру (Ответ на AllPlayersLeaveGame) */
-    case StopGame ⇒
-      context stop self
 
     /** Scheduler говорит, что пора обновить game state и отправить игрокам */
     case UpdateGameState ⇒
