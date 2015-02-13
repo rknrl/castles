@@ -20,7 +20,7 @@
 
         private var skillType:SkillType;
 
-        public function init(skillType:SkillType, skillLevel:SkillLevel) {
+        public function init(skillType:SkillType, skillLevel:SkillLevel): void {
             this.skillType = skillType;
 
             nameLabel.text = skillType.name();

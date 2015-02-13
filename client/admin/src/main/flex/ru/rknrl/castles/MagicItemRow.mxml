@@ -19,7 +19,7 @@
 
         private var itemType:ItemType;
 
-        public function init(itemType:ItemType, count:int) {
+        public function init(itemType:ItemType, count:int): void {
             this.itemType = itemType;
             typeLabel.text = itemType.name();
             countLabel.text = count.toString();

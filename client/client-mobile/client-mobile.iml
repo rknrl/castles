@@ -11,22 +11,13 @@
             <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="878460e1-9446-4087-b90d-5319a72c0849">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="social-client-mobile" build-configuration-name="social-client-mobile">
               <dependency linkage="Merged" />
             </entry>
             <entry module-name="social-client-base" build-configuration-name="social-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="dto-client" build-configuration-name="dto-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="rmi-client" build-configuration-name="rmi-client">
               <dependency linkage="Merged" />
             </entry>
             <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
@@ -79,16 +70,6 @@
     </content>
     <orderEntry type="jdk" jdkName="air" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
-      <library type="flex">
-        <properties id="878460e1-9446-4087-b90d-5319a72c0849" />
-        <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/ru/rknrl/castles/base-swc/1.0-SNAPSHOT/base-swc-1.0-SNAPSHOT.swc!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
     <orderEntry type="module" module-name="social-client-mobile" exported="" />

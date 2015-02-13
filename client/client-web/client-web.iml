@@ -23,12 +23,6 @@
             <entry module-name="client-base" build-configuration-name="client-base">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="dto-client" build-configuration-name="dto-client">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="rmi-client" build-configuration-name="rmi-client">
-              <dependency linkage="Merged" />
-            </entry>
           </entries>
           <sdk name="air" />
         </dependencies>

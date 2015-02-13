@@ -25,8 +25,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: 
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val account = context.actorOf(Props(classOf[Account], matchmaking, database, config, name), "account" + name)
-      val client = context.actorOf(Props(classOf[Client], sender, account, name), "client" + name)
+      val client = context.actorOf(Props(classOf[CastlesClient], sender, matchmaking, database, config, name), "client" + name)
       sender ! Register(client)
   }
 }

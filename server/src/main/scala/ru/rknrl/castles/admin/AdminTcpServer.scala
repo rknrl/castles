@@ -30,9 +30,8 @@ class AdminTcpServer(tcp: ActorRef,
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val tcpSender = sender()
       val admin = context.actorOf(Props(classOf[Admin], database, matchmaking, login, password, name), "admin" + name)
-      val client = context.actorOf(Props(classOf[Client], tcpSender, admin, name), "admin-client" + name)
-      tcpSender ! Register(client)
+      val client = context.actorOf(Props(classOf[Client], sender, admin, name), "admin-client" + name)
+      sender ! Register(client)
   }
 }

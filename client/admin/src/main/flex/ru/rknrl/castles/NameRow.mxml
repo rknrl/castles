@@ -14,7 +14,7 @@
     <fx:Script><![CDATA[
         import ru.rknrl.dto.AccountIdDTO;
 
-        public function init(accountId:AccountIdDTO) {
+        public function init(accountId:AccountIdDTO): void {
             idLabel.text = accountId.id;
             typeLabel.text = accountId.type.name();
         }

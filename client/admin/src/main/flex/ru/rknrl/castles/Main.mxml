@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-               creationComplete="onCreationComplete(event)"
-               implements="ru.rknrl.castles.rmi.IAdminAuthFacade, ru.rknrl.castles.rmi.IAdminFacade">
+               creationComplete="onCreationComplete(event)">
 
     <s:Group id="authGroup" width="100%" height="100%">
         <s:Form horizontalCenter="0" verticalCenter="0">
@@ -49,14 +48,8 @@
         import ru.rknrl.castles.events.AddMagicItemEvent;
         import ru.rknrl.castles.events.SetSkillEvent;
         import ru.rknrl.castles.events.SetSlotEvent;
-        import ru.rknrl.castles.rmi.AdminAuthFacadeReceiver;
-        import ru.rknrl.castles.rmi.AdminAuthFacadeSender;
-        import ru.rknrl.castles.rmi.AdminFacadeReceiver;
-        import ru.rknrl.castles.rmi.AdminFacadeSender;
-        import ru.rknrl.core.rmi.Connection;
         import ru.rknrl.dto.AccountIdDTO;
         import ru.rknrl.dto.AccountStateDTO;
-        import ru.rknrl.dto.AdminAccountStateDTO;
         import ru.rknrl.dto.AdminAddGoldDTO;
         import ru.rknrl.dto.AdminAddItemDTO;
         import ru.rknrl.dto.AdminAuthenticateDTO;
@@ -66,18 +59,15 @@
         import ru.rknrl.dto.ItemDTO;
         import ru.rknrl.dto.SkillLevelDTO;
         import ru.rknrl.dto.SlotDTO;
+        import ru.rknrl.rmi.AccountStateEvent;
+        import ru.rknrl.rmi.AuthenticatedAsAdminEvent;
+        import ru.rknrl.rmi.Server;
 
         private static const host:String = "127.0.0.1";
         private static const port:int = 2337;
         private static const policyPort:int = 2336;
 
-        private var connection:Connection;
-
-        private var authFacadeSender:AdminAuthFacadeSender;
-        private var authFacadeReceiver:AdminAuthFacadeReceiver;
-
-        private var adminFacadeSender:AdminFacadeSender;
-        private var adminFacadeReceiver:AdminFacadeReceiver;
+        private var server:Server;
 
         private function onCreationComplete(event:FlexEvent):void {
             stateHolder.addEventListener(AddBalanceEvent.ADD_BALANCE, onAddBalance);
@@ -93,16 +83,16 @@
         }
 
         private function createConnection(host:String, port:int):void {
-            if (connection) throw new Error("already connected");
+            if (server) throw new Error("already connected");
 
             Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
 
-            connection = new Connection(new Socket());
-            connection.addEventListener(Event.CONNECT, onConnect);
-            connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
-            connection.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
-            connection.addEventListener(Event.CLOSE, onConnectionError);
-            connection.connect(host, port);
+            server = new Server(new Socket());
+            server.addEventListener(Event.CONNECT, onConnect);
+            server.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
+            server.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
+            server.addEventListener(Event.CLOSE, onConnectionError);
+            server.connect(host, port);
         }
 
         private function onConnectionError(event:Event):void {
@@ -110,29 +100,18 @@
         }
 
         private function onConnect(event:Event):void {
-            authFacadeReceiver = new AdminAuthFacadeReceiver(this);
-            connection.registerReceiver(authFacadeReceiver);
-
-            authFacadeSender = new AdminAuthFacadeSender(connection);
-
-            loadingGroup.includeInLayout = loadingGroup.visible = false;
-            adminGroup.includeInLayout = adminGroup.visible = true;
-        }
-
-        public function onAdminAuthReady():void {
             const authenticate:AdminAuthenticateDTO = new AdminAuthenticateDTO();
             authenticate.login = loginTextInput.text;
             authenticate.password = passwordTextInput.text;
-            authFacadeSender.authenticateAsAdmin(authenticate);
+            server.addEventListener(AuthenticatedAsAdminEvent.AUTHENTICATEDASADMIN, onAuthenticatedAsAdmin);
+            server.authenticateAsAdmin(authenticate);
         }
 
-        public function onAuthenticatedAsAdmin():void {
-            connection.unregisterReceiver(authFacadeReceiver);
-
-            adminFacadeReceiver = new AdminFacadeReceiver(this);
-            connection.registerReceiver(adminFacadeReceiver);
-
-            adminFacadeSender = new AdminFacadeSender(connection);
+        public function onAuthenticatedAsAdmin(e:AuthenticatedAsAdminEvent):void {
+            server.removeEventListener(AuthenticatedAsAdminEvent.AUTHENTICATEDASADMIN, onAuthenticatedAsAdmin);
+            loadingGroup.includeInLayout = loadingGroup.visible = false;
+            adminGroup.includeInLayout = adminGroup.visible = true;
+            server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState)
         }
 
         private function onGetClick(event:MouseEvent):void {
@@ -142,17 +121,17 @@
             dto.accountId = new AccountIdDTO();
             dto.accountId.id = accountIdInput.text;
             dto.accountId.type = accountTypeComboBox.selectedItem;
-            adminFacadeSender.getAccountState(dto);
+            server.getAccountState(dto);
         }
 
         private var currentAccountId:AccountIdDTO;
 
-        public function onAccountState(dto:AdminAccountStateDTO):void {
+        public function onAccountState(e:AccountStateEvent):void {
             stateHolder.removeAllElements();
 
-            const state:AccountStateDTO = dto.accountState;
+            const state:AccountStateDTO = e.adminAccountState.accountState;
 
-            currentAccountId = dto.accountId;
+            currentAccountId = e.adminAccountState.accountId;
 
             const nameRow:NameRow = new NameRow();
             nameRow.init(currentAccountId);
@@ -166,7 +145,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var slot:SlotDTO in state.slots.slots) {
+            for each(var slot:SlotDTO in state.slots) {
                 const slotRow:SlotRow = new SlotRow();
                 slotRow.init(slot.id, slot.buildingPrototype);
                 stateHolder.addElement(slotRow);
@@ -174,7 +153,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var skill:SkillLevelDTO in state.skills.levels) {
+            for each(var skill:SkillLevelDTO in state.skills) {
                 const skillRow:SkillRow = new SkillRow();
                 skillRow.init(skill.type, skill.level);
                 stateHolder.addElement(skillRow);
@@ -182,7 +161,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var item:ItemDTO in state.items.items) {
+            for each(var item:ItemDTO in state.items) {
                 const magicItemRow:MagicItemRow = new MagicItemRow();
                 magicItemRow.init(item.type, item.count);
                 stateHolder.addElement(magicItemRow);
@@ -199,7 +178,7 @@
             const dto:AdminAddGoldDTO = new AdminAddGoldDTO();
             dto.accountId = currentAccountId;
             dto.amount = event.amount;
-            adminFacadeSender.addGold(dto)
+            server.addGold(dto)
         }
 
         private function onAddMagicItem(event:AddMagicItemEvent):void {
@@ -207,14 +186,14 @@
             dto.accountId = currentAccountId;
             dto.itemType = event.itemType;
             dto.amount = event.amount;
-            adminFacadeSender.addItem(dto)
+            server.addItem(dto)
         }
 
         private function onSetSlot(event:SetSlotEvent):void {
             const dto:AdminSetSlotDTO = new AdminSetSlotDTO();
             dto.accountId = currentAccountId;
             dto.slot = event.slotDto;
-            adminFacadeSender.setSlot(dto)
+            server.setSlot(dto)
         }
 
         private function onSetSkill(event:SetSkillEvent):void {
@@ -222,7 +201,7 @@
             dto.accountId = currentAccountId;
             dto.skilType = event.skillType;
             dto.skillLevel = event.skillLevel;
-            adminFacadeSender.setSkill(dto)
+            server.setSkill(dto)
         }
         ]]></fx:Script>
 </s:Application>

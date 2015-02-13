@@ -28,7 +28,7 @@
 
         private var slotId:SlotId;
 
-        public function init(slotId:SlotId, buildingPrototype:BuildingPrototypeDTO) {
+        public function init(slotId:SlotId, buildingPrototype:BuildingPrototypeDTO): void {
             this.slotId = slotId;
             nameLabel.text = slotId.name();
             buildingLabel.text = buildingPrototype ? buildingPrototype.type.name() + " " + buildingPrototype.level.name() : "None";

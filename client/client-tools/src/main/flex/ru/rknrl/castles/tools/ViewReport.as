@@ -24,7 +24,7 @@ import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.menu.factory.MobileFactory;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.PlayerInfoDTO;
+import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.loaders.BitmapLoader;
@@ -206,8 +206,8 @@ public class ViewReport extends Sprite {
 
         const w:int = layout is LayoutPortrait ? 8 : 15;
         const h:int = layout is LayoutPortrait ? 11 : 15;
-        const playerInfos:Vector.<PlayerInfoDTO> = layout is LayoutPortrait ? DtoMock.playerInfosPortrait() : DtoMock.playerInfosLandscape();
-        const losers:Vector.<PlayerInfoDTO> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
+        const playerInfos:Vector.<PlayerDTO> = layout is LayoutPortrait ? DtoMock.playerInfosPortrait() : DtoMock.playerInfosLandscape();
+        const losers:Vector.<PlayerDTO> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
 
         view.removeSearchOpponentsScreen();
         const gameView:GameView = view.addGame(PlayerInfo.fromDtoVector(playerInfos), w, h);

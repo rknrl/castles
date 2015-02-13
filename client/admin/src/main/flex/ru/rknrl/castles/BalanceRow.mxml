@@ -16,7 +16,7 @@
     <fx:Script><![CDATA[
         import ru.rknrl.castles.events.AddBalanceEvent;
 
-        public function init(balance:int) {
+        public function init(balance:int): void {
             balanceLabel.text = balance.toString();
         }
 
