@@ -41,6 +41,6 @@ object Slot {
   def fromDto(dto: SlotDTO) =
     new Slot(
       dto.getId,
-      if (dto.hasBuildingPrototype) Some(BuildingPrototype.fromDto(dto.getBuildingPrototype)) else None
+      if (dto.hasBuildingPrototype) Some(BuildingPrototype(dto.getBuildingPrototype)) else None
     )
 }

@@ -22,13 +22,13 @@ class AccountState(val slots: Slots,
                    val rating: Double,
                    val gamesCount: Int) {
 
-  def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig): AccountState = {
+  def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
     val price = config.buildingPrices(BuildingLevel.LEVEL_1)
     assert(price <= gold)
     copy(newSlots = slots.build(id, buildingType), newGold = gold - price)
   }
 
-  def upgradeBuilding(id: SlotId, config: AccountConfig): AccountState = {
+  def upgradeBuilding(id: SlotId, config: AccountConfig) = {
     val level = BuildingPrototype.getNextLevel(slots.getLevel(id))
     val price = config.buildingPrices(level)
     assert(price <= gold)
@@ -56,9 +56,8 @@ class AccountState(val slots: Slots,
     copy(newItems = items.add(itemType, 1), newGold = gold - price)
   }
 
-  def addItem(itemType: ItemType, count: Int) = {
+  def addItem(itemType: ItemType, count: Int) =
     copy(newItems = items.add(itemType, count))
-  }
 
   def addGold(value: Int) =
     copy(newGold = Math.max(0, gold + value))
@@ -113,7 +112,9 @@ object AccountState {
 
   private def initSkills = new Skills(initSkillLevels.toMap)
 
-  private def initItemsCount(config: AccountConfig) = for (itemType ← ItemType.values()) yield itemType → new Item(itemType, config.initItemCount)
+  private def initItemsCount(config: AccountConfig) =
+    for (itemType ← ItemType.values())
+    yield itemType → new Item(itemType, config.initItemCount)
 
   private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)
 
@@ -128,10 +129,10 @@ object AccountState {
     gamesCount = 0
   )
 
-  def fromDto(dto: AccountStateDTO) = new AccountState(
-    slots = Slots.fromDto(dto.getSlotsList.asScala),
-    skills = Skills.fromDto(dto.getSkillsList.asScala),
-    items = Items.fromDto(dto.getItemsList.asScala),
+  def apply(dto: AccountStateDTO) = new AccountState(
+    slots = Slots(dto.getSlotsList.asScala),
+    skills = Skills(dto.getSkillsList.asScala),
+    items = Items(dto.getItemsList.asScala),
     gold = dto.getGold,
     rating = dto.getRating,
     gamesCount = dto.getGamesCount

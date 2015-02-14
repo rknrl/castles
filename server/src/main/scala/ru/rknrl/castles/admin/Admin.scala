@@ -87,7 +87,7 @@ class Admin(database: ActorRef,
       getState(dto.getAccountId,
         (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
-            update(accountId, accountState.setBuilding(dto.getSlot.getId, BuildingPrototype.fromDto(dto.getSlot.getBuildingPrototype)))
+            update(accountId, accountState.setBuilding(dto.getSlot.getId, BuildingPrototype(dto.getSlot.getBuildingPrototype)))
           else
             update(accountId, accountState.removeBuilding(dto.getSlot.getId))
       )
@@ -106,7 +106,7 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        f(accountId, AccountState.fromDto(accountStateDto))
+        f(accountId, AccountState(accountStateDto))
 
       case invalid ⇒
         log.info("invalid result=" + invalid)

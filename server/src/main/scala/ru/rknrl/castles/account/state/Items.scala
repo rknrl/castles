@@ -16,7 +16,7 @@ class Item(val itemType: ItemType,
 
   assert(count >= 0)
 
-  def add(value: Int) = new Item(itemType, Math.max(0, count + value))
+  def +(value: Int) = new Item(itemType, Math.max(0, count + value))
 
   def dto = ItemDTO.newBuilder()
     .setType(itemType)
@@ -25,7 +25,7 @@ class Item(val itemType: ItemType,
 }
 
 object Item {
-  def fromDto(dto: ItemDTO) = new Item(dto.getType, dto.getCount)
+  def apply(dto: ItemDTO) = new Item(dto.getType, dto.getCount)
 }
 
 class Items(val items: Map[ItemType, Item]) {
@@ -33,14 +33,14 @@ class Items(val items: Map[ItemType, Item]) {
   for (itemType ← ItemType.values()) assert(items.contains(itemType))
 
   def add(itemType: ItemType, value: Int) =
-    new Items(items.updated(itemType, items(itemType).add(value)))
+    new Items(items.updated(itemType, items(itemType) + value))
 
   def dto = for ((itemType, item) ← items) yield item.dto
 }
 
 object Items {
-  def fromDto(dto: Iterable[ItemDTO]) = {
-    val items = for (itemDto ← dto) yield itemDto.getType → Item.fromDto(itemDto)
+  def apply(dto: Iterable[ItemDTO]) = {
+    val items = for (itemDto ← dto) yield itemDto.getType → Item(itemDto)
     new Items(items.toMap)
   }
 }

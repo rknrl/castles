@@ -65,11 +65,8 @@ object Skills {
       case _ ⇒ throw new IllegalStateException("hasn't next level " + level)
     }
 
-  def levelToInt(level: SkillLevel) = level.getNumber
-
-  def fromDto(dto: Iterable[SkillLevelDTO]) = {
+  def apply(dto: Iterable[SkillLevelDTO]) = {
     val skills = for (skillDto ← dto) yield skillDto.getType → skillDto.getLevel
-
     new Skills(skills.toMap)
   }
 }

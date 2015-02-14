@@ -36,6 +36,8 @@ class Point(val x: Double, val y: Double) {
       case _ ⇒ false
     }
 
+  override def toString = "{" + x + "," + y + "}"
+
   def dto = PointDTO.newBuilder()
     .setX(x.toFloat)
     .setY(y.toFloat)

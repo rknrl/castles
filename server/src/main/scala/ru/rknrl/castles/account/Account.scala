@@ -91,7 +91,7 @@ class Account(matchmaking: ActorRef,
 
     /** from Database */
     case AccountStateResponse(id, dto) ⇒
-      state = AccountState.fromDto(dto)
+      state = AccountState(dto)
       database ! GetTutorState(accountId.dto)
 
     case TutorStateResponse(id, tutorState) ⇒
@@ -191,7 +191,7 @@ class Account(matchmaking: ActorRef,
 
     /** from Admin or Payments */
     case AdminSetAccountState(_, accountStateDto) ⇒
-      state = AccountState.fromDto(accountStateDto)
+      state = AccountState(accountStateDto)
       client ! AccountStateUpdated(accountStateDto)
 
     case C2B.UpdateTutorState(state) ⇒

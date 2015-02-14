@@ -38,5 +38,5 @@ object BuildingPrototype {
          level ← BuildingLevel.values())
     yield new BuildingPrototype(buildingType, level)
 
-  def fromDto(dto: BuildingPrototypeDTO) = new BuildingPrototype(dto.getType, dto.getLevel)
+  def apply(dto: BuildingPrototypeDTO) = new BuildingPrototype(dto.getType, dto.getLevel)
 }

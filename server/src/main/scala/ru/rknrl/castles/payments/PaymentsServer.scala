@@ -119,7 +119,7 @@ class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) 
             val result = Await.result(future, 5 seconds)
             result match {
               case AccountStateResponse(_, accountStateDto) ⇒
-                val state = AccountState.fromDto(accountStateDto)
+                val state = AccountState(accountStateDto)
                 val newState = state.applyProduct(product, productInfo.count)
 
                 val future = Patterns.ask(database, Update(accountId.dto, newState.dto), 5 seconds)

@@ -8,22 +8,15 @@
 
 package ru.rknrl.castles.account.state
 
-import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO._
-import ru.rknrl.dto.GameDTO.CellSize
 
 class Slots(val slots: Map[SlotId, Slot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
   assert(buildingsCount > 0)
 
-  def buildingsCount = {
-    var count = 0
-    for ((id, slot) ← slots) {
-      if (slot.buildingPrototype.isDefined) count += 1
-    }
-    count
-  }
+  def buildingsCount =
+    slots.count { case (id, slot) ⇒ slot.buildingPrototype.isDefined}
 
   def set(id: SlotId, buildingPrototype: BuildingPrototype) =
     update(id, slots(id).set(buildingPrototype))
@@ -60,9 +53,8 @@ object Slots {
   val top = Math.abs(-1)
   val bottom = 0
 
-  def fromDto(dto: Iterable[SlotDTO]) = {
+  def apply(dto: Iterable[SlotDTO]) = {
     val slots = for (slotDto ← dto) yield slotDto.getId → Slot.fromDto(slotDto)
-
     new Slots(slots.toMap)
   }
 }
