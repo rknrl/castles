@@ -29,7 +29,7 @@ git diff --cached &&
 git commit -m "update version" &&
 git push
 
-#ssh castles@castles-static.rknrl.ru
-#cd /var/castles/client/
+#ssh castles@rknrl.ru
+#cd /var/castles-client/
 #sudo -E git pull
 #sudo service nginx restart
