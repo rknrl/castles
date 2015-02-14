@@ -10,17 +10,16 @@ package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
-import akka.actor.{Props, ActorLogging, ActorRef}
+import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
-import ru.rknrl.castles.payments.PaymentsServer._
-import ru.rknrl.castles.{AccountId, Config}
-import ru.rknrl.core.social.{Product, SocialConfig}
+import ru.rknrl.core.social.SocialConfig
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -28,22 +27,6 @@ import spray.routing.HttpService
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
-object PaymentsServer {
-
-  /** Payments -> Matchmaking */
-  case class AddProduct(accountId: AccountId, oderId: String, product: Product, count: Int)
-
-  /** Matchmaking -> Payments */
-  case class ProductAdded(orderId: String)
-
-  /** Matchmaking -> Payments */
-  case object AccountNotFound
-
-  /** Matchmaking -> Payments */
-  case object DatabaseError
-
-}
 
 class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
   val bugLog = LoggerFactory.getLogger("client")
