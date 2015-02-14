@@ -22,7 +22,7 @@ class AccountId(val accountType: AccountType,
     case _ ⇒ false
   }
 
-  override def hashCode = (accountType.getNumber + id).hashCode
+  override def hashCode = toString.hashCode
 
   override def toString = accountType.toString + " " + id
 

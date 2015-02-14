@@ -34,11 +34,17 @@ class AccountConfig(val initGold: Int,
 
   private def buildingPricesDto =
     for ((buildingLevel, price) ← buildingPrices.map)
-    yield BuildingPriceDTO.newBuilder().setLevel(buildingLevel).setPrice(price).build()
+    yield BuildingPriceDTO.newBuilder()
+      .setLevel(buildingLevel)
+      .setPrice(price)
+      .build()
 
   private def skillUpgradePricesDto =
     for ((totalLevel, price) ← skillUpgradePrices.map)
-    yield SkillUpgradePriceDTO.newBuilder().setTotalLevel(totalLevel).setPrice(price).build()
+    yield SkillUpgradePriceDTO.newBuilder()
+      .setTotalLevel(totalLevel)
+      .setPrice(price)
+      .build()
 
   def dto = AccountConfigDTO.newBuilder()
     .addAllBuildings(buildingPricesDto.asJava)

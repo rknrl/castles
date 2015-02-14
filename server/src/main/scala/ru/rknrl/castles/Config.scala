@@ -39,8 +39,6 @@ class Config(val host: String,
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig) {
-  val regeneration = 0.0002
-  val speed = 0.00005
 
   private def checkProductInfoConfig() =
     for (p ← products)
