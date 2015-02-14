@@ -10,10 +10,13 @@ package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
-import akka.actor.{ActorLogging, ActorRef}
+import akka.actor.{Props, ActorLogging, ActorRef}
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
+import ru.rknrl.castles.MatchMaking.AdminSetAccountState
+import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.castles.payments.PaymentsServer._
 import ru.rknrl.castles.{AccountId, Config}
@@ -42,7 +45,7 @@ object PaymentsServer {
 
 }
 
-class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
+class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
   val bugLog = LoggerFactory.getLogger("client")
 
   implicit val UTF8StringMarshaller =
@@ -110,25 +113,38 @@ class PaymentsServer(config: Config, matchmaking: ActorRef) extends StoppingStra
             log.info("price=" + price + ",expect " + productInfo.price)
             complete(callback.accountNotFoundError)
           } else {
-            val future = Patterns.ask(matchmaking, AddProduct(accountId, orderId, product, productInfo.count), 5 seconds)
-            val result = Await.result(future, 5 seconds)
+            log.info("AddProduct")
 
+            val future = Patterns.ask(database, GetAccountState(accountId.dto), 5 seconds)
+            val result = Await.result(future, 5 seconds)
             result match {
-              case ProductAdded(oId) ⇒
-                if (orderId == oId) {
-                  log.info("ProductAdded complete: " + httpResponse)
-                  complete(httpResponse)
-                } else {
-                  log.info("ProductAdded orderId=" + oId + ", expected " + orderId)
-                  complete(callback.databaseError)
+              case AccountStateResponse(_, accountStateDto) ⇒
+                val state = AccountState.fromDto(accountStateDto)
+                val newState = state.applyProduct(product, productInfo.count)
+
+                val future = Patterns.ask(database, Update(accountId.dto, newState.dto), 5 seconds)
+                val result = Await.result(future, 5 seconds)
+
+                result match {
+                  case msg@AccountStateResponse(_, newAccountStateDto) ⇒
+                    if (newAccountStateDto.getGold == newState.gold) {
+                      matchmaking ! AdminSetAccountState(accountId, newAccountStateDto)
+                      complete(httpResponse)
+                    } else {
+                      log.info("invalid gold=" + newAccountStateDto.getGold + ", but expected " + newState.gold)
+                      complete(callback.databaseError)
+                    }
+                  case invalid ⇒
+                    log.info("invalid update result=" + invalid)
+                    complete(callback.databaseError)
                 }
 
-              case AccountNotFound ⇒
-                log.info("account not found " + accountId)
+              case AccountNoExists ⇒
+                log.info("account not found")
                 complete(callback.accountNotFoundError)
 
               case invalid ⇒
-                log.info("Add to database invalid result " + invalid)
+                log.info("invalid get result=" + invalid)
                 complete(callback.databaseError)
             }
           }

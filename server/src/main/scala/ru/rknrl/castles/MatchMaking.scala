@@ -10,15 +10,12 @@ package ru.rknrl.castles
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
-import akka.pattern.Patterns
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.Bot
-import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
-import ru.rknrl.castles.payments.PaymentsServer._
 import ru.rknrl.castles.rmi.B2C.AdminOnline
 import ru.rknrl.castles.rmi.C2B.GetOnline
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
@@ -27,7 +24,6 @@ import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class BotIdIterator extends IdIterator {
@@ -198,7 +194,7 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def receive = {
-    /** from Admin */
+    /** from Admin or PaymentTransaction */
     case msg@AdminSetAccountState(accountId, _) ⇒
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
@@ -210,44 +206,6 @@ class MatchMaking(interval: FiniteDuration,
         .setAccounts(accountIdToAccountRef.size)
         .setGames(gameRefToGameInfo.size)
         .build())
-
-    /** from PaymentServer */
-    case AddProduct(accountId, orderId, product, count) ⇒
-      log.info("AddProduct")
-      val payments = sender
-
-      val future = Patterns.ask(database, GetAccountState(accountId.dto), 5 seconds)
-      val result = Await.result(future, 5 seconds)
-      result match {
-        case AccountStateResponse(_, accountStateDto) ⇒
-          val state = AccountState.fromDto(accountStateDto)
-          val newState = state.applyProduct(product, count)
-
-          val future = Patterns.ask(database, Update(accountId.dto, newState.dto), 5 seconds)
-          val result = Await.result(future, 5 seconds)
-
-          result match {
-            case msg@AccountStateResponse(_, newAccountStateDto) ⇒
-              if (newAccountStateDto.getGold == newState.gold) {
-                payments ! ProductAdded(orderId)
-                accountIdToAccountRef(accountId) ! AdminSetAccountState(accountId, newAccountStateDto)
-              } else {
-                log.info("invalid gold=" + newAccountStateDto.getGold + ", but expected " + newState.gold)
-                payments ! DatabaseError
-              }
-            case invalid ⇒
-              log.info("invalid update result=" + invalid)
-              payments ! DatabaseError
-          }
-
-        case AccountNoExists ⇒
-          log.info("account not found")
-          payments ! AccountNotFound
-
-        case invalid ⇒
-          log.info("invalid get result=" + invalid)
-          payments ! DatabaseError
-      }
 
     /** Аккаунт спрашивает находится ли он сейчас в игре?
       * В ответ отправляем InGameResponse

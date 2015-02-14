@@ -45,7 +45,7 @@ object Main {
 
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, database, top, config.game), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[PaymentsServer], config, matchmaking), "payment-server")
+    val payments = system.actorOf(Props(classOf[PaymentsServer], config, database, matchmaking), "payment-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
