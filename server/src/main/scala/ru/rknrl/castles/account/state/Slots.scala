@@ -47,35 +47,6 @@ class Slots(val slots: Map[SlotId, Slot]) {
   def dto = for ((id, slot) ← slots) yield slot.dto
 }
 
-class IJ(val i: Int, val j: Int) {
-  override def equals(obj: scala.Any): Boolean = obj match {
-    case that: IJ ⇒ this.i == that.i && this.j == that.j
-    case _ ⇒ false
-  }
-
-  def up = new IJ(i, j - 1)
-
-  def upLeft = new IJ(i - 1, j - 1)
-
-  def upRight = new IJ(i + 1, j - 1)
-
-  def left = new IJ(i - 1, j)
-
-  def right = new IJ(i + 1, j)
-
-  def down = new IJ(i, j + 1)
-
-  def downLeft = new IJ(i - 1, j + 1)
-
-  def downRight = new IJ(i + 1, j + 1)
-
-  def toXY = new Point((i + 0.5) * CellSize.SIZE_VALUE, (j + 0.5) * CellSize.SIZE_VALUE)
-
-  def near(that: IJ) = up == that || upLeft == that || upRight == that ||
-    this == that || left == that || right == that ||
-    down == that || downLeft == that || downRight == that
-}
-
 object Slots {
   val positions = Map(
     SlotId.SLOT_1 → new IJ(Slot1Pos.SLOT_1_X_VALUE, Slot1Pos.SLOT_1_Y_VALUE),
