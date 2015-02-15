@@ -156,7 +156,7 @@ class Account(matchmaking: ActorRef,
 
   def updateState(newState: AccountState) = {
     state = newState
-    database ! Update(accountId.dto, state.dto)
+    database ! UpdateAccountState(accountId.dto, state.dto)
   }
 
   def enterGame: Receive = persistent.orElse {
@@ -180,7 +180,7 @@ class Account(matchmaking: ActorRef,
       for ((itemType, count) ← usedItems)
         state = state.addItem(itemType, -count)
 
-      database ! Update(accountId.dto, state.dto)
+      database ! UpdateAccountState(accountId.dto, state.dto)
       context become account
   }
 

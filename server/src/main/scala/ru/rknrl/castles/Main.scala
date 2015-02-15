@@ -14,8 +14,8 @@ import akka.pattern._
 import net.liftweb.json._
 import ru.rknrl.PolicyServer
 import ru.rknrl.castles.admin.AdminTcpServer
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
-import ru.rknrl.castles.database.MySqlDb
 import ru.rknrl.castles.payments.PaymentsServer
 import spray.can.Http
 
@@ -39,7 +39,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val database = system.actorOf(Props(classOf[MySqlDb], config.db), "database")
+    val database = system.actorOf(Props(classOf[Database], config.db), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 

@@ -105,7 +105,7 @@ class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) 
                 val state = AccountState(accountStateDto)
                 val newState = state.applyProduct(product, productInfo.count)
 
-                val future = Patterns.ask(database, Update(accountId.dto, newState.dto), 5 seconds)
+                val future = Patterns.ask(database, UpdateAccountState(accountId.dto, newState.dto), 5 seconds)
                 val result = Await.result(future, 5 seconds)
 
                 result match {

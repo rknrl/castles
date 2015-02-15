@@ -15,7 +15,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{GetAccountState, AccountNoExists, AccountStateResponse, Update}
+import ru.rknrl.castles.database.Database.{GetAccountState, AccountNoExists, AccountStateResponse, UpdateAccountState}
 import ru.rknrl.castles.rmi.B2C.{AdminOnline, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
@@ -114,7 +114,7 @@ class Admin(database: ActorRef,
   }
 
   def update(accountId: AccountIdDTO, newAccountState: AccountState): Unit = {
-    val future = Patterns.ask(database, Update(accountId, newAccountState.dto), 5 seconds)
+    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
