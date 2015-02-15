@@ -71,6 +71,7 @@ class Account(matchmaking: ActorRef,
   def auth: Receive = {
     /** from Client */
     case Authenticate(authenticate) ⇒
+      log.debug("Authenticate")
       if (checkSecret(authenticate)) {
         client = sender
         accountId = new AccountId(authenticate.getUserInfo.getAccountId)
@@ -78,12 +79,13 @@ class Account(matchmaking: ActorRef,
         userInfo = authenticate.getUserInfo
         database ! Database.GetAccountState(accountId.dto)
       } else {
-        log.info("reject")
+        log.debug("reject")
         sender ! CloseConnection
       }
 
     /** from Database */
     case AccountNoExists ⇒
+      log.debug("AccountNoExists")
       val initTutorState = TutorStateDTO.newBuilder()
         .setAppRunCount(0)
         .build()
@@ -91,10 +93,12 @@ class Account(matchmaking: ActorRef,
 
     /** from Database */
     case AccountStateResponse(id, dto) ⇒
+      log.debug("AccountStateResponse")
       state = AccountState(dto)
       database ! GetTutorState(accountId.dto)
 
     case TutorStateResponse(id, tutorState) ⇒
+      log.debug("TutorStateResponse")
       matchmaking ! InGame(accountId)
       context become enterAccount(tutorState)
   }
@@ -102,6 +106,7 @@ class Account(matchmaking: ActorRef,
   def enterAccount(tutorState: TutorStateDTO): Receive = {
     /** Matchmaking ответил на InGame */
     case InGameResponse(game, searchOpponents, top) ⇒
+      log.debug("InGameResponse")
       this.top = top
       if (game.isDefined) {
         client ! authenticated(searchOpponents = false, Some(gameAddress), top, tutorState)
@@ -135,21 +140,27 @@ class Account(matchmaking: ActorRef,
 
   def account: Receive = persistent.orElse {
     case BuyBuilding(buy: BuyBuildingDTO) ⇒
+      log.debug("BuyBuilding")
       updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
 
     case UpgradeBuilding(dto: UpgradeBuildingDTO) ⇒
+      log.debug("UpgradeBuilding")
       updateState(state.upgradeBuilding(dto.getId, config.account))
 
     case RemoveBuilding(dto: RemoveBuildingDTO) ⇒
+      log.debug("RemoveBuilding")
       updateState(state.removeBuilding(dto.getId))
 
     case UpgradeSkill(upgrade: UpgradeSkillDTO) ⇒
+      log.debug("UpgradeSkill")
       updateState(state.upgradeSkill(upgrade.getType, config.account))
 
     case BuyItem(buy: BuyItemDTO) ⇒
+      log.debug("BuyItem")
       updateState(state.buyItem(buy.getType, config.account))
 
-    case C2B.EnterGame ⇒
+    case EnterGame ⇒
+      log.debug("EnterGame")
       placeGameOrder()
       context become enterGame
   }
@@ -162,6 +173,7 @@ class Account(matchmaking: ActorRef,
   def enterGame: Receive = persistent.orElse {
     /** Matchmaking говорит к какой игре коннектится */
     case ConnectToGame(game) ⇒
+      log.debug("ConnectToGame")
       client ! EnteredGame(gameAddress)
       connectToGame(game)
   }
@@ -171,6 +183,7 @@ class Account(matchmaking: ActorRef,
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
     case LeaveGame(usedItems, reward, newRating) ⇒
+      log.debug("LeaveGame")
       client ! B2C.LeavedGame
 
       state = state.addGold(reward)
@@ -187,18 +200,23 @@ class Account(matchmaking: ActorRef,
   def persistent: Receive = {
     /** from Database, ответ на Update */
     case AccountStateResponse(_, accountStateDto) ⇒
+      log.debug("AccountStateResponse")
       client ! AccountStateUpdated(accountStateDto)
 
     /** from Admin or Payments */
     case AdminSetAccountState(_, accountStateDto) ⇒
+      log.debug("AdminSetAccountState")
       state = AccountState(accountStateDto)
       client ! AccountStateUpdated(accountStateDto)
 
     case C2B.UpdateTutorState(state) ⇒
+      log.debug("C2B.UpdateTutorState")
       database ! Database.UpdateTutorState(accountId.dto, state)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
-    case DuplicateAccount ⇒ client ! CloseConnection
+    case DuplicateAccount ⇒
+      log.debug("DuplicateAccount")
+      client ! CloseConnection
   }
 
   def placeGameOrder() =
@@ -215,7 +233,7 @@ class Account(matchmaking: ActorRef,
     .build()
 
   override def postStop() = {
-    log.info("account stop")
+    log.debug("account stop")
     matchmaking ! Offline(accountId)
   }
 }

@@ -15,7 +15,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{GetAccountState, AccountNoExists, AccountStateResponse, UpdateAccountState}
+import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.rmi.B2C.{AdminOnline, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
@@ -40,50 +40,59 @@ class Admin(database: ActorRef,
   def auth: Receive = {
     /** from Client */
     case AuthenticateAsAdmin(authenticate) ⇒
+      log.debug("AuthenticateAsAdmin")
       if (authenticate.getLogin == login && authenticate.getPassword == password) {
         client = sender
         client ! AuthenticatedAsAdmin
         context become admin
       } else {
-        log.info("reject")
+        log.debug("reject")
         sender ! CloseConnection
       }
   }
 
   def admin: Receive = {
     /** from Database */
-    case AccountStateResponse(accountId, accountState) ⇒ sendToClient(accountId, accountState)
+    case AccountStateResponse(accountId, accountState) ⇒
+      log.debug("AccountStateResponse")
+      sendToClient(accountId, accountState)
 
     /** from Database */
-    case AccountNoExists ⇒ log.info("account does not exist")
+    case AccountNoExists ⇒
+      log.debug("AccountNoExists")
 
     case C2B.GetAccountState(dto) ⇒
+      log.debug("C2B.GetAccountState")
       database ! Database.GetAccountState(dto.getAccountId)
 
     case GetOnline ⇒
-      log.info("getOnline")
+      log.debug("GetOnline")
       matchmaking ! GetOnline
 
     case msg: AdminOnline ⇒
-      log.info("adminOnline")
+      log.debug("AdminOnline")
       client ! msg
 
     case AddGold(dto) ⇒
+      log.debug("AddGold")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.getAmount))
       )
 
     case AddItem(dto) ⇒
+      log.debug("AddItem")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.getItemType, dto.getAmount))
       )
 
     case SetSkill(dto) ⇒
+      log.debug("SetSkill")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.getSkilType, dto.getSkillLevel))
       )
 
     case SetSlot(dto) ⇒
+      log.debug("SetSlot")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
@@ -109,7 +118,7 @@ class Admin(database: ActorRef,
         f(accountId, AccountState(accountStateDto))
 
       case invalid ⇒
-        log.info("invalid result=" + invalid)
+        log.error("invalid result=" + invalid)
     }
   }
 
@@ -123,7 +132,7 @@ class Admin(database: ActorRef,
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒
-        log.info("invalid result=" + invalid)
+        log.error("invalid result=" + invalid)
     }
   }
 }

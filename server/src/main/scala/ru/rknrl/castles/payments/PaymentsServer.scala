@@ -85,7 +85,7 @@ class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) 
 
         if (!(config.products exists (_.id == productId))) {
 
-          log.info("product not found " + productId)
+          log.error("product not found " + productId)
           complete(callback.accountNotFoundError)
 
         } else {
@@ -123,11 +123,11 @@ class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) 
                 }
 
               case AccountNoExists ⇒
-                log.info("account not found")
+                log.error("account not found")
                 complete(callback.accountNotFoundError)
 
               case invalid ⇒
-                log.info("invalid get result=" + invalid)
+                log.error("invalid get result=" + invalid)
                 complete(callback.databaseError)
             }
           }

@@ -17,7 +17,7 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.castles.rmi.B2C.GameOver
+import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
@@ -47,11 +47,13 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
   override def receive: Receive = {
     case ConnectToGame(gameRef) ⇒
+      log.debug("ConnectToGame")
       game = Some(gameRef)
       gameRef ! Join(accountId, self)
       gameRef ! C2B.JoinGame
 
-    case B2C.JoinedGame(gameState) ⇒
+    case JoinedGame(gameState) ⇒
+      log.debug("JoinedGame")
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
@@ -153,5 +155,5 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
 
-  override def postStop() = log.info("bot stop")
+  override def postStop() = log.debug("bot stop")
 }

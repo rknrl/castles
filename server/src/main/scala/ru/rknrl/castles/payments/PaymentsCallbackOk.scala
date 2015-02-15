@@ -77,7 +77,8 @@ class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
           httpResponse = HttpResponse(entity = successResponse())
         )
     } catch {
-      case _: Throwable ⇒
+      case e: Throwable ⇒
+        log.error("error request parsing ", e)
         Response(errorResponse(OkErrorCode.CALLBACK_INVALID_PAYMENT))
     }
 

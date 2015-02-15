@@ -181,6 +181,7 @@ class MatchMaking(interval: FiniteDuration,
   val gameIdIterator = new GameIdIterator
 
   def createGame(big: Boolean, orders: Iterable[GameOrder]) = {
+    log.debug("createGame")
     val playerIdIterator = new PlayerIdIterator
 
     val players = for (order ← orders) yield {
@@ -196,12 +197,13 @@ class MatchMaking(interval: FiniteDuration,
   def receive = {
     /** from Admin or PaymentTransaction */
     case msg@AdminSetAccountState(accountId, _) ⇒
+      log.debug("AdminSetAccountState")
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
 
     /** from Admin */
     case GetOnline ⇒
-      log.info("getOnline")
+      log.debug("GetOnline")
       sender ! AdminOnline(AdminOnlineDTO.newBuilder()
         .setAccounts(accountIdToAccountRef.size)
         .setGames(gameRefToGameInfo.size)
@@ -211,6 +213,7 @@ class MatchMaking(interval: FiniteDuration,
       * В ответ отправляем InGameResponse
       */
     case InGame(accountId) ⇒
+      log.debug("InGame")
       if (accountIdToAccountRef.contains(accountId)) {
         val oldAccountRef = accountIdToAccountRef(accountId)
         oldAccountRef ! DuplicateAccount
@@ -225,7 +228,7 @@ class MatchMaking(interval: FiniteDuration,
 
     /** Аккаунт отсоединился */
     case Offline(accountId) ⇒
-      log.info("account offline")
+      log.debug("Offline")
       if (accountIdToAccountRef.contains(accountId) && accountIdToAccountRef(accountId) == sender) {
         accountIdToAccountRef = accountIdToAccountRef - accountId
         val gameInfo = accountIdToGameInfo.get(accountId)
@@ -233,13 +236,18 @@ class MatchMaking(interval: FiniteDuration,
       }
 
     /** Аккаунт присылает заявку на игру */
-    case PlaceGameOrder(gameOrder) ⇒ placeGameOrder(gameOrder, sender)
+    case PlaceGameOrder(gameOrder) ⇒
+      log.debug("PlaceGameOrder")
+      placeGameOrder(gameOrder, sender)
 
     /** Game оповещает, что игрок вышел из игры */
-    case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒ onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
+    case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
+      log.debug("PlayerLeaveGame")
+      onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
     case AllPlayersLeaveGame ⇒
+      log.debug("AllPlayersLeaveGame")
       onGameOver(sender)
       context stop sender
 

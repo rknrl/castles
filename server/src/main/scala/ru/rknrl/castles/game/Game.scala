@@ -205,6 +205,7 @@ class Game(players: Map[PlayerId, Player],
       * Добавляем/Обнавляем рефы в мапах
       */
     case Join(accountId, client) ⇒
+      log.debug("Join")
       val playerId = `accountId→playerId`(accountId)
       `playerId→account` = `playerId→account` + (playerId → sender)
 
@@ -215,6 +216,7 @@ class Game(players: Map[PlayerId, Player],
       * Убираем из его мапы online
       */
     case Offline(accountId) ⇒
+      log.debug("Offline")
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
 
@@ -223,6 +225,7 @@ class Game(players: Map[PlayerId, Player],
       * и отправляем стартовое сообщение JoinGameMsg
       */
     case C2B.JoinGame ⇒
+      log.debug("C2B.JoinGame")
       val playerId = `client→playerId`(sender)
       online = online + playerId
       val builder = gameState.dtoBuilder(playerId)
@@ -234,11 +237,13 @@ class Game(players: Map[PlayerId, Player],
 
     /** Игрок сдается */
     case Surrender ⇒
+      log.debug("Surrender")
       if (playerStates(senderPlayerId) == PlayerState.GAME)
         addLoser(senderPlayerId, getPlace)
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case C2B.LeaveGame ⇒
+      log.debug("C2B.LeaveGame")
       if (playerStates(senderPlayerId) == PlayerState.GAME_OVER)
         addLeaved(senderPlayerId)
 
@@ -331,5 +336,5 @@ class Game(players: Map[PlayerId, Player],
     if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
 
-  override def postStop() = log.info("game stop")
+  override def postStop() = log.debug("game stop")
 }
