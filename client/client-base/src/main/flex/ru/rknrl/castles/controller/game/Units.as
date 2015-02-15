@@ -9,6 +9,8 @@
 package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.model.Warning;
+
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
@@ -30,7 +32,7 @@ public class Units {
         for each(var unit:Unit in units) {
             if (unit.id.id == id.id) return unit;
         }
-        throw new Error("can't find unit " + id);
+        throw new Warning("can't find unit " + id);
     }
 
     public function add(endPos:Point, dto:UnitDTO):void {

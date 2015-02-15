@@ -39,13 +39,7 @@ public class Point {
     public function duration(endPos:Point, speed:Number):Number {
         return distance(endPos) / speed;
     }
-
-    public function lerp2(endPos:Point, startTime:int, currentTime:int, speed:Number):Point {
-        if (currentTime < startTime) throw new Error("currentTime=" + currentTime + "; startTime=" + startTime);
-        const progress:Number = Math.min(1, (currentTime - startTime) / duration(endPos, speed));
-        return lerp(endPos, progress);
-    }
-
+    
     public function lerp(endPos:Point, progress:Number):Point {
         return new Point(x + (endPos.x - x) * progress, y + (endPos.y - y) * progress);
     }

@@ -19,6 +19,7 @@ import flash.net.Socket;
 import flash.system.Security;
 
 import ru.rknrl.castles.controller.Controller;
+import ru.rknrl.castles.model.Warning;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.view.View;
@@ -75,6 +76,7 @@ public class Main extends Sprite {
         this.gamePort = gamePort;
         this.policyPort = policyPort;
         this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
+        log.add("bugsLogUrl=" + bugsLogUrl);
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
@@ -220,7 +222,15 @@ public class Main extends Sprite {
         const stackTrace:String = error ? error.getStackTrace() : "";
         log.error(event.error.toString(), stackTrace);
         log.send(bugsLogUrl);
-//      todo temp  destroy();
+        if (!(error is Warning)) {
+            addErrorScreen();
+        }
+    }
+
+    private function addErrorScreen():void {
+        destroyConnection();
+        view.removeLoadingScreenIfExists();
+        view.addErrorScreen();
     }
 }
 }

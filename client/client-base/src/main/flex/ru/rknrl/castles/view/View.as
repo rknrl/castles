@@ -13,6 +13,7 @@ import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.loading.ErrorScreen;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
@@ -123,6 +124,10 @@ public class View extends Sprite {
 
     public function removeAnyLoadingScreen():void {
         _removeLoadingScreen();
+    }
+
+    public function addErrorScreen():void {
+        addChild(new ErrorScreen(_layout));
     }
 }
 }
