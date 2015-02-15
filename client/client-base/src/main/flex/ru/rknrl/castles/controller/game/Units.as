@@ -9,8 +9,7 @@
 package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.model.Warning;
-
+import ru.rknrl.Warning;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.units.UnitsView;

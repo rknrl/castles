@@ -11,8 +11,7 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.model.Warning;
-
+import ru.rknrl.Warning;
 import ru.rknrl.castles.model.points.Point;
 
 public class PeriodicView extends Sprite {

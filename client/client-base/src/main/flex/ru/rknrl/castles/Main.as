@@ -18,8 +18,8 @@ import flash.events.UncaughtErrorEvent;
 import flash.net.Socket;
 import flash.system.Security;
 
+import ru.rknrl.Warning;
 import ru.rknrl.castles.controller.Controller;
-import ru.rknrl.castles.model.Warning;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.view.View;
@@ -220,11 +220,9 @@ public class Main extends Sprite {
     private function onUncaughtError(event:UncaughtErrorEvent):void {
         const error:Error = event.error as Error;
         const stackTrace:String = error ? error.getStackTrace() : "";
-        log.error(event.error.toString(), stackTrace);
+        log.error(event.error, stackTrace);
         log.send(bugsLogUrl);
-        if (!(error is Warning)) {
-            addErrorScreen();
-        }
+        if (!(error is Warning)) addErrorScreen();
     }
 
     private function addErrorScreen():void {
