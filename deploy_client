@@ -20,6 +20,8 @@ cp -a ~/dev/rknrl/castles/client/client-web/src/main/www/. ~/dev/rknrl/castles-d
 
 cd ~/dev/rknrl/castles-deploy/castles-client/www &&
 sed -i.bak 's/127\.0\.0\.1/castles\.rknrl\.ru/g' *.html &&
+# replace port 8080 by 80 in vk.html, ok.html, mm.html
+sed -i.bak 's/8080/80/g' *.html &&
 rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/*.bak &&
 
 # commit changes
