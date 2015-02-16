@@ -21,7 +21,7 @@ import ru.rknrl.utils.print;
 public class MainWeb extends MainWebBase {
     public function MainWeb() {
         const flashVars:Object = loaderInfo.parameters;
-        Log.add("flashVars:\n" + print(flashVars));
+        Log.info("flashVars:\n" + print(flashVars));
 
         const host:String = flashVars.rknrlHost;
         const gamePort:int = flashVars.rknrlGamePort;

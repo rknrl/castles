@@ -27,8 +27,8 @@ public class MainWebBase extends Main {
     public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
         Security.allowDomain("*");
 
-        Log.add("authenticationSecret=" + authenticationSecret.body);
-        Log.add("authenticationParams=" + authenticationSecret.params);
+        Log.info("authenticationSecret=" + authenticationSecret.body);
+        Log.info("authenticationParams=" + authenticationSecret.params);
 
         const layout:Layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, contentsScaleFactor);
 
@@ -41,7 +41,7 @@ public class MainWebBase extends Main {
     }
 
     private function onResize(event:Event):void {
-        Log.add("resize " + stage.stageWidth + "x" + stage.stageHeight);
+        Log.info("resize " + stage.stageWidth + "x" + stage.stageHeight);
         layout = new LayoutLandscape(stage.stageWidth, stage.stageHeight, contentsScaleFactor);
     }
 

@@ -78,7 +78,7 @@ public class Main extends Sprite {
         this.gamePort = gamePort;
         this.policyPort = policyPort;
         this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
-        Log.add("bugsLogUrl=" + bugsLogUrl);
+        Log.info("bugsLogUrl=" + bugsLogUrl);
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
@@ -118,8 +118,8 @@ public class Main extends Sprite {
     }
 
     private function onLocaleError(event:Event):void {
-        Log.add("locale error " + event);
-        Log.add("use default locale");
+        Log.info("locale error " + event);
+        Log.info("use default locale");
 
         setupLocale(defaultLocale);
     }
@@ -146,10 +146,10 @@ public class Main extends Sprite {
     private function onGetMyUserInfo(userInfo:UserInfo):void {
         if (userInfo) {
             myUserInfo = userInfo;
-            Log.add("myUserInfo: " + myUserInfo)
+            Log.info("myUserInfo: " + myUserInfo)
         } else {
             myUserInfo = new UserInfo(accountId.id, locale.defaultName, null, Sex.UNDEFINED);
-            Log.add("myUserInfo fail");
+            Log.info("myUserInfo fail");
         }
 
         tryConnect();
@@ -163,7 +163,7 @@ public class Main extends Sprite {
         if (server) throw new Error("already connected");
 
         const policyUrl:String = "xmlsocket://" + host + ":" + policyPort;
-        Log.add("loadPolicyFile:" + policyUrl);
+        Log.info("loadPolicyFile:" + policyUrl);
         Security.loadPolicyFile(policyUrl);
 
         server = new Server(new Socket());
@@ -175,7 +175,7 @@ public class Main extends Sprite {
     }
 
     private function onConnect(event:Event):void {
-        Log.add("onConnect");
+        Log.info("onConnect");
         const authenticate:AuthenticateDTO = new AuthenticateDTO();
         authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
         authenticate.secret = secret;
@@ -186,7 +186,7 @@ public class Main extends Sprite {
 
     private function onAuthenticated(e:AuthenticatedEvent):void {
         server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
-        Log.add("onAuthenticationResult");
+        Log.info("onAuthenticationResult");
 
         view.removeLoadingScreen();
         controller = new Controller(view, e.success, server, social);
@@ -220,7 +220,7 @@ public class Main extends Sprite {
     }
 
     private function onConnectionError(event:Event):void {
-        Log.add("onConnectionError");
+        Log.info("onConnectionError");
         destroy();
     }
 

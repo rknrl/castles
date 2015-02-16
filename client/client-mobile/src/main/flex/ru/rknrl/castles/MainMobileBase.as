@@ -35,7 +35,7 @@ public class MainMobileBase extends Main {
     }
 
     public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
-        Log.add(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
+        Log.info(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
 
         stage.autoOrients = false;
 
@@ -54,8 +54,8 @@ public class MainMobileBase extends Main {
         authenticationSecret.body = "secret";
         authenticationSecret.params = null;
 
-        Log.add("authenticationSecret=" + authenticationSecret.body);
-        Log.add("authenticationParams=" + authenticationSecret.params);
+        Log.info("authenticationSecret=" + authenticationSecret.body);
+        Log.info("authenticationParams=" + authenticationSecret.params);
 
         const layout:Layout = tablet ? new LayoutLandscape(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor) : new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
