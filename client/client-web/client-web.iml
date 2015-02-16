@@ -32,6 +32,7 @@
             <entry key="compiler.locale" value="en_US" />
           </map>
           <option name="resourceFilesMode" value="None" />
+          <option name="additionalOptions" value="-swf-version=17" />
         </compiler-options>
         <packaging-air-desktop />
         <packaging-android />
