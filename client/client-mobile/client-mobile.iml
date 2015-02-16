@@ -30,7 +30,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="air" />
+          <sdk name="Air" />
         </dependencies>
         <compiler-options>
           <map>
@@ -40,14 +40,12 @@
         <packaging-air-desktop />
         <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-android.xml" package-file-name="Castles">
           <files-to-package>
-            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - EN.tsv" path-in-package="castles - EN.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
           </files-to-package>
           <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/android/android.p12" use-temp-certificate="false" />
         </packaging-android>
         <packaging-ios enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-ios.xml" package-file-name="Castles">
           <files-to-package>
-            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - EN.tsv" path-in-package="castles - EN.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-568h@2x.png" path-in-package="Default-568h@2x.png" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape.png" path-in-package="Default-Landscape.png" />
@@ -68,7 +66,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="air" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="Air" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />

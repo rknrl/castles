@@ -21,7 +21,7 @@
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="air" />
+          <sdk name="Air" />
         </dependencies>
         <compiler-options>
           <map>
@@ -44,7 +44,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/demo/flex" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="air" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="Air" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Maven: ru.rknrl.castles:base-swc:swc:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.flexunit:flexunit:swc:as3:4.1.0" level="project" />
