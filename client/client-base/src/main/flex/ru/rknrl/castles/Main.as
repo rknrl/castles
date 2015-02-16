@@ -17,11 +17,13 @@ import flash.events.SecurityErrorEvent;
 import flash.events.UncaughtErrorEvent;
 import flash.net.Socket;
 import flash.system.Security;
+import flash.text.TextField;
 
 import ru.rknrl.Warning;
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
+import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
@@ -39,6 +41,7 @@ import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.log.Log;
 import ru.rknrl.rmi.AuthenticatedEvent;
 import ru.rknrl.rmi.Server;
+import ru.rknrl.utils.createTextField;
 
 public class Main extends Sprite {
     private static const cachedAvatarsLimit:int = 10;
@@ -103,6 +106,10 @@ public class Main extends Sprite {
         stage.align = StageAlign.TOP_LEFT;
         stage.quality = StageQuality.BEST;
 
+        const verTextField:TextField = createTextField(Fonts.debug);
+        verTextField.text = "1.00";
+        stage.addChild(verTextField);
+
         localeLoader = new TextLoader(localesUrl + "castles - RU.tsv");
         localeLoader.addEventListener(Event.COMPLETE, onLocaleComplete);
         localeLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLocaleError);
@@ -155,7 +162,9 @@ public class Main extends Sprite {
     private function createConnection(host:String, port:int):void {
         if (server) throw new Error("already connected");
 
-        Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
+        const policyUrl:String = "xmlsocket://" + host + ":" + policyPort;
+        Log.add("loadPolicyFile:" + policyUrl);
+        Security.loadPolicyFile(policyUrl);
 
         server = new Server(new Socket());
         server.addEventListener(Event.CONNECT, onConnect);

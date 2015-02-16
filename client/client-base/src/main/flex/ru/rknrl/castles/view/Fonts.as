@@ -56,5 +56,6 @@ public class Fonts {
     public static const popupPrice:TextFormat = regular(18, Colors.grey);
 
     public static const star:TextFormat = new TextFormat(starFont.fontName);
+    public static const debug:TextFormat = regular(6, Colors.grey);
 }
 }

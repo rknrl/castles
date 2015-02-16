@@ -7,8 +7,6 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
-import flash.system.Security;
-
 import ru.rknrl.core.social.MM;
 import ru.rknrl.core.social.OK;
 import ru.rknrl.core.social.SocialWeb;
@@ -22,8 +20,6 @@ import ru.rknrl.utils.print;
 [SWF(frameRate="60", quality="high")]
 public class MainWeb extends MainWebBase {
     public function MainWeb() {
-        Security.allowDomain("*");
-
         const flashVars:Object = loaderInfo.parameters;
         Log.add("flashVars:\n" + print(flashVars));
 
