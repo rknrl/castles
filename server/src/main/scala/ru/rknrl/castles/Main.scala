@@ -16,7 +16,7 @@ import ru.rknrl.PolicyServer
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
-import ru.rknrl.castles.payments.PaymentsServer
+import ru.rknrl.castles.payments.HttpServer
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -45,7 +45,7 @@ object Main {
 
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, database, top, config.game), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[PaymentsServer], config, database, matchmaking), "payment-server")
+    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
 
     val tcp = IO(Tcp)

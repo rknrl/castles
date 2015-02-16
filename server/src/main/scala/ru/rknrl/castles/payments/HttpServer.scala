@@ -28,8 +28,15 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
+class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
   val bugLog = LoggerFactory.getLogger("client")
+
+  val crossdomain = """<?xml version="1.0"?>
+                      |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
+                      |<cross-domain-policy>
+                      |<site-control permitted-cross-domain-policies="master-only"/>
+                      |<allow-access-from domain="*" to-ports="*"/>
+                      |</cross-domain-policy>""".stripMargin
 
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
@@ -43,6 +50,10 @@ class PaymentsServer(config: Config, database: ActorRef, matchmaking: ActorRef) 
           bugLog.info(log)
           complete(StatusCodes.OK)
         }
+      }
+    } ~ path("crossdomain.xml") {
+      respondWithMediaType(`application/xml`) {
+        complete(crossdomain)
       }
     } ~ path("vk_callback") {
       post {
