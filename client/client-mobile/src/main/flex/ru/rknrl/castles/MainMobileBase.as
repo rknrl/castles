@@ -34,9 +34,8 @@ public class MainMobileBase extends Main {
         return inch > maxPhoneInch;
     }
 
-    public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort: int) {
-        const log:Log = new Log();
-        log.add(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
+    public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
+        Log.add(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
 
         stage.autoOrients = false;
 
@@ -45,7 +44,7 @@ public class MainMobileBase extends Main {
         const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
 
         const accountType:AccountType = AccountType.DEV;
-        const social:SocialMobile = new SocialMobile(log);
+        const social:SocialMobile = new SocialMobile();
 
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = "1";
@@ -55,8 +54,8 @@ public class MainMobileBase extends Main {
         authenticationSecret.body = "secret";
         authenticationSecret.params = null;
 
-        log.add("authenticationSecret=" + authenticationSecret.body);
-        log.add("authenticationParams=" + authenticationSecret.params);
+        Log.add("authenticationSecret=" + authenticationSecret.body);
+        Log.add("authenticationParams=" + authenticationSecret.params);
 
         const layout:Layout = tablet ? new LayoutLandscape(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor) : new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
@@ -69,7 +68,7 @@ public class MainMobileBase extends Main {
          trace("deviceLocale:" + deviceLocale);
          */
 
-        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, log, social, layout, new MobileFactory());
+        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, social, layout, new MobileFactory());
     }
 }
 }

@@ -31,7 +31,6 @@ import ru.rknrl.rmi.Server;
 public class Controller {
     private var view:View;
     private var server:Server;
-    private var log:Log;
     private var social:Social;
 
     private var menu:MenuController;
@@ -40,11 +39,9 @@ public class Controller {
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
                                server:Server,
-                               log:Log,
                                social:Social) {
         this.view = view;
         this.server = server;
-        this.log = log;
         this.social = social;
 
         tutorState = authenticated.tutor;
@@ -77,7 +74,7 @@ public class Controller {
     private var game:GameController;
 
     private function onEnteredGame(e:EnteredGameEvent):void {
-        log.add("onEnteredGame");
+        Log.add("onEnteredGame");
         joinGame(e.node);
     }
 
@@ -87,7 +84,7 @@ public class Controller {
     }
 
     private function onJoinedGame(e:JoinedGameEvent):void {
-        log.add("onJoinedGame");
+        Log.add("onJoinedGame");
         server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
         server.addEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
 
@@ -104,7 +101,7 @@ public class Controller {
     }
 
     private function onLeavedGame(e:LeavedGameEvent):void {
-        log.add("onLeavedGame");
+        Log.add("onLeavedGame");
 
         view.removeGame();
         view.showMenuAndLock();

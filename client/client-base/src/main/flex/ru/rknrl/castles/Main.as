@@ -55,7 +55,6 @@ public class Main extends Sprite {
 
     private var localesUrl:String;
     private var defaultLocale:String;
-    private var log:Log;
     private var social:Social;
 
     private var myUserInfo:UserInfo;
@@ -71,18 +70,17 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, log:Log, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
+    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
         this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
-        log.add("bugsLogUrl=" + bugsLogUrl);
+        Log.add("bugsLogUrl=" + bugsLogUrl);
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
         this.localesUrl = localesUrl;
         this.defaultLocale = defaultLocale;
-        this.log = log;
         this.social = social;
         _layout = layout;
         this.deviceFactory = deviceFactory;
@@ -113,8 +111,8 @@ public class Main extends Sprite {
     }
 
     private function onLocaleError(event:Event):void {
-        log.add("locale error " + event);
-        log.add("use default locale");
+        Log.add("locale error " + event);
+        Log.add("use default locale");
 
         setupLocale(defaultLocale);
     }
@@ -141,10 +139,10 @@ public class Main extends Sprite {
     private function onGetMyUserInfo(userInfo:UserInfo):void {
         if (userInfo) {
             myUserInfo = userInfo;
-            log.add("myUserInfo: " + myUserInfo)
+            Log.add("myUserInfo: " + myUserInfo)
         } else {
             myUserInfo = new UserInfo(accountId.id, locale.defaultName, null, Sex.UNDEFINED);
-            log.add("myUserInfo fail");
+            Log.add("myUserInfo fail");
         }
 
         tryConnect();
@@ -168,7 +166,7 @@ public class Main extends Sprite {
     }
 
     private function onConnect(event:Event):void {
-        log.add("onConnect");
+        Log.add("onConnect");
         const authenticate:AuthenticateDTO = new AuthenticateDTO();
         authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
         authenticate.secret = secret;
@@ -179,10 +177,10 @@ public class Main extends Sprite {
 
     private function onAuthenticated(e:AuthenticatedEvent):void {
         server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
-        log.add("onAuthenticationResult");
+        Log.add("onAuthenticationResult");
 
         view.removeLoadingScreen();
-        controller = new Controller(view, e.success, server, log, social);
+        controller = new Controller(view, e.success, server, social);
     }
 
     private function destroyConnection():void {
@@ -213,15 +211,15 @@ public class Main extends Sprite {
     }
 
     private function onConnectionError(event:Event):void {
-        log.add("onConnectionError");
+        Log.add("onConnectionError");
         destroy();
     }
 
     private function onUncaughtError(event:UncaughtErrorEvent):void {
         const error:Error = event.error as Error;
         const stackTrace:String = error ? error.getStackTrace() : "";
-        log.error(event.error, stackTrace);
-        log.send(bugsLogUrl);
+        Log.error(event.error, stackTrace);
+        Log.send(bugsLogUrl);
         if (!(error is Warning)) addErrorScreen();
     }
 

@@ -27,10 +27,8 @@ public class MainWebStandalone extends MainWebBase {
     public function MainWebStandalone() {
         Security.allowDomain("*");
 
-        const log:Log = new Log();
-
         const accountType:AccountType = AccountType.DEV;
-        const social:Social = new SocialMock(log);
+        const social:Social = new SocialMock();
 
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = "1";
@@ -39,7 +37,7 @@ public class MainWebStandalone extends MainWebBase {
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = "body";
 
-        super(log, host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
+        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
     }
 }
 }
