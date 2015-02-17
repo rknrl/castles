@@ -26,7 +26,7 @@
             <entry library-id="cd83876e-2486-41d6-8144-07449b7b31fc">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="ane-android-flash" build-configuration-name="ane-android-flash">
+            <entry module-name="ane-flash" build-configuration-name="ane-android-flash">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -84,6 +84,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="ane-android-flash" exported="" />
   </component>
 </module>
