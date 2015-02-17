@@ -23,10 +23,7 @@
             <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="cd83876e-2486-41d6-8144-07449b7b31fc">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="ane-flash" build-configuration-name="ane-android-flash">
+            <entry library-id="a68c7cb9-5d97-4112-af9f-e84613c9fee3">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -76,9 +73,9 @@
     <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
-        <properties id="cd83876e-2486-41d6-8144-07449b7b31fc" />
+        <properties id="a68c7cb9-5d97-4112-af9f-e84613c9fee3" />
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../core/ane/ane-android/ane/CoreExtension.ane!/" />
+          <root url="jar://$MODULE_DIR$/../../../core/ane/target/CoreANE.ane!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
