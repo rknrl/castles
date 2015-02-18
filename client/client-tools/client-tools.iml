@@ -15,7 +15,24 @@
           <sdk name="Apache-Flex-Mac" />
         </dependencies>
         <compiler-options />
-        <packaging-air-desktop package-file-name="Main" />
+        <packaging-air-desktop use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ViewReport-descriptor.xml" package-file-name="Main" />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+      <configuration name="create-icons" target-platform="Desktop" main-class="ru.rknrl.castles.tools.CreateIcons" output-file="CreateIcons.swf" output-folder="$MODULE_DIR$/target">
+        <dependencies>
+          <entries>
+            <entry module-name="client-base" build-configuration-name="client-base">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="common-client" build-configuration-name="common-client">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="Apache-Flex-Mac" />
+        </dependencies>
+        <compiler-options />
+        <packaging-air-desktop use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/CreateIcons-descriptor.xml" package-file-name="create-icons" />
         <packaging-android />
         <packaging-ios />
       </configuration>

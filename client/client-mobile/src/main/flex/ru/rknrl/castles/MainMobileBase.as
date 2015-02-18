@@ -11,6 +11,7 @@ import flash.display.StageAspectRatio;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
+import ru.rknrl.ANE;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -44,7 +45,6 @@ public class MainMobileBase extends Main {
         const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
 
         const accountType:AccountType = AccountType.DEV;
-        const social:SocialMobile = new SocialMobile();
 
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = "1";
@@ -62,11 +62,9 @@ public class MainMobileBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        /*
-         var ane:AndroidANE = new AndroidANE();
-         const deviceLocale:String = ane.getDeviceLocale();
-         trace("deviceLocale:" + deviceLocale);
-         */
+        const ane:ANE = new ANE();
+        ane.init();
+        const social:SocialMobile = new SocialMobile(ane);
 
         super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, social, layout, new MobileFactory());
     }

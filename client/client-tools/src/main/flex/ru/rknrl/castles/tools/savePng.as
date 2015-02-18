@@ -17,7 +17,7 @@ import mx.graphics.codec.PNGEncoder;
 
 public function savePng(fileName:String, bitmapData:BitmapData):BitmapData {
     const byteArray:ByteArray = new PNGEncoder().encode(bitmapData);
-    const file:File = new File(File.applicationDirectory.nativePath + "/" + fileName + ".png");
+    const file:File = new File(fileName + ".png");
     trace(file.nativePath);
     const fileStream:FileStream = new FileStream();
     fileStream.open(file, FileMode.WRITE);

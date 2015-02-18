@@ -35,13 +35,13 @@
           </map>
         </compiler-options>
         <packaging-air-desktop />
-        <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-android.xml" package-file-name="Castles">
+        <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-android-descriptor.xml" package-file-name="Castles">
           <files-to-package>
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
           </files-to-package>
           <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/android/android.p12" use-temp-certificate="false" />
         </packaging-android>
-        <packaging-ios enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-app-ios.xml" package-file-name="Castles">
+        <packaging-ios enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-ios-descriptor.xml" package-file-name="Castles">
           <files-to-package>
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-568h@2x.png" path-in-package="Default-568h@2x.png" />
@@ -49,6 +49,14 @@
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape@2x.png" path-in-package="Default-Landscape@2x.png" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default.png" path-in-package="Default.png" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default@2x.png" path-in-package="Default@2x.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon-Large.png" path-in-package="Icon-Large.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon-Small-50.png" path-in-package="Icon-Small-50.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon-Small-50@2x.png" path-in-package="Icon-Small-50@2x.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon-Small.png" path-in-package="Icon-Small.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon-Small@2x.png" path-in-package="Icon-Small@2x.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon.png" path-in-package="Icon.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon@2x-Large.png" path-in-package="Icon@2x-Large.png" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_ios/Icon@2x.png" path-in-package="Icon@2x.png" />
           </files-to-package>
           <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/ios/ios_development.p12" provisioning-profile-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/castles_development.mobileprovision" />
         </packaging-ios>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<application xmlns="http://ns.adobe.com/air/application/16.0">
+
+    <id>ru.rknrl.castles</id>
+
+    <filename>Castles</filename>
+
+    <name>Castles</name>
+
+    <versionNumber>0.0.1</versionNumber>
+    <versionLabel>0.0.1</versionLabel>
+
+    <supportedLanguages>en ru</supportedLanguages>
+
+    <description>
+        <text xml:lang="en">Castles description</text>
+        <text xml:lang="ru">Башенки описание</text>
+    </description>
+
+    <copyright>Толя Янот</copyright>
+
+    <extensions>
+        <extensionID>ru.rknrl.CoreANE</extensionID>
+    </extensions>
+
+    <icon>
+        <image36x36>icons_android/36.png</image36x36>
+        <image48x48>icons_android/48.png</image48x48>
+        <image72x72>icons_android/72.png</image72x72>
+        <image96x96>icons_android/96.png</image96x96>
+        <image144x144>icons_android/144.png</image144x144>
+    </icon>
+
+    <initialWindow>
+        <content>CastlesMobile.swf</content>
+
+        <visible>true</visible>
+
+        <autoOrients>false</autoOrients>
+
+        <fullScreen>true</fullScreen>
+
+        <renderMode>gpu</renderMode>
+    </initialWindow>
+
+    <android>
+        <colorDepth>32bit</colorDepth>
+        <manifestAdditions><![CDATA[
+			<manifest android:installLocation="auto">
+			    <uses-sdk android:minSdkVersion="8"
+                          android:targetSdkVersion="8" />
+
+                <uses-permission android:name="android.permission.INTERNET"/>
+                <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+                <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+                <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+                <uses-permission android:name="android.permission.READ_PHONE_STATE"/> <!-- required for reading phone's IMEI -->
+                <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- required for getting user's email for getting name -->
+                <uses-permission android:name="com.android.vending.BILLING" />
+
+                <application android:largeHeap="true" android:hardwareAccelerated="true">
+                     <activity android:launchMode="singleTop">
+                        <intent-filter>
+                            <action android:name="android.intent.action.MAIN"/>
+                            <category android:name="android.intent.category.LAUNCHER"/>
+                        </intent-filter>
+                    </activity>
+                    <activity android:name="ru.crazypanda.CoreANEActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+                </application>
+
+			</manifest>
+		]]></manifestAdditions>
+    </android>
+</application>

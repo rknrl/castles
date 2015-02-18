@@ -254,7 +254,7 @@ public class ViewReport extends Sprite {
 
             const width:int = layout is LayoutPortrait ? 160 : 512;
             html += '<img src = "' + device + name + '.png" width="' + width + 'px"/>';
-            return savePng(folder + device + name, bitmapData);
+            return savePng(File.applicationDirectory.nativePath + "/" + folder + device + name, bitmapData);
         }
     }
 }
