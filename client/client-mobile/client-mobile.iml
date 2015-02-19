@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="client-mobile">
     <configurations>
-      <configuration name="client-mobile" target-platform="Mobile" pure-as="true" main-class="ru.rknrl.castles.MainMobile" output-file="client-mobile.swf" output-folder="$MODULE_DIR$/target">
+      <configuration name="client-mobile" target-platform="Mobile" pure-as="true" main-class="ru.rknrl.castles.MainMobile" output-file="CastlesMobile.swf" output-folder="$MODULE_DIR$/target">
         <dependencies target-player="14.0">
           <entries>
             <entry module-name="client-base" build-configuration-name="client-base">
