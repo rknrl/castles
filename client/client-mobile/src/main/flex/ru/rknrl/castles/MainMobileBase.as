@@ -11,7 +11,8 @@ import flash.display.StageAspectRatio;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
-import ru.rknrl.ANE;
+import org.onepf.OpenIAB;
+
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -62,7 +63,7 @@ public class MainMobileBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        const ane:ANE = new ANE();
+        const ane:OpenIAB = new OpenIAB();
         Log.info("ANE:" + ane.init());
         const social:SocialMobile = new SocialMobile(ane);
 

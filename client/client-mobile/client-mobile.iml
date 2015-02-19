@@ -23,7 +23,7 @@
             <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="a68c7cb9-5d97-4112-af9f-e84613c9fee3">
+            <entry library-id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -82,9 +82,9 @@
     <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
-        <properties id="a68c7cb9-5d97-4112-af9f-e84613c9fee3" />
+        <properties id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7" />
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../core/ane/target/CoreANE.ane!/" />
+          <root url="jar://$MODULE_DIR$/../../../OpenIAB-Flash-Plugin/bin/OpenIAB.ane!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -17,8 +17,7 @@
             <load-config filename="${AIR_HOME}/frameworks/airmobile-config.xml"/>
             <load-config filename="flex-config-mobile.xml"/>
 
-            <source-path path-element="${rknrl}/ane/flash/src"/>
-            <source-path path-element="${rknrl}/ane/default-lib/src"/>
+            <source-path path-element="${rknrl}/../OpenIAB-Flash-Plugin/flash/src"/>
 
             <source-path path-element="${rknrl}/common/common-client/src/main/flex"/>
             <source-path path-element="${rknrl}/dto/dto-client/src/main/flex"/>
@@ -34,8 +33,8 @@
                 <include name="base-swc.swc"/>
             </compiler.library-path>
 
-            <runtime-shared-library-path path-element="${rknrl}/ane/target/CoreANE.ane">
-                <url rsl-url="CoreANE.ane"/>
+            <runtime-shared-library-path path-element="${rknrl}/../OpenIAB-Flash-Plugin/bin/OpenIAB.ane">
+                <url rsl-url="OpenIAB.ane"/>
             </runtime-shared-library-path>
 
         </mxmlc>
@@ -59,7 +58,7 @@
             <arg value="CastlesMobile.swf"/>
             <arg line="icons_android"/>
             <arg value="-extdir"/>
-            <arg file="${rknrl}/ane/target"/>
+            <arg file="${rknrl}/../OpenIAB-Flash-Plugin/bin"/>
         </exec>
     </target>
 
@@ -84,7 +83,7 @@
             <arg value="CastlesMobile.swf"/>
             <arg line="Default-568h@2x.png Default-Landscape.png Default-Landscape@2x.png Default@2x.png Icon-Small.png Icon-Small@2x.png Icon-Small-50.png Icon-Small-50@2x.png Icon.png Icon@2x.png Icon-Large.png Icon@2x-Large.png"/>
             <arg value="-extdir"/>
-            <arg file="${rknrl}/ane/target"/>
+            <arg file="${rknrl}/../OpenIAB-Flash-Plugin/bin/"/>
         </exec>
     </target>
 </project>

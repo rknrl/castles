@@ -20,7 +20,7 @@
     <copyright>Толя Янот</copyright>
 
     <extensions>
-        <extensionID>ru.rknrl.CoreANE</extensionID>
+        <extensionID>org.onepf.OpenIAB</extensionID>
     </extensions>
 
     <icon>
