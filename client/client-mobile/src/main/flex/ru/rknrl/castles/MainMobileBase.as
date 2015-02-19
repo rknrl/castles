@@ -63,7 +63,7 @@ public class MainMobileBase extends Main {
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
         const ane:ANE = new ANE();
-        ane.init();
+        Log.info("ANE:" + ane.init());
         const social:SocialMobile = new SocialMobile(ane);
 
         super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, social, layout, new MobileFactory());
