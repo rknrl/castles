@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<flex-config>
+    <compiler>
+        <debug>false</debug>
+        <incremental>false</incremental>
+        <optimize>true</optimize>
+        <!--<omit-trace-statements>true</omit-trace-statements> todo what is that-->
+        <!--<strict>true</strict> todo what is that-->
+        <!--<as3>true</as3> todo what is that-->
+        <verbose-stacktraces>true</verbose-stacktraces>
+  	</compiler>
+</flex-config>

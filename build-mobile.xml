@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="Castles-Mobile" default="castles-mobile-swf">
+    <property file="${user.home}/build.properties"/>
+    <taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar"/>
+
+    <target name="castles-mobile-swf">
+        <!-- Clean -->
+
+        <delete file="target/CastlesMobile.swf"/>
+
+        <!-- Build swf -->
+
+        <mxmlc file="${castles}/client/client-mobile/src/main/flex/ru/rknrl/castles/MainMobile.as"
+               locale="en_US"
+               output="target/CastlesMobile.swf">
+
+            <load-config filename="${AIR_HOME}/frameworks/airmobile-config.xml"/>
+            <load-config filename="flex-config-mobile.xml"/>
+
+            <source-path path-element="${rknrl}/ane/flash/src"/>
+            <source-path path-element="${rknrl}/ane/default-lib/src"/>
+
+            <source-path path-element="${rknrl}/common/common-client/src/main/flex"/>
+            <source-path path-element="${rknrl}/dto/dto-client/src/main/flex"/>
+            <source-path path-element="${rknrl}/rmi/rmi-client/src/main/flex"/>
+            <source-path path-element="${rknrl}/social/social-client-base/src/main/flex"/>
+            <source-path path-element="${rknrl}/social/social-client-mobile/src/main/flex"/>
+
+            <source-path path-element="${castles}/client/client-base/src/main/flex"/>
+            <source-path path-element="${castles}/client/client-mobile/src/main/flex"/>
+            <source-path path-element="${castles}/client/client-mobile/src/main/resources"/>
+
+            <compiler.library-path dir="${castles}/client/client-base/src/main/fla" append="true">
+                <include name="base-swc.swc"/>
+            </compiler.library-path>
+
+            <runtime-shared-library-path path-element="${rknrl}/ane/target/CoreANE.ane">
+                <url rsl-url="CoreANE.ane"/>
+            </runtime-shared-library-path>
+
+        </mxmlc>
+    </target>
+
+    <target name="android-apk">
+        <copy todir="target">
+            <fileset dir="${castles}/client/client-mobile/src/main/resources" includes="icons_android/"/>
+        </copy>
+
+        <exec executable="${AIR_HOME}/bin/adt" dir="target">
+            <arg value="-package"/>
+            <arg line="-target apk-captive-runtime"/>
+            <arg line="-storetype pkcs12"/>
+            <arg value="-keystore"/>
+            <arg file="${rknrl}/certificates/android/android.p12"/>
+            <arg value="-storepass"/>
+            <arg value="${android.storepass}"/>
+            <arg value="castles.apk"/>
+            <arg value="${castles}/client/client-mobile/src/main/flex/ru/rknrl/castles/Castles-android-descriptor.xml"/>
+            <arg value="CastlesMobile.swf"/>
+            <arg line="icons_android"/>
+            <arg value="-extdir"/>
+            <arg file="${rknrl}/ane/target"/>
+        </exec>
+    </target>
+
+    <target name="ios-ipa">
+        <copy todir="target">
+            <fileset dir="${castles}/client/client-mobile/src/main/resources/icons_ios"/>
+            <fileset dir="${castles}/client/client-mobile/src/main/resources/splash"/>
+        </copy>
+
+        <exec executable="${AIR_HOME}/bin/adt" dir="target">
+            <arg value="-package"/>
+            <arg line="-target ipa-app-store"/>
+            <arg value="-provisioning-profile"/>
+            <arg file="client/client-mobile/src/main/flex/ru/rknrl/castles/castles_development.mobileprovision"/>
+            <arg line="-storetype pkcs12"/>
+            <arg value="-keystore"/>
+            <arg file="${rknrl}/certificates/ios/ios_development.p12"/>
+            <arg value="-storepass"/>
+            <arg value="${ios.development.storepass}"/>
+            <arg value="castles.ipa"/>
+            <arg value="${castles}/client/client-mobile/src/main/flex/ru/rknrl/castles/Castles-ios-descriptor.xml"/>
+            <arg value="CastlesMobile.swf"/>
+            <arg line="Default-568h@2x.png Default-Landscape.png Default-Landscape@2x.png Default@2x.png Icon-Small.png Icon-Small@2x.png Icon-Small-50.png Icon-Small-50@2x.png Icon.png Icon@2x.png Icon-Large.png Icon@2x-Large.png"/>
+            <arg value="-extdir"/>
+            <arg file="${rknrl}/ane/target"/>
+        </exec>
+    </target>
+</project>

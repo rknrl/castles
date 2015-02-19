@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="Castles" default="castles-web-swf">
+<project name="Castles-Web" default="castles-web-swf">
     <property file="${user.home}/build.properties"/>
     <taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar"/>
 
@@ -10,7 +10,7 @@
             <mxmlc file="${castles}/client/client-web/src/main/flex/ru/rknrl/castles/MainWeb.as"
                    output="target/client-web.swf">
                 <load-config filename="${FLEX_HOME}/frameworks/flex-config.xml"/>
-                <load-config filename="flex-config.xml"/>
+                <load-config filename="flex-config-web.xml"/>
 
                 <source-path path-element="${rknrl}/common/common-client/src/main/flex"/>
                 <source-path path-element="${rknrl}/dto/dto-client/src/main/flex"/>
