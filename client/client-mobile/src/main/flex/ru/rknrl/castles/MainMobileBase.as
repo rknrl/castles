@@ -7,6 +7,8 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
+import com.freshplanet.ane.AirFacebook.Facebook;
+
 import flash.display.StageAspectRatio;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
@@ -63,9 +65,10 @@ public class MainMobileBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        const ane:OpenIAB = new OpenIAB();
-        Log.info("ANE:" + ane.init());
-        const social:SocialMobile = new SocialMobile(ane);
+        const paymentsAne:OpenIAB = new OpenIAB();
+        Log.info("PaymentsANE:" + paymentsAne.init());
+        const facebookAne:Facebook = new Facebook();
+        const social:SocialMobile = new SocialMobile(facebookAne, paymentsAne);
 
         super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, social, layout, new MobileFactory());
     }

@@ -21,6 +21,9 @@
 
     <extensions>
         <extensionID>org.onepf.OpenIAB</extensionID>
+        <extensionID>com.freshplanet.AirFacebook</extensionID>
+        <extensionID>com.freshplanet.ane.AirDeviceId</extensionID>
+        <extensionID>com.sticksports.nativeExtensions.Keychain</extensionID>
     </extensions>
 
     <icon>
@@ -64,6 +67,19 @@
 
             <key>UIPrerenderedIcon</key>
             <true/>
+
+            <key>CFBundleURLTypes</key>
+            <array>
+                <dict>
+                    <key>CFBundleURLSchemes</key>
+                    <array>
+                        <string>fb{YOUR_FB_ID}</string>
+                    </array>
+                </dict>
+            </array>
+
+            <key>FacebookAppID</key>
+            <string>{YOUR_FB_ID}</string>
         ]]></InfoAdditions>
 
         <Entitlements>

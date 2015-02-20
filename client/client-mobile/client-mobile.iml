@@ -26,6 +26,15 @@
             <entry library-id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7">
               <dependency linkage="Merged" />
             </entry>
+            <entry library-id="17d87ebb-9d47-4359-8663-e79844a6f992">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="4494bfd2-e503-4ec7-937f-a7215960452f">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="55b877ca-25cf-445d-b4d1-10e12aa8dbb2">
+              <dependency linkage="Merged" />
+            </entry>
           </entries>
           <sdk name="Air" />
         </dependencies>
@@ -85,6 +94,36 @@
         <properties id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7" />
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../../OpenIAB-Flash-Plugin/bin/OpenIAB.ane!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="17d87ebb-9d47-4359-8663-e79844a6f992" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../ANE-DeviceId/bin/AirDeviceId.ane!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="4494bfd2-e503-4ec7-937f-a7215960452f" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../ANE-Keychain/bin/Keychain.ane!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="55b877ca-25cf-445d-b4d1-10e12aa8dbb2" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../ANE-Facebook/bin/AirFacebook.ane!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

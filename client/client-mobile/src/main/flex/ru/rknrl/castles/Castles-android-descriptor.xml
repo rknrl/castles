@@ -21,6 +21,9 @@
 
     <extensions>
         <extensionID>org.onepf.OpenIAB</extensionID>
+        <extensionID>com.freshplanet.AirFacebook</extensionID>
+        <extensionID>com.freshplanet.ane.AirDeviceId</extensionID>
+        <extensionID>com.sticksports.nativeExtensions.Keychain</extensionID>
     </extensions>
 
     <icon>
@@ -59,15 +62,17 @@
                 <uses-permission android:name="com.android.vending.BILLING" />
 
                 <application android:largeHeap="true" android:hardwareAccelerated="true">
-                     <activity android:launchMode="singleTop">
+                    <activity android:launchMode="singleTop">
                         <intent-filter>
                             <action android:name="android.intent.action.MAIN"/>
                             <category android:name="android.intent.category.LAUNCHER"/>
                         </intent-filter>
                     </activity>
-                    <activity android:name="ru.crazypanda.CoreANEActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+                    <activity android:name="org.onepf.OpenIAB" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+                    <activity android:name="com.facebook.LoginActivity"/>
+                    <activity android:name="com.freshplanet.ane.AirFacebook.LoginActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"></activity>
+                    <activity android:name="com.freshplanet.ane.AirFacebook.DialogActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"></activity>
                 </application>
-
 			</manifest>
 		]]></manifestAdditions>
     </android>

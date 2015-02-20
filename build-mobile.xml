@@ -33,16 +33,31 @@
                 <include name="base-swc.swc"/>
             </compiler.library-path>
 
-            <runtime-shared-library-path path-element="${rknrl}/../OpenIAB-Flash-Plugin/bin/OpenIAB.ane">
+            <runtime-shared-library-path path-element="${payments.ane}/OpenIAB.ane">
                 <url rsl-url="OpenIAB.ane"/>
             </runtime-shared-library-path>
 
+            <runtime-shared-library-path path-element="${facebook.ane}/AirFacebook.ane">
+                <url rsl-url="AirFacebook.ane"/>
+            </runtime-shared-library-path>
+
+            <runtime-shared-library-path path-element="${keychain.ane}/Keychain.ane">
+                <url rsl-url="AirKeychain.ane"/>
+            </runtime-shared-library-path>
+
+            <runtime-shared-library-path path-element="${deviceid.ane}/AirDeviceId.ane">
+                <url rsl-url="AirDeviceId.ane"/>
+            </runtime-shared-library-path>
         </mxmlc>
     </target>
 
     <target name="android-apk">
         <copy todir="target">
             <fileset dir="${castles}/client/client-mobile/src/main/resources" includes="icons_android/"/>
+            <file name="${payments.ane}/OpenIAB.ane"/>
+            <file name="${facebook.ane}/AirFacebook.ane"/>
+            <file name="${keychain.ane}/Keychain.ane"/>
+            <file name="${deviceid.ane}/AirDeviceId.ane"/>
         </copy>
 
         <exec executable="${AIR_HOME}/bin/adt" dir="target">
@@ -58,7 +73,7 @@
             <arg value="CastlesMobile.swf"/>
             <arg line="icons_android"/>
             <arg value="-extdir"/>
-            <arg file="${rknrl}/../OpenIAB-Flash-Plugin/bin"/>
+            <arg file="target"/>
         </exec>
     </target>
 
@@ -66,6 +81,10 @@
         <copy todir="target">
             <fileset dir="${castles}/client/client-mobile/src/main/resources/icons_ios"/>
             <fileset dir="${castles}/client/client-mobile/src/main/resources/splash"/>
+            <file name="${payments.ane}/OpenIAB.ane"/>
+            <file name="${facebook.ane}/AirFacebook.ane"/>
+            <file name="${keychain.ane}/Keychain.ane"/>
+            <file name="${deviceid.ane}/AirDeviceId.ane"/>
         </copy>
 
         <exec executable="${AIR_HOME}/bin/adt" dir="target">
@@ -83,7 +102,7 @@
             <arg value="CastlesMobile.swf"/>
             <arg line="Default-568h@2x.png Default-Landscape.png Default-Landscape@2x.png Default@2x.png Icon-Small.png Icon-Small@2x.png Icon-Small-50.png Icon-Small-50@2x.png Icon.png Icon@2x.png Icon-Large.png Icon@2x-Large.png"/>
             <arg value="-extdir"/>
-            <arg file="${rknrl}/../OpenIAB-Flash-Plugin/bin/"/>
+            <arg file="target"/>
         </exec>
     </target>
 </project>
