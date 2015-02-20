@@ -1,0 +1,96 @@
+<html>
+
+<head>
+    <title>Game</title>
+
+    <script type="text/javascript" src="swfobject.js"></script>
+
+    <script type="text/javascript" src="getflashvars.js"></script>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <script type="text/javascript">
+        function flash() {
+            return document.getElementById("flashContent");
+        }
+
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '370173203168786',
+                xfbml: true,
+                version: 'v2.2'
+            });
+
+            function onLogin(response) {
+                if (response.status == 'connected') {
+                    flashVars.rknrlAccountType = "FACEBOOK";
+                    flashVars.rknrlHost = "127.0.0.1";
+                    flashVars.rknrlHttpPort = "8080";
+                    flashVars.rknrlGamePort = "2335";
+                    flashVars.rknrlPolicyPort = "2336";
+
+                    swfobject.embedSWF("game.swf", "flashContent", "100%", "100%", "10.1.0", "expressInstall.swf", flashVars,
+                            {
+                                quality: "high",
+                                allowFullScreenInteractive: 'true',
+                                allowfullscreen: true
+                            });
+                }
+            }
+
+            FB.getLoginStatus(function (response) {
+                if (response.status == 'connected') {
+                    onLogin(response);
+                } else {
+                    FB.login(function (response) {
+                        onLogin(response);
+                    }, {scope: 'user_friends'});
+                }
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function sendResult(callbackId, value) {
+            flash().onResult({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function sendError(callbackId, value) {
+            flash().onFail({
+                callbackId: callbackId,
+                data: value
+            });
+        }
+
+        function reloadPage() {
+            document.location.reload(true)
+        }
+    </script>
+</head>
+
+<body>
+<div id="flashContent">
+    <p><a href="https://www.adobe.com/go/getflashplayer"><img
+            src="https://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
+            alt="Get Adobe Flash player"/></a></p>
+</div>
+</body>
+
+</html>

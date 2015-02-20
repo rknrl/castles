@@ -7,6 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
+import ru.rknrl.core.social.FB;
 import ru.rknrl.core.social.MM;
 import ru.rknrl.core.social.OK;
 import ru.rknrl.core.social.SocialWeb;
@@ -57,6 +58,8 @@ public class MainWeb extends MainWebBase {
                 return new VK(flashVars);
             case AccountType.MOIMIR:
                 return new MM(flashVars);
+            case AccountType.FACEBOOK:
+                return new FB(flashVars);
         }
         throw new Error("unknown account type " + accountType);
     }
