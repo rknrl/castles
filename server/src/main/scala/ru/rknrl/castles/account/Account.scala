@@ -16,14 +16,14 @@ import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game.Game
-import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
+import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto.AccountDTO._
-import ru.rknrl.dto.AuthDTO.{AuthenticateDTO, AuthenticatedDTO, TopUserInfoDTO}
+import ru.rknrl.dto.AuthDTO._
 import ru.rknrl.dto.CommonDTO._
 
 import scala.collection.JavaConverters._
@@ -62,6 +62,12 @@ class Account(matchmaking: ActorRef,
 
       case AccountType.MOIMIR ⇒
         SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
+
+      case AccountType.FACEBOOK ⇒
+        true // todo
+
+      case AccountType.GENERATED ⇒
+        SocialAuth.checkSecretGenerated(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.generatorSecret)
 
       case _ ⇒ false
     }

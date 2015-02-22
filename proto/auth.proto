@@ -19,6 +19,11 @@ message AuthenticateDTO {
     required AuthenticationSecretDTO secret = 3;
 }
 
+message RegisteredDTO {
+    required string id = 1;
+    required string pass = 2;
+}
+
 message AuthenticatedDTO {
     required AccountStateDTO accountState = 1;
 

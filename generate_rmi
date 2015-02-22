@@ -10,7 +10,7 @@ scala_out="${project}/server/src/main/scala/"
 as3_out="${project}/client/client-base/src/main/flex/"
 package_out="ru.rknrl.rmi"
 
-rm -rf ${java_out}/ru/rknrl/rmi/*
+rm -rf ${scala_out}/ru/rknrl/rmi/*
 
 ${rknrl_core}/rmi/rmi-gen/rmi-gen \
 scala \

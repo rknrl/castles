@@ -16,6 +16,7 @@ enum AccountType {
     MOIMIR = 4;
     FOTOSTRANA = 5;
     FACEBOOK = 6;
+    GENERATED = 7;
 }
 
 enum DeviceType {

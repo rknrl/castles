@@ -73,13 +73,13 @@
                 <dict>
                     <key>CFBundleURLSchemes</key>
                     <array>
-                        <string>fb{YOUR_FB_ID}</string>
+                        <string>fb370173203168786</string>
                     </array>
                 </dict>
             </array>
 
             <key>FacebookAppID</key>
-            <string>{YOUR_FB_ID}</string>
+            <string>370173203168786</string>
         ]]></InfoAdditions>
 
         <Entitlements>

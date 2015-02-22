@@ -150,6 +150,7 @@
           "currency": "мэйлик"
         }
       ]
-    }
+    },
+    "generatorSecret": "enter generate secret"
   }
 }

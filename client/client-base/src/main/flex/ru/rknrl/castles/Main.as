@@ -220,7 +220,7 @@ public class Main extends Sprite {
     }
 
     private function onConnectionError(event:Event):void {
-        Log.info("onConnectionError");
+        Log.info("onConnectionError " + event);
         destroy();
     }
 
