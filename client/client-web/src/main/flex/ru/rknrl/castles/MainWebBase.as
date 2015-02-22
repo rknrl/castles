@@ -18,6 +18,7 @@ import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
+import ru.rknrl.dto.PlatformType;
 import ru.rknrl.log.Log;
 
 public class MainWebBase extends Main {
@@ -35,7 +36,7 @@ public class MainWebBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, DeviceType.CANVAS, localesUrl, defaultLocale, social, layout, new CanvasFactory());
+        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, DeviceType.PC, PlatformType.CANVAS, localesUrl, defaultLocale, social, layout, new CanvasFactory(), loaderInfo);
 
         stage.addEventListener(Event.RESIZE, onResize);
     }

@@ -7,6 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
+import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageQuality;
@@ -35,6 +36,7 @@ import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
+import ru.rknrl.dto.PlatformType;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.LoadImageManager;
 import ru.rknrl.loaders.TextLoader;
@@ -55,6 +57,7 @@ public class Main extends Sprite {
     private var accountId:AccountIdDTO;
     private var secret:AuthenticationSecretDTO;
     private var deviceType:DeviceType;
+    private var platformType:PlatformType;
 
     private var localesUrl:String;
     private var defaultLocale:String;
@@ -73,7 +76,7 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory) {
+    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType: PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -82,6 +85,7 @@ public class Main extends Sprite {
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
+        this.platformType = platformType;
         this.localesUrl = localesUrl;
         this.defaultLocale = defaultLocale;
         this.social = social;
@@ -180,6 +184,7 @@ public class Main extends Sprite {
         authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
         authenticate.secret = secret;
         authenticate.deviceType = deviceType;
+        authenticate.platformType = platformType;
         server.addEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
         server.authenticate(authenticate);
     }

@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles
 
-import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto.AuthDTO.ProductDTO
-import ru.rknrl.dto.CommonDTO.{AccountType, BuildingLevel, BuildingType}
+import ru.rknrl.dto.CommonDTO._
 
 object Config {
 
@@ -48,18 +48,33 @@ class Config(val host: String,
 
   checkProductInfoConfig()
 
-  private def socialByAccountType(accountType: AccountType) =
-    accountType match {
-      case AccountType.DEV ⇒ social.vk
-      case AccountType.VKONTAKTE ⇒ social.vk
-      case AccountType.ODNOKLASSNIKI ⇒ social.ok
-      case AccountType.MOIMIR ⇒ social.mm
-      case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
+  private def socialByAccountType(platformType: PlatformType, accountType: AccountType) =
+    platformType match {
+      case PlatformType.CANVAS ⇒
+        accountType match {
+          case AccountType.DEV ⇒ social.vk
+          case AccountType.VKONTAKTE ⇒ social.vk
+          case AccountType.ODNOKLASSNIKI ⇒ social.ok
+          case AccountType.MOIMIR ⇒ social.mm
+          case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
+        }
+      case PlatformType.IOS ⇒
+        accountType match {
+          case AccountType.DEV ⇒ social.vk // todo
+          case AccountType.DEVICE_ID ⇒ social.vk // todo
+          case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
+        }
+      case PlatformType.ANDROID ⇒
+        accountType match {
+          case AccountType.DEV ⇒ social.vk // todo
+          case AccountType.DEVICE_ID ⇒ social.vk // todo
+          case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
+        }
     }
 
-  def productsDto(accountType: AccountType) =
+  def productsDto(platformType: PlatformType, accountType: AccountType) =
     for (p ← products;
-         productInfo = socialByAccountType(accountType).get.productsInfo.find(_.id == p.id).get)
+         productInfo = socialByAccountType(platformType, accountType).get.productsInfo.find(_.id == p.id).get)
     yield ProductDTO.newBuilder()
       .setId(p.id)
       .setTitle(p.title)

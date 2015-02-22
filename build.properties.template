@@ -3,8 +3,7 @@ castles = ${user.home}/dev/rknrl/castles
 
 payments.ane = ${user.home}/dev/rknrl/OpenIAB-Flash-Plugin/bin
 facebook.ane = ${user.home}/dev/rknrl/ANE-Facebook/bin
-keychain.ane = ${user.home}/dev/rknrl/ANE-Keychain/bin
-deviceid.ane = ${user.home}/dev/rknrl/ANE-DeviceId/bin
+deviceid.ane = ${user.home}/dev/rknrl/devie-uniq-ane
 
 FLEX_HOME = ${user.home}/dev/rknrl/sdk/Apache-Flex-Mac
 AIR_HOME = ${user.home}/dev/rknrl/sdk/Air

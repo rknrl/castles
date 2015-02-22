@@ -22,8 +22,7 @@
     <extensions>
         <extensionID>org.onepf.OpenIAB</extensionID>
         <extensionID>com.freshplanet.AirFacebook</extensionID>
-        <extensionID>com.freshplanet.ane.AirDeviceId</extensionID>
-        <extensionID>com.sticksports.nativeExtensions.Keychain</extensionID>
+        <extensionID>ru.rknrl.DeviceId</extensionID>
     </extensions>
 
     <icon>

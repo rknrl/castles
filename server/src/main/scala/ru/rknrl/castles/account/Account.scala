@@ -46,6 +46,7 @@ class Account(matchmaking: ActorRef,
   var client: ActorRef = null
   var accountId: AccountId = null
   var deviceType: DeviceType = null
+  var platformType: PlatformType = null
   var userInfo: UserInfoDTO = null
   var state: AccountState = null
   var top: Iterable[TopUserInfoDTO] = null
@@ -66,8 +67,8 @@ class Account(matchmaking: ActorRef,
       case AccountType.FACEBOOK ⇒
         true // todo
 
-      case AccountType.GENERATED ⇒
-        SocialAuth.checkSecretGenerated(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.generatorSecret)
+      case AccountType.DEVICE_ID ⇒
+        true
 
       case _ ⇒ false
     }
@@ -75,13 +76,13 @@ class Account(matchmaking: ActorRef,
   override def receive = auth
 
   def auth: Receive = {
-    /** from Client */
     case Authenticate(authenticate) ⇒
       log.debug("Authenticate")
       if (checkSecret(authenticate)) {
         client = sender
         accountId = new AccountId(authenticate.getUserInfo.getAccountId)
         deviceType = authenticate.getDeviceType
+        platformType = authenticate.getPlatformType
         userInfo = authenticate.getUserInfo
         database ! Database.GetAccountState(accountId.dto)
       } else {
@@ -89,7 +90,6 @@ class Account(matchmaking: ActorRef,
         sender ! CloseConnection
       }
 
-    /** from Database */
     case AccountNoExists ⇒
       log.debug("AccountNoExists")
       val initTutorState = TutorStateDTO.newBuilder()
@@ -97,7 +97,6 @@ class Account(matchmaking: ActorRef,
         .build()
       database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
 
-    /** from Database */
     case AccountStateResponse(id, dto) ⇒
       log.debug("AccountStateResponse")
       state = AccountState(dto)
@@ -136,7 +135,7 @@ class Account(matchmaking: ActorRef,
       .setConfig(config.account.dto)
       .addAllTop(top.asJava)
       .setTutor(tutorState)
-      .addAllProducts(config.productsDto(accountId.accountType).asJava)
+      .addAllProducts(config.productsDto(platformType, accountId.accountType).asJava)
       .setSearchOpponents(searchOpponents)
 
     if (gameAddress.isDefined) builder.setGame(gameAddress.get)

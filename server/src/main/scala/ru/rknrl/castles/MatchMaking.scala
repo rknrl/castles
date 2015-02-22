@@ -155,8 +155,7 @@ class MatchMaking(interval: FiniteDuration,
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
-
-      val botOrder = new GameOrder(accountId, DeviceType.CANVAS, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
+      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }

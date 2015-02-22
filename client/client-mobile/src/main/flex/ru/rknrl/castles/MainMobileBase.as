@@ -9,12 +9,15 @@
 package ru.rknrl.castles {
 import com.freshplanet.ane.AirFacebook.Facebook;
 
+import flash.display.Sprite;
 import flash.display.StageAspectRatio;
+import flash.events.Event;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
 import org.onepf.OpenIAB;
 
+import ru.rknrl.DeviceId;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -24,9 +27,10 @@ import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
+import ru.rknrl.dto.PlatformType;
 import ru.rknrl.log.Log;
 
-public class MainMobileBase extends Main {
+public class MainMobileBase extends Sprite {
     [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
@@ -38,25 +42,66 @@ public class MainMobileBase extends Main {
         return inch > maxPhoneInch;
     }
 
-    public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
-        Log.info(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
+    private var host:String;
+    private var gamePort:int;
+    private var policyPort:int;
+    private var httpPort:int;
 
+    private var facebook:Facebook;
+    private var loginScreen:LoginScreen;
+    private var main:Main;
+
+    public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
+        this.host = host;
+        this.gamePort = gamePort;
+        this.policyPort = policyPort;
+        this.httpPort = httpPort;
+
+        Log.info(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
         stage.autoOrients = false;
 
+        facebook = Facebook.getInstance();
+//        facebook.init();
+
+//        if (facebook.isLogin) {
+//            start(AccountType.FACEBOOK, facebook.uid, facebook.accessToken);
+//        } else {
+        addChild(loginScreen = new LoginScreen());
+        loginScreen.addEventListener(LoginScreen.LOGIN_FACEBOOK, onLoginFacebook);
+        loginScreen.addEventListener(LoginScreen.LOGIN_CANCEL, onLoginCancel);
+//        }
+    }
+
+    private function onLoginFacebook(e:Event):void {
+        removeChild(loginScreen);
+//        facebook.openSessionWithPublishPermissions();
+    }
+
+    private function onLoginCancel(e:Event):void {
+        removeChild(loginScreen);
+        const deviceId:String = new DeviceId().get();
+        start(AccountType.DEVICE_ID, deviceId, "");
+    }
+
+    private function start(accountType:AccountType, id:String, secret:String):void {
         const tablet:Boolean = isTablet(stage.fullScreenWidth, stage.fullScreenHeight);
         stage.setAspectRatio(tablet ? StageAspectRatio.LANDSCAPE : StageAspectRatio.PORTRAIT);
         const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
+        Log.info("deviceType=" + deviceType.name());
 
-        const accountType:AccountType = AccountType.DEV;
+        const platformType:PlatformType = Capabilities.manufacturer.match(/android/) ? PlatformType.ANDROID : PlatformType.IOS;
+        Log.info("platformType=" + platformType.name());
 
         const accountId:AccountIdDTO = new AccountIdDTO();
-        accountId.id = "1";
+        accountId.id = id;
         accountId.type = accountType;
 
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
-        authenticationSecret.body = "secret";
+        authenticationSecret.body = secret;
         authenticationSecret.params = null;
 
+        Log.info("accountId=" + accountId.id);
+        Log.info("accountType=" + accountId.type.name());
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
 
@@ -67,10 +112,9 @@ public class MainMobileBase extends Main {
 
         const paymentsAne:OpenIAB = new OpenIAB();
         Log.info("PaymentsANE:" + paymentsAne.init());
-        const facebookAne:Facebook = new Facebook();
-        const social:SocialMobile = new SocialMobile(facebookAne, paymentsAne);
+        const social:SocialMobile = new SocialMobile(accountId.id, facebook, paymentsAne);
 
-        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, localesUrl, defaultLocale, social, layout, new MobileFactory());
+        addChild(main = new Main(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
     }
 }
 }

@@ -16,11 +16,17 @@ enum AccountType {
     MOIMIR = 4;
     FOTOSTRANA = 5;
     FACEBOOK = 6;
-    GENERATED = 7;
+    DEVICE_ID = 7;
+}
+
+enum PlatformType {
+    CANVAS = 1;
+    IOS = 2;
+    ANDROID = 3;
 }
 
 enum DeviceType {
-    CANVAS = 1;
+    PC = 1;
     PHONE = 2;
     TABLET = 3;
 }

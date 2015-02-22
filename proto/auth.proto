@@ -15,13 +15,9 @@ message AuthenticationSecretDTO {
 
 message AuthenticateDTO {
     required UserInfoDTO userInfo = 1;
-    required DeviceType deviceType = 2;
-    required AuthenticationSecretDTO secret = 3;
-}
-
-message RegisteredDTO {
-    required string id = 1;
-    required string pass = 2;
+    required PlatformType platformType = 2;
+    required DeviceType deviceType = 3;
+    required AuthenticationSecretDTO secret = 4;
 }
 
 message AuthenticatedDTO {
