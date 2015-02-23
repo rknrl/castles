@@ -2,7 +2,7 @@
 
 # build client-web.swf via ant
 
-ant castles-web-swf &&
+ant -buildfile build-web.xml castles-web-swf &&
 
 # clear out folder
 
