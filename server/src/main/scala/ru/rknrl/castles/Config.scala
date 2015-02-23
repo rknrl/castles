@@ -56,6 +56,7 @@ class Config(val host: String,
           case AccountType.VKONTAKTE ⇒ social.vk
           case AccountType.ODNOKLASSNIKI ⇒ social.ok
           case AccountType.MOIMIR ⇒ social.mm
+          case AccountType.FACEBOOK ⇒ social.vk // todo
           case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
         }
       case PlatformType.IOS ⇒

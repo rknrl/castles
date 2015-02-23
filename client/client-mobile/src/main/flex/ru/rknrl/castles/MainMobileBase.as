@@ -12,12 +12,14 @@ import com.freshplanet.ane.AirFacebook.Facebook;
 import flash.display.Sprite;
 import flash.display.StageAspectRatio;
 import flash.events.Event;
+import flash.events.UncaughtErrorEvent;
 import flash.system.Capabilities;
 import flash.utils.ByteArray;
 
 import org.onepf.OpenIAB;
 
 import ru.rknrl.DeviceId;
+import ru.rknrl.Warning;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -46,6 +48,7 @@ public class MainMobileBase extends Sprite {
     private var gamePort:int;
     private var policyPort:int;
     private var httpPort:int;
+    private var bugsLogUrl:String;
 
     private var facebook:Facebook;
     private var loginScreen:LoginScreen;
@@ -56,6 +59,11 @@ public class MainMobileBase extends Sprite {
         this.gamePort = gamePort;
         this.policyPort = policyPort;
         this.httpPort = httpPort;
+
+        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
+        Log.info("bugsLogUrl=" + bugsLogUrl);
+
+        loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
         Log.info(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
         stage.autoOrients = false;
@@ -111,10 +119,18 @@ public class MainMobileBase extends Sprite {
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
         const paymentsAne:OpenIAB = new OpenIAB();
-        Log.info("PaymentsANE:" + paymentsAne.init());
+//        Log.info("PaymentsANE:" + paymentsAne.init());
         const social:SocialMobile = new SocialMobile(accountId.id, facebook, paymentsAne);
 
-        addChild(main = new Main(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
+        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
+    }
+
+    private function onUncaughtError(event:UncaughtErrorEvent):void {
+        const error:Error = event.error as Error;
+        const stackTrace:String = error ? error.getStackTrace() : "";
+        Log.error(event.error, stackTrace);
+        Log.send(bugsLogUrl);
+        if (!(error is Warning) && main) main.addErrorScreen();
     }
 }
 }

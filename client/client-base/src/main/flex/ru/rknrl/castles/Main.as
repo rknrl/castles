@@ -48,8 +48,6 @@ import ru.rknrl.utils.createTextField;
 public class Main extends Sprite {
     private static const cachedAvatarsLimit:int = 10;
 
-    private var bugsLogUrl:String;
-
     private var host:String;
     private var gamePort:int;
     private var policyPort:int;
@@ -76,12 +74,10 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType: PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType: PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
-        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
-        Log.info("bugsLogUrl=" + bugsLogUrl);
         this.accountId = accountId;
         this.secret = secret;
         this.deviceType = deviceType;
@@ -92,8 +88,6 @@ public class Main extends Sprite {
         _layout = layout;
         this.deviceFactory = deviceFactory;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-
-        loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
     }
 
     private var _layout:Layout;
@@ -229,15 +223,7 @@ public class Main extends Sprite {
         destroy();
     }
 
-    private function onUncaughtError(event:UncaughtErrorEvent):void {
-        const error:Error = event.error as Error;
-        const stackTrace:String = error ? error.getStackTrace() : "";
-        Log.error(event.error, stackTrace);
-        Log.send(bugsLogUrl);
-        if (!(error is Warning)) addErrorScreen();
-    }
-
-    private function addErrorScreen():void {
+    public function addErrorScreen():void {
         destroyConnection();
         view.removeLoadingScreenIfExists();
         view.addErrorScreen();

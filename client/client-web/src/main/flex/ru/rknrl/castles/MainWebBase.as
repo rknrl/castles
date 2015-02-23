@@ -8,9 +8,11 @@
 
 package ru.rknrl.castles {
 import flash.events.Event;
+import flash.events.UncaughtErrorEvent;
 import flash.system.Security;
 import flash.utils.ByteArray;
 
+import ru.rknrl.Warning;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.menu.factory.CanvasFactory;
@@ -25,8 +27,15 @@ public class MainWebBase extends Main {
     [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
+    private var bugsLogUrl:String;
+
     public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
         Security.allowDomain("*");
+
+        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
+        Log.info("bugsLogUrl=" + bugsLogUrl);
+
+        loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
@@ -36,7 +45,7 @@ public class MainWebBase extends Main {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, DeviceType.PC, PlatformType.CANVAS, localesUrl, defaultLocale, social, layout, new CanvasFactory(), loaderInfo);
+        super(host, gamePort, policyPort, accountId, authenticationSecret, DeviceType.PC, PlatformType.CANVAS, localesUrl, defaultLocale, social, layout, new CanvasFactory(), loaderInfo);
 
         stage.addEventListener(Event.RESIZE, onResize);
     }
@@ -48,6 +57,14 @@ public class MainWebBase extends Main {
 
     private function get contentsScaleFactor():Number {
         return stage.hasOwnProperty("contentsScaleFactor") ? stage["contentsScaleFactor"] : 1;
+    }
+
+    private function onUncaughtError(event:UncaughtErrorEvent):void {
+        const error:Error = event.error as Error;
+        const stackTrace:String = error ? error.getStackTrace() : "";
+        Log.error(event.error, stackTrace);
+        Log.send(bugsLogUrl);
+        if (!(error is Warning)) addErrorScreen();
     }
 }
 }
