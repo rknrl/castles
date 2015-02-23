@@ -97,7 +97,7 @@ public class MainMobileBase extends Sprite {
         const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
         Log.info("deviceType=" + deviceType.name());
 
-        const platformType:PlatformType = Capabilities.manufacturer.match(/android/) ? PlatformType.ANDROID : PlatformType.IOS;
+        const platformType:PlatformType = Capabilities.manufacturer.match(/android/i) ? PlatformType.ANDROID : PlatformType.IOS;
         Log.info("platformType=" + platformType.name());
 
         const accountId:AccountIdDTO = new AccountIdDTO();
