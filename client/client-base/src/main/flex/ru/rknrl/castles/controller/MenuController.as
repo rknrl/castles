@@ -12,7 +12,7 @@ import flash.utils.Dictionary;
 
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
-import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -40,7 +40,7 @@ public class MenuController {
     private var view:MenuView;
     private var server:Server;
     private var model:MenuModel;
-    private var social:Social;
+    private var social:ISocial;
     private var tutorState:TutorStateDTO;
 
     /** Показывался ли уже туториал для этого экрана за текущий запуск приложения */
@@ -54,7 +54,7 @@ public class MenuController {
         return result;
     }
 
-    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:Social, tutorState:TutorStateDTO) {
+    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:ISocial, tutorState:TutorStateDTO) {
         this.view = view;
         this.server = server;
         this.model = model;

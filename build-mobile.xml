@@ -57,7 +57,7 @@
 
         <exec executable="${AIR_HOME}/bin/adt" dir="target">
             <arg value="-package"/>
-            <arg line="-target apk-captive-runtime"/>
+            <arg line="-target apk-debug"/>
             <arg line="-storetype pkcs12"/>
             <arg value="-keystore"/>
             <arg file="${rknrl}/certificates/android/android.p12"/>

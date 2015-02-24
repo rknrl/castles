@@ -21,7 +21,7 @@ import org.onepf.OpenIAB;
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
-import ru.rknrl.asocial.SocialMobile;
+import ru.rknrl.asocial.mobile.Social;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -131,7 +131,7 @@ public class MainMobileBase extends Sprite {
 
         const paymentsAne:OpenIAB = new OpenIAB();
         Log.info("PaymentsANE:" + paymentsAne.init());
-        const social:SocialMobile = new SocialMobile(accountId.id, facebook, paymentsAne);
+        const social:Social = new Social(accountId.id, facebook, paymentsAne);
 
         addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
     }

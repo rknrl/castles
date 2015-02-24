@@ -22,7 +22,7 @@ import flash.text.TextField;
 import ru.rknrl.Log;
 import ru.rknrl.asocial.Sex;
 
-import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.UserInfo;
 
 import ru.rknrl.castles.controller.Controller;
@@ -59,7 +59,7 @@ public class Main extends Sprite {
 
     private var localesUrl:String;
     private var defaultLocale:String;
-    private var social:Social;
+    private var social:ISocial;
 
     private var myUserInfo:UserInfo;
 
@@ -74,7 +74,7 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -105,7 +105,7 @@ public class Main extends Sprite {
         stage.quality = StageQuality.BEST;
 
         const verTextField:TextField = createTextField(Fonts.debug);
-        verTextField.text = "1.01";
+        verTextField.text = "1.02";
         stage.addChild(verTextField);
 
         localeLoader = new TextLoader(localesUrl + "castles - RU.tsv");

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <flex-config>
+    <swf-version>27</swf-version>
     <compiler>
-        <debug>false</debug>
+        <debug>true</debug>
         <incremental>false</incremental>
         <optimize>true</optimize>
         <!--<omit-trace-statements>true</omit-trace-statements> todo what is that-->

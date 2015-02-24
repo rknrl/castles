@@ -9,7 +9,7 @@
 package ru.rknrl.castles {
 import flash.system.Security;
 
-import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.SocialMock;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
@@ -27,7 +27,7 @@ public class MainWebStandalone extends MainWebBase {
         Security.allowDomain("*");
 
         const accountType:AccountType = AccountType.DEV;
-        const social:Social = new SocialMock();
+        const social:ISocial = new SocialMock();
 
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = "1";

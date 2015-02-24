@@ -14,7 +14,7 @@ import flash.utils.ByteArray;
 
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
-import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.menu.factory.CanvasFactory;
@@ -29,7 +29,7 @@ public class MainWebBase extends Main {
 
     private var bugsLogUrl:String;
 
-    public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:Social) {
+    public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountIdDTO, authenticationSecret:AuthenticationSecretDTO, social:ISocial) {
         Security.allowDomain("*");
 
         this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";

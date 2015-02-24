@@ -10,7 +10,7 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 
 import ru.rknrl.Log;
-import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
@@ -31,7 +31,7 @@ import ru.rknrl.rmi.Server;
 public class Controller {
     private var view:View;
     private var server:Server;
-    private var social:Social;
+    private var social:ISocial;
 
     private var menu:MenuController;
     private var tutorState:TutorStateDTO;
@@ -39,7 +39,7 @@ public class Controller {
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
                                server:Server,
-                               social:Social) {
+                               social:ISocial) {
         this.view = view;
         this.server = server;
         this.social = social;
