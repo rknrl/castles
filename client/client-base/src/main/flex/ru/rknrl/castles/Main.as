@@ -15,12 +15,16 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
-import flash.events.UncaughtErrorEvent;
 import flash.net.Socket;
 import flash.system.Security;
 import flash.text.TextField;
 
-import ru.rknrl.Warning;
+import ru.rknrl.Log;
+import ru.rknrl.asocial.Sex;
+
+import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.UserInfo;
+
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
@@ -29,9 +33,6 @@ import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.core.social.Sex;
-import ru.rknrl.core.social.Social;
-import ru.rknrl.core.social.UserInfo;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
@@ -40,7 +41,6 @@ import ru.rknrl.dto.PlatformType;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.LoadImageManager;
 import ru.rknrl.loaders.TextLoader;
-import ru.rknrl.log.Log;
 import ru.rknrl.rmi.AuthenticatedEvent;
 import ru.rknrl.rmi.Server;
 import ru.rknrl.utils.createTextField;
@@ -74,7 +74,7 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType: PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:Social, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;

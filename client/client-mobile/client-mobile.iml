@@ -11,12 +11,6 @@
             <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="social-client-mobile" build-configuration-name="social-client-mobile">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="social-client-base" build-configuration-name="social-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
               <dependency linkage="Merged" />
             </entry>
@@ -30,6 +24,15 @@
               <dependency linkage="Merged" />
             </entry>
             <entry library-id="cbe0062c-3cfb-4f06-8b6c-2b5fd89bb4dc">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="asocial-mobile" build-configuration-name="mobile">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="asocial-base" build-configuration-name="base">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="aslog" build-configuration-name="aslog">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -82,8 +85,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
-    <orderEntry type="module" module-name="social-client-mobile" exported="" />
-    <orderEntry type="module" module-name="social-client-base" exported="" />
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
     <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module-library" exported="">
@@ -116,5 +117,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="asocial-base" exported="" />
+    <orderEntry type="module" module-name="aslog" exported="" />
+    <orderEntry type="module" module-name="asocial-mobile" exported="" />
   </component>
 </module>

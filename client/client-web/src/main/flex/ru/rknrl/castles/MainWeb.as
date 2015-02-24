@@ -7,16 +7,16 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
-import ru.rknrl.core.social.FB;
-import ru.rknrl.core.social.MM;
-import ru.rknrl.core.social.OK;
-import ru.rknrl.core.social.SocialWeb;
-import ru.rknrl.core.social.VK;
+import ru.rknrl.Log;
+import ru.rknrl.asocial.FB;
+import ru.rknrl.asocial.MM;
+import ru.rknrl.asocial.OK;
+import ru.rknrl.asocial.SocialWeb;
+import ru.rknrl.asocial.VK;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.log.Log;
-import ru.rknrl.utils.print;
+import ru.rknrl.print;
 
 [SWF(frameRate="60", quality="high")]
 public class MainWeb extends MainWebBase {

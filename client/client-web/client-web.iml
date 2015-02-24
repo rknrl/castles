@@ -5,12 +5,6 @@
       <configuration name="client-web" pure-as="true" main-class="ru.rknrl.castles.MainWeb" output-file="castles-web.swf" output-folder="$MODULE_DIR$/target">
         <dependencies target-player="10.1">
           <entries>
-            <entry module-name="social-client-web" build-configuration-name="social-client-web">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="social-client-base" build-configuration-name="social-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
@@ -21,6 +15,15 @@
               <dependency linkage="Merged" />
             </entry>
             <entry module-name="client-base" build-configuration-name="client-base">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="asocial-web" build-configuration-name="web">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="asocial-base" build-configuration-name="base">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="aslog" build-configuration-name="aslog">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -55,9 +58,10 @@
     <orderEntry type="library" exported="" name="Maven: org.flexunit:flexunit:swc:as3:4.1.0" level="project" />
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
-    <orderEntry type="module" module-name="social-client-base" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
     <orderEntry type="module" module-name="dto-core-client" exported="" />
-    <orderEntry type="module" module-name="social-client-web" exported="" />
+    <orderEntry type="module" module-name="asocial-base" exported="" />
+    <orderEntry type="module" module-name="asocial-web" exported="" />
+    <orderEntry type="module" module-name="aslog" exported="" />
   </component>
 </module>

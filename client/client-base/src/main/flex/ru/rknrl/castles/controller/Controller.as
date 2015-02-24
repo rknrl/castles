@@ -9,6 +9,8 @@
 package ru.rknrl.castles.controller {
 import flash.events.Event;
 
+import ru.rknrl.Log;
+import ru.rknrl.asocial.Social;
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
@@ -16,13 +18,11 @@ import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.dto.TutorStateDTO;
-import ru.rknrl.log.Log;
 import ru.rknrl.rmi.EnteredGameEvent;
 import ru.rknrl.rmi.JoinedGameEvent;
 import ru.rknrl.rmi.LeavedGameEvent;

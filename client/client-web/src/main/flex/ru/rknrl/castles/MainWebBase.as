@@ -12,16 +12,16 @@ import flash.events.UncaughtErrorEvent;
 import flash.system.Security;
 import flash.utils.ByteArray;
 
+import ru.rknrl.Log;
 import ru.rknrl.Warning;
+import ru.rknrl.asocial.Social;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.menu.factory.CanvasFactory;
-import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.PlatformType;
-import ru.rknrl.log.Log;
 
 public class MainWebBase extends Main {
     [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]

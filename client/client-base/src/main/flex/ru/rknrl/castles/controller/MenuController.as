@@ -10,6 +10,9 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
 
+import ru.rknrl.asocial.PaymentDialogData;
+import ru.rknrl.asocial.PaymentDialogEvent;
+import ru.rknrl.asocial.Social;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -20,9 +23,6 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.core.social.PaymentDialogData;
-import ru.rknrl.core.social.PaymentDialogEvent;
-import ru.rknrl.core.social.Social;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuyBuildingDTO;
 import ru.rknrl.dto.BuyItemDTO;

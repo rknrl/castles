@@ -19,22 +19,25 @@ import flash.utils.ByteArray;
 import org.onepf.OpenIAB;
 
 import ru.rknrl.DeviceId;
+import ru.rknrl.Log;
 import ru.rknrl.Warning;
+import ru.rknrl.asocial.SocialMobile;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.menu.factory.MobileFactory;
-import ru.rknrl.core.social.SocialMobile;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.PlatformType;
-import ru.rknrl.log.Log;
 
 public class MainMobileBase extends Sprite {
     [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
+
+    private static const facebookAppId:String = "370172643168842";
+    private static const facebookAppIdDev:String = "370173203168786";
 
     private static function isTablet(fullScreenWidth:int, fullScreenHeight:int):Boolean {
         const dpi:Number = Capabilities.screenDPI;
@@ -69,20 +72,28 @@ public class MainMobileBase extends Sprite {
         stage.autoOrients = false;
 
         facebook = Facebook.getInstance();
-//        facebook.init();
+        facebook.init(facebookAppIdDev, false);
 
-//        if (facebook.isLogin) {
-//            start(AccountType.FACEBOOK, facebook.uid, facebook.accessToken);
-//        } else {
-        addChild(loginScreen = new LoginScreen());
-        loginScreen.addEventListener(LoginScreen.LOGIN_FACEBOOK, onLoginFacebook);
-        loginScreen.addEventListener(LoginScreen.LOGIN_CANCEL, onLoginCancel);
-//        }
+        if (facebook.isSessionOpen) {
+            onSessionOpened(true, false, null);
+        } else {
+            addChild(loginScreen = new LoginScreen());
+            loginScreen.addEventListener(LoginScreen.LOGIN_FACEBOOK, onLoginFacebook);
+            loginScreen.addEventListener(LoginScreen.LOGIN_CANCEL, onLoginCancel);
+        }
     }
 
     private function onLoginFacebook(e:Event):void {
         removeChild(loginScreen);
-//        facebook.openSessionWithPublishPermissions();
+        facebook.openSessionWithReadPermissions([], onSessionOpened);
+    }
+
+    private function onSessionOpened(success:Boolean, userCancelled:Boolean, error:String):void {
+        if (success) {
+            start(AccountType.FACEBOOK, "uid", facebook.accessToken);
+        } else if (error) {
+            Log.error(error, null);
+        }
     }
 
     private function onLoginCancel(e:Event):void {
@@ -119,7 +130,7 @@ public class MainMobileBase extends Sprite {
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
         const paymentsAne:OpenIAB = new OpenIAB();
-//        Log.info("PaymentsANE:" + paymentsAne.init());
+        Log.info("PaymentsANE:" + paymentsAne.init());
         const social:SocialMobile = new SocialMobile(accountId.id, facebook, paymentsAne);
 
         addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));

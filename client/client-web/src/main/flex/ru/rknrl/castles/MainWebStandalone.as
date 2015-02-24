@@ -9,12 +9,11 @@
 package ru.rknrl.castles {
 import flash.system.Security;
 
-import ru.rknrl.core.social.Social;
-import ru.rknrl.core.social.SocialMock;
+import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.SocialMock;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.log.Log;
 
 [SWF(width="1024", height="768", frameRate="60", quality="high")]
 public class MainWebStandalone extends MainWebBase {
