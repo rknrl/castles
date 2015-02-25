@@ -10,7 +10,7 @@ package ru.rknrl.castles {
 import flash.display.Sprite;
 import flash.text.TextField;
 
-import ru.rknrl.asocial.mobile.FB;
+import ru.rknrl.asocial.mobile.Social;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.utils.createTextField;
@@ -21,7 +21,7 @@ public class WebViewBackground extends Sprite {
         textField.text = "Back to Castles";
         textField.scaleX = textField.scaleY = layout.scale;
         textField.x = (layout.screenWidth - textField.width) / 2;
-        textField.y = layout.screenHeight - FB.footerHeight / 2 - textField.height / 2;
+        textField.y = layout.screenHeight - Social.footerHeight / 2 - textField.height / 2;
         addChild(textField);
     }
 }

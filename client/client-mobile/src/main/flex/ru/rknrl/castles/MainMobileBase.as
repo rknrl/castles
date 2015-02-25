@@ -21,8 +21,8 @@ import org.onepf.OpenIAB;
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
-import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.mobile.FB;
+import ru.rknrl.asocial.mobile.ISocialMobile;
 import ru.rknrl.asocial.mobile.NO;
 import ru.rknrl.asocial.mobile.Social;
 import ru.rknrl.castles.view.layout.Layout;
@@ -62,7 +62,7 @@ public class MainMobileBase extends Sprite {
     private var loginScreen:LoginScreen;
     private var webViewBackground:WebViewBackground;
     private var openIab:OpenIAB;
-    private var social:Social;
+    private var social:ISocialMobile;
     private var main:Main;
 
     public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
@@ -163,7 +163,7 @@ public class MainMobileBase extends Sprite {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, ISocial(social), layout, new MobileFactory(), loaderInfo));
+        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
     }
 
     private function onUncaughtError(event:UncaughtErrorEvent):void {
