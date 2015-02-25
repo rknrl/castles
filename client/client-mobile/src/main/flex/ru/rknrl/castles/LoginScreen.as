@@ -13,13 +13,14 @@ import flash.events.MouseEvent;
 import flash.text.TextField;
 
 import ru.rknrl.castles.view.Fonts;
+import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.utils.createTextField;
 
 public class LoginScreen extends Sprite {
-    public static const LOGIN_FACEBOOK:String = "loginFacebook";
-    public static const LOGIN_CANCEL:String = "loginCancel";
+    public static const LOGIN_VIA_FACEBOOK:String = "loginViaFacebook";
+    public static const LOGIN_VIA_DEVICE_ID:String = "loginViaDeviceId";
 
-    public function LoginScreen() {
+    public function LoginScreen(layout: Layout) {
         const facebookTextField:TextField = createTextField(Fonts.loading);
         facebookTextField.text = "Facebook login";
         facebookTextField.addEventListener(MouseEvent.CLICK, onFacebookClick);
@@ -33,11 +34,11 @@ public class LoginScreen extends Sprite {
     }
 
     private function onFacebookClick(event:MouseEvent):void {
-        dispatchEvent(new Event(LOGIN_FACEBOOK));
+        dispatchEvent(new Event(LOGIN_VIA_FACEBOOK));
     }
 
     private function onCancelClick(event:MouseEvent):void {
-        dispatchEvent(new Event(LOGIN_CANCEL));
+        dispatchEvent(new Event(LOGIN_VIA_DEVICE_ID));
     }
 }
 }

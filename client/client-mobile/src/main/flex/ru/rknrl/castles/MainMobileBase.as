@@ -7,10 +7,10 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
-import com.freshplanet.ane.AirFacebook.Facebook;
-
 import flash.display.Sprite;
+import flash.display.StageAlign;
 import flash.display.StageAspectRatio;
+import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.UncaughtErrorEvent;
 import flash.system.Capabilities;
@@ -21,6 +21,9 @@ import org.onepf.OpenIAB;
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
+import ru.rknrl.asocial.ISocial;
+import ru.rknrl.asocial.mobile.FB;
+import ru.rknrl.asocial.mobile.NO;
 import ru.rknrl.asocial.mobile.Social;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
@@ -52,9 +55,14 @@ public class MainMobileBase extends Sprite {
     private var policyPort:int;
     private var httpPort:int;
     private var bugsLogUrl:String;
+    private var deviceType:DeviceType;
+    private var platformType:PlatformType;
 
-    private var facebook:Facebook;
+    private var layout:Layout;
     private var loginScreen:LoginScreen;
+    private var webViewBackground:WebViewBackground;
+    private var openIab:OpenIAB;
+    private var social:Social;
     private var main:Main;
 
     public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
@@ -70,47 +78,74 @@ public class MainMobileBase extends Sprite {
 
         Log.info(stage.fullScreenWidth + "x" + stage.fullScreenHeight);
         stage.autoOrients = false;
+        stage.align = StageAlign.TOP_LEFT;
+        stage.scaleMode = StageScaleMode.NO_SCALE;
 
-        facebook = Facebook.getInstance();
-        facebook.init(facebookAppIdDev, false);
+        const tablet:Boolean = isTablet(stage.fullScreenWidth, stage.fullScreenHeight);
+        stage.setAspectRatio(tablet ? StageAspectRatio.LANDSCAPE : StageAspectRatio.PORTRAIT);
+        deviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
+        Log.info("deviceType=" + deviceType.name());
 
-        if (facebook.isSessionOpen) {
-            onSessionOpened(true, false, null);
-        } else {
-            addChild(loginScreen = new LoginScreen());
-            loginScreen.addEventListener(LoginScreen.LOGIN_FACEBOOK, onLoginFacebook);
-            loginScreen.addEventListener(LoginScreen.LOGIN_CANCEL, onLoginCancel);
-        }
+        platformType = Capabilities.manufacturer.match(/android/i) ? PlatformType.ANDROID : PlatformType.IOS;
+        Log.info("platformType=" + platformType.name());
+
+        layout = tablet ? new LayoutLandscape(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor) : new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
+
+        openIab = new OpenIAB();
+        Log.info("PaymentsANE:" + openIab.init());
+
+        addLoginScreen();
     }
 
-    private function onLoginFacebook(e:Event):void {
+    private function addLoginScreen():void {
+        addChild(loginScreen = new LoginScreen(layout));
+        loginScreen.addEventListener(LoginScreen.LOGIN_VIA_DEVICE_ID, onLoginViaDeviceId);
+        loginScreen.addEventListener(LoginScreen.LOGIN_VIA_FACEBOOK, onLoginViaFacebook);
+    }
+
+    private function removeLoginScreen():void {
+        loginScreen.removeEventListener(LoginScreen.LOGIN_VIA_DEVICE_ID, onLoginViaDeviceId);
+        loginScreen.removeEventListener(LoginScreen.LOGIN_VIA_FACEBOOK, onLoginViaFacebook);
         removeChild(loginScreen);
-        facebook.openSessionWithReadPermissions([], onSessionOpened);
     }
 
-    private function onSessionOpened(success:Boolean, userCancelled:Boolean, error:String):void {
-        if (success) {
-            start(AccountType.FACEBOOK, "uid", facebook.accessToken);
-        } else if (error) {
-            Log.error(error, null);
-        }
-    }
+    private function onLoginViaDeviceId(e:Event):void {
+        removeLoginScreen();
 
-    private function onLoginCancel(e:Event):void {
-        removeChild(loginScreen);
         const deviceId:String = new DeviceId().get();
+        social = new NO(deviceId, new PaymentsBridge(openIab));
         start(AccountType.DEVICE_ID, deviceId, "");
     }
 
+    private function onLoginViaFacebook(e:Event):void {
+        removeLoginScreen();
+
+        webViewBackground = new WebViewBackground(layout);
+        addChild(webViewBackground);
+
+        social = new FB(facebookAppIdDev, new PaymentsBridge(openIab), stage);
+        social.addEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
+        social.addEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
+        social.login();
+    }
+
+    private function onFacebookLoginSuccess(e:Event):void {
+        social.removeEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
+        social.removeEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
+        removeChild(webViewBackground);
+
+        start(AccountType.FACEBOOK, "uid", "secret"); // todo uid, secret
+    }
+
+    private function onFacebookLoginFail(e:Event):void {
+        social.removeEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
+        social.removeEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
+        removeChild(webViewBackground);
+
+        addLoginScreen();
+    }
+
     private function start(accountType:AccountType, id:String, secret:String):void {
-        const tablet:Boolean = isTablet(stage.fullScreenWidth, stage.fullScreenHeight);
-        stage.setAspectRatio(tablet ? StageAspectRatio.LANDSCAPE : StageAspectRatio.PORTRAIT);
-        const deviceType:DeviceType = tablet ? DeviceType.TABLET : DeviceType.PHONE;
-        Log.info("deviceType=" + deviceType.name());
-
-        const platformType:PlatformType = Capabilities.manufacturer.match(/android/i) ? PlatformType.ANDROID : PlatformType.IOS;
-        Log.info("platformType=" + platformType.name());
-
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = id;
         accountId.type = accountType;
@@ -124,16 +159,11 @@ public class MainMobileBase extends Sprite {
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
 
-        const layout:Layout = tablet ? new LayoutLandscape(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor) : new LayoutPortrait(stage.fullScreenWidth, stage.fullScreenHeight, stage.contentsScaleFactor);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        const paymentsAne:OpenIAB = new OpenIAB();
-        Log.info("PaymentsANE:" + paymentsAne.init());
-        const social:Social = new Social(accountId.id, facebook, paymentsAne);
-
-        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
+        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, ISocial(social), layout, new MobileFactory(), loaderInfo));
     }
 
     private function onUncaughtError(event:UncaughtErrorEvent):void {
@@ -144,4 +174,21 @@ public class MainMobileBase extends Sprite {
         if (!(error is Warning) && main) main.addErrorScreen();
     }
 }
+}
+
+import org.onepf.OpenIAB;
+
+import ru.rknrl.asocial.PaymentDialogData;
+import ru.rknrl.asocial.mobile.IPayments;
+
+class PaymentsBridge implements IPayments {
+    private var openIab:OpenIAB;
+
+    public function PaymentsBridge(openIab:OpenIAB) {
+        this.openIab = openIab;
+    }
+
+    public function purchase(paymentsDialogData:PaymentDialogData):void {
+        openIab.purchase(paymentsDialogData.id.toString());
+    }
 }

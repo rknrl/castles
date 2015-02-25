@@ -20,11 +20,9 @@ import flash.system.Security;
 import flash.text.TextField;
 
 import ru.rknrl.Log;
-import ru.rknrl.asocial.Sex;
-
 import ru.rknrl.asocial.ISocial;
-import ru.rknrl.asocial.UserInfo;
-
+import ru.rknrl.asocial.Sex;
+import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;

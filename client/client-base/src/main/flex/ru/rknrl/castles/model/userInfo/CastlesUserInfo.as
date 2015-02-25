@@ -8,8 +8,8 @@
 
 package ru.rknrl.castles.model.userInfo {
 import ru.rknrl.asocial.Sex;
-import ru.rknrl.asocial.UserInfo;
-import ru.rknrl.asocial.UserInfoAvatarUrl;
+import ru.rknrl.asocial.userInfo.UserInfo;
+import ru.rknrl.asocial.userInfo.UserInfoAvatarUrl;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.UserInfoDTO;

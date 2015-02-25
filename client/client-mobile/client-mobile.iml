@@ -20,9 +20,6 @@
             <entry library-id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="55b877ca-25cf-445d-b4d1-10e12aa8dbb2">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-id="cbe0062c-3cfb-4f06-8b6c-2b5fd89bb4dc">
               <dependency linkage="Merged" />
             </entry>
@@ -92,16 +89,6 @@
         <properties id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7" />
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../../OpenIAB-Flash-Plugin/bin/OpenIAB.ane!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library type="flex">
-        <properties id="55b877ca-25cf-445d-b4d1-10e12aa8dbb2" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../ANE-Facebook/bin/AirFacebook.ane!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

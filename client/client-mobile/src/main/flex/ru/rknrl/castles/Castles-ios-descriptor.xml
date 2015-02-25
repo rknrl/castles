@@ -21,7 +21,6 @@
 
     <extensions>
         <extensionID>org.onepf.OpenIAB</extensionID>
-        <extensionID>com.freshplanet.AirFacebook</extensionID>
         <extensionID>ru.rknrl.DeviceId</extensionID>
     </extensions>
 
@@ -66,21 +65,7 @@
 
             <key>UIPrerenderedIcon</key>
             <true/>
-
-            <key>CFBundleURLTypes</key>
-            <array>
-                <dict>
-                    <key>CFBundleURLSchemes</key>
-                    <array>
-                        <string>fb370173203168786</string>
-                    </array>
-                </dict>
-            </array>
-
-            <key>FacebookAppID</key>
-            <string>370173203168786</string>
         ]]></InfoAdditions>
-
         <Entitlements>
             <![CDATA[
                 <key>aps-environment</key>
