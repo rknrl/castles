@@ -20,7 +20,7 @@ public class CastlesUserInfo extends UserInfo {
     private var _photo256:String;
 
     public function CastlesUserInfo(uid:String, accountType:AccountType, firstName:String, lastName:String, photo96:String, photo256:String) {
-        super(uid, firstName, lastName, Sex.UNDEFINED);
+        super({}, uid, firstName, lastName, Sex.UNDEFINED);
         _accountType = accountType;
         _photo96 = photo96;
         _photo256 = photo256;

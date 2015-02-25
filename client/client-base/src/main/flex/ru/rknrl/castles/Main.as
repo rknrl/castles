@@ -144,7 +144,7 @@ public class Main extends Sprite {
             myUserInfo = userInfo;
             Log.info("myUserInfo: " + myUserInfo)
         } else {
-            myUserInfo = new UserInfo(accountId.id, locale.defaultName, null, Sex.UNDEFINED);
+            myUserInfo = new UserInfo({}, accountId.id, locale.defaultName, null, Sex.UNDEFINED);
             Log.info("myUserInfo fail");
         }
 
