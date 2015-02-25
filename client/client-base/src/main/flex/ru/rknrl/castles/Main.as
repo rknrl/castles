@@ -136,7 +136,7 @@ public class Main extends Sprite {
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
 
-        social.getMyUserInfo(onGetMyUserInfo);
+        social.me(onGetMyUserInfo);
     }
 
     private function onGetMyUserInfo(userInfo:UserInfo):void {
