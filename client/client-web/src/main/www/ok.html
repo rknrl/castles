@@ -21,73 +21,6 @@
                     alert("init fail " + error)
                 });
 
-        /**
-         * https://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-users.getCurrentUser
-         */
-        function getMyUserInfo(callbackId) {
-            FAPI.Client.call(
-                    {
-                        "method": "users.getCurrentUser",
-                        "fields": "uid,locale,first_name,last_name,name,gender,age,birthday,has_email,current_status,current_status_id,current_status_date,online,photo_id,pic50x50,pic128x128,pic128max,pic180min,pic240min,pic320min,pic190x190,pic640x480,pic1024x768,location"
-                    },
-                    function (method, result, data) {
-                        if (result) {
-                            sendResult(callbackId, result);
-                        } else {
-                            sendError(callbackId, data);
-                        }
-                    });
-        }
-
-        /**
-         * https://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-friends.get
-         * https://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-users.getInfo
-         */
-        function getFriends(callbackId) {
-            FAPI.Client.call(
-                    {
-                        "method": "friends.get"
-                    },
-                    function (method, result, data) {
-                        if (result) {
-
-                            FAPI.Client.call(
-                                    {
-                                        "method": "users.getInfo",
-                                        "uids": result,
-                                        "fields": "uid,first_name,last_name,photo_id,pic50x50,pic128x128,pic128max,pic180min,pic240min,pic320min,pic190x190,pic640x480,pic1024x768"
-                                    },
-                                    function (method, result, data) {
-                                        if (result) {
-                                            sendResult(callbackId, result);
-                                        } else {
-                                            sendError(callbackId, data);
-                                        }
-                                    }
-                            )
-
-                        } else {
-                            sendError(callbackId, data);
-                        }
-                    });
-        }
-
-        /**
-         * https://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-friends.getAppUsers
-         */
-        function getAppFriends(callbackId) {
-            FAPI.Client.call(
-                    {
-                        "method": "friends.getAppUsers"
-                    },
-                    function (method, result, data) {
-                        if (result) {
-                            sendResult(callbackId, result.uids);
-                        } else {
-                            sendError(callbackId, data);
-                        }
-                    });
-        }
 
         function API_callback(method, result, data) {
             alert("Method " + method + " finished with result " + result + ", " + data);
@@ -107,26 +40,11 @@
             FAPI.UI.showPayment(p.name, p.description, p.code, p.price, p.options, p.attributes, p.currency, p.callback, p.uiConf);
         }
 
-
         /**
          * https://apiok.ru/wiki/display/api/ActionScript+API+-+showInvite+ru
          */
         function showInviteDialog(p) {
             FAPI.UI.showInvite(p.text, p.params, p.selected_uids);
-        }
-
-        function sendResult(callbackId, value) {
-            flash().onResult({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
-        function sendError(callbackId, value) {
-            flash().onFail({
-                callbackId: callbackId,
-                data: value
-            });
         }
 
         function reloadPage() {

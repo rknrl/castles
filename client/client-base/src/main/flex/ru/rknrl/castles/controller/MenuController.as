@@ -10,9 +10,9 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
 
+import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
-import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -211,7 +211,7 @@ public class MenuController {
 
     private function onBuy(event:Event):void {
         const product:ProductDTO = model.products.product;
-        social.showPaymentDialog(new PaymentDialogData(product.id, product.title, product.description, product.price));
+        social.ui.showPaymentDialog(new PaymentDialogData(product.id, product.title, product.description, product.price));
         // todo temp view.lock = true;
     }
 

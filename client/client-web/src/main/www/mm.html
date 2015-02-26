@@ -27,62 +27,12 @@
             });
             mailru.events.listen(mailru.app.events.incomingPayment, function (d) {
                 if (d.status == "success") {
-                    alert(str(d));
                     flash().onPaymentSuccess();
                 } else {
                     flash().onPaymentFail(d);
                 }
             });
         });
-
-        function str(m) {
-            var s = "";
-            for (key in m) {
-                s += key + "=" + m[key];
-            }
-            return s;
-        }
-
-        /**
-         * https://api.mail.ru/docs/reference/js/users-getinfo/
-         */
-        function getMyUserInfo(callbackId) {
-            mailru.app.users.getInfo(function (result) {
-                if (result.error) {
-                    sendError(callbackId, result.error);
-                } else {
-                    sendResult(callbackId, result[0]);
-                }
-            });
-        }
-
-        /**
-         * https://api.mail.ru/docs/reference/js/friends.getExtended/
-         */
-        function getFriends(callbackId) {
-            mailru.common.friends.getExtended(
-                    function (result) {
-                        if (result.error) {
-                            sendError(callbackId, result.error);
-                        } else {
-                            sendResult(callbackId, result);
-                        }
-                    });
-        }
-
-        /**
-         * https://api.mail.ru/docs/reference/js/friends.getAppUsers/
-         */
-        function getAppFriends(callbackId) {
-            mailru.common.friends.getAppUsers(
-                    function (result) {
-                        if (result.error) {
-                            sendError(callbackId, result.error);
-                        } else {
-                            sendResult(callbackId, result);
-                        }
-                    });
-        }
 
         /**
          * https://api.mail.ru/docs/reference/js/payments-showdialog/
@@ -96,20 +46,6 @@
          */
         function showInviteDialog(params) {
             mailru.app.friends.request(params);
-        }
-
-        function sendResult(callbackId, value) {
-            flash().onResult({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
-        function sendError(callbackId, value) {
-            flash().onFail({
-                callbackId: callbackId,
-                data: value
-            });
         }
 
         function reloadPage() {
