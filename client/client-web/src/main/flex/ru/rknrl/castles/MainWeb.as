@@ -8,12 +8,11 @@
 
 package ru.rknrl.castles {
 import ru.rknrl.Log;
-import ru.rknrl.asocial.Facebook;
-import ru.rknrl.asocial.ISocial;
-import ru.rknrl.asocial.MoiMir;
-import ru.rknrl.asocial.Odnoklassniki;
-import ru.rknrl.asocial.Social;
-import ru.rknrl.asocial.Vkontakte;
+import ru.rknrl.asocial.ISocialWeb;
+import ru.rknrl.asocial.platforms.Facebook;
+import ru.rknrl.asocial.platforms.MoiMir;
+import ru.rknrl.asocial.platforms.Odnoklassniki;
+import ru.rknrl.asocial.platforms.Vkontakte;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
@@ -31,7 +30,7 @@ public class MainWeb extends MainWebBase {
         const httpPort:int = flashVars.rknrlHttpPort;
 
         const accountType:AccountType = getAccountType(flashVars.rknrlAccountType);
-        const social:Social = createSocial(accountType, flashVars);
+        const social:ISocialWeb = createSocial(accountType, flashVars);
 
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = social.flashVars.uid;
@@ -41,7 +40,7 @@ public class MainWeb extends MainWebBase {
         authenticationSecret.body = social.flashVars.authenticationSecret;
         authenticationSecret.params = social.flashVars.authenticationParams;
 
-        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, ISocial(social));
+        super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
     }
 
     private static function getAccountType(name:String):AccountType {
@@ -51,7 +50,7 @@ public class MainWeb extends MainWebBase {
         throw new Error("unknown account type " + name);
     }
 
-    private static function createSocial(accountType:AccountType, flashVars:Object):Social {
+    private static function createSocial(accountType:AccountType, flashVars:Object):ISocialWeb {
         switch (accountType) {
             case AccountType.ODNOKLASSNIKI:
                 return new Odnoklassniki(flashVars);

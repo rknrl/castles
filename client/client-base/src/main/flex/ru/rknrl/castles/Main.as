@@ -21,7 +21,7 @@ import flash.text.TextField;
 
 import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
-import ru.rknrl.asocial.Sex;
+import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
@@ -136,7 +136,7 @@ public class Main extends Sprite {
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
 
-        social.me(onGetMyUserInfo);
+        social.api.me(onGetMyUserInfo);
     }
 
     private function onGetMyUserInfo(userInfo:UserInfo):void {

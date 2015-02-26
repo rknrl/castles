@@ -21,10 +21,10 @@ import org.onepf.OpenIAB;
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
-import ru.rknrl.asocial.Facebook;
 import ru.rknrl.asocial.ISocialMobile;
-import ru.rknrl.asocial.MockSocial;
 import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.platforms.Facebook;
+import ru.rknrl.asocial.platforms.SocialMock;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -113,7 +113,7 @@ public class MainMobileBase extends Sprite {
         removeLoginScreen();
 
         const deviceId:String = new DeviceId().get();
-        social = new MockSocial(deviceId, new PaymentsBridge(openIab));
+        social = new SocialMock(deviceId, new PaymentsBridge(openIab));
         start(AccountType.DEVICE_ID, deviceId, "");
     }
 

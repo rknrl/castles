@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.userInfo {
-import ru.rknrl.asocial.Sex;
+import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.asocial.userInfo.UserInfoAvatarUrl;
 import ru.rknrl.dto.AccountIdDTO;
