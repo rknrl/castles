@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles {
 import ru.rknrl.Log;
+import ru.rknrl.asocial.Facebook;
 import ru.rknrl.asocial.ISocial;
-import ru.rknrl.asocial.web.FB;
-import ru.rknrl.asocial.web.MM;
-import ru.rknrl.asocial.web.OK;
-import ru.rknrl.asocial.web.Social;
-import ru.rknrl.asocial.web.VK;
+import ru.rknrl.asocial.MoiMir;
+import ru.rknrl.asocial.Odnoklassniki;
+import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.Vkontakte;
 import ru.rknrl.dto.AccountIdDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
@@ -54,13 +54,13 @@ public class MainWeb extends MainWebBase {
     private static function createSocial(accountType:AccountType, flashVars:Object):Social {
         switch (accountType) {
             case AccountType.ODNOKLASSNIKI:
-                return new OK(flashVars);
+                return new Odnoklassniki(flashVars);
             case AccountType.VKONTAKTE:
-                return new VK(flashVars);
+                return new Vkontakte(flashVars);
             case AccountType.MOIMIR:
-                return new MM(flashVars);
+                return new MoiMir(flashVars);
             case AccountType.FACEBOOK:
-                return new FB(flashVars);
+                return new Facebook(flashVars);
         }
         throw new Error("unknown account type " + accountType);
     }

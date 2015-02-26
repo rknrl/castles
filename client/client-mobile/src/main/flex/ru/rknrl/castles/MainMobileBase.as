@@ -21,10 +21,10 @@ import org.onepf.OpenIAB;
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
 import ru.rknrl.Warning;
-import ru.rknrl.asocial.mobile.FB;
-import ru.rknrl.asocial.mobile.ISocialMobile;
-import ru.rknrl.asocial.mobile.NO;
-import ru.rknrl.asocial.mobile.Social;
+import ru.rknrl.asocial.Facebook;
+import ru.rknrl.asocial.ISocialMobile;
+import ru.rknrl.asocial.MockSocial;
+import ru.rknrl.asocial.Social;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -113,7 +113,7 @@ public class MainMobileBase extends Sprite {
         removeLoginScreen();
 
         const deviceId:String = new DeviceId().get();
-        social = new NO(deviceId, new PaymentsBridge(openIab));
+        social = new MockSocial(deviceId, new PaymentsBridge(openIab));
         start(AccountType.DEVICE_ID, deviceId, "");
     }
 
@@ -123,7 +123,7 @@ public class MainMobileBase extends Sprite {
         webViewBackground = new WebViewBackground(layout);
         addChild(webViewBackground);
 
-        social = new FB(facebookAppIdDev, new PaymentsBridge(openIab), stage);
+        social = new Facebook(facebookAppIdDev, new PaymentsBridge(openIab), stage);
         social.addEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
         social.addEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         social.login();
@@ -178,8 +178,8 @@ public class MainMobileBase extends Sprite {
 
 import org.onepf.OpenIAB;
 
+import ru.rknrl.asocial.IPayments;
 import ru.rknrl.asocial.PaymentDialogData;
-import ru.rknrl.asocial.mobile.IPayments;
 
 class PaymentsBridge implements IPayments {
     private var openIab:OpenIAB;

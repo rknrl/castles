@@ -10,7 +10,7 @@ package ru.rknrl.castles {
 import flash.display.Sprite;
 import flash.text.TextField;
 
-import ru.rknrl.asocial.mobile.Social;
+import ru.rknrl.asocial.Social;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.utils.createTextField;
