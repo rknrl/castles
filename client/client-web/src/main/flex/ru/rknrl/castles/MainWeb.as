@@ -57,7 +57,7 @@ public class MainWeb extends MainWebBase {
             case AccountType.VKONTAKTE:
                 return new Vkontakte(flashVars);
             case AccountType.MOIMIR:
-                return new MoiMir(flashVars);
+                return new MoiMir(flashVars, "05ba20802b21da64c5daab3ad3ceb05d");
             case AccountType.FACEBOOK:
                 return new Facebook(flashVars);
         }
