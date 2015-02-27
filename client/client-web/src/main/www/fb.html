@@ -18,7 +18,6 @@
             return document.getElementById("flashContent");
         }
 
-
         window.fbAsyncInit = function () {
             FB.init({
                 appId: '370173203168786',
@@ -33,6 +32,10 @@
                     flashVars.rknrlHttpPort = "8080";
                     flashVars.rknrlGamePort = "2335";
                     flashVars.rknrlPolicyPort = "2336";
+                    flashVars.accessToken = response.authResponse.accessToken;
+                    flashVars.expiresIn = response.authResponse.expiresIn;
+                    flashVars.signedRequest = response.authResponse.signedRequest;
+                    flashVars.userID = response.authResponse.userID;
 
                     swfobject.embedSWF("game.swf", "flashContent", "100%", "100%", "10.1.0", "expressInstall.swf", flashVars,
                             {
@@ -43,6 +46,7 @@
                 }
             }
 
+            // https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus
             FB.getLoginStatus(function (response) {
                 if (response.status == 'connected') {
                     onLogin(response);
