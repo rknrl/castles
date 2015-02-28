@@ -65,7 +65,7 @@ class Account(matchmaking: ActorRef,
         SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
 
       case AccountType.FACEBOOK ⇒
-        true // todo
+        SocialAuth.checkSecretFb(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.fb.get)
 
       case AccountType.DEVICE_ID ⇒
         true
