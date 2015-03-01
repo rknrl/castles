@@ -156,11 +156,13 @@ public class MainMobileBase extends Sprite {
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = secret;
         authenticationSecret.params = null;
+        authenticationSecret.accessToken = secret;
 
         Log.info("accountId=" + accountId.id);
         Log.info("accountType=" + accountId.type.name());
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
+        Log.info("authenticationAccessToken=" + authenticationSecret.accessToken);
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();

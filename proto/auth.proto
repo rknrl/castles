@@ -11,6 +11,7 @@ import "account.proto";
 message AuthenticationSecretDTO {
     required string body = 1;
     optional string params = 2;
+    optional string accessToken = 3;
 }
 
 message AuthenticateDTO {

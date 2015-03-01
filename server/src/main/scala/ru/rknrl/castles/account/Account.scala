@@ -56,7 +56,10 @@ class Account(matchmaking: ActorRef,
       case AccountType.DEV ⇒
         true
       case AccountType.VKONTAKTE ⇒
-        SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.vk.get)
+        if (authenticate.getSecret.hasAccessToken)
+          true // todo: check access token
+        else
+          SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.vk.get)
 
       case AccountType.ODNOKLASSNIKI ⇒
         SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getUserInfo.getAccountId.getId, config.social.ok.get)

@@ -63,12 +63,20 @@ class Config(val host: String,
         accountType match {
           case AccountType.DEV ⇒ social.vk // todo
           case AccountType.DEVICE_ID ⇒ social.vk // todo
+          case AccountType.VKONTAKTE ⇒ social.vk // todo
+          case AccountType.ODNOKLASSNIKI ⇒ social.vk // todo
+          case AccountType.MOIMIR ⇒ social.vk // todo
+          case AccountType.FACEBOOK ⇒ social.vk // todo
           case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
         }
       case PlatformType.ANDROID ⇒
         accountType match {
           case AccountType.DEV ⇒ social.vk // todo
           case AccountType.DEVICE_ID ⇒ social.vk // todo
+          case AccountType.VKONTAKTE ⇒ social.vk // todo
+          case AccountType.ODNOKLASSNIKI ⇒ social.vk // todo
+          case AccountType.MOIMIR ⇒ social.vk // todo
+          case AccountType.FACEBOOK ⇒ social.vk // todo
           case _ ⇒ throw new IllegalArgumentException("unknown accountType " + accountType)
         }
     }
