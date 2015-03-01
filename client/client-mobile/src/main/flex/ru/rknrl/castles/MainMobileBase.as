@@ -25,6 +25,8 @@ import ru.rknrl.asocial.ISocialMobile;
 import ru.rknrl.asocial.Social;
 import ru.rknrl.asocial.platforms.MoiMir;
 import ru.rknrl.asocial.platforms.SocialMock;
+import ru.rknrl.asocial.userInfo.Sex;
+import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -71,6 +73,7 @@ public class MainMobileBase extends Sprite {
     private var webViewBackground:WebViewBackground;
     private var openIab:OpenIAB;
     private var social:ISocialMobile;
+    private var myUserInfo:UserInfo;
     private var main:Main;
 
     public function MainMobileBase(host:String, gamePort:int, policyPort:int, httpPort:int) {
@@ -123,6 +126,7 @@ public class MainMobileBase extends Sprite {
         const deviceId:String = new DeviceId().get();
         social = new SocialMock(deviceId, new PaymentsBridge(openIab));
         start(AccountType.DEVICE_ID, deviceId, "");
+        myUserInfo = new UserInfo({}, deviceId, null, null, Sex.UNDEFINED);
     }
 
     private function onLoginViaFacebook(e:Event):void {
@@ -142,7 +146,18 @@ public class MainMobileBase extends Sprite {
         social.removeEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         removeChild(webViewBackground);
 
-        start(AccountType.MOIMIR, social.uid, social.accessToken);
+        social.api.me(onGetMyUserInfo);
+    }
+
+    private function onGetMyUserInfo(userInfo:UserInfo):void {
+        if (userInfo) {
+            myUserInfo = userInfo;
+            Log.info("myUserInfo: " + myUserInfo);
+            start(AccountType.DEVICE_ID, myUserInfo.uid, social.accessToken);
+        } else {
+            addLoginScreen();
+            Log.info("myUserInfo fail");
+        }
     }
 
     private function onFacebookLoginFail(e:Event):void {
@@ -153,15 +168,15 @@ public class MainMobileBase extends Sprite {
         addLoginScreen();
     }
 
-    private function start(accountType:AccountType, id:String, secret:String):void {
+    private function start(accountType:AccountType, id:String, accessToken:String):void {
         const accountId:AccountIdDTO = new AccountIdDTO();
         accountId.id = id;
         accountId.type = accountType;
 
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
-        authenticationSecret.body = secret;
+        authenticationSecret.body = accessToken;
         authenticationSecret.params = null;
-        authenticationSecret.accessToken = secret;
+        authenticationSecret.accessToken = accessToken;
 
         Log.info("accountId=" + accountId.id);
         Log.info("accountType=" + accountId.type.name());
@@ -172,7 +187,7 @@ public class MainMobileBase extends Sprite {
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
 
-        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), loaderInfo));
+        addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), myUserInfo));
     }
 
     private function onUncaughtError(event:UncaughtErrorEvent):void {
@@ -180,7 +195,7 @@ public class MainMobileBase extends Sprite {
         const stackTrace:String = error ? error.getStackTrace() : "";
         Log.error(event.error, stackTrace);
         Log.send(bugsLogUrl);
-        if (!(error is Warning) && main) main.addErrorScreen();
+        if (main && !(error is Warning) && main) main.addErrorScreen();
     }
 }
 }

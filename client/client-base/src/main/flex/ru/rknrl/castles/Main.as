@@ -7,7 +7,6 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
-import flash.display.LoaderInfo;
 import flash.display.Sprite;
 import flash.display.StageAlign;
 import flash.display.StageQuality;
@@ -21,7 +20,6 @@ import flash.text.TextField;
 
 import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
-import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.controller.Controller;
 import ru.rknrl.castles.model.events.ViewEvents;
@@ -36,7 +34,6 @@ import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.PlatformType;
-import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.loaders.LoadImageManager;
 import ru.rknrl.loaders.TextLoader;
 import ru.rknrl.rmi.AuthenticatedEvent;
@@ -64,15 +61,13 @@ public class Main extends Sprite {
     private var server:Server;
 
     private var localeLoader:TextLoader;
-    private var locale:CastlesLocale;
 
     private var view:View;
-    private var loadImageManager:ILoadImageManager;
     private var deviceFactory:DeviceFactory;
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, loaderInfo:LoaderInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, myUserInfo:UserInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -85,6 +80,7 @@ public class Main extends Sprite {
         this.social = social;
         _layout = layout;
         this.deviceFactory = deviceFactory;
+        this.myUserInfo = myUserInfo;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -128,25 +124,13 @@ public class Main extends Sprite {
         localeLoader.removeEventListener(Event.COMPLETE, onLocaleComplete);
         localeLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLocaleError);
         localeLoader.removeEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
-        locale = new CastlesLocale(data);
+        const locale:CastlesLocale = new CastlesLocale(data);
 
-        loadImageManager = new LoadImageManager(cachedAvatarsLimit);
+        const loadImageManager:LoadImageManager = new LoadImageManager(cachedAvatarsLimit);
         if (view) throw new Error("view already on stage");
         addChild(view = new View(_layout, locale, loadImageManager, deviceFactory));
         view.addEventListener(ViewEvents.TRY_CONNECT, onTryConnect);
         view.addLoadingScreen();
-
-        social.api.me(onGetMyUserInfo);
-    }
-
-    private function onGetMyUserInfo(userInfo:UserInfo):void {
-        if (userInfo) {
-            myUserInfo = userInfo;
-            Log.info("myUserInfo: " + myUserInfo)
-        } else {
-            myUserInfo = new UserInfo({}, accountId.id, locale.defaultName, null, Sex.UNDEFINED);
-            Log.info("myUserInfo fail");
-        }
 
         tryConnect();
     }
@@ -204,7 +188,7 @@ public class Main extends Sprite {
         }
     }
 
-    private function destroy():void {
+    private function addNoConnectionScreen():void {
         destroyConnection();
         view.removeLoadingScreenIfExists();
         view.addNoConnectionScreen();
@@ -218,7 +202,7 @@ public class Main extends Sprite {
 
     private function onConnectionError(event:Event):void {
         Log.info("onConnectionError " + event);
-        destroy();
+        addNoConnectionScreen();
     }
 
     public function addErrorScreen():void {
