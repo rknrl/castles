@@ -62,10 +62,16 @@ class Account(matchmaking: ActorRef,
           SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.vk.get)
 
       case AccountType.ODNOKLASSNIKI ⇒
-        SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getUserInfo.getAccountId.getId, config.social.ok.get)
+        if (authenticate.getSecret.hasAccessToken)
+          true // todo: check access token
+        else
+          SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getUserInfo.getAccountId.getId, config.social.ok.get)
 
       case AccountType.MOIMIR ⇒
-        SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
+        if (authenticate.getSecret.hasAccessToken)
+          true // todo: check access token
+        else
+          SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
 
       case AccountType.FACEBOOK ⇒
         SocialAuth.checkSecretFb(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.fb.get)
