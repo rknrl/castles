@@ -1,6 +1,8 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+
     <title>Game</title>
 
     <script type="text/javascript" src="swfobject.js"></script>
@@ -38,11 +40,11 @@
                     flashVars.userID = response.authResponse.userID;
 
                     swfobject.embedSWF("game.swf", "flashContent", "100%", "100%", "10.1.0", "expressInstall.swf", flashVars,
-                            {
-                                quality: "high",
-                                allowFullScreenInteractive: 'true',
-                                allowfullscreen: true
-                            });
+                        {
+                            quality: "high",
+                            allowFullScreenInteractive: 'true',
+                            allowfullscreen: true
+                        });
                 }
             }
 
@@ -69,20 +71,6 @@
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
 
-        function sendResult(callbackId, value) {
-            flash().onResult({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
-        function sendError(callbackId, value) {
-            flash().onFail({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
         function reloadPage() {
             document.location.reload(true)
         }
@@ -90,10 +78,28 @@
 </head>
 
 <body>
+
+<?php
+
+list($encoded_sig, $payload) = explode('.', $_POST["signed_request"], 2);
+
+$sig = base64_url_decode($encoded_sig);
+$data = base64_url_decode($payload);
+
+echo("sig:" . $sig);
+echo("data:" . $data);
+
+function base64_url_decode($input)
+{
+    return base64_decode(strtr($input, '-_', '+/'));
+}
+
+?>
+
 <div id="flashContent">
     <p><a href="https://www.adobe.com/go/getflashplayer"><img
-            src="https://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
-            alt="Get Adobe Flash player"/></a></p>
+                src="https://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
+                alt="Get Adobe Flash player"/></a></p>
 </div>
 </body>
 

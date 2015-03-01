@@ -23,8 +23,8 @@ import ru.rknrl.Log;
 import ru.rknrl.Warning;
 import ru.rknrl.asocial.ISocialMobile;
 import ru.rknrl.asocial.Social;
-import ru.rknrl.asocial.platforms.Facebook;
 import ru.rknrl.asocial.platforms.SocialMock;
+import ru.rknrl.asocial.platforms.Vkontakte;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -41,6 +41,9 @@ public class MainMobileBase extends Sprite {
 
     private static const facebookAppId:String = "370172643168842";
     private static const facebookAppIdDev:String = "370173203168786";
+
+    private static const vkontakteAppId:String = "4662212";
+    private static const vkontakteAppIdDev:String = "4628723";
 
     private static function isTablet(fullScreenWidth:int, fullScreenHeight:int):Boolean {
         const dpi:Number = Capabilities.screenDPI;
@@ -123,7 +126,7 @@ public class MainMobileBase extends Sprite {
         webViewBackground = new WebViewBackground(layout);
         addChild(webViewBackground);
 
-        social = new Facebook(facebookAppIdDev, new PaymentsBridge(openIab), stage);
+        social = new Vkontakte(vkontakteAppIdDev, new PaymentsBridge(openIab), stage);
         social.addEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
         social.addEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         social.login();
@@ -134,7 +137,7 @@ public class MainMobileBase extends Sprite {
         social.removeEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         removeChild(webViewBackground);
 
-        start(AccountType.FACEBOOK, "uid", "secret"); // todo uid, secret
+        start(AccountType.VKONTAKTE, social.uid, social.accessToken);
     }
 
     private function onFacebookLoginFail(e:Event):void {
@@ -158,7 +161,6 @@ public class MainMobileBase extends Sprite {
         Log.info("accountType=" + accountId.type.name());
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
-
 
         const localesUrl:String = "";
         const defaultLocale:String = ByteArray(new DefaultLocaleByteArray()).toString();
