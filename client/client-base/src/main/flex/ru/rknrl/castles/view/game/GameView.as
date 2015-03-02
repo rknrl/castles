@@ -61,7 +61,7 @@ public class GameView extends Sprite {
         addChild(_area = new GameArea(h, v));
         addChild(ui = new Sprite());
         ui.addChild(_magicItems = new MagicItemsView(layout));
-        addChild(_tutor = new GameTutorialView(layout, deviceFactory));
+        addChild(_tutor = new GameTutorialView(layout, deviceFactory, loadImageManager));
 
         for (var i:int = 0; i < playerInfos.length; i++) {
             const playerInfo:PlayerInfo = playerInfos[i];
@@ -130,7 +130,7 @@ public class GameView extends Sprite {
         if (gameOverScreen) gameOverScreen.layout = value;
         if (_tutor) {
             _tutor.layout = value;
-            _tutor.areaPos = areaPos;
+            _tutor.setAreaRect(areaPos, _area.h, _area.v);
         }
     }
 

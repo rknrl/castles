@@ -90,7 +90,7 @@ public class Colors {
 
     public static const flaskFillBitmapData:BitmapData = new BitmapData(1, 1, false, flaskFillColor);
 
-    public static const modalBitmapData:BitmapData = new BitmapData(1, 1, true, 0x44000000);
+    public static const modalBitmapData:BitmapData = new BitmapData(1, 1, true, 0x66000000);
 
     public static const grassBitmapData:BitmapData = new BitmapData(1, 1, false, 0xc2ffa6);
 
