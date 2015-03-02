@@ -23,10 +23,16 @@ import ru.rknrl.Log;
 import ru.rknrl.Warning;
 import ru.rknrl.asocial.ISocialMobile;
 import ru.rknrl.asocial.Social;
+import ru.rknrl.asocial.platforms.Facebook;
 import ru.rknrl.asocial.platforms.MoiMir;
+import ru.rknrl.asocial.platforms.Odnoklassniki;
 import ru.rknrl.asocial.platforms.SocialMock;
+import ru.rknrl.asocial.platforms.Vkontakte;
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
+import ru.rknrl.castles.view.LoginEvent;
+import ru.rknrl.castles.view.LoginScreen;
+import ru.rknrl.castles.view.WebViewBackground;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
@@ -110,35 +116,58 @@ public class MainMobileBase extends Sprite {
 
     private function addLoginScreen():void {
         addChild(loginScreen = new LoginScreen(layout));
-        loginScreen.addEventListener(LoginScreen.LOGIN_VIA_DEVICE_ID, onLoginViaDeviceId);
-        loginScreen.addEventListener(LoginScreen.LOGIN_VIA_FACEBOOK, onLoginViaFacebook);
+        loginScreen.addEventListener(LoginEvent.LOGIN, onLogin);
     }
 
     private function removeLoginScreen():void {
-        loginScreen.removeEventListener(LoginScreen.LOGIN_VIA_DEVICE_ID, onLoginViaDeviceId);
-        loginScreen.removeEventListener(LoginScreen.LOGIN_VIA_FACEBOOK, onLoginViaFacebook);
+        loginScreen.removeEventListener(LoginEvent.LOGIN, onLogin);
         removeChild(loginScreen);
     }
 
-    private function onLoginViaDeviceId(e:Event):void {
+    private function onLogin(e:LoginEvent):void {
         removeLoginScreen();
 
-        const deviceId:String = new DeviceId().get();
-        social = new SocialMock(deviceId, new PaymentsBridge(openIab));
-        start(AccountType.DEVICE_ID, deviceId, "");
-        myUserInfo = new UserInfo({}, deviceId, null, null, Sex.UNDEFINED);
+        switch (e.socialName) {
+            case LoginScreen.DEVICE_ID:
+                const deviceId:String = new DeviceId().get();
+                social = new SocialMock(deviceId, new PaymentsBridge(openIab));
+                myUserInfo = new UserInfo({}, deviceId, null, null, Sex.UNDEFINED);
+                start(AccountType.DEVICE_ID, deviceId, "");
+                break;
+            case LoginScreen.FACEBOOK:
+                social = new Facebook(facebookAppIdDev, new PaymentsBridge(openIab), stage);
+                webViewLogin();
+                break;
+            case LoginScreen.VKONTAKTE:
+                social = new Vkontakte(vkontakteAppIdDev, new PaymentsBridge(openIab), stage);
+                webViewLogin();
+                break;
+            case LoginScreen.ODNOKLASSNIKI:
+                social = new Odnoklassniki(odniklassnikiAppIdDev, new PaymentsBridge(openIab), stage);
+                webViewLogin();
+                break;
+            case LoginScreen.MOI_MIR:
+                social = new MoiMir(moiMirAppIdDev, moiMirPrivateKeyDev, new PaymentsBridge(openIab), stage);
+                webViewLogin();
+                break;
+            default :
+                throw new Error("unknown social name: " + e.socialName);
+        }
     }
 
-    private function onLoginViaFacebook(e:Event):void {
-        removeLoginScreen();
-
+    private function webViewLogin():void {
         webViewBackground = new WebViewBackground(layout);
+        webViewBackground.addEventListener(WebViewBackground.LOGIN_CANCEL, onLoginCancel);
         addChild(webViewBackground);
 
-        social = new MoiMir(moiMirAppIdDev, moiMirPrivateKeyDev, new PaymentsBridge(openIab), stage);
         social.addEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
         social.addEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         social.login();
+    }
+
+    private function onLoginCancel(event:Event):void {
+        social.closeWebView();
+        onFacebookLoginFail();
     }
 
     private function onFacebookLoginSuccess(e:Event):void {
@@ -160,7 +189,7 @@ public class MainMobileBase extends Sprite {
         }
     }
 
-    private function onFacebookLoginFail(e:Event):void {
+    private function onFacebookLoginFail(e:Event = null):void {
         social.removeEventListener(Social.LOGIN_SUCCESS, onFacebookLoginSuccess);
         social.removeEventListener(Social.LOGIN_FAIL, onFacebookLoginFail);
         removeChild(webViewBackground);

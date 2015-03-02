@@ -32,6 +32,9 @@
             <entry module-name="aslog" build-configuration-name="aslog">
               <dependency linkage="Merged" />
             </entry>
+            <entry library-id="0bbb4aad-46f3-4dc6-bd1f-81bfdf576ee1">
+              <dependency linkage="Merged" />
+            </entry>
           </entries>
           <sdk name="Air" />
         </dependencies>
@@ -107,5 +110,15 @@
     <orderEntry type="module" module-name="asocial-base" exported="" />
     <orderEntry type="module" module-name="aslog" exported="" />
     <orderEntry type="module" module-name="asocial-mobile" exported="" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="0bbb4aad-46f3-4dc6-bd1f-81bfdf576ee1" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../client-base/src/main/fla/base-swc.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
