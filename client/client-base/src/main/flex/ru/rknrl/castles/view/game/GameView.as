@@ -24,6 +24,7 @@ import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {
@@ -61,11 +62,11 @@ public class GameView extends Sprite {
         addChild(_area = new GameArea(h, v));
         addChild(ui = new Sprite());
         ui.addChild(_magicItems = new MagicItemsView(layout));
-        addChild(_tutor = new GameTutorialView(layout, deviceFactory, loadImageManager));
+        addChild(_tutor = new GameTutorialView(layout, locale, deviceFactory, loadImageManager));
 
         for (var i:int = 0; i < playerInfos.length; i++) {
             const playerInfo:PlayerInfo = playerInfos[i];
-            const avatar:GameAvatar = new GameAvatar(playerInfo, layout, loadImageManager);
+            const avatar:GameAvatar = new GameAvatar(playerInfo, layout, locale, loadImageManager);
             ui.addChild(avatar);
             avatars.push(avatar);
         }
@@ -146,6 +147,17 @@ public class GameView extends Sprite {
         if (gameOverScreen) throw new Error("gameOverScreen already open");
         _area.visible = ui.visible = _tutor.visible = false;
         addChild(gameOverScreen = new GameOverScreen(winners, losers, win, reward, _layout, locale, loadImageManager))
+    }
+
+    private function getAvatarById(playerId:PlayerIdDTO):GameAvatar {
+        for each(var avatar:GameAvatar in avatars) {
+            if (avatar.playerId.id == playerId.id) return avatar;
+        }
+        throw new Error("can't find avatar " + playerId.id);
+    }
+
+    public function setDeadAvatar(playerId:PlayerIdDTO):void {
+        getAvatarById(playerId).dead = true;
     }
 }
 }

@@ -21,6 +21,7 @@ import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
 import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
@@ -37,10 +38,12 @@ import ru.rknrl.utils.createTextField;
 public class GameTutorialView extends TutorialView {
     private var arrows:ArrowsView;
     private var tornadoPath:TornadoPathView;
+    private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
 
-    public function GameTutorialView(layout:Layout, deviceFactory:DeviceFactory, loadImageManager:ILoadImageManager) {
+    public function GameTutorialView(layout:Layout, locale: CastlesLocale, deviceFactory:DeviceFactory, loadImageManager:ILoadImageManager) {
         super(layout, deviceFactory);
+        this.locale = locale;
         this.loadImageManager = loadImageManager;
         addChild(arrows = new ArrowsView());
         addChild(tornadoPath = new TornadoPathView());
@@ -154,7 +157,7 @@ public class GameTutorialView extends TutorialView {
         var avatar:GameAvatar;
 
         function addAvatar():void {
-            avatar = new GameAvatar(playerInfo, layout, loadImageManager);
+            avatar = new GameAvatar(playerInfo, layout, locale, loadImageManager);
             avatar.bitmapDataScale = layout.bitmapDataScale;
             avatar.scaleX = avatar.scaleY = layout.scale;
             const avatarPos:Point = layout.gameAvatarPos(avatar.playerId, _areaH, _areaV);
@@ -206,7 +209,7 @@ public class GameTutorialView extends TutorialView {
         var avatar:GameAvatar;
 
         function addAvatar():void {
-            avatar = new GameAvatar(playerInfos[i], layout, loadImageManager);
+            avatar = new GameAvatar(playerInfos[i], layout, locale, loadImageManager);
             avatar.bitmapDataScale = layout.bitmapDataScale;
             avatar.scaleX = avatar.scaleY = layout.scale;
             const avatarPos:Point = layout.gameAvatarPos(avatar.playerId, _areaH, _areaV);

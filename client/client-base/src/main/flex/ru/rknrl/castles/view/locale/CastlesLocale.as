@@ -36,6 +36,7 @@ public class CastlesLocale extends Locale {
     private static const SEARCH_OPPONENTS:String = "search_opponents";
     private static const NO_CONNECTION:String = "no_connection";
     private static const FAST_AND_TRUST:String = "fast_and_trust";
+    private static const DEAD: String = "dead";
 
     public function CastlesLocale(data:String) {
         super(data);
@@ -135,6 +136,10 @@ public class CastlesLocale extends Locale {
 
     public function get fastAndTrust():String {
         return translate(FAST_AND_TRUST);
+    }
+
+    public function get dead():String {
+        return translate(DEAD);
     }
 }
 }
