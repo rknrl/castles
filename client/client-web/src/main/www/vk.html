@@ -1,15 +1,24 @@
 <html>
-
 <head>
     <title>Game</title>
 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <link rel="stylesheet" type="text/css" href="http://st0.vk.me/css/al/common.css?493">
+
     <script src="https://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+
+    <script type="text/javascript" src="jquery-1.6.2.min-ver4.js"></script>
 
     <script type="text/javascript" src="swfobject.js"></script>
 
     <script type="text/javascript" src="getflashvars.js"></script>
 
     <style>
+        .invisible {
+            display: none;
+        }
+
         body {
             padding: 0;
             margin: 0;
@@ -40,7 +49,7 @@
                     flashVars.rknrlGamePort = "2335";
                     flashVars.rknrlPolicyPort = "2336";
 
-                    swfobject.embedSWF("game.swf", "flashContent", "100%", "100%", "10.1.0", "expressInstall.swf", flashVars,
+                    swfobject.embedSWF("game.swf", "flashContent", "100%", "600px", "10.1.0", "expressInstall.swf", flashVars,
                             {
                                 quality: "high",
                                 allowFullScreenInteractive: 'true',
@@ -52,9 +61,7 @@
                 },
                 5.26);
 
-        /**
-         * https://vk.com/dev/payments_dialog
-         */
+        /** https://vk.com/dev/payments_dialog */
         function showPaymentDialog(p) {
             VK.callMethod("showOrderBox", {
                 type: "item",
@@ -62,41 +69,66 @@
             });
         }
 
-        /**
-         * https://vk.com/dev/Javascript_API
-         */
+        /** https://vk.com/dev/Javascript_API */
         function showInviteDialog(p) {
             VK.callMethod("showInviteBox", {});
         }
 
-        function sendResult(callbackId, value) {
-            flash().onResult({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
-        function sendError(callbackId, value) {
-            flash().onFail({
-                callbackId: callbackId,
-                data: value
-            });
-        }
-
         function reloadPage() {
             document.location.reload(true)
+        }
+
+        function onGameTabClick() {
+            var gameTab = $('#gameTab');
+            if (gameTab.hasClass("active_link")) return;
+            gameTab.addClass('active_link');
+            $('#guideTab').removeClass('active_link');
+            $('#tabContainer').addClass('invisible');
+        }
+
+        function onGuideTabClick() {
+            var guideTab = $('#guideTab');
+            if (guideTab.hasClass("active_link")) return;
+            $('#gameTab').removeClass('active_link');
+            guideTab.addClass('active_link');
+
+            var tabContainer = $('#tabContainer');
+            tabContainer.load('guide.html', {}, null);
+            tabContainer.removeClass('invisible');
         }
     </script>
 </head>
 
 <body>
 
-<div id="flashContent">
-    <p><a href="https://www.adobe.com/go/getflashplayer"><img
-            src="https://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
-            alt="Get Adobe Flash player"/></a></p>
+<div class="tabs t_bar clear_fix">
+    <ul class="t0">
+        <li id="gameTab"
+            onclick="onGameTabClick()"
+            class="active_link">
+            <a href="#"><b class="tl1"><b></b></b><b class="tl2"></b>
+                <b class="tab_word">Игра</b>
+            </a>
+        </li>
+        <li id="guideTab" class="">
+            <a onclick="onGuideTabClick();"><b
+                    class="tl1"><b></b></b><b class="tl2"></b>
+                <b class="tab_word">Как играть и выигрывать</b>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div id="tabContainer" class="invisible" style="padding: 0; margin: 0"></div>
+
+<div id="content">
+    <div id="flashContent">
+        <p><a href="https://www.adobe.com/go/getflashplayer">
+            <img src="https://www.adobe.com/images/shared/download_buttons/get_flash_player.gif"
+                 alt="Get Adobe Flash player"/>
+        </a></p>
+    </div>
 </div>
 
 </body>
-
 </html>
