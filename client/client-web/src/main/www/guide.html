@@ -4,6 +4,27 @@
     <title></title>
 
     <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 18px;
+            font-weight: lighter;
+            margin-left: 50px;
+            width: 640px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: normal;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: normal;
+        }
+
         .buildings {
             display: table;
             padding-bottom: 50px;
@@ -15,105 +36,148 @@
             vertical-align: middle;
         }
 
+        .buildings div:nth-child(1) {
+            padding-right: 32px;
+        }
         .buildings div:nth-child(2) {
-            width: 250px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
-<div>
-    Отправляй отряды из домика в домик и захвати все
-</div>
+<h1>Башенки</h1>
 
-<h1>Используй тактику</h1>
+<img src="guide/GameScreen.png" width="640px">
 
-<div class="buildings">
-    <div>
-        <img src="guide/House.png">
-    </div>
-    <div>
-        <b>Домик</b><br>
-        Быстро воспроизводит население<br>
-        Защита: ★★★<br>
-        Скорость роста населения: ★★★<br>
-        Атака воинов: ★★★<br>
-        Скорость воинов: ★★★<br>
-    </div>
-</div>
+<p>Число на домике показывает, сколько людей в нем находятся.</p>
+
+<p>Количество людей в домиках постоянно растет.</p>
+
+<p>Вы можете направлять отряды людей из одного домика в другой и захватывать противников.</p>
+
+<p>Чтобы выиграть - захватите все домики противников.</p>
+
+<h1>Учитывайте особенности</h1>
+
+<p>Чем выше атака отряда, тем выше шанс захватить домик меньшим числом людей.</p>
+
+<p>Чем выше оборона домика, тем лучше он противостоит захватам.</p>
 
 <div class="buildings">
-    <div>
-        <img src="guide/Tower.png">
+    <div class="icon">
+        <img src="guide/GuideHouse.png">
     </div>
     <div>
-        <b>Башня</b><br>
-        Стреляет по проходящим мимо отрядам<br>
-        Защита: ★★★<br>
-        Скорость роста населения: ★★★<br>
-        Атака воинов: ★★★<br>
-        Скорость воинов: ★★★<br>
+        <h2>Избушка</h2>
+
+        <p>В избушке быстро растет население.</p>
+
+        <p>Оборона избушки, скорость и атака отрядов - сердняя.</p>
     </div>
 </div>
 
 <div class="buildings">
-    <div>
-        <img src="guide/Church.png">
+    <div class="icon">
+        <img src="guide/GuideChurch.png">
     </div>
     <div>
-        <b>Церковь</b><br>
-        Чем больше людей в твоих церквях - тем сильнее магические предметы<br>
-        Защита: ★★★<br>
-        Скорость роста населения: ★★★<br>
-        Атака воинов: ★★★<br>
-        Скорость воинов: ★★★<br>
-    </div>
-</div>
+        <h2>Церковь</h2>
 
-<h1>Используй предметы</h1>
+        <p>Церковь имеет слабую оборону.</p>
 
-<div class="buildings">
-    <div>
-        <img src="guide/Church.png">
-    </div>
-    <div>
-        <b>Фаерболл</b><br>
+        <p>Отряды, выходящие из церкви, самые быстрые и хорошо атакуют.</p>
+
+        <p>Чем больше людей в ваших церквях, тем сильнее действие магических предметов.</p>
     </div>
 </div>
 
 <div class="buildings">
-    <div>
-        <img src="guide/Church.png">
+    <div class="icon">
+        <img src="guide/GuideTower.png">
     </div>
     <div>
-        <b>Усиление</b><br>
+        <h2>Башня</h2>
+
+        <p>Башня имеет сильную оборону.</p>
+
+        <p>Отряды, выходящие из башни, самые медленные, но лучшие в атаке.</p>
+
+        <p>Башня стреляет по отрядам противника.</p>
+    </div>
+</div>
+
+<img src="guide/GuideBuy.jpg" width="640px">
+
+<p>Используте награду за выигранные бои на постройку новых домиков или их улучшение.</p>
+
+<img src="guide/GuideUpgrade.jpg" width="640px">
+
+<p>Так же вы можете улучшить все свои характеристики.</p>
+
+<h1>Используйте магические предметы</h1>
+
+<p>Покупайте предметы заранее перед боем.</p>
+
+<div class="buildings">
+    <div>
+        <img src="guide/GuideFireball.png">
+    </div>
+    <div>
+        <h2>Фаербол</h2>
+
+        <p>Выберите место, куда упадет фаербол. Он нанесет урон всем ближайшим отрядам и домикам.</p>
+
+        <p>Отряды понесут больше потерь, чем население домиков.</p>
     </div>
 </div>
 
 <div class="buildings">
     <div>
-        <img src="guide/Church.png">
+        <img src="guide/GuideStrengthening.png">
     </div>
     <div>
-        <b>Вулкан</b><br>
+        <h2>Усиление</h2>
+
+        <p>Выберите ваш домик, и все характеристики домика и отрядов, выходящих из него, увеличатся на некоторое
+            время.</p>
     </div>
 </div>
 
 <div class="buildings">
     <div>
-        <img src="guide/Church.png">
+        <img src="guide/GuideVolcano.png">
     </div>
     <div>
-        <b>Торнадо</b><br>
+        <h2>Вулкан</h2>
+
+        <p>Выберите место, где образуется вулкан. Отряды и домики в радиусе действия вулкана получат урон.</p>
+
+        <p>Население домиков пострадает больше, чем отряды.</p>
     </div>
 </div>
 
 <div class="buildings">
     <div>
-        <img src="guide/Church.png">
+        <img src="guide/GuideTornado.png">
     </div>
     <div>
-        <b>Подмога</b><br>
+        <h2>Торнадо</h2>
+
+        <p>Нарисуйте траекторию, по которой двинется торнадо. Оно нанесет урон всем отрядам и домикам на пути.</p>
+
+        <p>Торнадо несет самые сильные разрушения из всех магических предметов.</p>
+    </div>
+</div>
+
+<div class="buildings">
+    <div>
+        <img src="guide/GuideAssistance.png">
+    </div>
+    <div>
+        <h2>Подмога</h2>
+
+        <p>Выберите ваш домик, и к нему отправится отряд из 50 человек.</p>
     </div>
 </div>
 
