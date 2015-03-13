@@ -12,6 +12,7 @@ import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.ui.Keyboard;
+import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
@@ -72,6 +73,7 @@ public class GameView extends Sprite {
         }
 
         this.layout = layout;
+        addEventListener(GameViewEvents.SHAKE, onShake);
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
@@ -91,6 +93,12 @@ public class GameView extends Sprite {
     }
 
     private function onEnterFrame(event:Event):void {
+        const time:int = getTimer();
+        if (time < shakeStartTime + shakeDuration) {
+            area.rotation = Math.sin(time - shakeStartTime) / 1.5;
+        } else {
+            area.rotation = 0;
+        }
         dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(_area.mouseX, _area.mouseY)))
     }
 
@@ -138,7 +146,16 @@ public class GameView extends Sprite {
     private function onKeyUp(event:KeyboardEvent):void {
         if (event.keyCode == Keyboard.ESCAPE) {
             dispatchEvent(new Event(GameViewEvents.SURRENDER));
+        } else {
+            onShake();
         }
+    }
+
+    private static const shakeDuration:int = 200;
+    private var shakeStartTime:int;
+
+    private function onShake(event: Event = null):void {
+        shakeStartTime = getTimer();
     }
 
     private var gameOverScreen:GameOverScreen;

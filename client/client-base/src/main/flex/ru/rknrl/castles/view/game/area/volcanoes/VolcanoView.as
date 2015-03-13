@@ -19,7 +19,14 @@ public class VolcanoView extends Sprite {
         this.radius = radius;
     }
 
+    private var _radius:Number;
+
+    public function get radius():Number {
+        return _radius;
+    }
+
     public function set radius(value:Number):void {
+        _radius = value;
         scaleX = scaleY = value / originalSize;
     }
 }
