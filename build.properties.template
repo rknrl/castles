@@ -1,5 +1,7 @@
 rknrl = ${user.home}/dev/rknrl/core
 castles = ${user.home}/dev/rknrl/castles
+asocial = ${user.home}/dev/rknrl/asocial
+aslog = ${user.home}/dev/rknrl/aslog
 
 payments.ane = ${user.home}/dev/rknrl/OpenIAB-Flash-Plugin/bin
 facebook.ane = ${user.home}/dev/rknrl/ANE-Facebook/bin

@@ -47,7 +47,7 @@
 
         <fullScreen>true</fullScreen>
 
-        <renderMode>gpu</renderMode>
+        <renderMode>cpu</renderMode>
     </initialWindow>
 
     <iPhone>

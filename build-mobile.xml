@@ -22,8 +22,9 @@
             <source-path path-element="${rknrl}/common/common-client/src/main/flex"/>
             <source-path path-element="${rknrl}/dto/dto-client/src/main/flex"/>
             <source-path path-element="${rknrl}/rmi/rmi-client/src/main/flex"/>
-            <source-path path-element="${rknrl}/social/social-client-base/src/main/flex"/>
-            <source-path path-element="${rknrl}/social/social-client-mobile/src/main/flex"/>
+            <source-path path-element="${aslog}/src"/>
+            <source-path path-element="${asocial}/base/src"/>
+            <source-path path-element="${asocial}/mobile/src"/>
 
             <source-path path-element="${castles}/client/client-base/src/main/flex"/>
             <source-path path-element="${castles}/client/client-mobile/src/main/flex"/>
@@ -51,7 +52,6 @@
         <copy todir="target">
             <fileset dir="${castles}/client/client-mobile/src/main/resources" includes="icons_android/"/>
             <file name="${payments.ane}/OpenIAB.ane"/>
-            <file name="${facebook.ane}/AirFacebook.ane"/>
             <file name="${deviceid.ane}/DeviceId.ane"/>
         </copy>
 
@@ -77,7 +77,6 @@
             <fileset dir="${castles}/client/client-mobile/src/main/resources/icons_ios"/>
             <fileset dir="${castles}/client/client-mobile/src/main/resources/splash"/>
             <file name="${payments.ane}/OpenIAB.ane"/>
-            <file name="${facebook.ane}/AirFacebook.ane"/>
             <file name="${deviceid.ane}/DeviceId.ane"/>
         </copy>
 

@@ -15,8 +15,9 @@
                 <source-path path-element="${rknrl}/common/common-client/src/main/flex"/>
                 <source-path path-element="${rknrl}/dto/dto-client/src/main/flex"/>
                 <source-path path-element="${rknrl}/rmi/rmi-client/src/main/flex"/>
-                <source-path path-element="${rknrl}/social/social-client-base/src/main/flex"/>
-                <source-path path-element="${rknrl}/social/social-client-web/src/main/flex"/>
+                <source-path path-element="${aslog}/src"/>
+                <source-path path-element="${asocial}/base/src"/>
+                <source-path path-element="${asocial}/web/src"/>
 
                 <source-path path-element="${castles}/client/client-base/src/main/flex"/>
                 <source-path path-element="${castles}/client/client-web/src/main/flex"/>
