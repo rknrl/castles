@@ -14,6 +14,7 @@ import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.Bot
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi.B2C.AdminOnline
@@ -207,6 +208,13 @@ class MatchMaking(interval: FiniteDuration,
         .setAccounts(accountIdToAccountRef.size)
         .setGames(gameRefToGameInfo.size)
         .build())
+
+    /** from Admin */
+    case Database.AccountDeleted(dto) ⇒
+      log.debug("AccountDeleted")
+      val accountId = new AccountId(dto)
+      if (accountIdToAccountRef.contains(accountId))
+        accountIdToAccountRef(accountId) ! DuplicateAccount
 
     /** Аккаунт спрашивает находится ли он сейчас в игре?
       * В ответ отправляем InGameResponse

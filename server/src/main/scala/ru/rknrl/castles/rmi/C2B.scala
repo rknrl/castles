@@ -12,7 +12,7 @@ import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.AccountDTO.{BuyBuildingDTO, BuyItemDTO, RemoveBuildingDTO, UpgradeBuildingDTO, UpgradeSkillDTO}
 import ru.rknrl.dto.AdminDTO._
 import ru.rknrl.dto.AuthDTO.AuthenticateDTO
-import ru.rknrl.dto.CommonDTO.TutorStateDTO
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO}
 import ru.rknrl.dto.GameDTO._
 
 object C2B {
@@ -79,4 +79,5 @@ object C2B {
 
   case class SetSlot(dto: AdminSetSlotDTO) extends Msg(124)
 
+  case class DeleteAccount(accountId: AccountIdDTO) extends Msg(125)
 }

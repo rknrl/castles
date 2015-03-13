@@ -39,6 +39,11 @@ object Database {
   /** Ответом будет List[TopItem] */
   case object GetTop
 
+  /** Ответом будет AccountDeleted */
+  case class DeleteAccount(accountId: AccountIdDTO)
+
+  case class AccountDeleted(accountId: AccountIdDTO)
+
   /** Ответом будет AccountStateResponse или AccountNoExists */
   case class GetAccountState(accountId: AccountIdDTO)
 
@@ -93,6 +98,22 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor wit
         }
       )
 
+    case DeleteAccount(accountId) ⇒
+      val ref = sender()
+      pool.sendPreparedStatement("DELETE FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
+        queryResult ⇒
+          if (queryResult.rowsAffected == 1)
+            pool.sendPreparedStatement("DELETE FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
+              queryResult ⇒
+                if (queryResult.rowsAffected == 1)
+                  ref ! AccountDeleted(accountId)
+                else
+                  log.error("Delete tutor state: invalid rows affected count " + queryResult)
+            )
+          else
+            log.error("Delete account: invalid rows affected count " + queryResult)
+      )
+
     case Insert(accountId, accountState, userInfo, tutorState) ⇒
       val ref = sender()
 
@@ -101,9 +122,9 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor wit
           if (queryResult.rowsAffected == 1)
             pool.sendPreparedStatement("INSERT INTO tutor_state (id,state) VALUES (?,?);", Seq(accountId.toByteArray, tutorState.toByteArray)).map(
               queryResult ⇒
-                if (queryResult.rowsAffected == 1) {
+                if (queryResult.rowsAffected == 1)
                   ref ! AccountStateResponse(accountId, accountState)
-                } else
+                else
                   log.error("Insert tutor state: invalid rows affected count " + queryResult)
             )
           else
@@ -143,9 +164,9 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor wit
       pool.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
-            if (resultSet.size == 0) {
+            if (resultSet.size == 0)
               ref ! AccountNoExists
-            } else if (resultSet.size == 1) {
+            else if (resultSet.size == 1) {
               val row: RowData = resultSet.head
 
               val byteArray = row("state").asInstanceOf[Array[Byte]]

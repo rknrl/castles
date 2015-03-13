@@ -65,6 +65,13 @@ class Admin(database: ActorRef,
       log.debug("C2B.GetAccountState")
       database ! Database.GetAccountState(dto.getAccountId)
 
+    case C2B.DeleteAccount(accountId) ⇒
+      log.debug("C2B.DeleteAccount")
+      database ! Database.DeleteAccount(accountId)
+
+    case msg: Database.AccountDeleted ⇒
+      matchmaking forward msg
+
     case GetOnline ⇒
       log.debug("GetOnline")
       matchmaking ! GetOnline
