@@ -16,22 +16,29 @@ public class Unit {
     private var startTime:int;
     private var speed:Number;
 
-    public function Unit(id:UnitIdDTO, startPos:Point, endPos:Point, startTime:int, speed:Number) {
+    public function Unit(id:UnitIdDTO, startPos:Point, endPos:Point, startTime:int, speed:Number, count:int) {
         _id = id;
         this.endPos = endPos;
-        update(startTime, startPos, speed);
+        update(startTime, startPos, speed, count);
     }
 
-    public function update(startTime:int, startPos:Point, speed:Number):void {
+    public function update(startTime:int, startPos:Point, speed:Number, count:int):void {
         this.startTime = startTime;
         this.startPos = startPos;
         this.speed = speed;
+        this._count = count;
     }
 
     private var _id:UnitIdDTO;
 
     public function get id():UnitIdDTO {
         return _id;
+    }
+
+    private var _count:int;
+
+    public function get count():int {
+        return _count;
     }
 
     private function get duration():int {

@@ -109,7 +109,7 @@ public class GameController {
         fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
         tornadoes = new Tornadoes(view.area.tornadoes);
         volcanoes = new Volcanoes(view.area.volcanoes);
-        units = new Units(view.area.units);
+        units = new Units(view.area.units, view.area.blood);
         arrows = new Arrows(view.area.arrows);
         tornadoPath = new TornadoPath(view.area.tornadoPath);
         magicItems = new MagicItems(view.magicItems);
@@ -326,7 +326,7 @@ public class GameController {
         gameOver(e.gameOver);
     }
 
-    private var isGameOver: Boolean;
+    private var isGameOver:Boolean;
 
     private function gameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {

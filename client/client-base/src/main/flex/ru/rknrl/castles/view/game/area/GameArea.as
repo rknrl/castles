@@ -14,6 +14,7 @@ import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
+import ru.rknrl.castles.view.game.area.units.BloodView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.castles.view.game.area.volcanoes.VolcanoesView;
 import ru.rknrl.dto.BuildingIdDTO;
@@ -43,6 +44,12 @@ public class GameArea extends Sprite {
 
     public function get ground():Ground {
         return _ground;
+    }
+
+    private var _blood:BloodView;
+
+    public function get blood():BloodView {
+        return _blood;
     }
 
     private var _volcanoes:VolcanoesView;
@@ -97,6 +104,7 @@ public class GameArea extends Sprite {
         _h = h;
         _v = v;
         addChild(_ground = new Ground(h, v));
+        addChild(_blood = new BloodView());
         addChild(_volcanoes = new VolcanoesView());
         addChild(_arrows = new ArrowsView());
         addChild(_units = new UnitsView());
