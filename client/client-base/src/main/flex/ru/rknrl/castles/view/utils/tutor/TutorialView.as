@@ -96,6 +96,12 @@ public class TutorialView extends TutorialViewBase {
         return new Move(points, _cursor, duration)
     }
 
+    protected function get clearItemsLayer():ITutorCommand {
+        return exec(function ():void {
+            while (_itemsLayer.numChildren) _itemsLayer.removeChildAt(0)
+        });
+    }
+
     protected function get open():ITutorCommand {
         return exec(startOpen);
     }

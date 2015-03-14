@@ -61,13 +61,13 @@ public class GameTutorialView extends TutorialView {
             textField.x = layout.screenCenterX - textField.width / 2;
             const areaHeight:Number = _areaV * CellSize.SIZE.id() / 2 * layout.scale;
             textField.y = _areaPos.y + areaHeight - textField.height / 2;
-            addChild(textField);
+            itemsLayer.addChild(textField);
         });
     }
 
     private function get removeText():ITutorCommand {
         return exec(function ():void {
-            removeChild(textField);
+            itemsLayer.removeChild(textField);
         });
     }
 
@@ -241,7 +241,8 @@ public class GameTutorialView extends TutorialView {
             open,
             addText("У тебя 3 противника"),
             loopUntilClick(loop),
-            removeText
+            removeText,
+            clearItemsLayer
         ]);
     }
 
