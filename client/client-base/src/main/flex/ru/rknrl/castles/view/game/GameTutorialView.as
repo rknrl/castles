@@ -11,6 +11,7 @@ import flash.events.Event;
 import flash.text.TextField;
 import flash.utils.getTimer;
 
+import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.points.Points;
@@ -25,7 +26,6 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerIdDTO;
@@ -41,7 +41,7 @@ public class GameTutorialView extends TutorialView {
     private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
 
-    public function GameTutorialView(layout:Layout, locale: CastlesLocale, deviceFactory:DeviceFactory, loadImageManager:ILoadImageManager) {
+    public function GameTutorialView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory, loadImageManager:ILoadImageManager) {
         super(layout, deviceFactory);
         this.locale = locale;
         this.loadImageManager = loadImageManager;
@@ -132,7 +132,7 @@ public class GameTutorialView extends TutorialView {
         clickItemAndCast(ItemType.ASSISTANCE, buildingPos, "Вызывай подмогу");
     }
 
-    public function playSelfBuildings(buildings:Vector.<BuildingDTO>, playerInfo:PlayerInfo):void {
+    public function playSelfBuildings(buildings:Vector.<Building>, playerInfo:PlayerInfo):void {
         var buildingsView:BuildingsView;
 
         function addBuildings():void {
@@ -145,8 +145,8 @@ public class GameTutorialView extends TutorialView {
             buildingsView.y = _areaPos.y;
             addChild(buildingsView);
 
-            for each(var b:BuildingDTO in buildings) {
-                buildingsView.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(true, ownerId), b.population, b.strengthened, Point.fromDto(b.pos));
+            for each(var b:Building in buildings) {
+                buildingsView.addBuilding(b.id, b.buildingType, b.buildingLevel, new BuildingOwner(true, ownerId), b.population, b.strengthened, b.pos);
             }
         }
 
@@ -182,7 +182,7 @@ public class GameTutorialView extends TutorialView {
         ]);
     }
 
-    public function playEnemyBuildings(buildings:Vector.<Vector.<BuildingDTO>>, playerInfos:Vector.<PlayerInfo>):void {
+    public function playEnemyBuildings(buildings:Vector.<Vector.<Building>>, playerInfos:Vector.<PlayerInfo>):void {
         var buildingsView:BuildingsView;
         var i:int = 0;
 
@@ -196,8 +196,8 @@ public class GameTutorialView extends TutorialView {
             buildingsView.y = _areaPos.y;
             addChild(buildingsView);
 
-            for each(var b:BuildingDTO in buildings[i]) {
-                buildingsView.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(true, ownerId), b.population, b.strengthened, Point.fromDto(b.pos));
+            for each(var b:Building in buildings[i]) {
+                buildingsView.addBuilding(b.id, b.buildingType, b.buildingLevel, new BuildingOwner(true, ownerId), b.population, b.strengthened, b.pos);
             }
             i++;
         }

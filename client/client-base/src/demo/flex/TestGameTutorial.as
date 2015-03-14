@@ -15,6 +15,7 @@ import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;
 
 import ru.rknrl.castles.model.DtoMock;
+import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -90,10 +91,10 @@ public class TestGameTutorial extends Sprite {
         throw new Error("can't find building " + id);
     }
 
-    private function buildingsByOwner(ownerId:int):Vector.<BuildingDTO> {
-        const result:Vector.<BuildingDTO> = new <BuildingDTO>[];
+    private function buildingsByOwner(ownerId:int):Vector.<Building> {
+        const result:Vector.<Building> = new <Building>[];
         for each(var b:BuildingDTO in buildings) {
-            if (b.hasOwner && b.owner.id == ownerId) result.push(b);
+            if (b.hasOwner && b.owner.id == ownerId) result.push(Building.fromDto(b));
         }
         return result;
     }
@@ -109,7 +110,7 @@ public class TestGameTutorial extends Sprite {
                 break;
             case Keyboard.NUMBER_2:
                 gameView.tutor.playEnemyBuildings(
-                        new <Vector.<BuildingDTO>>[
+                        new <Vector.<Building>>[
                             buildingsByOwner(1),
                             buildingsByOwner(2),
                             buildingsByOwner(3)

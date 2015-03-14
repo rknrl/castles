@@ -118,11 +118,12 @@ public class GameController {
 
         for each(var slotsPos:SlotsPosDTO in gameState.slots) view.area.addSlots(slotsPos);
 
-        var buildingList:Vector.<Building> = new <Building>[];
+        const buildingList:Vector.<Building> = new <Building>[];
         for each(var b:BuildingDTO in gameState.buildings) {
+            buildingList.push(Building.fromDto(b));
+
             const owner:BuildingOwner = new BuildingOwner(b.hasOwner, b.owner);
-            const pos:Point = new Point(b.pos.x, b.pos.y);
-            buildingList.push(new Building(b.id, pos, owner, b.strengthened));
+            const pos:Point = Point.fromDto(b.pos);
             view.area.addBuilding(b.id, b.building.type, b.building.level, owner, b.population, b.strengthened, pos);
         }
         buildings = new Buildings(buildingList);
@@ -189,7 +190,11 @@ public class GameController {
 
         if (time - tutorLastTime > tutorInterval && !isGameOver && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
             tutorLastTime = time;
-            if (!tutorState.arrow)
+            if (!tutorState.selfBuildings)
+                playSelfBuildingsTutor();
+            else if (!tutorState.enemyBuildings)
+                playEnemyBuildingsTutor();
+            else if (!tutorState.arrow)
                 playArrowTutor();
             else if (!tutorState.arrows && buildings.getSelfBuildingsPos(selfId))
                 playArrowsTutor();
@@ -286,7 +291,7 @@ public class GameController {
 
     private function updateBuilding(dto:BuildingUpdateDTO):void {
         const owner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
-        buildings.byId(dto.id).update(owner, dto.strengthened);
+        buildings.byId(dto.id).update(owner, dto.population, dto.strengthened);
 
         view.area.setBuildingCount(dto.id, dto.population);
         view.area.setBuildingOwner(dto.id, owner);
@@ -368,8 +373,7 @@ public class GameController {
                 if (tornadoPath.points.length >= 2) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
-                        server.updateTutorState(tutorState);
-                        tutorLastTime = getTimer();
+                        sendTutorState();
                     }
 
                     const gameState:CastTorandoDTO = new CastTorandoDTO();
@@ -395,14 +399,12 @@ public class GameController {
                         if (filteredIds.length > 1 && tutorState.arrow) {
                             if (!tutorState.arrows) {
                                 tutorState.arrows = true;
-                                server.updateTutorState(tutorState);
-                                tutorLastTime = getTimer();
+                                sendTutorState();
                             }
                         } else {
                             if (!tutorState.arrow) {
                                 tutorState.arrow = true;
-                                server.updateTutorState(tutorState);
-                                tutorLastTime = getTimer();
+                                sendTutorState();
                             }
                         }
 
@@ -423,8 +425,7 @@ public class GameController {
             case ItemType.FIREBALL:
                 if (!tutorState.fireball) {
                     tutorState.fireball = true;
-                    server.updateTutorState(tutorState);
-                    tutorLastTime = getTimer();
+                    sendTutorState();
                 }
 
                 server.castFireball(mousePos.dto());
@@ -435,8 +436,7 @@ public class GameController {
                 if (strBuilding) {
                     if (!tutorState.strengthened) {
                         tutorState.strengthened = true;
-                        server.updateTutorState(tutorState);
-                        tutorLastTime = getTimer();
+                        sendTutorState();
                     }
 
                     server.castStrengthening(strBuilding.id);
@@ -446,8 +446,7 @@ public class GameController {
             case ItemType.VOLCANO:
                 if (!tutorState.volcano) {
                     tutorState.volcano = true;
-                    server.updateTutorState(tutorState);
-                    tutorLastTime = getTimer();
+                    sendTutorState();
                 }
 
                 server.castVolcano(mousePos.dto());
@@ -461,8 +460,7 @@ public class GameController {
                 if (building) {
                     if (!tutorState.assistance) {
                         tutorState.assistance = true;
-                        server.updateTutorState(tutorState);
-                        tutorLastTime = getTimer();
+                        sendTutorState();
                     }
 
                     server.castAssistance(building.id);
@@ -473,6 +471,11 @@ public class GameController {
     }
 
     // tutor
+
+    private function sendTutorState():void {
+        server.updateTutorState(tutorState);
+        tutorLastTime = getTimer();
+    }
 
     private function playFireballTutor():void {
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
@@ -506,6 +509,23 @@ public class GameController {
         if (buildingPos) {
             view.tutor.playStrengthening(buildingPos);
         }
+    }
+
+    private function playSelfBuildingsTutor():void {
+        view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayerInfo()));
+
+        tutorState.selfBuildings = true;
+        sendTutorState();
+    }
+
+    private function playEnemyBuildingsTutor():void {
+        const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayerInfos();
+        const ids:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
+        for each(var playerInfo:PlayerDTO in playerInfos) ids.push(playerInfo.id);
+        view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(ids), PlayerInfo.fromDtoVector(playerInfos));
+
+        tutorState.enemyBuildings = true;
+        sendTutorState();
     }
 
     private function playArrowTutor():void {

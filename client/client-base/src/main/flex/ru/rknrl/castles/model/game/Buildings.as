@@ -42,12 +42,24 @@ public class Buildings {
 
     // tutorial:
 
-    private function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
-        const selfBuildings:Vector.<Building> = new <Building>[];
+    private function getBuildingsById(id:PlayerIdDTO):Vector.<Building> {
+        const result:Vector.<Building> = new <Building>[];
         for each(var building:Building in buildings) {
-            if (building.owner.equalsId(selfId)) selfBuildings.push(building);
+            if (building.owner.equalsId(id)) result.push(building);
         }
-        return selfBuildings;
+        return result;
+    }
+
+    public function getEnemyBuildings(ids:Vector.<PlayerIdDTO>):Vector.<Vector.<Building>> {
+        const result: Vector.<Vector.<Building>> = new <Vector.<Building>>[];
+        for each(var id: PlayerIdDTO in ids) {
+            result.push(getBuildingsById(id));
+        }
+        return result;
+    }
+
+    public function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
+        return getBuildingsById(selfId);
     }
 
     public function getSelfBuildingPos(selfId:PlayerIdDTO):Point {

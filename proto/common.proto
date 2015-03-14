@@ -99,6 +99,8 @@ message TutorStateDTO {
     optional bool tornado = 11;
     optional bool assistance = 12;
     optional bool strengthened = 13;
+    optional bool selfBuildings = 14;
+    optional bool enemyBuildings = 15;
 }
 
 enum SlotId {
