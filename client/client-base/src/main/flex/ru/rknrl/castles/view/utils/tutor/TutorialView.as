@@ -17,6 +17,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
+import ru.rknrl.castles.view.utils.tutor.commands.LoopUntilClick;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorCommandQueue;
 import ru.rknrl.castles.view.utils.tutor.commands.Wait;
@@ -128,6 +129,10 @@ public class TutorialView extends TutorialViewBase {
 
     protected function get mouseUp():ITutorCommand {
         return exec(_cursorHalo.mouseUp);
+    }
+
+    protected function loopUntilClick(commands:Vector.<ITutorCommand>):ITutorCommand {
+        return new LoopUntilClick(commands, this);
     }
 
     protected function get waitForClick():ITutorCommand {
