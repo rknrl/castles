@@ -119,7 +119,7 @@ public class GameTutorialView extends TutorialView {
     }
 
     public function playFireball(buildingPos:Point):void {
-        clickItemAndCast(ItemType.FIREBALL, buildingPos, "Запусти фаерболл в противника");
+        clickItemAndCast(ItemType.FIREBALL, buildingPos, "Запусти фаербол в противника");
     }
 
     public function playVolcano(buildingPos:Point):void {
@@ -269,7 +269,7 @@ public class GameTutorialView extends TutorialView {
         play(new <ITutorCommand>[
             showCursor,
             open,
-            addText("Захвати все домики противников чтобы выиграть"),
+            addText("Можно отправлять отряды сразу из нескольких домиков"),
             tween(screenCorner, toGlobal(startBuildingPos1)),
             mouseDown,
             wait(400),
@@ -288,6 +288,16 @@ public class GameTutorialView extends TutorialView {
             wait(400),
             removeText,
             waitForClick
+        ]);
+    }
+
+    public function playWin():void {
+        play(new <ITutorCommand>[
+            hideCursor,
+            open,
+            addText("Захвати все домики противников, чтобы выиграть"),
+            waitForClick,
+            removeText
         ]);
     }
 

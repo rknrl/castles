@@ -398,6 +398,7 @@ public class GameController {
                         if (filteredIds.length > 1 && tutorState.arrow) {
                             if (!tutorState.arrows) {
                                 tutorState.arrows = true;
+                                onArrowsTutorComplete();
                                 sendTutorState();
                             }
                         } else {
@@ -469,22 +470,91 @@ public class GameController {
         }
     }
 
-    // tutor
+    //----------------------------------------------
+    //
+    // TUTOR
+    //
+    //----------------------------------------------
 
     private function sendTutorState():void {
         server.updateTutorState(tutorState);
         tutorLastTime = getTimer();
     }
 
+    // Твои домики желтого цвета
+
+    private function playSelfBuildingsTutor():void {
+        view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayerInfo()));
+        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsComplete);
+    }
+
+    private function onSelfBuildingsComplete(e:Event):void {
+        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsComplete);
+
+        tutorState.selfBuildings = true;
+        sendTutorState();
+
+        if (!tutorState.enemyBuildings) playEnemyBuildingsTutor();
+    }
+
+    // У тебя 3 противника
+
+    private function playEnemyBuildingsTutor():void {
+        const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayerInfos();
+        const ids:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
+        for each(var playerInfo:PlayerDTO in playerInfos) ids.push(playerInfo.id);
+        view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(ids), PlayerInfo.fromDtoVector(playerInfos));
+        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsComplete);
+    }
+
+    private function onEnemyBuildingsComplete(e:Event):void {
+        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsComplete);
+
+        tutorState.enemyBuildings = true;
+        sendTutorState();
+    }
+
+    // Отправляй отряды и захватывай чужие домики
+
+    private function playArrowTutor():void {
+        const startPos:Point = buildings.getSelfBuildingPos(selfId);
+        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playArrow(startPos, endPos);
+    }
+
+    // Можно отправлять отряды сразу из нескольких домиков
+
+    private function playArrowsTutor():void {
+        const startPos:Vector.<Point> = buildings.getSelfBuildingsPos(selfId);
+        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
+        view.tutor.playArrows(startPos[0], startPos[1], endPos);
+    }
+
+    private function onArrowsTutorComplete():void {
+        playWinTutor();
+    }
+
+    // Захвати все домики противников, чтобы выиграть
+
+    private function playWinTutor():void {
+        view.tutor.playWin();
+    }
+
+    // Запусти фаербол в противника
+
     private function playFireballTutor():void {
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playFireball(buildingPos);
     }
 
+    // Создай вулкан под башней противника
+
     private function playVolcanoTutor():void {
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playVolcano(buildingPos);
     }
+
+    // Используй торнадо против противника
 
     private function playTornadoTutor():void {
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
@@ -498,10 +568,7 @@ public class GameController {
         view.tutor.playTornado(points);
     }
 
-    private function playAssistanceTutor():void {
-        const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
-        view.tutor.playAssistance(buildingPos);
-    }
+    // Усилить свой домик
 
     private function playStrengthenedTutor():void {
         const buildingPos:Point = buildings.getUnstrengthenedSelfBuildingPos(selfId);
@@ -510,45 +577,11 @@ public class GameController {
         }
     }
 
-    private function playSelfBuildingsTutor():void {
-        view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayerInfo()));
-        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsPlayed);
-    }
+    // Вызывай подмогу
 
-    private function onSelfBuildingsPlayed(e:Event):void {
-        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsPlayed);
-
-        tutorState.selfBuildings = true;
-        sendTutorState();
-
-        if (!tutorState.enemyBuildings) playEnemyBuildingsTutor();
-    }
-
-    private function playEnemyBuildingsTutor():void {
-        const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayerInfos();
-        const ids:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
-        for each(var playerInfo:PlayerDTO in playerInfos) ids.push(playerInfo.id);
-        view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(ids), PlayerInfo.fromDtoVector(playerInfos));
-        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsPlayed);
-    }
-
-    private function onEnemyBuildingsPlayed(e:Event):void {
-        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsPlayed);
-
-        tutorState.enemyBuildings = true;
-        sendTutorState();
-    }
-
-    private function playArrowTutor():void {
-        const startPos:Point = buildings.getSelfBuildingPos(selfId);
-        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
-        view.tutor.playArrow(startPos, endPos);
-    }
-
-    private function playArrowsTutor():void {
-        const startPos:Vector.<Point> = buildings.getSelfBuildingsPos(selfId);
-        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
-        view.tutor.playArrows(startPos[0], startPos[1], endPos);
+    private function playAssistanceTutor():void {
+        const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
+        view.tutor.playAssistance(buildingPos);
     }
 }
 }
