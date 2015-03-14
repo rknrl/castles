@@ -38,22 +38,15 @@ public class TutorialViewBase extends Sprite {
         modalScreen.layout = _layout;
     }
 
-    protected final function openImpl():void {
-        if (visible) throw new Error("tutor already visible");
+    protected final function startOpen():void {
         visible = true;
-
         tweener.value = 0;
         tweener.nextValue = 1;
         updateTransition();
     }
 
-    protected final function closeImpl(event:Event = null):void {
+    protected final function startClose(event:Event = null):void {
         tweener.nextValue = 0;
-    }
-
-    private function closeImmediate():void {
-        if (!visible) throw new Error("tutor not visible");
-        visible = false;
     }
 
     public final function get playing():Boolean {
@@ -72,7 +65,9 @@ public class TutorialViewBase extends Sprite {
 
         if (modalScreen) alpha = tweener.value;
 
-        if (tweener.nextValue == 0 && tweener.value == 0 && visible) closeImmediate();
+        if (tweener.nextValue == 0 && tweener.value == 0 && visible) {
+            visible = false
+        }
     }
 }
 }

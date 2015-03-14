@@ -20,6 +20,7 @@ import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameView;
+import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
@@ -192,8 +193,6 @@ public class GameController {
             tutorLastTime = time;
             if (!tutorState.selfBuildings)
                 playSelfBuildingsTutor();
-            else if (!tutorState.enemyBuildings)
-                playEnemyBuildingsTutor();
             else if (!tutorState.arrow)
                 playArrowTutor();
             else if (!tutorState.arrows && buildings.getSelfBuildingsPos(selfId))
@@ -513,9 +512,16 @@ public class GameController {
 
     private function playSelfBuildingsTutor():void {
         view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayerInfo()));
+        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsPlayed);
+    }
+
+    private function onSelfBuildingsPlayed(e:Event):void {
+        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsPlayed);
 
         tutorState.selfBuildings = true;
         sendTutorState();
+
+        if (!tutorState.enemyBuildings) playEnemyBuildingsTutor();
     }
 
     private function playEnemyBuildingsTutor():void {
@@ -523,6 +529,11 @@ public class GameController {
         const ids:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
         for each(var playerInfo:PlayerDTO in playerInfos) ids.push(playerInfo.id);
         view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(ids), PlayerInfo.fromDtoVector(playerInfos));
+        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsPlayed);
+    }
+
+    private function onEnemyBuildingsPlayed(e:Event):void {
+        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsPlayed);
 
         tutorState.enemyBuildings = true;
         sendTutorState();

@@ -64,6 +64,10 @@ public class Points {
         }
         return new Points(result);
     }
+
+    public static function two(a:Point, b:Point):Points {
+        return new Points(new <Point>[a, b]);
+    }
 }
 }
 

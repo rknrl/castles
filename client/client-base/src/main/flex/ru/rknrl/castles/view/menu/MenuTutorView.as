@@ -47,6 +47,7 @@ public class MenuTutorView extends TutorialView {
 
         play(new <ITutorCommand>[
             wait(500),
+            showCursor,
             open,
             cursorPos(startPos),
             wait(500),
@@ -71,6 +72,7 @@ public class MenuTutorView extends TutorialView {
     private function tweenAndClick(clickPos:Point):void {
         play(new <ITutorCommand>[
             wait(500),
+            showCursor,
             open,
             tween(screenCorner, clickPos),
             wait(100),

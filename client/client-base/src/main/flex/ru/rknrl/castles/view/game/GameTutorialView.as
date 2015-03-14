@@ -59,7 +59,8 @@ public class GameTutorialView extends TutorialView {
             textField.text = text;
             textField.scaleX = textField.scaleY = layout.scale;
             textField.x = layout.screenCenterX - textField.width / 2;
-            textField.y = _areaPos.y + _areaV * CellSize.SIZE.id() / 2 - textField.height / 2;
+            const areaHeight:Number = _areaV * CellSize.SIZE.id() / 2 * layout.scale;
+            textField.y = _areaPos.y + areaHeight - textField.height / 2;
             addChild(textField);
         });
     }
@@ -102,6 +103,7 @@ public class GameTutorialView extends TutorialView {
         const pos:Point = layout.gameMagicItem(indexOf(itemType));
 
         play(new <ITutorCommand>[
+            showCursor,
             open,
             addText(text),
             tween(screenCorner, pos),
@@ -171,11 +173,12 @@ public class GameTutorialView extends TutorialView {
         }
 
         play(new <ITutorCommand>[
+            hideCursor,
             open,
             exec(addAvatar),
             exec(addBuildings),
             addText("Твои домики желтого цвета"),
-            wait(3000),
+            waitForClick,
             exec(removeAvatar),
             exec(removeBuildings),
             removeText
@@ -224,6 +227,7 @@ public class GameTutorialView extends TutorialView {
 
 
         const commands:Vector.<ITutorCommand> = new <ITutorCommand>[];
+        commands.push(hideCursor);
         commands.push(open);
         for each(var builds:* in buildings) {
             commands.push(exec(addAvatar));
@@ -235,11 +239,14 @@ public class GameTutorialView extends TutorialView {
             commands.push(removeText);
         }
 
+        commands.push(waitForClick);
+
         play(commands);
     }
 
     public function playArrow(startBuildingPos:Point, endBuildingPos:Point):void {
         play(new <ITutorCommand>[
+            showCursor,
             open,
             addText("Отправляй отряды и захватывай чужие домики"),
             tween(screenCorner, toGlobal(startBuildingPos)),
@@ -253,12 +260,14 @@ public class GameTutorialView extends TutorialView {
             mouseUp,
             exec(arrows.removeArrows),
             wait(400),
-            removeText
+            removeText,
+            waitForClick
         ]);
     }
 
     public function playArrows(startBuildingPos1:Point, startBuildingPos2:Point, endBuildingPos:Point):void {
         play(new <ITutorCommand>[
+            showCursor,
             open,
             addText("Захвати все домики противников чтобы выиграть"),
             tween(screenCorner, toGlobal(startBuildingPos1)),
@@ -277,7 +286,8 @@ public class GameTutorialView extends TutorialView {
             mouseUp,
             exec(arrows.removeArrows),
             wait(400),
-            removeText
+            removeText,
+            waitForClick
         ]);
     }
 
@@ -301,6 +311,7 @@ public class GameTutorialView extends TutorialView {
         }
 
         play(new <ITutorCommand>[
+            showCursor,
             open,
             addText("Используй торнадо против противника"),
             tween(screenCorner, pos),

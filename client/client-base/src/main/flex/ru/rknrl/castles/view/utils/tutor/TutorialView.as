@@ -20,8 +20,11 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorCommandQueue;
 import ru.rknrl.castles.view.utils.tutor.commands.Wait;
+import ru.rknrl.castles.view.utils.tutor.commands.WaitForClick;
 
 public class TutorialView extends TutorialViewBase {
+    public static const TUTOR_COMPLETE:String = "tutorComplete";
+
     private var _itemsLayer:Sprite;
 
     public function get itemsLayer():Sprite {
@@ -45,6 +48,7 @@ public class TutorialView extends TutorialViewBase {
         const cursorMC:DisplayObject = deviceFactory.cursor();
         cursorMC.alpha = 0.8;
         _cursor.addChild(cursorMC);
+        _cursor.visible = false;
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
         this.layout = layout;
@@ -67,7 +71,8 @@ public class TutorialView extends TutorialViewBase {
     private function onTutorComplete(event:Event = null):void {
         command.removeEventListener(Event.COMPLETE, onTutorComplete);
         command = null;
-        closeImpl();
+        startClose();
+        dispatchEvent(new Event(TUTOR_COMPLETE));
     }
 
     private function onEnterFrame(event:Event):void {
@@ -83,7 +88,7 @@ public class TutorialView extends TutorialViewBase {
     }
 
     protected function tween(a:Point, b:Point):ITutorCommand {
-        return new Move(new Points(new <Point>[a, b]), _cursor, duration)
+        return new Move(Points.two(a, b), _cursor, duration)
     }
 
     protected function tweenPath(points:Points):ITutorCommand {
@@ -91,13 +96,25 @@ public class TutorialView extends TutorialViewBase {
     }
 
     protected function get open():ITutorCommand {
-        return exec(openImpl);
+        return exec(startOpen);
     }
 
     protected function cursorPos(point:Point):ITutorCommand {
         return exec(function ():void {
             _cursor.x = point.x;
             _cursor.y = point.y;
+        });
+    }
+
+    protected function get showCursor():ITutorCommand {
+        return exec(function ():void {
+            _cursor.visible = true
+        });
+    }
+
+    protected function get hideCursor():ITutorCommand {
+        return exec(function ():void {
+            _cursor.visible = false
         });
     }
 
@@ -111,6 +128,10 @@ public class TutorialView extends TutorialViewBase {
 
     protected function get mouseUp():ITutorCommand {
         return exec(_cursorHalo.mouseUp);
+    }
+
+    protected function get waitForClick():ITutorCommand {
+        return new WaitForClick(this);
     }
 
     protected static function wait(duration:int):ITutorCommand {
