@@ -13,7 +13,7 @@ import akka.actor._
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
-import ru.rknrl.castles.bot.Bot
+import ru.rknrl.castles.bot.{Bot, BotTutor}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -49,7 +49,8 @@ object MatchMaking {
                   val items: Items,
                   val rating: Double,
                   val gamesCount: Int,
-                  val isBot: Boolean)
+                  val isBot: Boolean,
+                  val isTutor: Boolean)
 
   // admin -> matchmakin
 
@@ -130,8 +131,17 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
-    var sorted = orders.sortBy(_.rating)(Ordering.Double.reverse)
-    var createdGames = List.empty[GameInfo]
+    val (tutorOrders, notTutorOrders) = orders.span(_.isTutor)
+
+    if (tutorOrders.size > 0)
+      println("tutorOrders:" + tutorOrders.size)
+
+    if (notTutorOrders.size > 0)
+      println("notTutorOrders:" + notTutorOrders.size)
+
+    var createdGames = tutorOrders.map(order ⇒ createGameWithBot(big, playersCount, List(order), isTutor = true))
+
+    var sorted = notTutorOrders.sortBy(_.rating)(Ordering.Double.reverse)
 
     while (sorted.size > playersCount) {
       createdGames = createdGames :+ createGame(big, sorted.take(playersCount))
@@ -139,14 +149,14 @@ class MatchMaking(interval: FiniteDuration,
     }
 
     if (sorted.size > 0)
-      createdGames = createdGames :+ createGameWithBot(big, playersCount, sorted)
+      createdGames = createdGames :+ createGameWithBot(big, playersCount, sorted, isTutor = false)
 
     createdGames
   }
 
   val botIdIterator = new BotIdIterator
 
-  def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder]) = {
+  def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder], isTutor: Boolean) = {
     val botsCount = if (big) playerCount - orders.size else playerCount - orders.size
     assert(botsCount >= 1, botsCount)
 
@@ -155,8 +165,9 @@ class MatchMaking(interval: FiniteDuration,
 
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
-      val bot = context.actorOf(Props(classOf[Bot], accountId, gameConfig), accountId.id)
-      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true)
+      val botClass = if (isTutor) classOf[BotTutor] else classOf[Bot]
+      val bot = context.actorOf(Props(botClass, accountId, gameConfig), accountId.id)
+      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }

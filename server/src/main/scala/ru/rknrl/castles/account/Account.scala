@@ -129,7 +129,7 @@ class Account(matchmaking: ActorRef,
         client ! authenticated(searchOpponents = true, None, top, tutorState)
         context become enterGame
       } else if (state.gamesCount == 0) {
-        placeGameOrder(); // При первом заходе сразу попадаем в бой
+        placeGameOrder(isTutor = true); // При первом заходе сразу попадаем в бой
         client ! authenticated(searchOpponents = true, None, top, tutorState)
         context become enterGame
       } else {
@@ -175,7 +175,7 @@ class Account(matchmaking: ActorRef,
 
     case EnterGame ⇒
       log.debug("EnterGame")
-      placeGameOrder()
+      placeGameOrder(isTutor = false)
       context become enterGame
   }
 
@@ -233,8 +233,8 @@ class Account(matchmaking: ActorRef,
       client ! CloseConnection
   }
 
-  def placeGameOrder() =
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false))
+  def placeGameOrder(isTutor: Boolean) =
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
 
   def connectToGame(game: ActorRef) = {
     game ! Game.Join(accountId, client)

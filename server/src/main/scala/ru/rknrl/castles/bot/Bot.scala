@@ -57,77 +57,80 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
-    case newGameState: GameState ⇒
-      gameState = Some(newGameState)
-      val time = newGameState.time
+    case newGameState: GameState ⇒ update(newGameState)
+  }
 
-      if (time - lastTime > interval) {
-        lastTime = time
+  def update(newGameState: GameState) = {
+    gameState = Some(newGameState)
+    val time = newGameState.time
 
-        val myBuildings = buildings.filter(my).toList
-        val fromBuildings = myBuildings.filter(_.population > 5)
+    if (time - lastTime > interval) {
+      lastTime = time
 
-        val enemyBuildings = buildings.filterNot(my).toList
+      val myBuildings = buildings.filter(my).toList
+      val fromBuildings = myBuildings.filter(_.population > 5)
 
-        if (fromBuildings.size > 0 && enemyBuildings.size > 0) {
+      val enemyBuildings = buildings.filterNot(my).toList
 
-          if (toBuildingId.isEmpty ||
-            my(gameState.get.buildings.map(toBuildingId.get)) ||
-            myBuildings.size < myBuildingsSize ||
-            time - toBuildingSetTime > timeout) {
+      if (fromBuildings.size > 0 && enemyBuildings.size > 0) {
 
-            val weights = buildingsToWeights(enemyBuildings, myBuildings)
-            val toBuildings = weights.toList.sortBy(_.weight).take(3)
+        if (toBuildingId.isEmpty ||
+          my(gameState.get.buildings.map(toBuildingId.get)) ||
+          myBuildings.size < myBuildingsSize ||
+          time - toBuildingSetTime > timeout) {
 
-            val friendly = Math.random() < 0.33
-            if (friendly) {
-              toBuildingId = Some(myBuildings.minBy(_.population).id)
-            } else {
-              val rnd = Math.floor(Math.random() * toBuildings.size).toInt
-              toBuildingId = Some(toBuildings(rnd).id)
-              toBuildingSetTime = time
-            }
+          val weights = buildingsToWeights(enemyBuildings, myBuildings)
+          val toBuildings = weights.toList.sortBy(_.weight).take(3)
+
+          val friendly = Math.random() < 0.33
+          if (friendly) {
+            toBuildingId = Some(myBuildings.minBy(_.population).id)
+          } else {
+            val rnd = Math.floor(Math.random() * toBuildings.size).toInt
+            toBuildingId = Some(toBuildings(rnd).id)
+            toBuildingSetTime = time
           }
+        }
 
-          myBuildingsSize = myBuildings.size
+        myBuildingsSize = myBuildings.size
 
-          sender ! Move(
-            MoveDTO.newBuilder()
-              .addAllFromBuildings(fromBuildings.map(_.id.dto).asJava)
-              .setToBuilding(toBuildingId.get.dto)
-              .build()
-          )
+        sender ! Move(
+          MoveDTO.newBuilder()
+            .addAllFromBuildings(fromBuildings.map(_.id.dto).asJava)
+            .setToBuilding(toBuildingId.get.dto)
+            .build()
+        )
 
-          if (time - lastCastTime > 10000) {
-            lastCastTime = time
+        if (time - lastCastTime > 10000) {
+          lastCastTime = time
 
-            val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState}
+          val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState}
 
-            val availableCast = items.filter(itemState ⇒
-              itemState.count > 0 &&
-                itemState.itemType != ItemType.TORNADO &&
-                newGameState.gameItems.canCast(playerId.get, itemState.itemType, config, time))
+          val availableCast = items.filter(itemState ⇒
+            itemState.count > 0 &&
+              itemState.itemType != ItemType.TORNADO &&
+              newGameState.gameItems.canCast(playerId.get, itemState.itemType, config, time))
 
-            if (availableCast.size > 0) {
-              val rnd = Math.floor(Math.random() * availableCast.size).toInt
-              val itemType = availableCast.toList(rnd).itemType
+          if (availableCast.size > 0) {
+            val rnd = Math.floor(Math.random() * availableCast.size).toInt
+            val itemType = availableCast.toList(rnd).itemType
 
-              val ownedEnemyBuildings = enemyBuildings.filter(_.owner.isDefined)
+            val ownedEnemyBuildings = enemyBuildings.filter(_.owner.isDefined)
 
-              itemType match {
-                case ItemType.FIREBALL ⇒
-                  sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
-                case ItemType.VOLCANO ⇒
-                  sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
-                case ItemType.STRENGTHENING ⇒
-                  sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
-                case ItemType.ASSISTANCE ⇒
-                  sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
-              }
+            itemType match {
+              case ItemType.FIREBALL ⇒
+                sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+              case ItemType.VOLCANO ⇒
+                sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+              case ItemType.STRENGTHENING ⇒
+                sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
+              case ItemType.ASSISTANCE ⇒
+                sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
             }
           }
         }
       }
+    }
   }
 
   def buildings = gameState.get.buildings.map.map { case (id, b) ⇒ b}
