@@ -9,6 +9,7 @@
 package ru.rknrl.castles.controller.game {
 import flash.events.Event;
 import flash.utils.getTimer;
+import flash.utils.setTimeout;
 
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
@@ -172,6 +173,7 @@ public class GameController {
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
 
+    private static const tutorDelay:int = 30000;
     private static const tutorInterval:int = 10000;
     private var tutorLastTime:int = -8000;
 
@@ -189,24 +191,23 @@ public class GameController {
             }
         }
 
-        if (time - tutorLastTime > tutorInterval && !isGameOver && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
-            tutorLastTime = time;
+        if (!isGameOver && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected) {
             if (!tutorState.selfBuildings)
                 playSelfBuildingsTutor();
-            else if (!tutorState.arrow)
-                playArrowTutor();
-            else if (!tutorState.arrows && buildings.getSelfBuildingsPos(selfId))
-                playArrowsTutor();
-            else if (!tutorState.fireball)
-                playFireballTutor();
-            else if (!tutorState.tornado)
-                playTornadoTutor();
-            else if (!tutorState.strengthened)
-                playStrengthenedTutor();
-            else if (!tutorState.volcano)
-                playVolcanoTutor();
-            else if (!tutorState.assistance)
-                playAssistanceTutor();
+            else if (time - winTutorTime > tutorDelay &&
+                    time - tutorLastTime > tutorInterval) {
+                tutorLastTime = time;
+                if (!tutorState.fireball)
+                    playFireballTutor();
+                else if (!tutorState.tornado)
+                    playTornadoTutor();
+                else if (!tutorState.strengthened)
+                    playStrengthenedTutor();
+                else if (!tutorState.volcano)
+                    playVolcanoTutor();
+                else if (!tutorState.assistance)
+                    playAssistanceTutor();
+            }
         }
     }
 
@@ -404,6 +405,7 @@ public class GameController {
                         } else {
                             if (!tutorState.arrow) {
                                 tutorState.arrow = true;
+                                onArrowTutorComplete();
                                 sendTutorState();
                             }
                         }
@@ -512,6 +514,8 @@ public class GameController {
 
         tutorState.enemyBuildings = true;
         sendTutorState();
+
+        playArrowTutor();
     }
 
     // Отправляй отряды и захватывай чужие домики
@@ -520,6 +524,10 @@ public class GameController {
         const startPos:Point = buildings.getSelfBuildingPos(selfId);
         const endPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playArrow(startPos, endPos);
+    }
+
+    private function onArrowTutorComplete():void {
+        setTimeout(playArrowsTutor, 3000); // todo на захват домика; повторять через интервал
     }
 
     // Можно отправлять отряды сразу из нескольких домиков
@@ -536,8 +544,16 @@ public class GameController {
 
     // Захвати все домики противников, чтобы выиграть
 
+    private var winTutorTime:int = int.MAX_VALUE;
+
     private function playWinTutor():void {
         view.tutor.playWin();
+        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onWinTutorComplete);
+    }
+
+    private function onWinTutorComplete(e:Event):void {
+        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onWinTutorComplete);
+        winTutorTime = getTimer();
     }
 
     // Запусти фаербол в противника
