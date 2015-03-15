@@ -218,7 +218,8 @@ public class ViewReport extends Sprite {
         const losers:Vector.<PlayerDTO> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
 
         view.removeSearchOpponentsScreen();
-        const gameView:GameView = view.addGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
+        const gameView:GameView = view.createGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
+        view.addGame();
         const buildings:Vector.<BuildingDTO> = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
         for each(var b:BuildingDTO in  buildings) {
             gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));

@@ -12,6 +12,7 @@ import flash.events.Event;
 import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.controller.game.GameController;
+import ru.rknrl.castles.controller.game.GameSplash;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -57,20 +58,40 @@ public class Controller {
 
         if (authenticated.searchOpponents) {
             view.hideMenu();
-            view.addSearchOpponentScreen();
+            if (!addGameSplash()) view.addSearchOpponentScreen();
         } else if (authenticated.hasGame) {
             view.hideMenu();
-            view.addLoadingScreen();
+            if (!addGameSplash()) view.addLoadingScreen();
             joinGame(authenticated.game);
         }
     }
 
+    private function addGameSplash():Boolean {
+        if (!tutorState.hasSelfBuildings) {
+            gameSplash = new GameSplash(view.addGameSplash());
+            gameSplash.addEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
+            return true;
+        }
+        return false;
+    }
+
     private function onPlay(event:Event):void {
         view.hideMenu();
-        view.addSearchOpponentScreen();
+        if (!addGameSplash()) view.addSearchOpponentScreen();
         server.enterGame();
     }
 
+    private function onGameSplashComplete(e:Event):void {
+        gameSplash.removeEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
+        view.removeGameSplash();
+        if (game) {
+            view.addGame();
+        } else {
+            view.addLoadingScreen();
+        }
+    }
+
+    private var gameSplash:GameSplash;
     private var game:GameController;
 
     private function onEnteredGame(e:EnteredGameEvent):void {
@@ -90,14 +111,17 @@ public class Controller {
 
         const gameState:GameStateDTO = e.gameState;
 
-        view.removeAnyLoadingScreen();
-
         const h:int = Math.round(gameState.width / CellSize.SIZE.id());
         const v:int = Math.round(gameState.height / CellSize.SIZE.id());
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
-        const gameView:GameView = view.addGame(playerInfos, h, v);
+        const gameView:GameView = view.createGame(playerInfos, h, v);
         game = new GameController(gameView, server, gameState, tutorState);
+
+        if (!gameSplash) {
+            view.removeAnyLoadingScreen();
+            view.addGame();
+        }
     }
 
     private function onLeavedGame(e:LeavedGameEvent):void {

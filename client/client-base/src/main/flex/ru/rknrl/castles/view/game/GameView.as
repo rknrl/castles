@@ -154,7 +154,7 @@ public class GameView extends Sprite {
     private static const shakeDuration:int = 200;
     private var shakeStartTime:int;
 
-    private function onShake(event: Event = null):void {
+    private function onShake(event:Event = null):void {
         shakeStartTime = getTimer();
     }
 

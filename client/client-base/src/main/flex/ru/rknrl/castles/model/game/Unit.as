@@ -49,5 +49,9 @@ public class Unit {
         const progress:Number = (time - startTime) / duration;
         return startPos.lerp(endPos, progress);
     }
+
+    public function needRemove(time: int):Boolean {
+        return time - startTime > duration;
+    }
 }
 }

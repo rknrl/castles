@@ -11,6 +11,7 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
+import ru.rknrl.castles.view.game.GameSplashView;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.ErrorScreen;
@@ -67,10 +68,14 @@ public class View extends Sprite {
 
     private var game:GameView;
 
-    public function addGame(playerInfos:Vector.<PlayerInfo>, h:int, v:int):GameView {
+    public function createGame(playerInfos:Vector.<PlayerInfo>, h:int, v:int):GameView {
         if (game) throw new Error("game already exists");
-        addChild(game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager, deviceFactory));
+        game = new GameView(playerInfos, h, v, _layout, locale, loadImageManager, deviceFactory);
         return game;
+    }
+
+    public function addGame():void {
+        addChild(game);
     }
 
     public function removeGame():void {
@@ -78,6 +83,20 @@ public class View extends Sprite {
         game.removeListeners();
         removeChild(game);
         game = null;
+    }
+
+    private var gameSplash:GameSplashView;
+
+    public function addGameSplash():GameSplashView {
+        if (gameSplash) throw new Error("game splash already exists");
+        addChild(gameSplash = new GameSplashView(_layout, locale, deviceFactory));
+        return gameSplash;
+    }
+
+    public function removeGameSplash():void {
+        if (!gameSplash) throw new Error("game splash don't exists");
+        removeChild(gameSplash);
+        gameSplash = null;
     }
 
     private var loadingScreen:LoadingScreen;

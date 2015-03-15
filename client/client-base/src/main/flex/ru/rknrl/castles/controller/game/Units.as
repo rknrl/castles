@@ -7,7 +7,6 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller.game {
-import flash.display.BitmapData;
 import flash.utils.getTimer;
 
 import ru.rknrl.Warning;
@@ -47,11 +46,10 @@ public class Units {
     }
 
     public function updateUnit(dto:UnitUpdateDTO):void {
-        var unit:Unit = getUnit(dto.id);
-        var newPos:Point = new Point(dto.pos.x, dto.pos.y);
+        const unit:Unit = getUnit(dto.id);
+        const newPos:Point = new Point(dto.pos.x, dto.pos.y);
+        if (unit.count > dto.count) bloodView.addBlood(newPos);
         unit.update(getTimer(), newPos, dto.speed, dto.count);
-
-        if (unit.count < dto.count) bloodView.addBlood(newPos);
         view.setUnitCount(dto.id, dto.count);
         view.setPos(dto.id.id, newPos);
     }
@@ -61,7 +59,7 @@ public class Units {
         const index:int = units.indexOf(unit);
         units.splice(index, 1);
         view.remove(id.id);
-        bloodView.addBlood(unit.pos(getTimer()));
+        bloodView.addBlood(unit.pos(getTimer())); // todo Не добавлять кровь при обычном входе в здание
     }
 
     public function update(time:int):void {

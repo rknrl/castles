@@ -71,7 +71,8 @@ public class TestGameTutorial extends Sprite {
         const h:int = layout is LayoutPortrait ? 11 : 15;
         playerInfos = layout is LayoutPortrait ? DtoMock.playerInfosPortrait() : DtoMock.playerInfosLandscape();
 
-        gameView = view.addGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
+        gameView = view.createGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
+        view.addGame();
         buildings = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
         for each(var b:BuildingDTO in  buildings) {
             gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
