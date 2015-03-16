@@ -144,7 +144,7 @@ class MatchMaking(interval: FiniteDuration,
     var sorted = notTutorOrders.sortBy(_.rating)(Ordering.Double.reverse)
 
     while (sorted.size > playersCount) {
-      createdGames = createdGames :+ createGame(big, sorted.take(playersCount))
+      createdGames = createdGames :+ createGame(big, sorted.take(playersCount), isTutor = false)
       sorted = sorted.drop(playersCount)
     }
 
@@ -172,7 +172,7 @@ class MatchMaking(interval: FiniteDuration,
       placeGameOrder(botOrder, bot)
     }
 
-    createGame(big, result)
+    createGame(big, result, isTutor)
   }
 
   def botItems(playerItems: Items) =
@@ -191,7 +191,7 @@ class MatchMaking(interval: FiniteDuration,
 
   val gameIdIterator = new GameIdIterator
 
-  def createGame(big: Boolean, orders: Iterable[GameOrder]) = {
+  def createGame(big: Boolean, orders: Iterable[GameOrder], isTutor: Boolean) = {
     log.debug("createGame")
     val playerIdIterator = new PlayerIdIterator
 
@@ -200,7 +200,7 @@ class MatchMaking(interval: FiniteDuration,
       playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.skills, order.items, isBot = order.isBot)
     }
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, gameConfig, self), gameIdIterator.next)
+    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, gameConfig, self), gameIdIterator.next)
 
     new GameInfo(game, orders)
   }

@@ -66,10 +66,10 @@ object PlayerState extends Enumeration {
  * Finish game:
  *
  * Когда все игроки перешли в состояние leaved отправляем Matchmaking сообщение GameOver, а он нам в ответ StopGame, удаляем актор игры
- *
  */
 class Game(players: Map[PlayerId, Player],
            big: Boolean,
+           isTutor: Boolean,
            config: GameConfig,
            matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
@@ -164,7 +164,7 @@ class Game(players: Map[PlayerId, Player],
 
   def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, config)
+  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, isTutor, config)
 
   var moveActions = Map[PlayerId, MoveDTO]()
   var fireballCasts = Map[PlayerId, PointDTO]()

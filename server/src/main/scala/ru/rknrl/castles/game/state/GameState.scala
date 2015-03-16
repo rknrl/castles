@@ -90,7 +90,7 @@ object GameState {
       new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
     }
 
-  def init(time: Long, players: List[Player], big: Boolean, config: GameConfig) = {
+  def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig) = {
     if (big)
       assert(players.size == 4)
     else
@@ -106,19 +106,24 @@ object GameState {
 
     val playersBuildings = getPlayerBuildings(players, playersSlotsPositions, buildingIdIterator, config)
 
-    val slotsIJs = GameArea.toIJs(playersSlotsPositions)
+    val buildings =
+      if (isTutor) {
+        playersBuildings ++ TutorMap.buildings(buildingIdIterator)
+      } else {
+        val slotsIJs = GameArea.toIJs(playersSlotsPositions)
 
-    val randomBuildings = if (big)
-      MapGenerator.getRandomBuildings(slotsIJs, Math.floor(gameArea.h / 2).toInt, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
-    else
-      MapGenerator.getRandomBuildings(slotsIJs, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
+        val randomBuildings = if (big)
+          MapGenerator.getRandomBuildings(slotsIJs, Math.floor(gameArea.h / 2).toInt, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
+        else
+          MapGenerator.getRandomBuildings(slotsIJs, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
 
-    val mirrorRandomBuildings = if (big)
-      mirrorBuildings4(gameArea, randomBuildings, buildingIdIterator)
-    else
-      mirrorBuildings2(gameArea, randomBuildings, buildingIdIterator)
+        val mirrorRandomBuildings = if (big)
+          mirrorBuildings4(gameArea, randomBuildings, buildingIdIterator)
+        else
+          mirrorBuildings2(gameArea, randomBuildings, buildingIdIterator)
 
-    val buildings = playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
+        playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
+      }
 
     val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 

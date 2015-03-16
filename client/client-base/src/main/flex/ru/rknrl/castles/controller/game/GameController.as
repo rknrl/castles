@@ -527,7 +527,7 @@ public class GameController {
     }
 
     private function onArrowTutorComplete():void {
-        setTimeout(playArrowsTutor, 3000); // todo на захват домика; повторять через интервал
+        setTimeout(playArrowsTutor, 3000); // todo повесить на захват домика; повторять через интервал
     }
 
     // Можно отправлять отряды сразу из нескольких домиков
