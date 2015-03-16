@@ -154,11 +154,12 @@ class Game(players: Map[PlayerId, Player],
       client ! all
     }
 
-  /** Отправить игрокам-ботам геймстейт */
-  def sendGameStateToBots() =
+  def sendGameStateToBots() = sendToBots(gameState)
+
+  def sendToBots(msg: Any) =
     for ((playerId, ref) ← `playerId→client`
          if players(playerId).isBot)
-      ref ! gameState
+      ref ! msg
 
   def senderPlayerId = `client→playerId`(sender)
 
@@ -278,6 +279,8 @@ class Game(players: Map[PlayerId, Player],
     case CastAssistance(buildingId: BuildingIdDTO) ⇒
       if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
 
+    case StartTutorGame ⇒
+      sendToBots(StartTutorGame)
   }
 
   def addLoser(playerId: PlayerId, place: Int) {

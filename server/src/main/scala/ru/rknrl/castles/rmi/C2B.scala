@@ -69,6 +69,8 @@ object C2B {
 
   case class CastAssistance(buildingId: BuildingIdDTO) extends GameMsg(120)
 
+  case object StartTutorGame extends GameMsg(126)
+
   // admin
 
   case class AddGold(dto: AdminAddGoldDTO) extends Msg(121)

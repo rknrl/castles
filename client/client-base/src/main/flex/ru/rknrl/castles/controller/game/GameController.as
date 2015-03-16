@@ -554,6 +554,7 @@ public class GameController {
     private function onWinTutorComplete(e:Event):void {
         view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onWinTutorComplete);
         winTutorTime = getTimer();
+        server.startTutorGame();
     }
 
     // Запусти фаербол в противника

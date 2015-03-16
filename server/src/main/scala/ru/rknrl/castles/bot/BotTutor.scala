@@ -12,9 +12,20 @@ import akka.actor.ActorLogging
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
+import ru.rknrl.castles.rmi.C2B.StartTutorGame
 
 class BotTutor(accountId: AccountId, config: GameConfig) extends Bot(accountId, config) with ActorLogging {
-  override def update(newGameState: GameState) = {
 
+  var active: Boolean = false
+
+  def tutorBotReceive: Receive = {
+    case StartTutorGame ⇒
+      active = true
+  }
+
+  override def receive = tutorBotReceive.orElse(super.receive)
+
+  override def update(newGameState: GameState) = {
+    if (active) super.update(newGameState)
   }
 }
