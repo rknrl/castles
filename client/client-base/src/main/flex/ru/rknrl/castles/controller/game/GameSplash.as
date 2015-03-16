@@ -77,10 +77,10 @@ public class GameSplash extends EventDispatcher {
     private function onMouseUp(event:MouseEvent):void {
         if (down) {
             down = false;
-            move = true;
             view.arrows.removeArrows();
 
             if (mousePos.distance(view.tower2Pos) < 32) {
+                move = true;
                 view.mouseEnabled = false;
 
                 const dto:UnitDTO = new UnitDTO();

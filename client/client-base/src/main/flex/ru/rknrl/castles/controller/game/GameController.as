@@ -296,7 +296,7 @@ public class GameController {
         const building:Building = buildings.byId(dto.id);
         const newOwner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
         const capture:Boolean = !building.owner.equals(selfOwner) &&
-                (building.population > dto.population || !building.owner.equals(newOwner));
+                (building.population > dto.population || newOwner.equals(selfOwner));
 
         if (capture) {
             if (firstGameTutorState.arrowUsed && !firstGameTutorState.arrowCapture) onArrowTutorComplete();
@@ -408,8 +408,11 @@ public class GameController {
                     }
 
                     if (filteredIds.length > 0) {
-                        firstGameTutorState.arrowUsed = !toBuilding.owner.equals(selfOwner);
-                        firstGameTutorState.arrowsUsed = filteredIds.length > 1 && !toBuilding.owner.equals(selfOwner);
+                        if (!firstGameTutorState.arrowUsed && !toBuilding.owner.equals(selfOwner))
+                            firstGameTutorState.arrowUsed = true;
+
+                        if (!firstGameTutorState.arrowsUsed && firstGameTutorState.arrowCapture && filteredIds.length > 1 && !toBuilding.owner.equals(selfOwner))
+                            firstGameTutorState.arrowsUsed = true;
 
                         const dto:MoveDTO = new MoveDTO();
                         dto.toBuilding = toBuilding.id;
@@ -501,9 +504,9 @@ public class GameController {
 
     private function playEnemyBuildingsTutor():void {
         const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayerInfos();
-        const ids:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
-        for each(var playerInfo:PlayerDTO in playerInfos) ids.push(playerInfo.id);
-        view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(ids), PlayerInfo.fromDtoVector(playerInfos));
+        const playerIds:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
+        for each(var playerInfo:PlayerDTO in playerInfos) playerIds.push(playerInfo.id);
+        view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(playerIds), PlayerInfo.fromDtoVector(playerInfos));
         view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsComplete);
     }
 
@@ -574,23 +577,25 @@ public class GameController {
 
     private function playTornadoTutor():void {
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
+        const points:Vector.<Point> = sin(buildingPos);
+        view.tutor.playTornado(points);
+    }
 
+    private static function sin(pos:Point):Vector.<Point> {
         const points:Vector.<Point> = new <Point>[];
         const deltaX:int = 200;
         const deltaY:int = 50;
         for (var x:int = 0; x < deltaX; x++) {
-            points.push(new Point(buildingPos.x - x, buildingPos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
+            points.push(new Point(pos.x - x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
         }
-        view.tutor.playTornado(points);
+        return points;
     }
 
     // Усилить свой домик
 
     private function playStrengthenedTutor():void {
-        const buildingPos:Point = buildings.getUnstrengthenedSelfBuildingPos(selfId);
-        if (buildingPos) {
-            view.tutor.playStrengthening(buildingPos);
-        }
+        const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
+        view.tutor.playStrengthening(buildingPos);
     }
 
     // Вызывай подмогу

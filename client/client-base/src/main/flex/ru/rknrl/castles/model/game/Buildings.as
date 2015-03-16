@@ -42,7 +42,7 @@ public class Buildings {
 
     // tutorial:
 
-    private function getBuildingsById(id:PlayerIdDTO):Vector.<Building> {
+    private function byPlayerId(id:PlayerIdDTO):Vector.<Building> {
         const result:Vector.<Building> = new <Building>[];
         for each(var building:Building in buildings) {
             if (building.owner.equalsId(id)) result.push(building);
@@ -50,38 +50,29 @@ public class Buildings {
         return result;
     }
 
-    public function getEnemyBuildings(ids:Vector.<PlayerIdDTO>):Vector.<Vector.<Building>> {
-        const result: Vector.<Vector.<Building>> = new <Vector.<Building>>[];
-        for each(var id: PlayerIdDTO in ids) {
-            result.push(getBuildingsById(id));
+    public function getEnemyBuildings(playerIds:Vector.<PlayerIdDTO>):Vector.<Vector.<Building>> {
+        const result:Vector.<Vector.<Building>> = new <Vector.<Building>>[];
+        for each(var id:PlayerIdDTO in playerIds) {
+            result.push(byPlayerId(id));
         }
         return result;
     }
 
     public function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
-        return getBuildingsById(selfId);
+        return byPlayerId(selfId);
     }
 
     public function getSelfBuildingPos(selfId:PlayerIdDTO):Point {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
-        if (selfBuildings.length < 1) throw new Error("getSelfBuildingPos: buildings.length=" + selfBuildings.length);
         return selfBuildings[0].pos;
     }
 
     public function getSelfBuildingsPos(selfId:PlayerIdDTO):Vector.<Point> {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
-        if (selfBuildings.length < 3) return null;
         return new <Point>[
             selfBuildings[1].pos,
             selfBuildings[2].pos
         ];
-    }
-
-    public function getUnstrengthenedSelfBuildingPos(selfId:PlayerIdDTO):Point {
-        for each(var building:Building in buildings) {
-            if (building.owner.equalsId(selfId) && !building.strengthened) return building.pos;
-        }
-        return null;
     }
 
     public function getEnemyBuildingPos(selfId:PlayerIdDTO):Point {
