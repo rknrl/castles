@@ -25,6 +25,7 @@ import ru.rknrl.dto.UnitIdDTO;
 
 public class GameSplash extends EventDispatcher {
     public static const GAME_SPLASH_COMPLETE:String = "gameSplashComplete";
+    private static const buildingRadius:int = 48;
 
     private var view:GameSplashView;
     private var unit:Unit;
@@ -32,7 +33,7 @@ public class GameSplash extends EventDispatcher {
     public function GameSplash(view:GameSplashView) {
         this.view = view;
         view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-        view.tower1.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+        view.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
     }
 
@@ -45,7 +46,11 @@ public class GameSplash extends EventDispatcher {
 
     private function onEnterFrame(event:Event):void {
         const time:int = getTimer();
-        if (!down && !move && time - lastTutorTime > tutorInterval) playArrow();
+        if (!down && !move && time - lastTutorTime > tutorInterval) {
+            view.playArrow();
+            lastTutorTime = time;
+        }
+
         view.arrows.orientArrows(mousePos);
 
         if (unit) {
@@ -61,17 +66,14 @@ public class GameSplash extends EventDispatcher {
         }
     }
 
-    public function playArrow():void {
-        view.playArrow();
-        lastTutorTime = getTimer();
-    }
-
     private var down:Boolean;
     private var move:Boolean;
 
     private function onMouseDown(event:MouseEvent):void {
-        down = true;
-        view.arrows.addArrow(new Point(view.tower1.x, view.tower1.y));
+        if (mousePos.distance(view.tower1Pos) < buildingRadius) {
+            down = true;
+            view.arrows.addArrow(view.tower1Pos);
+        }
     }
 
     private function onMouseUp(event:MouseEvent):void {
@@ -79,7 +81,7 @@ public class GameSplash extends EventDispatcher {
             down = false;
             view.arrows.removeArrows();
 
-            if (mousePos.distance(view.tower2Pos) < 32) {
+            if (mousePos.distance(view.tower2Pos) < buildingRadius) {
                 move = true;
                 view.mouseEnabled = false;
 

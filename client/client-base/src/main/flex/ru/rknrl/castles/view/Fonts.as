@@ -43,6 +43,7 @@ public class Fonts {
     public static const play:TextFormat = regular(24, Colors.darkGrey);
     public static const skillName:TextFormat = regular(18);
     public static const button:TextFormat = regular(18, 0xffffff);
+    public static const gameSplashText:TextFormat = regular(18, Colors.darkGrey);
 
     public static const gameAvatarPortrait:TextFormat = light(18);
     public static const gameAvatarLandscape:TextFormat = lightCenter(30);

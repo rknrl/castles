@@ -57,17 +57,23 @@ public class GameSplashView extends Sprite {
     }
 
     public function GameSplashView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory) {
+        mouseChildren = false;
+
         addChild(mouseHolder = new Bitmap(Colors.transparent));
         addChild(_units = new UnitsView());
         addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 7, false, new Point(0, 0)));
         addChild(_tower2 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(false), 3, false, new Point(0, 0)));
+
         addChild(_arrows = new ArrowsView());
         arrows.transform.colorTransform = Colors.transform(Colors.yellow);
+
         addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
-        addChild(titleTextField = createTextField(Fonts.title));
-        titleTextField.text = "Захвати свой первый домик";
-        addChild(textField = createTextField(Fonts.title));
-        textField.text = "Нажимай мышкой на желтый домик и не отпуская тащи на другой";
+        tutor.mouseEnabled = false;
+
+        addChild(titleTextField = createTextField(Fonts.gameSplashText));
+        titleTextField.text = "Захвати башню!";
+        addChild(textField = createTextField(Fonts.gameSplashText));
+        textField.text = "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
         this.layout = layout;
     }
 
@@ -92,13 +98,15 @@ public class GameSplashView extends Sprite {
         _tower2.x = tower2Pos.x;
         _tower2.y = tower2Pos.y;
 
+        const textHeight:Number = 24 * value.scale;
+        const gap:Number = 8 * value.scale;
         titleTextField.scaleX = titleTextField.scaleY = value.scale;
         titleTextField.x = value.screenCenterX - titleTextField.width / 2;
-        titleTextField.y = _layout.footerCenterY - 20 * value.scale;
+        titleTextField.y = _layout.footerCenterY - textHeight - gap / 2;
 
         textField.scaleX = textField.scaleY = value.scale;
         textField.x = value.screenCenterX - textField.width / 2;
-        textField.y = _layout.footerCenterY + 20 * value.scale;
+        textField.y = _layout.footerCenterY + gap / 2;
 
         tutor.layout = value;
     }
