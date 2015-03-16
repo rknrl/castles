@@ -73,6 +73,10 @@ public class TutorialView extends TutorialViewBase {
         command.removeEventListener(Event.COMPLETE, onTutorComplete);
         command = null;
         startClose();
+    }
+
+    override protected function close():void {
+        super.close();
         dispatchEvent(new Event(TUTOR_COMPLETE));
     }
 

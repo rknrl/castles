@@ -49,6 +49,10 @@ public class TutorialViewBase extends Sprite {
         tweener.nextValue = 0;
     }
 
+    protected function close(): void{
+        visible = false;
+    }
+
     public final function get playing():Boolean {
         return visible;
     }
@@ -65,9 +69,7 @@ public class TutorialViewBase extends Sprite {
 
         if (modalScreen) alpha = tweener.value;
 
-        if (tweener.nextValue == 0 && tweener.value == 0 && visible) {
-            visible = false
-        }
+        if (tweener.nextValue == 0 && tweener.value == 0 && visible) close()
     }
 }
 }
