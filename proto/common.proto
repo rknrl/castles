@@ -92,15 +92,12 @@ message TutorStateDTO {
 
     // game
 
-    optional bool arrow = 7;
-    optional bool arrows = 8;
-    optional bool fireball = 9;
-    optional bool volcano = 10;
-    optional bool tornado = 11;
-    optional bool assistance = 12;
-    optional bool strengthened = 13;
-    optional bool selfBuildings = 14;
-    optional bool enemyBuildings = 15;
+    optional bool firstGame = 7;
+    optional bool fireball = 8;
+    optional bool volcano = 9;
+    optional bool tornado = 10;
+    optional bool assistance = 11;
+    optional bool strengthened = 12;
 }
 
 enum SlotId {

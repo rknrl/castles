@@ -67,7 +67,7 @@ public class Controller {
     }
 
     private function addGameSplash():Boolean {
-        if (!tutorState.hasSelfBuildings) {
+        if (!tutorState.firstGame) {
             gameSplash = new GameSplash(view.addGameSplash());
             gameSplash.addEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
             return true;
