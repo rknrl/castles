@@ -11,13 +11,15 @@ import flash.events.Event;
 import flash.events.EventDispatcher;
 
 [Event(name="complete", type="flash.events.Event")]
-public class TutorCommandQueue extends EventDispatcher implements ITutorCommand {
+public class TutorSequenceCommands extends EventDispatcher implements ITutorCommand {
     private var commands:Vector.<ITutorCommand>;
     private var running:Boolean;
     private var completed:int;
+    private var loop:Boolean;
 
-    public function TutorCommandQueue(commands:Vector.<ITutorCommand>) {
+    public function TutorSequenceCommands(commands:Vector.<ITutorCommand>, loop:Boolean) {
         this.commands = commands;
+        this.loop = loop;
     }
 
     public function execute():void {
@@ -25,13 +27,20 @@ public class TutorCommandQueue extends EventDispatcher implements ITutorCommand 
         running = true;
         completed = 0;
 
+        if (loop) dispatchEvent(new Event(Event.COMPLETE));
+
         next();
     }
 
     private function next():void {
         if (isComplete) {
-            running = false;
-            dispatchEvent(new Event(Event.COMPLETE));
+            if (loop) {
+                completed = 0;
+                executeNext();
+            } else {
+                running = false;
+                dispatchEvent(new Event(Event.COMPLETE));
+            }
         } else {
             executeNext();
         }

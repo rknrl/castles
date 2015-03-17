@@ -17,9 +17,9 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.castles.view.utils.tutor.commands.LoopUntilClick;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
-import ru.rknrl.castles.view.utils.tutor.commands.TutorCommandQueue;
+import ru.rknrl.castles.view.utils.tutor.commands.TutorParallelCommands;
+import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
 import ru.rknrl.castles.view.utils.tutor.commands.Wait;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForClick;
 
@@ -64,7 +64,7 @@ public class TutorialView extends TutorialViewBase {
 
     protected function play(commands:Vector.<ITutorCommand>):void {
         if (command) throw new Error("tutor already playing");
-        command = new TutorCommandQueue(commands);
+        command = new TutorSequenceCommands(commands, false);
         command.addEventListener(Event.COMPLETE, onTutorComplete);
         command.execute();
     }
@@ -141,8 +141,16 @@ public class TutorialView extends TutorialViewBase {
         return exec(_cursorHalo.mouseUp);
     }
 
-    protected function loopUntilClick(commands:Vector.<ITutorCommand>):ITutorCommand {
-        return new LoopUntilClick(commands, this);
+    protected static function parallel(commands:Vector.<ITutorCommand>):ITutorCommand {
+        return new TutorParallelCommands(commands);
+    }
+
+    protected static function seqeunce(commands:Vector.<ITutorCommand>):ITutorCommand {
+        return new TutorSequenceCommands(commands, false);
+    }
+
+    protected static function loop(commands:Vector.<ITutorCommand>):ITutorCommand {
+        return new TutorSequenceCommands(commands, true);
     }
 
     protected function get waitForClick():ITutorCommand {

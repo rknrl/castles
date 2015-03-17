@@ -59,8 +59,8 @@ public class GameTutorialView extends TutorialView {
             textField.text = text;
             textField.scaleX = textField.scaleY = layout.scale;
             textField.x = layout.screenCenterX - textField.width / 2;
-            const areaHeight:Number = _areaV * CellSize.SIZE.id() / 2 * layout.scale;
-            textField.y = _areaPos.y + areaHeight - textField.height / 2;
+            const areaHeight:Number = _areaV * CellSize.SIZE.id() * layout.scale;
+            textField.y = _areaPos.y + areaHeight / 2 - textField.height / 2;
             itemsLayer.addChild(textField);
         });
     }
@@ -68,6 +68,26 @@ public class GameTutorialView extends TutorialView {
     private function get removeText():ITutorCommand {
         return exec(function ():void {
             itemsLayer.removeChild(textField);
+        });
+    }
+
+    private var buttonTextField:TextField;
+
+    private function addButton(text:String):ITutorCommand {
+        return exec(function ():void {
+            buttonTextField = createTextField(Fonts.loading);
+            buttonTextField.textColor = 0xffffff;
+            buttonTextField.text = text;
+            buttonTextField.scaleX = buttonTextField.scaleY = layout.scale;
+            buttonTextField.x = layout.screenCenterX - buttonTextField.width / 2;
+            buttonTextField.y = layout.footerCenterY - buttonTextField.height / 2;
+            itemsLayer.addChild(buttonTextField);
+        });
+    }
+
+    private function get removeButton():ITutorCommand {
+        return exec(function ():void {
+            itemsLayer.removeChild(buttonTextField);
         });
     }
 
@@ -178,10 +198,13 @@ public class GameTutorialView extends TutorialView {
             exec(addAvatar),
             exec(addBuildings),
             addText("Твои домики желтого цвета"),
+            wait(1500),
+            addButton("Дальше"),
             waitForClick,
             exec(removeAvatar),
             exec(removeBuildings),
-            removeText
+            removeText,
+            removeButton
         ]);
     }
 
@@ -226,22 +249,30 @@ public class GameTutorialView extends TutorialView {
             itemsLayer.removeChild(avatar);
         }
 
-        const loop:Vector.<ITutorCommand> = new <ITutorCommand>[];
+        const loopCommands:Vector.<ITutorCommand> = new <ITutorCommand>[];
 
         for each(var builds:* in buildings) {
-            loop.push(exec(addAvatar));
-            loop.push(exec(addBuildings));
-            loop.push(wait(1000));
-            loop.push(exec(removeAvatar));
-            loop.push(exec(removeBuildings));
+            loopCommands.push(exec(addAvatar));
+            loopCommands.push(exec(addBuildings));
+            loopCommands.push(wait(1000));
+            loopCommands.push(exec(removeAvatar));
+            loopCommands.push(exec(removeBuildings));
         }
 
         play(new <ITutorCommand>[
             hideCursor,
             open,
             addText("У тебя 3 противника"),
-            loopUntilClick(loop),
+            parallel(new <ITutorCommand>[
+                loop(loopCommands),
+                seqeunce(new <ITutorCommand>[
+                    wait(1500),
+                    addButton("Дальше"),
+                    waitForClick
+                ])
+            ]),
             removeText,
+            removeButton,
             clearItemsLayer
         ]);
     }
@@ -251,18 +282,21 @@ public class GameTutorialView extends TutorialView {
             showCursor,
             open,
             addText("Отправляй отряды и захватывай чужие домики"),
-            loopUntilClick(new <ITutorCommand>[
-                tween(screenCorner, toGlobal(startBuildingPos)),
-                mouseDown,
-                wait(400),
-                exec(function ():void {
-                    arrows.addArrow(startBuildingPos);
-                }),
-                tween(toGlobal(startBuildingPos), toGlobal(endBuildingPos)),
-                wait(400),
-                mouseUp,
-                exec(arrows.removeArrows),
-                wait(400)
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    tween(screenCorner, toGlobal(startBuildingPos)),
+                    mouseDown,
+                    wait(400),
+                    exec(function ():void {
+                        arrows.addArrow(startBuildingPos);
+                    }),
+                    tween(toGlobal(startBuildingPos), toGlobal(endBuildingPos)),
+                    wait(400),
+                    mouseUp,
+                    exec(arrows.removeArrows),
+                    wait(400)
+                ]),
+                waitForClick
             ]),
             exec(arrows.removeArrows),
             removeText
@@ -274,23 +308,26 @@ public class GameTutorialView extends TutorialView {
             showCursor,
             open,
             addText("Можно отправлять отряды сразу из нескольких домиков"),
-            loopUntilClick(new <ITutorCommand>[
-                tween(screenCorner, toGlobal(startBuildingPos1)),
-                mouseDown,
-                wait(400),
-                exec(function ():void {
-                    arrows.addArrow(startBuildingPos1);
-                }),
-                tween(toGlobal(startBuildingPos1), toGlobal(startBuildingPos2)),
-                wait(400),
-                exec(function ():void {
-                    arrows.addArrow(startBuildingPos2);
-                }),
-                tween(toGlobal(startBuildingPos2), toGlobal(endBuildingPos)),
-                wait(400),
-                mouseUp,
-                exec(arrows.removeArrows),
-                wait(400)
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    tween(screenCorner, toGlobal(startBuildingPos1)),
+                    mouseDown,
+                    wait(400),
+                    exec(function ():void {
+                        arrows.addArrow(startBuildingPos1);
+                    }),
+                    tween(toGlobal(startBuildingPos1), toGlobal(startBuildingPos2)),
+                    wait(400),
+                    exec(function ():void {
+                        arrows.addArrow(startBuildingPos2);
+                    }),
+                    tween(toGlobal(startBuildingPos2), toGlobal(endBuildingPos)),
+                    wait(400),
+                    mouseUp,
+                    exec(arrows.removeArrows),
+                    wait(400)
+                ]),
+                waitForClick
             ]),
             exec(arrows.removeArrows),
             removeText
@@ -302,8 +339,11 @@ public class GameTutorialView extends TutorialView {
             hideCursor,
             open,
             addText("Захвати все домики противников, чтобы выиграть"),
+            wait(1500),
+            addButton("В бой!"),
             waitForClick,
-            removeText
+            removeText,
+            removeButton
         ]);
     }
 
