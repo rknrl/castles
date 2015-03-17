@@ -126,14 +126,19 @@ public class GameTutorialView extends TutorialView {
             showCursor,
             open,
             addText(text),
-            tween(screenCorner, pos),
-            wait(500),
-            click,
-            wait(500),
-            tween(pos, toGlobal(buildingPos)),
-            wait(500),
-            click,
-            wait(500),
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    tween(screenCorner, pos),
+                    wait(500),
+                    click,
+                    wait(500),
+                    tween(pos, toGlobal(buildingPos)),
+                    wait(500),
+                    click,
+                    wait(500)
+                ]),
+                waitForClick
+            ]),
             removeText
         ]);
     }
