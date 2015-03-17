@@ -106,6 +106,7 @@ public class GameSplash extends EventDispatcher {
 
                 unit = new Unit(dto.id, startPos, endPos, getTimer(), dto.speed, dto.count);
                 view.units.addUnit(dto.id, dto.type, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, endPos);
+                view.tower1.count = 1;
             }
         }
     }

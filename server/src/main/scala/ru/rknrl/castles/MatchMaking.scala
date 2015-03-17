@@ -103,8 +103,11 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   class GameInfo(val gameRef: ActorRef,
-                 val orders: Iterable[GameOrder]) {
+                 val orders: Iterable[GameOrder],
+                 val isTutor: Boolean) {
     def big = orders.size == 4
+
+    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
   }
 
   var gameOrders = List[GameOrder]()
@@ -202,7 +205,7 @@ class MatchMaking(interval: FiniteDuration,
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, gameConfig, self), gameIdIterator.next)
 
-    new GameInfo(game, orders)
+    new GameInfo(game, orders, isTutor)
   }
 
   def receive = {
@@ -250,7 +253,18 @@ class MatchMaking(interval: FiniteDuration,
       if (accountIdToAccountRef.contains(accountId) && accountIdToAccountRef(accountId) == sender) {
         accountIdToAccountRef = accountIdToAccountRef - accountId
         val gameInfo = accountIdToGameInfo.get(accountId)
-        if (gameInfo.isDefined) gameInfo.get.gameRef ! Offline(accountId)
+        if (gameInfo.isDefined) {
+
+          // Если это тутор и игрок отвалился, то убиваем игру.
+          // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
+          if (gameInfo.get.isTutor && !gameInfo.get.order(accountId).isBot) {
+            accountIdToGameInfo = accountIdToGameInfo - accountId
+            onGameOver(gameInfo.get.gameRef)
+            context stop gameInfo.get.gameRef
+          } else {
+            gameInfo.get.gameRef ! Offline(accountId)
+          }
+        }
       }
 
     /** Аккаунт присылает заявку на игру */
@@ -324,7 +338,7 @@ class MatchMaking(interval: FiniteDuration,
 
     top = insert(top, TopItem(accountId, newRating, userInfo))
 
-    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating)
+    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating) // todo - если он ушел в оффлайн, ничо не сохранится
   }
 
   def insert(list: List[TopItem], item: TopItem) =
