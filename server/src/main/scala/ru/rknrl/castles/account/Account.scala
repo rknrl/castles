@@ -234,7 +234,7 @@ class Account(matchmaking: ActorRef,
   }
 
   def placeGameOrder(isTutor: Boolean) =
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills.stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
 
   def connectToGame(game: ActorRef) = {
     game ! Game.Join(accountId, client)

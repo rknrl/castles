@@ -16,6 +16,7 @@ import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, BotTutor}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
+import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi.B2C.AdminOnline
 import ru.rknrl.castles.rmi.C2B.GetOnline
@@ -45,7 +46,7 @@ object MatchMaking {
                   val deviceType: DeviceType,
                   val userInfo: UserInfoDTO,
                   val slots: Slots,
-                  val skills: Skills,
+                  val stat: Stat,
                   val items: Items,
                   val rating: Double,
                   val gamesCount: Int,
@@ -158,6 +159,7 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   val botIdIterator = new BotIdIterator
+  val tutorBotStat = new Stat(attack = 0.3, defence = 0.3, speed = 1)
 
   def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder], isTutor: Boolean) = {
     val botsCount = if (big) playerCount - orders.size else playerCount - orders.size
@@ -170,7 +172,8 @@ class MatchMaking(interval: FiniteDuration,
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[BotTutor] else classOf[Bot]
       val bot = context.actorOf(Props(botClass, accountId, config.game), accountId.id)
-      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
+      val botStat = if(isTutor) tutorBotStat else order.stat
+      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
@@ -219,7 +222,7 @@ class MatchMaking(interval: FiniteDuration,
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.skills, order.items, isBot = order.isBot)
+      playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
     }
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.game, self), gameIdIterator.next)

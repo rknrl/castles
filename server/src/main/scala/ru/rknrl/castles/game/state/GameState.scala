@@ -127,7 +127,7 @@ object GameState {
 
     val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 
-    val playerStates = for (player ← players) yield player.id → new PlayerState(player.skills.stat, 0)
+    val playerStates = for (player ← players) yield player.id → new PlayerState(player.stat, 0)
 
     new GameState(
       time,

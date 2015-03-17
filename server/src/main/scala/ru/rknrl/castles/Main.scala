@@ -43,7 +43,7 @@ object Main {
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, database, top, config.game), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, database, top, config), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
