@@ -221,6 +221,10 @@ class Game(players: Map[PlayerId, Player],
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
 
+      // Если это тутор и игрок отвалился, то убиваем игру.
+      // При перезаходе игрока будет создана новая игра (Иначе он не поймет, что произошло)
+      if(isTutor && !players(playerId).isBot) addLeaved(playerId)
+
     /** Игрок входит в бой
       * Кладем его в мапу online
       * и отправляем стартовое сообщение JoinGameMsg

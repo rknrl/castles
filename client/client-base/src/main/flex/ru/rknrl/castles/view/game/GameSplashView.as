@@ -67,7 +67,7 @@ public class GameSplashView extends Sprite {
 
         area.addChild(mouseHolder = new Bitmap(Colors.transparent));
         area.addChild(_units = new UnitsView());
-        area.addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 7, false, new Point(0, 0)));
+        area.addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 8, false, new Point(0, 0)));
         area.addChild(_tower2 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(false), 3, false, new Point(0, 0)));
 
         area.addChild(_arrows = new ArrowsView());

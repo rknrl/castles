@@ -59,6 +59,7 @@ public class GameSplash extends EventDispatcher {
                 view.units.remove(unit.id.id);
                 unit = null;
                 view.tower2.owner = new BuildingOwner(true, DtoMock.playerId(0));
+                view.tower2.count = 1;
                 setTimeout(addLoadingScreen, 1000);
             }
         }
@@ -94,7 +95,7 @@ public class GameSplash extends EventDispatcher {
                 dto.id = new UnitIdDTO();
                 dto.id.id = 0;
                 dto.type = BuildingType.TOWER;
-                dto.count = 3;
+                dto.count = 4;
                 dto.pos = DtoMock.point(view.tower1.x, view.tower1.y);
                 dto.owner = DtoMock.playerId(0);
                 dto.speed = 0.04;
