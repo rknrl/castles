@@ -50,7 +50,7 @@ public class TutorialViewBase extends Sprite {
         tweener.nextValue = 0;
     }
 
-    protected function close(): void{
+    public function close():void {
         visible = false;
     }
 

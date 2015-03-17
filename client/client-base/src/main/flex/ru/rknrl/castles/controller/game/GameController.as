@@ -180,7 +180,7 @@ public class GameController {
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
 
-    private static const tutorDelay:int = 30000;
+    private static const tutorDelay:int = 20000;
     private static const tutorInterval:int = 10000;
     private var tutorLastTime:int = -8000;
 
@@ -210,11 +210,11 @@ public class GameController {
                 if (!firstGameTutorState.arrowsSended) playArrowsTutor();
             } else if (time - winTutorTime > tutorDelay) {
 
-                if (!tutorState.fireball) playFireballTutor();
-                else if (!tutorState.tornado) playTornadoTutor();
-                else if (!tutorState.strengthened) playStrengthenedTutor();
-                else if (!tutorState.volcano) playVolcanoTutor();
-                else if (!tutorState.assistance) playAssistanceTutor();
+                if (!tutorState.fireball) view.tutor.itemClick(ItemType.FIREBALL);
+                else if (!tutorState.tornado) view.tutor.itemClick(ItemType.TORNADO);
+                else if (!tutorState.strengthened) view.tutor.itemClick(ItemType.STRENGTHENING);
+                else if (!tutorState.volcano) view.tutor.itemClick(ItemType.VOLCANO);
+                else if (!tutorState.assistance) view.tutor.itemClick(ItemType.ASSISTANCE);
             }
         }
     }
@@ -338,6 +338,24 @@ public class GameController {
                 magicItems.selected = null;
             } else {
                 magicItems.selected = event.itemType;
+
+                switch (event.itemType) {
+                    case ItemType.FIREBALL:
+                        if (!tutorState.fireball) playFireballTutor();
+                        break;
+                    case ItemType.STRENGTHENING:
+                        if (!tutorState.strengthened) playStrengthenedTutor();
+                        break;
+                    case ItemType.VOLCANO:
+                        if (!tutorState.volcano) playVolcanoTutor();
+                        break;
+                    case ItemType.TORNADO:
+                        if (!tutorState.tornado) playTornadoTutor();
+                        break;
+                    case ItemType.ASSISTANCE:
+                        if (!tutorState.assistance) playAssistanceTutor();
+                        break;
+                }
             }
         }
     }
@@ -492,6 +510,10 @@ public class GameController {
         tutorLastTime = getTimer();
     }
 
+    private function closeTutorIfExists():void {
+        if(view.tutor.playing) view.tutor.close();
+    }
+
     // Твои домики желтого цвета
 
     private function playSelfBuildingsTutor():void {
@@ -565,6 +587,7 @@ public class GameController {
     // Запусти фаербол в противника
 
     private function playFireballTutor():void {
+        closeTutorIfExists();
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playFireball(buildingPos);
     }
@@ -572,6 +595,7 @@ public class GameController {
     // Создай вулкан под башней противника
 
     private function playVolcanoTutor():void {
+        closeTutorIfExists();
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playVolcano(buildingPos);
     }
@@ -579,6 +603,7 @@ public class GameController {
     // Используй торнадо против противника
 
     private function playTornadoTutor():void {
+        closeTutorIfExists();
         const buildingPos:Point = buildings.getEnemyBuildingPos(selfId);
         const points:Vector.<Point> = sin(buildingPos);
         view.tutor.playTornado(points);
@@ -597,6 +622,7 @@ public class GameController {
     // Усилить свой домик
 
     private function playStrengthenedTutor():void {
+        closeTutorIfExists();
         const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
         view.tutor.playStrengthening(buildingPos);
     }
@@ -604,6 +630,7 @@ public class GameController {
     // Вызывай подмогу
 
     private function playAssistanceTutor():void {
+        closeTutorIfExists();
         const buildingPos:Point = buildings.getSelfBuildingPos(selfId);
         view.tutor.playAssistance(buildingPos);
     }

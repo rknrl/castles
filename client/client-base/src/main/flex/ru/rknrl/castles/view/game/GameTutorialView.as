@@ -9,6 +9,7 @@
 package ru.rknrl.castles.view.game {
 import flash.events.Event;
 import flash.text.TextField;
+import flash.utils.Dictionary;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.game.Building;
@@ -65,12 +66,6 @@ public class GameTutorialView extends TutorialView {
         });
     }
 
-    private function get removeText():ITutorCommand {
-        return exec(function ():void {
-            itemsLayer.removeChild(textField);
-        });
-    }
-
     private var buttonTextField:TextField;
 
     private function addButton(text:String):ITutorCommand {
@@ -82,12 +77,6 @@ public class GameTutorialView extends TutorialView {
             buttonTextField.x = layout.screenCenterX - buttonTextField.width / 2;
             buttonTextField.y = layout.footerCenterY - buttonTextField.height / 2;
             itemsLayer.addChild(buttonTextField);
-        });
-    }
-
-    private function get removeButton():ITutorCommand {
-        return exec(function ():void {
-            itemsLayer.removeChild(buttonTextField);
         });
     }
 
@@ -119,18 +108,34 @@ public class GameTutorialView extends TutorialView {
         return result;
     }
 
-    public function clickItemAndCast(itemType:ItemType, buildingPos:Point, text:String):void {
+    public function itemClick(itemType:ItemType):void {
         const pos:Point = layout.gameMagicItem(indexOf(itemType));
 
         play(new <ITutorCommand>[
             showCursor,
             open,
-            addText(text),
+            addText(itemsText[itemType]),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     tween(screenCorner, pos),
                     wait(500),
                     click,
+                    wait(500)
+                ]),
+                infinityWait
+            ]),
+        ]);
+    }
+
+    private function cast(itemType:ItemType, buildingPos:Point):void {
+        const pos:Point = layout.gameMagicItem(indexOf(itemType));
+
+        play(new <ITutorCommand>[
+            showCursor,
+            open,
+            addText(itemsText[itemType]),
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
                     wait(500),
                     tween(pos, toGlobal(buildingPos)),
                     wait(500),
@@ -139,24 +144,36 @@ public class GameTutorialView extends TutorialView {
                 ]),
                 waitForClick
             ]),
-            removeText
+            clearItemsLayer
         ]);
     }
 
+    private static const itemsText:Dictionary = createItemsText();
+
+    private static function createItemsText():Dictionary {
+        const itemsText:Dictionary = new Dictionary();
+        itemsText[ItemType.FIREBALL] = "Запусти фаербол в противника";
+        itemsText[ItemType.VOLCANO] = "Создай вулкан под башней противника";
+        itemsText[ItemType.STRENGTHENING] = "Усилить свой домик";
+        itemsText[ItemType.ASSISTANCE] = "Вызывай подмогу";
+        itemsText[ItemType.TORNADO] = "Используй торнадо против противника";
+        return itemsText;
+    }
+
     public function playFireball(buildingPos:Point):void {
-        clickItemAndCast(ItemType.FIREBALL, buildingPos, "Запусти фаербол в противника");
+        cast(ItemType.FIREBALL, buildingPos);
     }
 
     public function playVolcano(buildingPos:Point):void {
-        clickItemAndCast(ItemType.VOLCANO, buildingPos, "Создай вулкан под башней противника");
+        cast(ItemType.VOLCANO, buildingPos);
     }
 
     public function playStrengthening(buildingPos:Point):void {
-        clickItemAndCast(ItemType.STRENGTHENING, buildingPos, "Усилить свой домик");
+        cast(ItemType.STRENGTHENING, buildingPos);
     }
 
     public function playAssistance(buildingPos:Point):void {
-        clickItemAndCast(ItemType.ASSISTANCE, buildingPos, "Вызывай подмогу");
+        cast(ItemType.ASSISTANCE, buildingPos);
     }
 
     public function playSelfBuildings(buildings:Vector.<Building>, playerInfo:PlayerInfo):void {
@@ -177,10 +194,6 @@ public class GameTutorialView extends TutorialView {
             }
         }
 
-        function removeBuildings():void {
-            itemsLayer.removeChild(buildingsView);
-        }
-
         var avatar:GameAvatar;
 
         function addAvatar():void {
@@ -193,10 +206,6 @@ public class GameTutorialView extends TutorialView {
             itemsLayer.addChild(avatar);
         }
 
-        function removeAvatar():void {
-            itemsLayer.removeChild(avatar);
-        }
-
         play(new <ITutorCommand>[
             hideCursor,
             open,
@@ -206,10 +215,7 @@ public class GameTutorialView extends TutorialView {
             wait(1500),
             addButton("Дальше"),
             waitForClick,
-            exec(removeAvatar),
-            exec(removeBuildings),
-            removeText,
-            removeButton
+            clearItemsLayer
         ]);
     }
 
@@ -217,6 +223,7 @@ public class GameTutorialView extends TutorialView {
         var buildingsView:BuildingsView;
         var i:int = 0;
 
+        // todo переписать на visible всесто add/remove
         function addBuildings():void {
             const ownerId:PlayerIdDTO = new PlayerIdDTO();
             ownerId.id = i + 1;
@@ -270,14 +277,12 @@ public class GameTutorialView extends TutorialView {
             addText("У тебя 3 противника"),
             parallel(new <ITutorCommand>[
                 loop(loopCommands),
-                seqeunce(new <ITutorCommand>[
+                sequence(new <ITutorCommand>[
                     wait(1500),
                     addButton("Дальше"),
                     waitForClick
                 ])
             ]),
-            removeText,
-            removeButton,
             clearItemsLayer
         ]);
     }
@@ -304,7 +309,7 @@ public class GameTutorialView extends TutorialView {
                 waitForClick
             ]),
             exec(arrows.removeArrows),
-            removeText
+            clearItemsLayer
         ]);
     }
 
@@ -335,7 +340,7 @@ public class GameTutorialView extends TutorialView {
                 waitForClick
             ]),
             exec(arrows.removeArrows),
-            removeText
+            clearItemsLayer
         ]);
     }
 
@@ -347,8 +352,7 @@ public class GameTutorialView extends TutorialView {
             wait(1500),
             addButton("В бой!"),
             waitForClick,
-            removeText,
-            removeButton
+            clearItemsLayer
         ]);
     }
 
@@ -374,20 +378,23 @@ public class GameTutorialView extends TutorialView {
         play(new <ITutorCommand>[
             showCursor,
             open,
-            addText("Используй торнадо против противника"),
-            tween(screenCorner, pos),
-            click,
-            wait(400),
-            tween(pos, toGlobal(points[0])),
-            mouseDown,
-            wait(400),
-            exec(addTornadoPath),
-            tweenPath(new Points(toGlobalPoints(points))),
-            wait(400),
-            mouseUp,
-            exec(removeTornadoPath),
-            wait(400),
-            removeText
+            addText(itemsText[ItemType.TORNADO]),
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    wait(400),
+                    tween(pos, toGlobal(points[0])),
+                    mouseDown,
+                    wait(400),
+                    exec(addTornadoPath),
+                    tweenPath(new Points(toGlobalPoints(points))),
+                    wait(400),
+                    mouseUp,
+                    exec(removeTornadoPath),
+                    wait(400)
+                ]),
+                waitForClick
+            ]),
+            clearItemsLayer
         ]);
     }
 
@@ -399,6 +406,13 @@ public class GameTutorialView extends TutorialView {
             const progress:Number = interpolate(0, 1, getTimer(), tornadoStartTime, 500, easer);
             tornadoPath.drawPath(tornadoPoints, tornadoPoints.totalDistance * progress);
         }
+    }
+
+    protected function get clearItemsLayer():ITutorCommand {
+        return exec(function ():void {
+            while (itemsLayer.numChildren) itemsLayer.removeChildAt(0)
+            tornadoPath.clear();
+        });
     }
 }
 }

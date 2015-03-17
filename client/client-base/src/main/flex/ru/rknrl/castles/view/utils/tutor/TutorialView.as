@@ -17,6 +17,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
+import ru.rknrl.castles.view.utils.tutor.commands.InfinityWait;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorParallelCommands;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
@@ -70,13 +71,13 @@ public class TutorialView extends TutorialViewBase {
     }
 
     private function onTutorComplete(event:Event = null):void {
-        command.removeEventListener(Event.COMPLETE, onTutorComplete);
-        command = null;
         startClose();
     }
 
-    override protected function close():void {
+    override public function close():void {
         super.close();
+        command.removeEventListener(Event.COMPLETE, onTutorComplete);
+        command = null;
         dispatchEvent(new Event(TUTOR_COMPLETE));
     }
 
@@ -98,12 +99,6 @@ public class TutorialView extends TutorialViewBase {
 
     protected function tweenPath(points:Points):ITutorCommand {
         return new Move(points, _cursor, duration)
-    }
-
-    protected function get clearItemsLayer():ITutorCommand {
-        return exec(function ():void {
-            while (_itemsLayer.numChildren) _itemsLayer.removeChildAt(0)
-        });
     }
 
     protected function get open():ITutorCommand {
@@ -145,7 +140,7 @@ public class TutorialView extends TutorialViewBase {
         return new TutorParallelCommands(commands);
     }
 
-    protected static function seqeunce(commands:Vector.<ITutorCommand>):ITutorCommand {
+    protected static function sequence(commands:Vector.<ITutorCommand>):ITutorCommand {
         return new TutorSequenceCommands(commands, false);
     }
 
@@ -159,6 +154,10 @@ public class TutorialView extends TutorialViewBase {
 
     protected static function wait(duration:int):ITutorCommand {
         return new Wait(duration);
+    }
+
+    protected static function get infinityWait():ITutorCommand {
+        return new InfinityWait();
     }
 
     protected static function exec(func:Function):ITutorCommand {
