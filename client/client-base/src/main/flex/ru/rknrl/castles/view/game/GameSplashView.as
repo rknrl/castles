@@ -20,6 +20,7 @@ import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.castles.view.layout.Layout;
+import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.dto.BuildingLevel;
@@ -27,6 +28,9 @@ import ru.rknrl.dto.BuildingType;
 import ru.rknrl.utils.createTextField;
 
 public class GameSplashView extends Sprite {
+    private var area:Sprite;
+    private var loadingScreen:LoadingScreen;
+
     private var _tower1:BuildingView;
 
     public function get tower1():BuildingView {
@@ -59,20 +63,22 @@ public class GameSplashView extends Sprite {
     public function GameSplashView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory) {
         mouseChildren = false;
 
-        addChild(mouseHolder = new Bitmap(Colors.transparent));
-        addChild(_units = new UnitsView());
-        addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 7, false, new Point(0, 0)));
-        addChild(_tower2 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(false), 3, false, new Point(0, 0)));
+        addChild(area = new Sprite());
 
-        addChild(_arrows = new ArrowsView());
+        area.addChild(mouseHolder = new Bitmap(Colors.transparent));
+        area.addChild(_units = new UnitsView());
+        area.addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 7, false, new Point(0, 0)));
+        area.addChild(_tower2 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(false), 3, false, new Point(0, 0)));
+
+        area.addChild(_arrows = new ArrowsView());
         arrows.transform.colorTransform = Colors.transform(Colors.yellow);
 
-        addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
+        area.addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
         tutor.mouseEnabled = false;
 
-        addChild(titleTextField = createTextField(Fonts.gameSplashText));
+        area.addChild(titleTextField = createTextField(Fonts.gameSplashText));
         titleTextField.text = "Захвати башню!";
-        addChild(textField = createTextField(Fonts.gameSplashText));
+        area.addChild(textField = createTextField(Fonts.gameSplashText));
         textField.text = "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
         this.layout = layout;
     }
@@ -109,10 +115,16 @@ public class GameSplashView extends Sprite {
         textField.y = _layout.footerCenterY + gap / 2;
 
         tutor.layout = value;
+        if (loadingScreen) loadingScreen.layout = value;
     }
 
     public function playArrow():void {
         tutor.playArrow(tower1Pos, tower2Pos);
+    }
+
+    public function addLoadingScreen():void {
+        removeChild(area);
+        addChild(loadingScreen = new LoadingScreen("Отлично\nЗаходим в бой..", _layout));
     }
 }
 }

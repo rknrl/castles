@@ -70,14 +70,14 @@ object GameState {
         .build()
     }
 
-  def mirrorBuildings2(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
+  def mirrorBuildingsSmallMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
     for (b ← topRandomBuildings)
     yield {
       val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
       new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
     }
 
-  def mirrorBuildings4(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
+  def mirrorBuildingsBigMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
     for (b ← topRandomBuildings;
          part ← List(1, 2, 3))
     yield {
@@ -108,7 +108,7 @@ object GameState {
 
     val buildings =
       if (isTutor) {
-        playersBuildings ++ TutorMap.buildings(buildingIdIterator)
+        playersBuildings ++ TutorMap.bigMapBuildings(buildingIdIterator)
       } else {
         val slotsIJs = GameArea.toIJs(playersSlotsPositions)
 
@@ -118,9 +118,9 @@ object GameState {
           MapGenerator.getRandomBuildings(slotsIJs, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
 
         val mirrorRandomBuildings = if (big)
-          mirrorBuildings4(gameArea, randomBuildings, buildingIdIterator)
+          mirrorBuildingsBigMap(gameArea, randomBuildings, buildingIdIterator)
         else
-          mirrorBuildings2(gameArea, randomBuildings, buildingIdIterator)
+          mirrorBuildingsSmallMap(gameArea, randomBuildings, buildingIdIterator)
 
         playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
       }

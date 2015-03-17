@@ -60,7 +60,6 @@ public class GameController {
     private var view:GameView;
     private var server:Server;
     private var selfId:PlayerIdDTO;
-    private var selfOwner:BuildingOwner;
     private var tutorState:TutorStateDTO;
 
     private var bullets:Bullets;
@@ -104,13 +103,15 @@ public class GameController {
         this.tutorState = tutorState;
         firstGameTutorState = tutorState.firstGame ? FirstGameTutorState.completed() : FirstGameTutorState.empty();
 
-        if(!tutorState.firstGame) view.mouseEnabled = false;
+        if (!tutorState.firstGame) {
+            view.mouseEnabled = false;
+            view.magicItems.visible = false;
+        }
 
         width = gameState.width;
         height = gameState.height;
 
         selfId = gameState.selfId;
-        selfOwner = new BuildingOwner(true, selfId);
         players = gameState.players;
 
         bullets = new Bullets(view.area.bullets);
@@ -203,9 +204,11 @@ public class GameController {
             tutorLastTime = time;
 
             if (!firstGameTutorState.intro) playSelfBuildingsTutor();
-            else if (!firstGameTutorState.arrowCapture && !firstGameTutorState.arrowUsed) playArrowTutor();
-            else if (!firstGameTutorState.arrowsCapture && !firstGameTutorState.arrowsUsed) playArrowsTutor();
-            else if (time - winTutorTime > tutorDelay) {
+            else if (!firstGameTutorState.arrowCapture) {
+                if (!firstGameTutorState.arrowSended) playArrowTutor();
+            } else if (!firstGameTutorState.arrowsCapture) {
+                if (!firstGameTutorState.arrowsSended) playArrowsTutor();
+            } else if (time - winTutorTime > tutorDelay) {
 
                 if (!tutorState.fireball) playFireballTutor();
                 else if (!tutorState.tornado) playTornadoTutor();
@@ -297,12 +300,12 @@ public class GameController {
     private function updateBuilding(dto:BuildingUpdateDTO):void {
         const building:Building = buildings.byId(dto.id);
         const newOwner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
-        const capture:Boolean = !building.owner.equals(selfOwner) &&
-                (building.population > dto.population || newOwner.equals(selfOwner));
+        const capture:Boolean = !building.owner.equalsId(selfId) &&
+                (building.population > dto.population || newOwner.equalsId(selfId));
 
         if (capture) {
-            if (firstGameTutorState.arrowUsed && !firstGameTutorState.arrowCapture) onArrowTutorComplete();
-            else if (firstGameTutorState.arrowsUsed && !firstGameTutorState.arrowsCapture) onArrowsTutorComplete();
+            if (firstGameTutorState.arrowSended && !firstGameTutorState.arrowCapture) onArrowTutorComplete();
+            else if (firstGameTutorState.arrowsSended && !firstGameTutorState.arrowsCapture) onArrowsTutorComplete();
         }
 
         building.update(newOwner, dto.population, dto.strengthened);
@@ -410,11 +413,11 @@ public class GameController {
                     }
 
                     if (filteredIds.length > 0) {
-                        if (!firstGameTutorState.arrowUsed && !toBuilding.owner.equals(selfOwner))
-                            firstGameTutorState.arrowUsed = true;
+                        if (!firstGameTutorState.arrowSended && !toBuilding.owner.equalsId(selfId))
+                            firstGameTutorState.arrowSended = true;
 
-                        if (!firstGameTutorState.arrowsUsed && firstGameTutorState.arrowCapture && filteredIds.length > 1 && !toBuilding.owner.equals(selfOwner))
-                            firstGameTutorState.arrowsUsed = true;
+                        if (!firstGameTutorState.arrowsSended && firstGameTutorState.arrowCapture && filteredIds.length > 1 && !toBuilding.owner.equalsId(selfId))
+                            firstGameTutorState.arrowsSended = true;
 
                         const dto:MoveDTO = new MoveDTO();
                         dto.toBuilding = toBuilding.id;
@@ -524,9 +527,7 @@ public class GameController {
 
     private function playArrowTutor():void {
         view.mouseEnabled = true;
-        const startPos:Point = buildings.getSelfBuildingPos(selfId);
-        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
-        view.tutor.playArrow(startPos, endPos);
+        view.tutor.playArrow(Buildings.sourceBuilding1, Buildings.targetBuilding1);
     }
 
     private function onArrowTutorComplete():void {
@@ -537,9 +538,7 @@ public class GameController {
     // Можно отправлять отряды сразу из нескольких домиков
 
     private function playArrowsTutor():void {
-        const startPos:Vector.<Point> = buildings.getSelfBuildingsPos(selfId);
-        const endPos:Point = buildings.getEnemyBuildingPos(selfId);
-        view.tutor.playArrows(startPos[0], startPos[1], endPos);
+        view.tutor.playArrows(Buildings.sourceBuilding2_1, Buildings.sourceBuilding2_2, Buildings.targetBuilding2);
     }
 
     private function onArrowsTutorComplete():void {
@@ -559,6 +558,7 @@ public class GameController {
     private function onWinTutorComplete(e:Event):void {
         view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onWinTutorComplete);
         winTutorTime = getTimer();
+        view.magicItems.visible = true;
         server.startTutorGame();
     }
 

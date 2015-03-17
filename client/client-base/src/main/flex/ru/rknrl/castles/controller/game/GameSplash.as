@@ -59,11 +59,16 @@ public class GameSplash extends EventDispatcher {
                 view.units.remove(unit.id.id);
                 unit = null;
                 view.tower2.owner = new BuildingOwner(true, DtoMock.playerId(0));
-                setTimeout(function ():void {
-                    dispatchEvent(new Event(GAME_SPLASH_COMPLETE))
-                }, 1000)
+                setTimeout(addLoadingScreen, 1000);
             }
         }
+    }
+
+    private function addLoadingScreen():void {
+        view.addLoadingScreen();
+        setTimeout(function ():void {
+            dispatchEvent(new Event(GAME_SPLASH_COMPLETE))
+        }, 3000)
     }
 
     private var down:Boolean;

@@ -14,7 +14,7 @@ import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 object TutorMap {
 
-  def buildings(buildingIdIterator: BuildingIdIterator) = {
+  def bigMapBuildings(buildingIdIterator: BuildingIdIterator) = {
 
     def building(buildingType: BuildingType, buildingLevel: BuildingLevel, pos: IJ, population: Int) =
       new Building(
@@ -29,20 +29,20 @@ object TutorMap {
       )
 
     List(
-      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(4, 4), 5),
-      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(10, 4), 5),
-      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(10, 10), 5),
-      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(4, 10), 5),
+      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(4, 3), 1),
+      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(10, 3), 1),
+      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(10, 11), 1),
+      building(BuildingType.HOUSE, BuildingLevel.LEVEL_1, new IJ(4, 11), 1),
 
-      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(7, 2), 4),
-      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(7, 12), 4),
-      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(2, 7), 4),
-      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(12, 7), 4),
+      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(2, 5), 1),
+      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(2, 9), 1),
+      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(12, 5), 1),
+      building(BuildingType.CHURCH, BuildingLevel.LEVEL_1, new IJ(12, 9), 1),
 
-      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 6), 3),
-      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 6), 3),
-      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 8), 3),
-      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 8), 3)
+      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 6), 1),
+      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 6), 1),
+      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 8), 1),
+      building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 8), 1)
     )
   }
 }

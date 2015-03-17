@@ -12,11 +12,11 @@ public class FirstGameTutorState {
     public var intro:Boolean;
 
     /** Отправляй отряды и захватывай чужие домики */
-    public var arrowUsed:Boolean;
+    public var arrowSended:Boolean;
     public var arrowCapture:Boolean;
 
     /** Можно отправлять сразу из нескольких домиков */
-    public var arrowsUsed:Boolean;
+    public var arrowsSended:Boolean;
     public var arrowsCapture:Boolean;
 
     /** Захвати все домики противников, чтобы выиграть */
@@ -29,9 +29,9 @@ public class FirstGameTutorState {
     public static function completed():FirstGameTutorState {
         const state:FirstGameTutorState = new FirstGameTutorState();
         state.intro = true;
-        state.arrowUsed = true;
+        state.arrowSended = true;
         state.arrowCapture = true;
-        state.arrowsUsed = true;
+        state.arrowsSended = true;
         state.arrowsCapture = true;
         state.win = true;
         return state;

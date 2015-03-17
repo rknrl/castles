@@ -37,7 +37,7 @@ public class LoadingScreen extends Sprite {
         textField.defaultTextFormat = Fonts.loading;
         textField.textColor = Colors.yellow;
         textField.text = text;
-        textField.width = 200;
+        textField.width = 300;
         textField.wordWrap = true;
         textField.x = -textField.width / 2;
         textField.y = 10;
