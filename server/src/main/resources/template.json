@@ -1,5 +1,6 @@
 {
   "host": "127.0.0.1",
+  "staticHost": "127.0.0.1",
   "gamePort": 2335,
   "policyPort": 2336,
   "adminPort": 2337,

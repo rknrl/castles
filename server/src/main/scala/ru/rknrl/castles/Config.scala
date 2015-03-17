@@ -28,6 +28,7 @@ object Config {
 }
 
 class Config(val host: String,
+             val staticHost: String,
              val gamePort: Int,
              val policyPort: Int,
              val adminPort: Int,

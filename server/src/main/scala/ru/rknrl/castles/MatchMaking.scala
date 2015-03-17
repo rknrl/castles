@@ -83,7 +83,7 @@ object MatchMaking {
 class MatchMaking(interval: FiniteDuration,
                   database: ActorRef,
                   var top: List[TopItem],
-                  gameConfig: GameConfig) extends Actor with ActorLogging {
+                  config: Config) extends Actor with ActorLogging {
   /** Если у бота случается ошибка - стопаем его
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
@@ -169,7 +169,7 @@ class MatchMaking(interval: FiniteDuration,
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[BotTutor] else classOf[Bot]
-      val bot = context.actorOf(Props(botClass, accountId, gameConfig), accountId.id)
+      val bot = context.actorOf(Props(botClass, accountId, config.game), accountId.id)
       val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, order.skills, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
@@ -184,13 +184,32 @@ class MatchMaking(interval: FiniteDuration,
     })
 
   def botUserInfo(accountId: AccountId, number: Int) =
-    UserInfoDTO.newBuilder()
-      .setAccountId(accountId.dto)
-      .setFirstName("Бот")
-      .setLastName(number.toString)
-      .setPhoto96("1")
-      .setPhoto256("1")
-      .build()
+    number match {
+      case 0 ⇒
+        UserInfoDTO.newBuilder()
+          .setAccountId(accountId.dto)
+          .setFirstName("Sasha")
+          .setLastName("Serova")
+          .setPhoto96("http://" + config.staticHost + "/avatars/Sasha96.png")
+          .setPhoto256("http://" + config.staticHost + "/avatars/Sasha256.png")
+          .build()
+      case 1 ⇒
+        UserInfoDTO.newBuilder()
+          .setAccountId(accountId.dto)
+          .setFirstName("Napoleon")
+          .setLastName("1769")
+          .setPhoto96("http://" + config.staticHost + "/avatars/Napoleon96.png")
+          .setPhoto256("http://" + config.staticHost + "/avatars/Napoleon256.png")
+          .build()
+      case 2 ⇒
+        UserInfoDTO.newBuilder()
+          .setAccountId(accountId.dto)
+          .setFirstName("Виктория")
+          .setLastName("Викторовна")
+          .setPhoto96("http://" + config.staticHost + "/avatars/Babka96.png")
+          .setPhoto256("http://" + config.staticHost + "/avatars/Babka256.png")
+          .build()
+    }
 
   val gameIdIterator = new GameIdIterator
 
@@ -203,7 +222,7 @@ class MatchMaking(interval: FiniteDuration,
       playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.skills, order.items, isBot = order.isBot)
     }
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, gameConfig, self), gameIdIterator.next)
+    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.game, self), gameIdIterator.next)
 
     new GameInfo(game, orders, isTutor)
   }
