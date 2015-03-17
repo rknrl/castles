@@ -41,7 +41,6 @@ public class TutorialViewBase extends Sprite {
 
     protected final function startOpen():void {
         visible = true;
-        tweener.value = 0;
         tweener.nextValue = 1;
         updateTransition();
     }

@@ -123,7 +123,7 @@ public class GameSplashView extends Sprite {
 
     public function addLoadingScreen():void {
         removeChild(area);
-        addChild(loadingScreen = new LoadingScreen("Отлично\nЗаходим в бой..", _layout));
+        addChild(loadingScreen = new LoadingScreen("Отлично!\nЗаходим в бой", _layout));
     }
 }
 }

@@ -408,6 +408,7 @@ public class GameController {
                 if (tornadoPath.points.length >= 2) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
+                        closeTutorIfExists();
                         sendTutorState();
                     }
 
@@ -454,6 +455,7 @@ public class GameController {
             case ItemType.FIREBALL:
                 if (!tutorState.fireball) {
                     tutorState.fireball = true;
+                    closeTutorIfExists();
                     sendTutorState();
                 }
 
@@ -465,6 +467,7 @@ public class GameController {
                 if (strBuilding) {
                     if (!tutorState.strengthened) {
                         tutorState.strengthened = true;
+                        closeTutorIfExists();
                         sendTutorState();
                     }
 
@@ -475,6 +478,7 @@ public class GameController {
             case ItemType.VOLCANO:
                 if (!tutorState.volcano) {
                     tutorState.volcano = true;
+                    closeTutorIfExists();
                     sendTutorState();
                 }
 
@@ -489,6 +493,7 @@ public class GameController {
                 if (building) {
                     if (!tutorState.assistance) {
                         tutorState.assistance = true;
+                        closeTutorIfExists();
                         sendTutorState();
                     }
 

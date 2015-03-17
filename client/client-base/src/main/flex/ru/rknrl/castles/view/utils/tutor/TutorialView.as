@@ -76,6 +76,8 @@ public class TutorialView extends TutorialViewBase {
 
     override public function close():void {
         super.close();
+        clear();
+        _cursor.visible = false;
         command.removeEventListener(Event.COMPLETE, onTutorComplete);
         command = null;
         dispatchEvent(new Event(TUTOR_COMPLETE));
@@ -162,6 +164,10 @@ public class TutorialView extends TutorialViewBase {
 
     protected static function exec(func:Function):ITutorCommand {
         return new Exec(func);
+    }
+
+    protected function clear():void {
+        while (itemsLayer.numChildren) itemsLayer.removeChildAt(0)
     }
 }
 }

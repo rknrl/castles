@@ -112,8 +112,8 @@ public class GameTutorialView extends TutorialView {
         const pos:Point = layout.gameMagicItem(indexOf(itemType));
 
         play(new <ITutorCommand>[
-            showCursor,
             open,
+            showCursor,
             addText(itemsText[itemType]),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
@@ -123,7 +123,7 @@ public class GameTutorialView extends TutorialView {
                     wait(500)
                 ]),
                 infinityWait
-            ]),
+            ])
         ]);
     }
 
@@ -131,20 +131,19 @@ public class GameTutorialView extends TutorialView {
         const pos:Point = layout.gameMagicItem(indexOf(itemType));
 
         play(new <ITutorCommand>[
-            showCursor,
             open,
             addText(itemsText[itemType]),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(500),
+                    showCursor,
                     tween(pos, toGlobal(buildingPos)),
                     wait(500),
                     click,
                     wait(500)
                 ]),
-                waitForClick
-            ]),
-            clearItemsLayer
+                infinityWait
+            ])
         ]);
     }
 
@@ -214,8 +213,7 @@ public class GameTutorialView extends TutorialView {
             addText("Твои домики желтого цвета"),
             wait(1500),
             addButton("Дальше"),
-            waitForClick,
-            clearItemsLayer
+            waitForClick
         ]);
     }
 
@@ -283,7 +281,6 @@ public class GameTutorialView extends TutorialView {
                     waitForClick
                 ])
             ]),
-            clearItemsLayer
         ]);
     }
 
@@ -307,9 +304,7 @@ public class GameTutorialView extends TutorialView {
                     wait(400)
                 ]),
                 waitForClick
-            ]),
-            exec(arrows.removeArrows),
-            clearItemsLayer
+            ])
         ]);
     }
 
@@ -338,9 +333,7 @@ public class GameTutorialView extends TutorialView {
                     wait(400)
                 ]),
                 waitForClick
-            ]),
-            exec(arrows.removeArrows),
-            clearItemsLayer
+            ])
         ]);
     }
 
@@ -351,8 +344,7 @@ public class GameTutorialView extends TutorialView {
             addText("Захвати все домики противников, чтобы выиграть"),
             wait(1500),
             addButton("В бой!"),
-            waitForClick,
-            clearItemsLayer
+            waitForClick
         ]);
     }
 
@@ -376,12 +368,12 @@ public class GameTutorialView extends TutorialView {
         }
 
         play(new <ITutorCommand>[
-            showCursor,
             open,
             addText(itemsText[ItemType.TORNADO]),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(400),
+                    showCursor,
                     tween(pos, toGlobal(points[0])),
                     mouseDown,
                     wait(400),
@@ -392,9 +384,8 @@ public class GameTutorialView extends TutorialView {
                     exec(removeTornadoPath),
                     wait(400)
                 ]),
-                waitForClick
-            ]),
-            clearItemsLayer
+                infinityWait
+            ])
         ]);
     }
 
@@ -408,11 +399,11 @@ public class GameTutorialView extends TutorialView {
         }
     }
 
-    protected function get clearItemsLayer():ITutorCommand {
-        return exec(function ():void {
-            while (itemsLayer.numChildren) itemsLayer.removeChildAt(0)
-            tornadoPath.clear();
-        });
+    override protected function clear():void {
+        arrows.removeArrows();
+        tornado = false;
+        tornadoPath.clear();
+        super.clear();
     }
 }
 }
