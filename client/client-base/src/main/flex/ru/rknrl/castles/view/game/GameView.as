@@ -99,11 +99,13 @@ public class GameView extends Sprite {
         } else {
             area.rotation = 0;
         }
-        dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(_area.mouseX, _area.mouseY)))
+        dispatchEvent(new GameMouseEvent(GameMouseEvent.ENTER_FRAME, new Point(_area.mouseX, _area.mouseY)));
     }
 
     private function onMouseEvent(event:MouseEvent):void {
-        dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(_area.mouseX, _area.mouseY)))
+        if (mouseEnabled) {
+            dispatchEvent(new GameMouseEvent(getMouseEventType(event.type), new Point(_area.mouseX, _area.mouseY)));
+        }
     }
 
     private static function getMouseEventType(eventType:String):String {

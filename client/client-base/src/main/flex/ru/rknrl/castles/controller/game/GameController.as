@@ -104,6 +104,8 @@ public class GameController {
         this.tutorState = tutorState;
         firstGameTutorState = tutorState.firstGame ? FirstGameTutorState.completed() : FirstGameTutorState.empty();
 
+        if(!tutorState.firstGame) view.mouseEnabled = false;
+
         width = gameState.width;
         height = gameState.height;
 
@@ -521,6 +523,7 @@ public class GameController {
     // Отправляй отряды и захватывай чужие домики
 
     private function playArrowTutor():void {
+        view.mouseEnabled = true;
         const startPos:Point = buildings.getSelfBuildingPos(selfId);
         const endPos:Point = buildings.getEnemyBuildingPos(selfId);
         view.tutor.playArrow(startPos, endPos);
