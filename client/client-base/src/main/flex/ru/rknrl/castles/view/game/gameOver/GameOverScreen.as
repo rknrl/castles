@@ -12,6 +12,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
+import flash.utils.setTimeout;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
@@ -67,7 +68,10 @@ public class GameOverScreen extends Sprite {
         }
 
         this.layout = layout;
-        addEventListener(MouseEvent.MOUSE_DOWN, onClick);
+
+        setTimeout(function ():void {
+            addEventListener(MouseEvent.MOUSE_DOWN, onClick);
+        }, 1500);
     }
 
     public function set layout(value:Layout):void {
