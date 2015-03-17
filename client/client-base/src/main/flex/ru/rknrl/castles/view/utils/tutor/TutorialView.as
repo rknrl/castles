@@ -154,7 +154,7 @@ public class TutorialView extends TutorialViewBase {
     }
 
     protected function get waitForClick():ITutorCommand {
-        return new WaitForClick(this);
+        return new WaitForClick(stage);
     }
 
     protected static function wait(duration:int):ITutorCommand {

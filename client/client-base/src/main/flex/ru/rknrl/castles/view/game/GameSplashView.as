@@ -74,7 +74,6 @@ public class GameSplashView extends Sprite {
         arrows.transform.colorTransform = Colors.transform(Colors.yellow);
 
         area.addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
-        tutor.mouseEnabled = false;
 
         area.addChild(titleTextField = createTextField(Fonts.gameSplashText));
         titleTextField.text = "Захвати башню!";

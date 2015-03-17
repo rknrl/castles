@@ -22,6 +22,7 @@ public class TutorialViewBase extends Sprite {
         addChild(modalScreen = new ModalScreen(layout));
 
         visible = false;
+        mouseEnabled = mouseChildren = false;
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
         _layout = layout;
