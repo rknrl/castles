@@ -335,7 +335,9 @@ public class GameController {
     private function onMagicItemClick(event:MagicItemClickEvent):void {
         if (magicItemStates.canUse(event.itemType, getTimer())) {
             if (magicItems.selected == event.itemType) {
-                magicItems.selected = null;
+                if (!view.tutor.playing) {
+                    magicItems.selected = null;
+                }
             } else {
                 magicItems.selected = event.itemType;
 
@@ -405,7 +407,7 @@ public class GameController {
     private function onMouseUp(event:GameMouseEvent):void {
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
-                if (tornadoPath.points.length >= 2) {
+                if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
                         closeTutorIfExists();
@@ -448,6 +450,15 @@ public class GameController {
                 arrows.endDraw();
             }
         }
+    }
+
+    /** Нельзя запустить торнадо, не нарисовав траекторию достаточной длины */
+    private static function checkTornadoPoints(points:Vector.<Point>):Boolean {
+        const distance:int = 48;
+        for (var i:int = 1; i < points.length; i++) {
+            if (points[i].distance(points[0]) > distance) return true;
+        }
+        return false;
     }
 
     private function itemMouseDown(mousePos:Point):void {
@@ -516,7 +527,7 @@ public class GameController {
     }
 
     private function closeTutorIfExists():void {
-        if(view.tutor.playing) view.tutor.close();
+        if (view.tutor.playing) view.tutor.close();
     }
 
     // Твои домики желтого цвета
