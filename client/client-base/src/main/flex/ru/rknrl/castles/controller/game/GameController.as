@@ -96,14 +96,15 @@ public class GameController {
     public function GameController(view:GameView,
                                    server:Server,
                                    gameState:GameStateDTO,
-                                   tutorState:TutorStateDTO) {
+                                   tutorState:TutorStateDTO,
+                                   isFirstGame:Boolean) {
         this.view = view;
         this.server = server;
 
         this.tutorState = tutorState;
-        firstGameTutorState = tutorState.firstGame ? FirstGameTutorState.completed() : FirstGameTutorState.empty();
+        firstGameTutorState = isFirstGame ? FirstGameTutorState.empty() : FirstGameTutorState.completed();
 
-        if (!tutorState.firstGame) {
+        if (isFirstGame) {
             view.mouseEnabled = false;
             view.magicItems.visible = false;
         }

@@ -101,9 +101,7 @@ class Account(matchmaking: ActorRef,
 
     case AccountNoExists ⇒
       log.debug("AccountNoExists")
-      val initTutorState = TutorStateDTO.newBuilder()
-        .setAppRunCount(0)
-        .build()
+      val initTutorState = TutorStateDTO.newBuilder().build()
       database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
 
     case AccountStateResponse(id, dto) ⇒

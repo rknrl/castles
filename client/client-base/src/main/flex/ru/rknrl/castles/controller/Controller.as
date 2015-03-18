@@ -35,6 +35,7 @@ public class Controller {
     private var social:ISocial;
 
     private var menu:MenuController;
+    private var isFirstGame:Boolean;
     private var tutorState:TutorStateDTO;
 
     public function Controller(view:View,
@@ -46,15 +47,14 @@ public class Controller {
         this.social = social;
 
         tutorState = authenticated.tutor;
-        tutorState.appRunCount++;
-        server.updateTutorState(tutorState);
+        isFirstGame = authenticated.accountState.gamesCount == 0;
 
         server.addEventListener(EnteredGameEvent.ENTEREDGAME, onEnteredGame);
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
         const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, server, model, social, tutorState);
+        menu = new MenuController(menuView, server, model, social, tutorState, authenticated.accountState.gamesCount);
 
         if (authenticated.searchOpponents) {
             view.hideMenu();
@@ -67,7 +67,7 @@ public class Controller {
     }
 
     private function addGameSplash():Boolean {
-        if (!tutorState.firstGame) {
+        if (isFirstGame) {
             gameSplash = new GameSplash(view.addGameSplash());
             gameSplash.addEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
             return true;
@@ -84,6 +84,7 @@ public class Controller {
     private function onGameSplashComplete(e:Event):void {
         gameSplash.removeEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
         view.removeGameSplash();
+        gameSplash = null;
         if (game) {
             view.addGame();
         } else {
@@ -116,7 +117,7 @@ public class Controller {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.createGame(playerInfos, h, v);
-        game = new GameController(gameView, server, gameState, tutorState);
+        game = new GameController(gameView, server, gameState, tutorState, isFirstGame);
 
         if (!gameSplash) {
             view.removeAnyLoadingScreen();
@@ -132,6 +133,7 @@ public class Controller {
 
         game.destroy();
         game = null;
+        isFirstGame = false;
 
         server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
         server.removeEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);

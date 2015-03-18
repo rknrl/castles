@@ -83,21 +83,17 @@ message BuildingPrototypeDTO {
 }
 
 message TutorStateDTO {
-    required int32 appRunCount = 1;
-    optional bool slot = 2;
-    optional bool emptySlot = 3;
-    optional bool navigate = 4;
-    optional bool magicItem = 5;
-    optional bool skills = 6;
+    optional bool slot = 1;
+    optional bool emptySlot = 2;
+    optional bool navigate = 3;
+    optional bool magicItem = 4;
+    optional bool skills = 5;
 
-    // game
-
-    optional bool firstGame = 7;
-    optional bool fireball = 8;
-    optional bool volcano = 9;
-    optional bool tornado = 10;
-    optional bool assistance = 11;
-    optional bool strengthened = 12;
+    optional bool fireball = 6;
+    optional bool volcano = 7;
+    optional bool tornado = 8;
+    optional bool assistance = 9;
+    optional bool strengthened = 10;
 }
 
 enum SlotId {
