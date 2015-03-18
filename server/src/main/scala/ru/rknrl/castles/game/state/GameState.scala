@@ -42,53 +42,53 @@ object GameState {
     for (player ← players;
          (slotId, slot) ← player.slots.slots
          if slot.buildingPrototype.isDefined)
-    yield {
-      val ij = playersSlotsPositions(player.id.id)(slotId)
-      val xy = ij.toXY
+      yield {
+        val ij = playersSlotsPositions(player.id.id)(slotId)
+        val xy = ij.toXY
 
-      val prototype = slot.buildingPrototype.get
-      new Building(
-        buildingIdIterator.next,
-        prototype,
-        xy,
-        population = config.getStartPopulation(prototype),
-        owner = Some(player.id),
-        strengthened = false,
-        strengtheningStartTime = 0,
-        lastShootTime = 0)
-    }
+        val prototype = slot.buildingPrototype.get
+        new Building(
+          buildingIdIterator.next,
+          prototype,
+          xy,
+          population = config.getStartPopulation(prototype),
+          owner = Some(player.id),
+          strengthened = false,
+          strengtheningStartTime = 0,
+          lastShootTime = 0)
+      }
 
   def slotsPosDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, SlotsOrientation]) =
     for (player ← players)
-    yield {
-      val id = player.id.id
-      val pos = positions(id)
-      SlotsPosDTO.newBuilder()
-        .setPlayerId(player.id.dto)
-        .setPos(pos.toXY.dto)
-        .setOrientation(orientations(id))
-        .build()
-    }
+      yield {
+        val id = player.id.id
+        val pos = positions(id)
+        SlotsPosDTO.newBuilder()
+          .setPlayerId(player.id.dto)
+          .setPos(pos.toXY.dto)
+          .setOrientation(orientations(id))
+          .build()
+      }
 
   def mirrorBuildingsSmallMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
     for (b ← topRandomBuildings)
-    yield {
-      val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
-      new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
-    }
+      yield {
+        val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
+        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+      }
 
   def mirrorBuildingsBigMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
     for (b ← topRandomBuildings;
          part ← List(1, 2, 3))
-    yield {
-      val pos = part match {
-        case 1 ⇒ gameArea.mirrorH(b.pos)
-        case 2 ⇒ gameArea.mirrorV(b.pos)
-        case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
-      }
+      yield {
+        val pos = part match {
+          case 1 ⇒ gameArea.mirrorH(b.pos)
+          case 2 ⇒ gameArea.mirrorV(b.pos)
+          case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
+        }
 
-      new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
-    }
+        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+      }
 
   def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig) = {
     if (big)
@@ -98,7 +98,7 @@ object GameState {
 
     val gameArea = GameArea(big)
 
-    val slotsPositions = gameArea.randomSlotsPositions
+    val slotsPositions = if(isTutor) gameArea.tutorSlotsPositions else gameArea.randomSlotsPositions
 
     val playersSlotsPositions = gameArea.getPlayersSlotPositions(slotsPositions)
 
@@ -108,7 +108,7 @@ object GameState {
 
     val buildings =
       if (isTutor) {
-        playersBuildings ++ TutorMap.bigMapBuildings(buildingIdIterator)
+        playersBuildings ++ TutorMap.buildings(buildingIdIterator, big)
       } else {
         val slotsIJs = GameArea.toIJs(playersSlotsPositions)
 
@@ -282,7 +282,7 @@ class GameState(val time: Long,
   }
 
   def isPlayerLose(playerId: PlayerId) =
-    !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId)}
+    !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId) }
 
   def dtoBuilder(id: PlayerId) =
     GameStateDTO.newBuilder()

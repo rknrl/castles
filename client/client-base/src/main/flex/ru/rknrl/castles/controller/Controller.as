@@ -21,6 +21,7 @@ import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.CellSize;
+import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
 import ru.rknrl.dto.TutorStateDTO;
@@ -37,14 +38,17 @@ public class Controller {
     private var menu:MenuController;
     private var isFirstGame:Boolean;
     private var tutorState:TutorStateDTO;
+    private var deviceType:DeviceType;
 
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
                                server:Server,
-                               social:ISocial) {
+                               social:ISocial,
+                               deviceType:DeviceType) {
         this.view = view;
         this.server = server;
         this.social = social;
+        this.deviceType = deviceType;
 
         tutorState = authenticated.tutor;
         isFirstGame = authenticated.accountState.gamesCount == 0;
@@ -67,7 +71,7 @@ public class Controller {
     }
 
     private function addGameSplash():Boolean {
-        if (isFirstGame) {
+        if (isFirstGame && deviceType == DeviceType.PC) {
             gameSplash = new GameSplash(view.addGameSplash());
             gameSplash.addEventListener(GameSplash.GAME_SPLASH_COMPLETE, onGameSplashComplete);
             return true;

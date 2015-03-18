@@ -170,7 +170,7 @@ public class Main extends Sprite {
         Log.info("onAuthenticationResult");
 
         view.removeLoadingScreen();
-        controller = new Controller(view, e.success, server, social);
+        controller = new Controller(view, e.success, server, social, deviceType);
     }
 
     private function destroyConnection():void {

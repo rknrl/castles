@@ -236,7 +236,7 @@ public class GameTutorialView extends TutorialView {
                 buildingsView.addBuilding(b.id, b.buildingType, b.buildingLevel, new BuildingOwner(true, ownerId), b.population, b.strengthened, b.pos);
             }
             i++;
-            if (i == 3) i = 0; // todo
+            if (i == playerInfos.length) i = 0; // todo
         }
 
         function removeBuildings():void {
@@ -272,7 +272,7 @@ public class GameTutorialView extends TutorialView {
         play(new <ITutorCommand>[
             hideCursor,
             open,
-            addText("У тебя 3 противника"),
+            addText(playerInfos.length == 4 ? "У тебя 3 противника" : "Твой противник бирюзовый"),
             parallel(new <ITutorCommand>[
                 loop(loopCommands),
                 sequence(new <ITutorCommand>[

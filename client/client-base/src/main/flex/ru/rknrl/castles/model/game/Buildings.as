@@ -62,17 +62,6 @@ public class Buildings {
         return byPlayerId(selfId);
     }
 
-    private static function ij(i:int, j:int):Point {
-        return new Point((i + 0.5) * CellSize.SIZE.id(), (j + 0.5) * CellSize.SIZE.id())
-    }
-
-    public static const sourceBuilding1:Point = ij(2, 0);
-    public static const targetBuilding1:Point = ij(4, 3);
-
-    public static const sourceBuilding2_1:Point = ij(0, 0);
-    public static const sourceBuilding2_2:Point = ij(4, 0);
-    public static const targetBuilding2:Point = ij(2, 5);
-
     public function getSelfBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
         return selfBuildings[0].id;

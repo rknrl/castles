@@ -27,6 +27,7 @@ import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
 import ru.rknrl.dto.BulletDTO;
 import ru.rknrl.dto.CastTorandoDTO;
+import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
@@ -583,7 +584,7 @@ public class GameController {
 
     private function playArrowTutor():void {
         view.mouseEnabled = true;
-        view.tutor.playArrow(Buildings.sourceBuilding1, Buildings.targetBuilding1);
+        view.tutor.playArrow(sourceBuilding1, targetBuilding1);
     }
 
     private function onArrowTutorComplete():void {
@@ -594,7 +595,7 @@ public class GameController {
     // Можно отправлять отряды сразу из нескольких домиков
 
     private function playArrowsTutor():void {
-        view.tutor.playArrows(Buildings.sourceBuilding2_1, Buildings.sourceBuilding2_2, Buildings.targetBuilding2);
+        view.tutor.playArrows(sourceBuilding2_1, sourceBuilding2_2, targetBuilding2);
     }
 
     private function onArrowsTutorComplete():void {
@@ -669,5 +670,30 @@ public class GameController {
     }
 
     private var tutorBuildingId:BuildingIdDTO;
+
+    private static function ij(i:int, j:int):Point {
+        return new Point((i + 0.5) * CellSize.SIZE.id(), (j + 0.5) * CellSize.SIZE.id())
+    }
+
+    public function get sourceBuilding1():Point {
+        return players.length == 4 ? ij(2, 0) : ij(3, 0);
+    }
+
+    public function get targetBuilding1():Point {
+        return players.length == 4 ? ij(4, 3) : ij(6, 3);
+    }
+
+    public function get sourceBuilding2_1():Point {
+        return players.length == 4 ? ij(0, 0) : ij(1, 0);
+    }
+
+    public function get sourceBuilding2_2():Point {
+        return players.length == 4 ? ij(4, 0) : ij(5, 0);
+    }
+
+    public function get targetBuilding2():Point {
+        return players.length == 4 ? ij(2, 5) : ij(4, 3);
+    }
+
 }
 }
