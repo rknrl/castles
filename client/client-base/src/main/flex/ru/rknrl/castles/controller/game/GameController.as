@@ -426,7 +426,6 @@ public class GameController {
                 if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {
                     if (!tutorState.tornado) {
                         tutorState.tornado = true;
-                        closeTutorIfExists();
                         sendTutorState();
                     }
 
@@ -434,6 +433,8 @@ public class GameController {
                     gameState.points = Point.pointsToDto(tornadoPath.points);
                     server.castTornado(gameState);
                     magicItems.useItem();
+                } else {
+                    if (!tutorState.tornado) playTornadoTutor();
                 }
                 tornadoPath.endDraw()
             }
@@ -514,6 +515,7 @@ public class GameController {
                 break;
             case ItemType.TORNADO:
                 tornadoPath.startDraw(mousePos);
+                closeTutorIfExists();
                 break;
             case ItemType.ASSISTANCE:
                 const building:Building = buildings.selfInXy(selfId, mousePos);
