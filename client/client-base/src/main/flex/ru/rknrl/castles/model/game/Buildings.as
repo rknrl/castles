@@ -73,14 +73,14 @@ public class Buildings {
     public static const sourceBuilding2_2:Point = ij(4, 0);
     public static const targetBuilding2:Point = ij(2, 5);
 
-    public function getSelfBuildingPos(selfId:PlayerIdDTO):Point {
+    public function getSelfBuilding(selfId:PlayerIdDTO):BuildingIdDTO {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
-        return selfBuildings[0].pos;
+        return selfBuildings[0].id;
     }
 
-    public function getEnemyBuildingPos(selfId:PlayerIdDTO):Point {
+    public function getEnemyBuilding(selfId:PlayerIdDTO):BuildingIdDTO {
         for each(var building:Building in buildings) {
-            if (building.owner && !building.owner.equalsId(selfId)) return building.pos;
+            if (building.owner && !building.owner.equalsId(selfId)) return building.id;
         }
         throw new Error("no enemy buildings");
     }

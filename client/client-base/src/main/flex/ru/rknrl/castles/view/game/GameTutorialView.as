@@ -280,7 +280,7 @@ public class GameTutorialView extends TutorialView {
                     addButton("Дальше"),
                     waitForClick
                 ])
-            ]),
+            ])
         ]);
     }
 
