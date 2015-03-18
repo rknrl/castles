@@ -276,7 +276,7 @@ public class GameTutorialView extends TutorialView {
             parallel(new <ITutorCommand>[
                 loop(loopCommands),
                 sequence(new <ITutorCommand>[
-                    wait(1500),
+                    wait(2000),
                     addButton("Дальше"),
                     waitForClick
                 ])

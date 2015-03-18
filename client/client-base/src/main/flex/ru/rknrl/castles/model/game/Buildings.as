@@ -73,12 +73,12 @@ public class Buildings {
     public static const sourceBuilding2_2:Point = ij(4, 0);
     public static const targetBuilding2:Point = ij(2, 5);
 
-    public function getSelfBuilding(selfId:PlayerIdDTO):BuildingIdDTO {
+    public function getSelfBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
         const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
         return selfBuildings[0].id;
     }
 
-    public function getEnemyBuilding(selfId:PlayerIdDTO):BuildingIdDTO {
+    public function getEnemyBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
         for each(var building:Building in buildings) {
             if (building.owner && !building.owner.equalsId(selfId)) return building.id;
         }

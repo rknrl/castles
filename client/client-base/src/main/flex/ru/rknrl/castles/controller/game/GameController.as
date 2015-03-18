@@ -620,7 +620,7 @@ public class GameController {
 
     private function playFireballTutor():void {
         closeTutorIfExists();
-        tutorBuildingId = buildings.getEnemyBuilding(selfId);
+        tutorBuildingId = buildings.getEnemyBuildingId(selfId);
         view.tutor.playFireball(buildings.byId(tutorBuildingId).pos);
     }
 
@@ -628,7 +628,7 @@ public class GameController {
 
     private function playVolcanoTutor():void {
         closeTutorIfExists();
-        tutorBuildingId = buildings.getEnemyBuilding(selfId);
+        tutorBuildingId = buildings.getEnemyBuildingId(selfId);
         view.tutor.playVolcano(buildings.byId(tutorBuildingId).pos);
     }
 
@@ -636,17 +636,16 @@ public class GameController {
 
     private function playTornadoTutor():void {
         closeTutorIfExists();
-        tutorBuildingId = buildings.getEnemyBuilding(selfId);
-        const points:Vector.<Point> = sin(buildings.byId(tutorBuildingId).pos);
-        view.tutor.playTornado(points);
+        view.tutor.playTornado(tornadoPoints);
     }
 
-    private static function sin(pos:Point):Vector.<Point> {
+    private function get tornadoPoints():Vector.<Point> {
         const points:Vector.<Point> = new <Point>[];
         const deltaX:int = 200;
         const deltaY:int = 50;
+        const pos:Point = new Point(width - deltaX, height - deltaY);
         for (var x:int = 0; x < deltaX; x++) {
-            points.push(new Point(pos.x - x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
+            points.push(new Point(pos.x + x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
         }
         return points;
     }
@@ -655,7 +654,7 @@ public class GameController {
 
     private function playStrengthenedTutor():void {
         closeTutorIfExists();
-        tutorBuildingId = buildings.getSelfBuilding(selfId);
+        tutorBuildingId = buildings.getSelfBuildingId(selfId);
         view.tutor.playStrengthening(buildings.byId(tutorBuildingId).pos);
     }
 
@@ -663,7 +662,7 @@ public class GameController {
 
     private function playAssistanceTutor():void {
         closeTutorIfExists();
-        tutorBuildingId = buildings.getSelfBuilding(selfId);
+        tutorBuildingId = buildings.getSelfBuildingId(selfId);
         view.tutor.playAssistance(buildings.byId(tutorBuildingId).pos);
     }
 
