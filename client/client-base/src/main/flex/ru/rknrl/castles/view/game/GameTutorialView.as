@@ -25,6 +25,7 @@ import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.CellSize;
@@ -55,8 +56,7 @@ public class GameTutorialView extends TutorialView {
 
     private function addText(text:String):ITutorCommand {
         return exec(function ():void {
-            textField = createTextField(Fonts.loading);
-            textField.textColor = 0xffffff;
+            textField = createTextField(Fonts.tutorial);
             textField.text = text;
             textField.scaleX = textField.scaleY = layout.scale;
             textField.x = layout.screenCenterX - textField.width / 2;
@@ -66,16 +66,16 @@ public class GameTutorialView extends TutorialView {
         });
     }
 
-    private var buttonTextField:TextField;
+    private var buttonTextField:AnimatedTextField;
 
     private function addButton(text:String):ITutorCommand {
         return exec(function ():void {
-            buttonTextField = createTextField(Fonts.loading);
-            buttonTextField.textColor = 0xffffff;
+            buttonTextField = new AnimatedTextField(Fonts.tutorial);
             buttonTextField.text = text;
-            buttonTextField.scaleX = buttonTextField.scaleY = layout.scale;
-            buttonTextField.x = layout.screenCenterX - buttonTextField.width / 2;
-            buttonTextField.y = layout.footerCenterY - buttonTextField.height / 2;
+            buttonTextField.textScale = layout.scale;
+            buttonTextField.x = layout.screenCenterX;
+            buttonTextField.y = layout.gameMagicItemsY;
+            buttonTextField.bounce();
             itemsLayer.addChild(buttonTextField);
         });
     }

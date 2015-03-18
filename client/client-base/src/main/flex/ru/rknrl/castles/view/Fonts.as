@@ -20,8 +20,8 @@ public class Fonts {
         return new TextFormat(regularFont.fontName, size, color);
     }
 
-    private static function regularCenter(size:Number):TextFormat {
-        return new TextFormat(regularFont.fontName, size, null, null, null, null, null, null, TextFormatAlign.CENTER);
+    private static function regularCenter(size:Number, color: Object = null):TextFormat {
+        return new TextFormat(regularFont.fontName, size, color, null, null, null, null, null, TextFormatAlign.CENTER);
     }
 
     private static function bold(size:Number, color:Object = null):TextFormat {
@@ -44,6 +44,8 @@ public class Fonts {
     public static const skillName:TextFormat = regular(18);
     public static const button:TextFormat = regular(18, 0xffffff);
     public static const gameSplashText:TextFormat = regular(18, Colors.darkGrey);
+
+    public static const tutorial:TextFormat = regularCenter(30, 0xffffff);
 
     public static const gameAvatarPortrait:TextFormat = light(18);
     public static const gameAvatarLandscape:TextFormat = lightCenter(30);
