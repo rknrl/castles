@@ -272,7 +272,7 @@ public class GameTutorialView extends TutorialView {
         play(new <ITutorCommand>[
             hideCursor,
             open,
-            addText(playerInfos.length == 4 ? "У тебя 3 противника" : "Твой противник бирюзовый"),
+            addText(playerInfos.length == 3 ? "У тебя 3 противника" : "Твой противник бирюзовый"),
             parallel(new <ITutorCommand>[
                 loop(loopCommands),
                 sequence(new <ITutorCommand>[

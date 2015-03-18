@@ -75,18 +75,18 @@ public class GameController {
     private var firstGameTutorState:FirstGameTutorState;
     private var players:Vector.<PlayerDTO>;
 
-    public function getPlayerInfo(playerId:PlayerIdDTO):PlayerDTO {
+    private function getPlayer(playerId:PlayerIdDTO):PlayerDTO {
         for each(var playerInfo:PlayerDTO in players) {
             if (playerInfo.id.id == playerId.id) return playerInfo;
         }
         throw new Error("can't find playerInfo " + playerId.id);
     }
 
-    public function getSelfPlayerInfo():PlayerDTO {
-        return getPlayerInfo(selfId);
+    private function getSelfPlayer():PlayerDTO {
+        return getPlayer(selfId);
     }
 
-    public function getEnemiesPlayerInfos():Vector.<PlayerDTO> {
+    private function getEnemiesPlayers():Vector.<PlayerDTO> {
         const result:Vector.<PlayerDTO> = new <PlayerDTO>[];
         for each(var playerInfo:PlayerDTO in players) {
             if (playerInfo.id.id != selfId.id) result.push(playerInfo);
@@ -391,8 +391,8 @@ public class GameController {
         if (dto.playerId.id == selfId.id) {
             view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
             isGameOver = true;
-            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayerInfo()] : getEnemiesPlayerInfos();
-            const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayerInfos() : new <PlayerDTO>[getSelfPlayerInfo()];
+            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayer()] : getEnemiesPlayers();
+            const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayers() : new <PlayerDTO>[getSelfPlayer()];
             view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         } else {
             view.setDeadAvatar(dto.playerId);
@@ -452,11 +452,12 @@ public class GameController {
                     }
 
                     if (filteredIds.length > 0) {
-                        if (!firstGameTutorState.arrowSended && !toBuilding.owner.equalsId(selfId))
-                            firstGameTutorState.arrowSended = true;
-
-                        if (!firstGameTutorState.arrowsSended && firstGameTutorState.arrowCapture && filteredIds.length > 1 && !toBuilding.owner.equalsId(selfId))
-                            firstGameTutorState.arrowsSended = true;
+                        if (!toBuilding.owner.equalsId(selfId)) {
+                            if (!firstGameTutorState.arrowSended)
+                                firstGameTutorState.arrowSended = true;
+                            else if (!firstGameTutorState.arrowsSended && firstGameTutorState.arrowCapture && filteredIds.length > 1)
+                                firstGameTutorState.arrowsSended = true;
+                        }
 
                         const dto:MoveDTO = new MoveDTO();
                         dto.toBuilding = toBuilding.id;
@@ -552,7 +553,7 @@ public class GameController {
     // Твои домики желтого цвета
 
     private function playSelfBuildingsTutor():void {
-        view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayerInfo()));
+        view.tutor.playSelfBuildings(buildings.getSelfBuildings(selfId), PlayerInfo.fromDto(getSelfPlayer()));
         view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsComplete);
     }
 
@@ -565,7 +566,7 @@ public class GameController {
     // У тебя 3 противника
 
     private function playEnemyBuildingsTutor():void {
-        const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayerInfos();
+        const playerInfos:Vector.<PlayerDTO> = getEnemiesPlayers();
         const playerIds:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
         for each(var playerInfo:PlayerDTO in playerInfos) playerIds.push(playerInfo.id);
         view.tutor.playEnemyBuildings(buildings.getEnemyBuildings(playerIds), PlayerInfo.fromDtoVector(playerInfos));
@@ -600,6 +601,7 @@ public class GameController {
 
     private function onArrowsTutorComplete():void {
         firstGameTutorState.arrowsCapture = true;
+        closeTutorIfExists();
         playWinTutor();
     }
 
@@ -694,6 +696,5 @@ public class GameController {
     public function get targetBuilding2():Point {
         return players.length == 4 ? ij(2, 5) : ij(4, 3);
     }
-
 }
 }

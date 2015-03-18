@@ -8,15 +8,20 @@
 
 package ru.rknrl.castles.model.game {
 public class FirstGameTutorState {
-    /** Это твои домики, У тебя 3 противника */
+
+    /** Это твои домики, Это домики противников */
     public var intro:Boolean;
 
-    /** Отправляй отряды и захватывай чужие домики */
+    /** Отправили отряд из одного домика */
     public var arrowSended:Boolean;
+
+    /** Захватили домик отрядом */
     public var arrowCapture:Boolean;
 
-    /** Можно отправлять сразу из нескольких домиков */
+    /** Отправили отряд из нескольких домиков */
     public var arrowsSended:Boolean;
+
+    /** Захватили домик несколькими отрядами */
     public var arrowsCapture:Boolean;
 
     /** Захвати все домики противников, чтобы выиграть */
