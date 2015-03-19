@@ -10,7 +10,7 @@ package ru.rknrl.castles.view.utils.dust {
 import flash.display.Shape;
 
 public class DustShape extends Shape {
-    private static const duration:int = 5000;
+    public static const duration:int = 3000;
     public static const dScale:Number = -1 / duration;
 
     private static const minRadius:Number = 20;

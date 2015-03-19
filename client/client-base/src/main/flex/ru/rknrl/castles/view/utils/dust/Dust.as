@@ -15,7 +15,14 @@ public class Dust extends Sprite {
     private static const minDistance:Number = -60;
     private static const maxDistance:Number = 60;
 
-    public function Dust() {
+    private var _startTime:int;
+
+    public function get startTime():int {
+        return _startTime;
+    }
+
+    public function Dust(startTime:int) {
+        _startTime = startTime;
         for (var i:int = 0; i < 30; i++) {
             const shape:DustShape = new DustShape();
             shape.x = minDistance + Math.random() * (maxDistance - minDistance);

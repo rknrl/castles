@@ -32,7 +32,7 @@ public class DustDemo extends Sprite {
     }
 
     private function onClick(event:MouseEvent):void {
-        const dust:Dust = new Dust();
+        const dust:Dust = new Dust(getTimer());
         dust.x = mouseX;
         dust.y = mouseY;
         addChild(dust);
