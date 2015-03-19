@@ -48,7 +48,6 @@ public class Units {
     public function updateUnit(dto:UnitUpdateDTO):void {
         const unit:Unit = getUnit(dto.id);
         const newPos:Point = new Point(dto.pos.x, dto.pos.y);
-        if (unit.count > dto.count) bloodView.addBlood(newPos);
         unit.update(getTimer(), newPos, dto.speed, dto.count);
         view.setUnitCount(dto.id, dto.count);
         view.setPos(dto.id.id, newPos);
