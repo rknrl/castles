@@ -125,6 +125,10 @@ public class GameArea extends Sprite {
         buildings.setBuildingCount(id, count);
     }
 
+    public function setBuildingDust(id:BuildingIdDTO, visible:Boolean):void {
+        buildings.setBuildingsDust(id, visible);
+    }
+
     public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
         buildings.setBuildingOwner(id, owner);
         _ground.updateGroundColor(buildings.byId(id).pos, owner);

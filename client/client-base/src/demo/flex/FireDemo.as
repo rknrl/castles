@@ -9,8 +9,6 @@
 package {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.events.Event;
-import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
@@ -32,17 +30,6 @@ public class FireDemo extends Sprite {
         tower.y = 300;
         tower.transform.colorTransform = Colors.transform(Colors.yellow);
         addChild(tower);
-
-        addEventListener(Event.ENTER_FRAME, onEnterFrame);
-    }
-
-    private var lastTime:int;
-
-    private function onEnterFrame(event:Event):void {
-        const time:int = getTimer();
-        const deltaTime:int = time - lastTime;
-        lastTime = time;
-        dust.enterFrame(deltaTime);
     }
 }
 }

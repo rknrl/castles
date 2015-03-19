@@ -18,6 +18,7 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.FirstGameTutorState;
 import ru.rknrl.castles.model.game.GameMagicItems;
+import ru.rknrl.castles.model.game.Volcano;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameView;
@@ -228,8 +229,24 @@ public class GameController {
         tornadoes.update(time);
         bullets.update(time);
 
+        updateDustByVolcanoes();
+
         for each(var itemType:ItemType in ItemType.values) {
             view.magicItems.setItemCooldown(itemType, magicItemStates.cooldownProgress(itemType, time))
+        }
+    }
+
+    private function updateDustByVolcanoes():void {
+        for each(b in buildings.buildings) {
+            view.area.setBuildingDust(b.id, false);
+        }
+
+        const volcanoDamageRadius:int = 48;
+        for each(var volcano:Volcano in volcanoes.volcanoes) {
+            const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos, volcanoDamageRadius);
+            for each(var b:Building in inRadius) {
+                view.area.setBuildingDust(b.id, true);
+            }
         }
     }
 

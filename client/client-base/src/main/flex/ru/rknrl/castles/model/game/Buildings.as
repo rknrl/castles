@@ -15,7 +15,7 @@ import ru.rknrl.dto.PlayerIdDTO;
 public class Buildings {
     private static const mouseAreaRadius:Number = CellSize.SIZE.id() * 2 / 3;
 
-    private var buildings:Vector.<Building>;
+    public var buildings:Vector.<Building>;
 
     public function Buildings(buildings:Vector.<Building>) {
         this.buildings = buildings;
@@ -33,6 +33,14 @@ public class Buildings {
             if (building.pos.distance(pos) < mouseAreaRadius) return building;
         }
         return null;
+    }
+
+    public function inRadius(pos:Point, radius:Number):Vector.<Building> {
+        const result:Vector.<Building> = new <Building>[];
+        for each(var building:Building in buildings) {
+            if (building.pos.distance(pos) < radius) result.push(building);
+        }
+        return result;
     }
 
     public function selfInXy(selfId:PlayerIdDTO, pos:Point):Building {

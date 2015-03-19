@@ -40,6 +40,10 @@ public class BuildingsView extends Sprite {
         byId(id).count = count;
     }
 
+    public function setBuildingsDust(id:BuildingIdDTO, visible:Boolean):void {
+        byId(id).dustVisible = visible;
+    }
+
     public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
         byId(id).owner = owner;
     }

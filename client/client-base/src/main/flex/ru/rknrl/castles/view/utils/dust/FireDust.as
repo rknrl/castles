@@ -8,6 +8,8 @@
 
 package ru.rknrl.castles.view.utils.dust {
 import flash.display.Sprite;
+import flash.events.Event;
+import flash.utils.getTimer;
 
 public class FireDust extends Sprite {
     private var shapes:Vector.<FireDustShape> = new <FireDustShape>[];
@@ -20,9 +22,16 @@ public class FireDust extends Sprite {
             addChild(shape);
             shapes.push(shape);
         }
+        addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    public function enterFrame(deltaTime:int):void {
+    private var lastTime:int;
+
+    private function onEnterFrame(event:Event):void {
+        const time:int = getTimer();
+        const deltaTime:int = time - lastTime;
+        lastTime = time;
+
         for each(var shape:FireDustShape in shapes) {
             shape.enterFrame(deltaTime);
             if (shape.needRemove) {

@@ -21,7 +21,7 @@ public class Tornadoes {
         this.view = view;
     }
 
-    private const tornadoes:Vector.<Tornado> = new <Tornado>[];
+    public const tornadoes:Vector.<Tornado> = new <Tornado>[];
     private var tornadoIterator:int;
 
     public function add(dto:TornadoDTO):void {

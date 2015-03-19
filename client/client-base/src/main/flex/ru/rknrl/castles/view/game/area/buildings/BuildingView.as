@@ -18,6 +18,7 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.Shadow;
+import ru.rknrl.castles.view.utils.dust.FireDust;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
@@ -27,9 +28,12 @@ public class BuildingView extends Sprite {
     private static const textFieldBottom:int = -2;
     private static const textFieldCenterY:int = textFieldBottom - textFieldHeight / 2;
 
+    public static const dustY:int = -32;
+
     private var buildingHolder:Animated;
     private var building:DisplayObject;
     private var textField:AnimatedTextField;
+    private var dust:FireDust;
     private var scale:Number;
 
     public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
@@ -39,6 +43,9 @@ public class BuildingView extends Sprite {
         mouseChildren = false;
 
         addChild(buildingHolder = new Animated());
+        buildingHolder.addChild(dust = new FireDust());
+        dust.y = dustY;
+        dust.visible = false;
         buildingHolder.addChild(new Shadow());
         buildingHolder.addChild(building = Fla.createBuilding(buildingType, BuildingLevel.LEVEL_3));
 
@@ -78,6 +85,10 @@ public class BuildingView extends Sprite {
             textField.text = newText;
             textField.bounce();
         }
+    }
+
+    public function set dustVisible(value:Boolean):void {
+        dust.visible = value;
     }
 
     public function set strengthened(value:Boolean):void {

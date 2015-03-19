@@ -7,9 +7,12 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.game {
+import ru.rknrl.castles.model.points.Point;
+
 public class Volcano extends Periodic {
-    public function Volcano(id:int, startTime:int, millisTillEnd:int) {
+    public function Volcano(id:int, pos: Point, startTime:int, millisTillEnd:int) {
         _id = id;
+        _pos = pos;
         super(startTime, millisTillEnd);
     }
 
@@ -17,6 +20,12 @@ public class Volcano extends Periodic {
 
     public function get id():int {
         return _id;
+    }
+
+    private var _pos: Point;
+
+    public function get pos():Point {
+        return _pos;
     }
 
     private static const radiuses:Vector.<Number> = new <Number>[20, 30, 40];

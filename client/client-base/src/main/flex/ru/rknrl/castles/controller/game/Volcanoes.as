@@ -21,14 +21,15 @@ public class Volcanoes {
         this.view = view;
     }
 
-    private const volcanoes:Vector.<Volcano> = new <Volcano>[];
+    public const volcanoes:Vector.<Volcano> = new <Volcano>[];
     private var volcanoIterator:int;
 
     public function add(dto:VolcanoDTO):void {
         const time:int = getTimer();
-        const volcano:Volcano = new Volcano(volcanoIterator++, time, dto.millisTillEnd);
+        const pos:Point = new Point(dto.pos.x, dto.pos.y);
+        const volcano:Volcano = new Volcano(volcanoIterator++, pos, time, dto.millisTillEnd);
         volcanoes.push(volcano);
-        view.addVolcano(volcano.id, new Point(dto.pos.x, dto.pos.y), volcano.radius(time));
+        view.addVolcano(volcano.id, pos, volcano.radius(time));
     }
 
     public function update(time:int):void {
