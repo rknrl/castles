@@ -16,6 +16,11 @@ cp ~/dev/rknrl/castles/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-
 
 cp -a ~/dev/rknrl/castles/client/client-web/src/main/www/. ~/dev/rknrl/castles-deploy/castles-client/www &&
 
+# replace https://127.0.0.1 by https://rknrl.ru in vk.html, ok.html, mm.html
+
+cd ~/dev/rknrl/castles-deploy/castles-client/www &&
+sed -i.bak 's/https:\/\/127\.0\.0\.1/https:\/\/rknrl\.ru/g' *.html &&
+
 # replace 127.0.0.1 by castles.rknrl.ru in vk.html, ok.html, mm.html
 
 cd ~/dev/rknrl/castles-deploy/castles-client/www &&
