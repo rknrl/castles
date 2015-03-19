@@ -18,9 +18,11 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.FirstGameTutorState;
 import ru.rknrl.castles.model.game.GameMagicItems;
+import ru.rknrl.castles.model.game.Tornado;
 import ru.rknrl.castles.model.game.Volcano;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.dto.BuildingDTO;
@@ -233,6 +235,7 @@ public class GameController {
         bullets.update(time);
 
         updateDustByVolcanoes();
+        addKillsByTornadoes(time);
 
         for each(var itemType:ItemType in ItemType.values) {
             view.magicItems.setItemCooldown(itemType, magicItemStates.cooldownProgress(itemType, time))
@@ -249,6 +252,26 @@ public class GameController {
             const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos, volcanoDamageRadius);
             for each(var b:Building in inRadius) {
                 view.area.setBuildingDust(b.id, true);
+            }
+        }
+    }
+
+    private var tornadoKillsLastTime:int;
+
+    private function addKillsByTornadoes(time:int):void {
+        if (time - tornadoKillsLastTime > 100) {
+            tornadoKillsLastTime = time;
+
+            const tornadoDamageRadius:int = 48;
+            const damagedBuildings:Vector.<Building> = new <Building>[];
+            for each(var tornado:Tornado in tornadoes.tornadoes) {
+                const inRadius:Vector.<Building> = buildings.inRadius(tornado.pos(time), tornadoDamageRadius);
+                for each(var b:Building in inRadius) {
+                    if (damagedBuildings.indexOf(b) == -1) damagedBuildings.push(b);
+                }
+            }
+            for each(b in damagedBuildings) {
+                view.area.blood.addBlood(b.pos, b.owner.hasOwner ? Colors.playerColor(b.owner.ownerId) : Colors.noOwnerColor);
             }
         }
     }

@@ -174,7 +174,7 @@ public class Colors {
 
     // game objects colors
 
-    private static const noOwnerColor:uint = grey;
+    public static const noOwnerColor:uint = grey;
 
     private static const playerColors:Vector.<uint> = new <uint>[
         yellow,
