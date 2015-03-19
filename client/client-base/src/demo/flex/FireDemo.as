@@ -7,18 +7,32 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package {
+import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.view.utils.dust.Dust;
+import ru.rknrl.castles.view.Colors;
+import ru.rknrl.castles.view.Fla;
+import ru.rknrl.castles.view.utils.dust.FireDust;
+import ru.rknrl.dto.BuildingLevel;
+import ru.rknrl.dto.BuildingType;
 
-public class DustDemo extends Sprite {
-    private var dusts:Vector.<Dust> = new <Dust>[];
+public class FireDemo extends Sprite {
+    private var dust:FireDust;
 
-    public function DustDemo() {
-        stage.addEventListener(MouseEvent.CLICK, onClick);
+    public function FireDemo() {
+        dust = new FireDust();
+        dust.x = 300;
+        dust.y = 300 - 32;
+        addChild(dust);
+
+        const tower:DisplayObject = Fla.createBuilding(BuildingType.TOWER, BuildingLevel.LEVEL_3);
+        tower.x = 300;
+        tower.y = 300;
+        tower.transform.colorTransform = Colors.transform(Colors.yellow);
+        addChild(tower);
+
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
@@ -28,15 +42,7 @@ public class DustDemo extends Sprite {
         const time:int = getTimer();
         const deltaTime:int = time - lastTime;
         lastTime = time;
-        for each(var dust:Dust in dusts) dust.enterFrame(deltaTime);
-    }
-
-    private function onClick(event:MouseEvent):void {
-        const dust:Dust = new Dust();
-        dust.x = mouseX;
-        dust.y = mouseY;
-        addChild(dust);
-        dusts.push(dust);
+        dust.enterFrame(deltaTime);
     }
 }
 }
