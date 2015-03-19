@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.UnitIdDTO;
 
 public class Unit {
@@ -16,8 +17,9 @@ public class Unit {
     private var startTime:int;
     private var speed:Number;
 
-    public function Unit(id:UnitIdDTO, startPos:Point, endPos:Point, startTime:int, speed:Number, count:int) {
+    public function Unit(id:UnitIdDTO, owner:PlayerIdDTO, startPos:Point, endPos:Point, startTime:int, speed:Number, count:int) {
         _id = id;
+        _owner = owner;
         this.endPos = endPos;
         update(startTime, startPos, speed, count);
     }
@@ -35,6 +37,12 @@ public class Unit {
         return _id;
     }
 
+    private var _owner:PlayerIdDTO;
+
+    public function get owner():PlayerIdDTO {
+        return _owner;
+    }
+
     private var _count:int;
 
     public function get count():int {
@@ -50,7 +58,7 @@ public class Unit {
         return startPos.lerp(endPos, progress);
     }
 
-    public function needRemove(time: int):Boolean {
+    public function needRemove(time:int):Boolean {
         return time - startTime > duration;
     }
 }

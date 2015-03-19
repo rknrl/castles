@@ -50,6 +50,7 @@ import ru.rknrl.rmi.AddTornadoEvent;
 import ru.rknrl.rmi.AddUnitEvent;
 import ru.rknrl.rmi.AddVolcanoEvent;
 import ru.rknrl.rmi.GameOverEvent;
+import ru.rknrl.rmi.KillUnitEvent;
 import ru.rknrl.rmi.RemoveUnitEvent;
 import ru.rknrl.rmi.Server;
 import ru.rknrl.rmi.UpdateBuildingEvent;
@@ -160,6 +161,7 @@ public class GameController {
         server.addEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
         server.addEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
         server.addEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
+        server.addEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
         server.addEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
         server.addEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
         server.addEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
@@ -176,6 +178,7 @@ public class GameController {
         server.removeEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
         server.removeEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
         server.removeEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
+        server.removeEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
         server.removeEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
         server.removeEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
         server.removeEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
@@ -269,6 +272,11 @@ public class GameController {
 
     private function onRemoveUnit(e:RemoveUnitEvent):void {
         removeUnit(e.id);
+    }
+
+    private function onKillUnit(e:KillUnitEvent):void {
+        units.addBlood(e.killedId);
+        removeUnit(e.killedId);
     }
 
     private function removeUnit(id:UnitIdDTO):void {

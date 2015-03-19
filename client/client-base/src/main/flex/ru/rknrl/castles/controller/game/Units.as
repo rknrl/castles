@@ -12,6 +12,7 @@ import flash.utils.getTimer;
 import ru.rknrl.Warning;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.area.units.BloodView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.dto.BuildingLevel;
@@ -40,7 +41,7 @@ public class Units {
     public function add(endPos:Point, dto:UnitDTO):void {
         const startPos:Point = new Point(dto.pos.x, dto.pos.y);
 
-        units.push(new Unit(dto.id, startPos, endPos, getTimer(), dto.speed, dto.count));
+        units.push(new Unit(dto.id, dto.owner, startPos, endPos, getTimer(), dto.speed, dto.count));
 
         view.addUnit(dto.id, dto.type, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, startPos);
     }
@@ -48,6 +49,7 @@ public class Units {
     public function updateUnit(dto:UnitUpdateDTO):void {
         const unit:Unit = getUnit(dto.id);
         const newPos:Point = new Point(dto.pos.x, dto.pos.y);
+        if (unit.count > dto.count) addBlood(unit.id);
         unit.update(getTimer(), newPos, dto.speed, dto.count);
         view.setUnitCount(dto.id, dto.count);
         view.setPos(dto.id.id, newPos);
@@ -58,7 +60,11 @@ public class Units {
         const index:int = units.indexOf(unit);
         units.splice(index, 1);
         view.remove(id.id);
-        bloodView.addBlood(unit.pos(getTimer())); // todo Не добавлять кровь при обычном входе в здание
+    }
+
+    public function addBlood(id:UnitIdDTO):void {
+        const unit:Unit = getUnit(id);
+        bloodView.addBlood(unit.pos(getTimer()), Colors.playerColor(unit.owner));
     }
 
     public function update(time:int):void {

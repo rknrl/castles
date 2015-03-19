@@ -14,7 +14,7 @@ import ru.rknrl.castles.game.state.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.state.players.PlayerStates
 import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
-import ru.rknrl.castles.rmi.B2C.{AddUnit, RemoveUnit, UpdateUnit}
+import ru.rknrl.castles.rmi.B2C._
 
 class GameUnits(val units: Iterable[GameUnit]) {
   def add(newUnits: Iterable[GameUnit]) =
@@ -80,8 +80,8 @@ class GameUnits(val units: Iterable[GameUnit]) {
       }
     )
 
-  def `killed→removeMessages` =
-    for (unit ← units if unit.floorCount <= 0) yield new RemoveUnit(unit.id.dto)
+  def `killed→killMessages` =
+    for (unit ← units if unit.floorCount <= 0) yield KillUnit(unit.id.dto)
 }
 
 object GameUnits {

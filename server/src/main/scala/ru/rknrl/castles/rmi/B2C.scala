@@ -51,6 +51,8 @@ object B2C {
 
   case class RemoveUnit(id: UnitIdDTO) extends Msg(12)
 
+  case class KillUnit(killedId: UnitIdDTO) extends Msg(19)
+
   case class AddFireball(fireball: FireballDTO) extends Msg(13)
 
   case class AddVolcano(volcano: VolcanoDTO) extends Msg(14)

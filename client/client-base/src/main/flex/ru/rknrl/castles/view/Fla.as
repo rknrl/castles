@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.view {
 import flash.display.DisplayObject;
+import flash.display.MovieClip;
 
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
@@ -62,7 +63,7 @@ public class Fla {
         throw new Error("unknown building level " + buildingLevel);
     }
 
-    public static function unit(buildingType:BuildingType, buildingLevel:BuildingLevel):DisplayObject {
+    public static function unit(buildingType:BuildingType, buildingLevel:BuildingLevel):MovieClip {
         return new UnitMC();
     }
 }

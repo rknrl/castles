@@ -187,7 +187,8 @@ class GameState(val time: Long,
     val createdUnits = assistanceUnits ++ exitedUnits
     val addUnitMessages = `units→addMessages`(createdUnits, time)
     val enterUnits = `units→enterUnit`(units.units, time)
-    val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits) ++ units.`killed→removeMessages`
+    val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits)
+    val killUnitMessages = units.`killed→killMessages`
 
     val createdBullets = List.empty; // createBullets(buildings, units, time, config, playerStates)
 
@@ -272,7 +273,7 @@ class GameState(val time: Long,
       config
     )
 
-    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ removeUnitMessages ++
+    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ removeUnitMessages ++ killUnitMessages ++
       updateBuildingMessages ++
       addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages
 
