@@ -76,7 +76,7 @@ class AccountState(val slots: Slots,
 
   def applyProduct(product: Product, count: Int) =
     product.id match {
-      case 1 ⇒ addGold(count)
+      case ProductId.STARS_VALUE ⇒ addGold(count)
       case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
     }
 

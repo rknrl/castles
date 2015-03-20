@@ -31,6 +31,10 @@ enum DeviceType {
     TABLET = 3;
 }
 
+enum ProductId {
+    STARS = 1;
+}
+
 message AccountIdDTO {
     required AccountType type = 1;
     required string id = 2;

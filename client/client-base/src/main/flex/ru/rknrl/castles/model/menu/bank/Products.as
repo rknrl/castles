@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.model.menu.bank {
 import ru.rknrl.dto.ProductDTO;
+import ru.rknrl.dto.ProductId;
 
 public class Products {
     private var products:Vector.<ProductDTO>;
@@ -20,7 +21,7 @@ public class Products {
 
     public function Products(products:Vector.<ProductDTO>) {
         this.products = products;
-        _product = getProductById(1);
+        _product = getProductById(ProductId.STARS.id());
     }
 
     private function getProductById(id:int):ProductDTO {
