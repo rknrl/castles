@@ -116,9 +116,9 @@ class GameConfig(val constants: Constants,
 
   def bulletSpeed = shooting.speed
 
-  def shootingInterval(building: Building, player: Option[PlayerState]) = shooting.shootInterval
+  def shootingInterval = shooting.shootInterval
 
-  def shootRadius(building: Building, player: Option[PlayerState]) = shooting.shootRadius
+  def shootRadius = shooting.shootRadius
 
   def assistanceBuildingPrototype = assistance.buildingPrototype
 

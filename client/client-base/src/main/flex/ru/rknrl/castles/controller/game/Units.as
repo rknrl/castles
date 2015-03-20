@@ -35,7 +35,7 @@ public class Units {
         for each(var unit:Unit in units) {
             if (unit.id.id == id.id) return unit;
         }
-        throw new Warning("can't find unit " + id);
+        throw new Warning("can't find unit " + id.id);
     }
 
     public function add(endPos:Point, dto:UnitDTO):void {

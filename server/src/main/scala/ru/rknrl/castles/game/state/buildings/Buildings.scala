@@ -16,6 +16,7 @@ import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
 import ru.rknrl.castles.rmi.B2C.UpdateBuilding
+import ru.rknrl.dto.CommonDTO.BuildingType
 
 class Buildings(val map: Map[BuildingId, Building]) {
   def apply(id: BuildingId) = map(id)
@@ -60,7 +61,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
 
   def applyStrengtheningCasts(actions: Map[PlayerId, BuildingId], time: Long) = {
     def updateBuilding(b: Building) =
-      if (actions.exists { case (id, buildingId) ⇒ buildingId == b.id})
+      if (actions.exists { case (id, buildingId) ⇒ buildingId == b.id })
         b.strength(time)
       else
         b
@@ -78,11 +79,11 @@ class Buildings(val map: Map[BuildingId, Building]) {
     new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
 
-  def canShoot(time: Long, config: GameConfig, playerStates: PlayerStates) =
-    for ((id, b) ← map;
-         playerState = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
-         if time - b.lastShootTime > config.shootingInterval(b, playerState))
-    yield b
+  def canShoot(time: Long, config: GameConfig) =
+    for ((id, b) ← map
+         if b.prototype.buildingType == BuildingType.TOWER
+         if time - b.lastShootTime > config.shootingInterval)
+      yield b
 
   def applyShots(time: Long, bullets: Iterable[Bullet]) = {
     def updateBuilding(b: Building) =
@@ -97,44 +98,44 @@ class Buildings(val map: Map[BuildingId, Building]) {
   def applyFireballs(fireballs: Iterable[Fireball], playerStates: PlayerStates, config: GameConfig) =
     new Buildings(
       for ((id, b) ← map)
-      yield {
-        val nearFireballs = Fireballs.inRadius(fireballs, b.pos, config, playerStates)
-        var newB = b
-        val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
+        yield {
+          val nearFireballs = Fireballs.inRadius(fireballs, b.pos, config, playerStates)
+          var newB = b
+          val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
 
-        for (fireball ← nearFireballs)
-          newB = newB.setPopulation(config.buildingPopulationAfterFireballHit(newB, playerStates(fireball.playerId), buildingPlayer))
+          for (fireball ← nearFireballs)
+            newB = newB.setPopulation(config.buildingPopulationAfterFireballHit(newB, playerStates(fireball.playerId), buildingPlayer))
 
-        id → newB
-      }
+          id → newB
+        }
     )
 
   def applyTornadoes(tornadoes: Iterable[Tornado], playerStates: PlayerStates, config: GameConfig, time: Long) =
     new Buildings(
       for ((id, b) ← map)
-      yield {
-        val nearTornadoes = Tornadoes.inRadius(tornadoes, b.pos, config, playerStates, time)
-        var newB = b
-        val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
+        yield {
+          val nearTornadoes = Tornadoes.inRadius(tornadoes, b.pos, config, playerStates, time)
+          var newB = b
+          val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
 
-        for (tornado ← nearTornadoes)
-          newB = newB.setPopulation(config.buildingPopulationAfterTornadoHit(newB, playerStates(tornado.playerId), buildingPlayer))
-        id → newB
-      }
+          for (tornado ← nearTornadoes)
+            newB = newB.setPopulation(config.buildingPopulationAfterTornadoHit(newB, playerStates(tornado.playerId), buildingPlayer))
+          id → newB
+        }
     )
 
   def applyVolcanoes(volcanoes: Iterable[Volcano], playerStates: PlayerStates, config: GameConfig) =
     new Buildings(
       for ((id, b) ← map)
-      yield {
-        val nearVolcanoes = Volcanoes.inRadius(volcanoes, b.pos, config, playerStates)
-        var newB = b
-        val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
+        yield {
+          val nearVolcanoes = Volcanoes.inRadius(volcanoes, b.pos, config, playerStates)
+          var newB = b
+          val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
 
-        for (volcano ← nearVolcanoes)
-          newB = newB.setPopulation(config.buildingPopulationAfterVolcanoHit(newB, playerStates(volcano.playerId), buildingPlayer))
-        id → newB
-      }
+          for (volcano ← nearVolcanoes)
+            newB = newB.setPopulation(config.buildingPopulationAfterVolcanoHit(newB, playerStates(volcano.playerId), buildingPlayer))
+          id → newB
+        }
     )
 
   def dto = for ((id, building) ← map) yield building.dto

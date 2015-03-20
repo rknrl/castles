@@ -23,6 +23,9 @@ class GameUnits(val units: Iterable[GameUnit]) {
   def applyRemoveMessages(messages: Iterable[RemoveUnit]) =
     new GameUnits(units.filter(u ⇒ !messages.exists(_.id.getId == u.id.id)))
 
+  def applyKillMessages(messages: Iterable[KillUnit]) =
+    new GameUnits(units.filter(u ⇒ !messages.exists(_.killedId.getId == u.id.id)))
+
   def dto(time: Long) =
     for (unit ← units) yield unit.dto(time)
 

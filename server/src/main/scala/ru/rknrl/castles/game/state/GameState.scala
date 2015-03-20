@@ -188,15 +188,11 @@ class GameState(val time: Long,
     val addUnitMessages = `units→addMessages`(createdUnits, time)
     val enterUnits = `units→enterUnit`(units.units, time)
     val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits)
-    val killUnitMessages = units.`killed→killMessages`
-
-    val createdBullets = List.empty; // createBullets(buildings, units, time, config, playerStates)
+    val killUnitMessages = units.`killed→killMessages`.filter(msg ⇒ !removeUnitMessages.exists(_.id == msg.killedId))
 
     val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
     val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)
     val createdTornadoes = `casts→tornadoes`(tornadoCasts, time, config, playerStates)
-
-    val addBulletsMessages = `bullets→addMessage`(createdBullets, time)
 
     val addFireballMessages = `fireballs→addMessages`(createdFireballs, time)
     val addVolcanoMessages = `volcanoes→addMessages`(createdVolcanoes, time)
@@ -213,6 +209,22 @@ class GameState(val time: Long,
 
     val finishedFireballs = fireballs.getFinished(time)
 
+    val finishedBullets = bullets.getFinished(time)
+
+    val newUnits = units
+      .add(createdUnits)
+      .applyFireballs(finishedFireballs, playerStates, config, time)
+      .applyVolcanoes(volcanoes.list, playerStates, config, time)
+      .applyTornadoes(tornadoes.list, playerStates, config, time)
+      .applyBullets(finishedBullets, playerStates, config, time)
+      .applyRemoveMessages(removeUnitMessages)
+      .applyKillMessages(killUnitMessages)
+
+    val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
+
+    val createdBullets = createBullets(buildings, newUnits, time, config)
+    val addBulletsMessages = `bullets→addMessage`(createdBullets, time)
+
     val newBuildings = buildings
       .updatePopulation(deltaTime, config)
       .applyStrengtheningCasts(strengtheningCasts, time)
@@ -224,18 +236,7 @@ class GameState(val time: Long,
       .applyVolcanoes(volcanoes.list, playerStates, config)
       .applyTornadoes(tornadoes.list, playerStates, config, time)
 
-    val finishedBullets = bullets.getFinished(time)
-
-    val newUnits = units
-      .add(createdUnits)
-      .applyFireballs(finishedFireballs, playerStates, config, time)
-      .applyVolcanoes(volcanoes.list, playerStates, config, time)
-      .applyTornadoes(tornadoes.list, playerStates, config, time)
-      .applyBullets(finishedBullets, playerStates, config, time)
-      .applyRemoveMessages(removeUnitMessages)
-
     val updateBuildingMessages = Buildings.getUpdateMessages(buildings.map, newBuildings.map)
-    val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
 
     val newFireballs = fireballs
       .add(createdFireballs)
