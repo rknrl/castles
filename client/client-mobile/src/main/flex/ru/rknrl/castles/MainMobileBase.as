@@ -20,7 +20,6 @@ import org.onepf.OpenIAB;
 
 import ru.rknrl.DeviceId;
 import ru.rknrl.Log;
-import ru.rknrl.Warning;
 import ru.rknrl.asocial.ISocialMobile;
 import ru.rknrl.asocial.Social;
 import ru.rknrl.asocial.platforms.Facebook;
@@ -219,12 +218,18 @@ public class MainMobileBase extends Sprite {
         addChild(main = new Main(host, gamePort, policyPort, accountId, authenticationSecret, deviceType, platformType, localesUrl, defaultLocale, social, layout, new MobileFactory(), myUserInfo));
     }
 
+    private var hasError:Boolean;
+
     private function onUncaughtError(event:UncaughtErrorEvent):void {
-        const error:Error = event.error as Error;
-        const stackTrace:String = error ? error.getStackTrace() : "";
-        Log.error(event.error, stackTrace);
-        Log.send(bugsLogUrl);
-        if (main && !(error is Warning) && main) main.addErrorScreen();
+        if (!hasError) {
+            hasError = true;
+
+            const error:Error = event.error as Error;
+            const stackTrace:String = error ? error.getStackTrace() : "";
+            Log.error(event.error, stackTrace);
+            Log.send(bugsLogUrl);
+            if (main) main.addErrorScreen();
+        }
     }
 }
 }

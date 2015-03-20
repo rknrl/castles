@@ -14,7 +14,6 @@ import flash.system.Security;
 import flash.utils.ByteArray;
 
 import ru.rknrl.Log;
-import ru.rknrl.Warning;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
@@ -94,12 +93,18 @@ public class MainWebBase extends Sprite {
         return stage.hasOwnProperty("contentsScaleFactor") ? stage["contentsScaleFactor"] : 1;
     }
 
+    private var hasError:Boolean;
+
     private function onUncaughtError(event:UncaughtErrorEvent):void {
-        const error:Error = event.error as Error;
-        const stackTrace:String = error ? error.getStackTrace() : "";
-        Log.error(event.error, stackTrace);
-        Log.send(bugsLogUrl);
-        if (main && !(error is Warning)) main.addErrorScreen();
+        if (!hasError) {
+            hasError = true;
+
+            const error:Error = event.error as Error;
+            const stackTrace:String = error ? error.getStackTrace() : "";
+            Log.error(event.error, stackTrace);
+            Log.send(bugsLogUrl);
+            if (main) main.addErrorScreen();
+        }
     }
 }
 }

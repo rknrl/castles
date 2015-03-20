@@ -9,7 +9,6 @@
 package ru.rknrl.castles.controller.game {
 import flash.utils.getTimer;
 
-import ru.rknrl.Warning;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Colors;
@@ -35,7 +34,7 @@ public class Units {
         for each(var unit:Unit in units) {
             if (unit.id.id == id.id) return unit;
         }
-        throw new Warning("can't find unit " + id.id);
+        throw new Error("can't find unit " + id.id);
     }
 
     public function add(endPos:Point, dto:UnitDTO):void {

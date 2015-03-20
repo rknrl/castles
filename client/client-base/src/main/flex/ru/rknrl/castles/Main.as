@@ -81,6 +81,7 @@ public class Main extends Sprite {
         _layout = layout;
         this.deviceFactory = deviceFactory;
         this.myUserInfo = myUserInfo;
+        Log.isDebug = true;
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 

@@ -11,7 +11,6 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
-import ru.rknrl.Warning;
 import ru.rknrl.castles.model.points.Point;
 
 public class PeriodicView extends Sprite {
@@ -25,12 +24,12 @@ public class PeriodicView extends Sprite {
 
     protected final function byId(id:int):DisplayObject {
         const displayObject:DisplayObject = map[id];
-        if (!displayObject) throw new Warning("can't find " + _name + " " + id);
+        if (!displayObject) throw new Error("can't find " + _name + " " + id);
         return displayObject;
     }
 
     protected final function add(id:int, pos:Point, displayObject:DisplayObject):void {
-        if (map[id]) throw new Warning(_name + " " + id + " already exists");
+        if (map[id]) throw new Error(_name + " " + id + " already exists");
         map[id] = displayObject;
         displayObject.x = pos.x;
         displayObject.y = pos.y;
