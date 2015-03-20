@@ -10,6 +10,8 @@ package ru.rknrl.castles.controller.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
+import ru.rknrl.Log;
+
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -175,6 +177,8 @@ public class GameController {
     }
 
     public function destroy():void {
+        Log.info("game destroy");
+
         server.removeEventListener(UpdateBuildingEvent.UPDATEBUILDING, onUpdateBuilding);
         server.removeEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
         server.removeEventListener(AddUnitEvent.ADDUNIT, onAddUnit);

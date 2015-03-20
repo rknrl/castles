@@ -175,6 +175,7 @@ public class Main extends Sprite {
     }
 
     private function destroyConnection():void {
+        Log.info("destroyConnection");
         server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
         server.removeEventListener(Event.CONNECT, onConnect);
         server.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);

@@ -144,6 +144,7 @@ public class Controller {
     }
 
     public function destroy():void {
+        Log.info("controller destroy");
         if (game) {
             view.removeGame();
             game.destroy();

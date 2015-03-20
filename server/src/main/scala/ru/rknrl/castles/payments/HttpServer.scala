@@ -38,6 +38,8 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) exte
                       |<allow-access-from domain="*" to-ports="*"/>
                       |</cross-domain-policy>""".stripMargin
 
+  val bugDelimiter = "===================================================================\n"
+
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
       ctx.marshalTo(HttpEntity(contentType, value))
@@ -47,7 +49,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) exte
     path("bug") {
       post {
         entity(as[String]) { log =>
-          bugLog.info(log)
+          bugLog.info(bugDelimiter + log)
           complete(StatusCodes.OK)
         }
       }
