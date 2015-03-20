@@ -9,10 +9,10 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.castles.game.points.Point
 
 object Assistance {
   def `casts→units`(casts: Map[PlayerId, BuildingId],
@@ -20,6 +20,7 @@ object Assistance {
                     config: GameConfig,
                     playerStates: PlayerStates,
                     unitIdIterator: UnitIdIterator,
+                    assistancePositions: Map[PlayerId, Point],
                     time: Long) =
     for ((playerId, buildingId) ← casts) yield {
       val building = buildings(buildingId)
@@ -27,7 +28,7 @@ object Assistance {
       // assert(building.owner.get == playerId)
       // здание может быть захвачено противником до каста, в этом случае все равно отправляем отряд
 
-      val startPos = new Point(0, 0)
+      val startPos = assistancePositions(playerId)
       val endPos = building.pos
       val prototype = config.assistanceBuildingPrototype
       val speed = config.getUnitSpeed(prototype, playerStates(playerId), strengthened = false)

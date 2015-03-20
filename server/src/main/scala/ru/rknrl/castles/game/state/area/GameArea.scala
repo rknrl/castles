@@ -11,6 +11,7 @@ package ru.rknrl.castles.game.state.area
 import ru.rknrl.castles.account.state.{IJ, Slots}
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.SlotId
 import ru.rknrl.dto.GameDTO.{CellSize, SlotsOrientation}
 
@@ -33,9 +34,9 @@ trait GameArea {
 
   def height = v * CellSize.SIZE_VALUE
 
-  def tutorSlotsPositions: Map[Int, IJ]
+  def assistancePositions: Map[PlayerId, Point]
 
-  def randomSlotsPositions: Map[Int, IJ]
+  def slotsPositions: Map[Int, IJ]
 
   def playerIdToOrientation: Map[Int, SlotsOrientation]
 
@@ -65,54 +66,43 @@ trait GameArea {
       yield playerId → getPlayerSlotsPositions(playerId, pos).toMap
 }
 
-/**
- * 2 players, phones
- */
+/** 2 players, phones */
 class GameAreaSmall extends GameArea {
   val h = 8
   val v = 11
 
-  private val hForRandom = h - 1 - Slots.left - Slots.right
-  private val vForRandom = Math.floor((v - 1) / 2).toInt - Slots.top - Slots.bottom
+  def slotsPositions = createSlotsPositions(new IJ(3, 0))
 
-  def tutorSlotsPositions = slotsPositions(new IJ(3, 0))
-
-  def randomSlotsPositions =
-    slotsPositions(new IJ(
-      i = Math.round(Math.random() * hForRandom).toInt + Slots.left, // [2,5]
-      j = 0
-    ))
-
-  private def slotsPositions(pos: IJ) =
+  private def createSlotsPositions(top: IJ) =
     Map(
-      0 → pos,
-      1 → mirrorH(mirrorV(pos))
+      0 → top,
+      1 → mirrorH(mirrorV(top))
     )
-
 
   val playerIdToOrientation = Map(
     0 → SlotsOrientation.TOP_LEFT,
     1 → SlotsOrientation.BOTTOM_RIGHT
   )
+
+  val assistancePositions = Map(
+    new PlayerId(0) → new Point(0, 0),
+    new PlayerId(1) → new IJ(h, v).toXY
+  )
 }
 
-/**
- * 4 players, tables and canvas
- */
+/** 4 players, tables and canvas */
 class GameAreaBig extends GameArea {
   val h = 15
   val v = 15
 
-  def tutorSlotsPositions = slotsPositions(new IJ(2, 0))
+  val slotsPositions = createSlotsPositions(new IJ(2, 0))
 
-  def randomSlotsPositions = tutorSlotsPositions
-
-  private def slotsPositions(pos: IJ) =
+  private def createSlotsPositions(topLeft: IJ) =
     Map(
-      0 → pos,
-      1 → mirrorH(pos),
-      2 → mirrorV(pos),
-      3 → mirrorH(mirrorV(pos))
+      0 → topLeft,
+      1 → mirrorH(topLeft),
+      2 → mirrorV(topLeft),
+      3 → mirrorH(mirrorV(topLeft))
     )
 
   val playerIdToOrientation = Map(
@@ -120,5 +110,12 @@ class GameAreaBig extends GameArea {
     1 → SlotsOrientation.TOP_RIGHT,
     2 → SlotsOrientation.BOTTOM_LEFT,
     3 → SlotsOrientation.BOTTOM_RIGHT
+  )
+
+  val assistancePositions = Map(
+    new PlayerId(0) → new Point(0, 0),
+    new PlayerId(1) → new IJ(h, 0).leftTopXY,
+    new PlayerId(2) → new IJ(0, v).leftTopXY,
+    new PlayerId(3) → new IJ(h, v).leftTopXY
   )
 }

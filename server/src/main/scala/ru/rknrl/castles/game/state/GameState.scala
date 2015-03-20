@@ -10,6 +10,7 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.account.state.IJ
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.Moving._
 import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.area.{GameArea, MapGenerator}
@@ -98,7 +99,7 @@ object GameState {
 
     val gameArea = GameArea(big)
 
-    val slotsPositions = if(isTutor) gameArea.tutorSlotsPositions else gameArea.randomSlotsPositions
+    val slotsPositions = gameArea.slotsPositions
 
     val playersSlotsPositions = gameArea.getPlayersSlotPositions(slotsPositions)
 
@@ -144,6 +145,7 @@ object GameState {
       new UnitIdIterator,
       slotsPos,
       new PlayerStates(playerStates.toMap),
+      gameArea.assistancePositions,
       config
     )
   }
@@ -163,6 +165,7 @@ class GameState(val time: Long,
                 val unitIdIterator: UnitIdIterator,
                 val slotsPos: Iterable[SlotsPosDTO],
                 val playerStates: PlayerStates,
+                val assistancePositions: Map[PlayerId, Point],
                 val config: GameConfig) {
 
   def update(newTime: Long,
@@ -182,7 +185,7 @@ class GameState(val time: Long,
     val assistanceCasts = gameItems.checkCasts(newAssistanceCasts, ItemType.ASSISTANCE, config, time)
 
     val exitUnits = `moveActions→exitUnits`(moveActions, buildings, config)
-    val assistanceUnits = Assistance.`casts→units`(assistanceCasts, buildings, config, playerStates, unitIdIterator, time)
+    val assistanceUnits = Assistance.`casts→units`(assistanceCasts, buildings, config, playerStates, unitIdIterator, assistancePositions, time)
     val exitedUnits = `exitUnit→units`(exitUnits, buildings, config, unitIdIterator, playerStates, time)
     val createdUnits = assistanceUnits ++ exitedUnits
     val addUnitMessages = `units→addMessages`(createdUnits, time)
@@ -271,6 +274,7 @@ class GameState(val time: Long,
       unitIdIterator,
       slotsPos,
       newPlayerStates,
+      assistancePositions,
       config
     )
 

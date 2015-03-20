@@ -35,6 +35,8 @@ class IJ(val i: Int, val j: Int) {
 
   def toXY = new Point((i + 0.5) * CellSize.SIZE_VALUE, (j + 0.5) * CellSize.SIZE_VALUE)
 
+  def leftTopXY = new Point(i * CellSize.SIZE_VALUE, j * CellSize.SIZE_VALUE)
+
   def near(that: IJ) = up == that || upLeft == that || upRight == that ||
     this == that || left == that || right == that ||
     down == that || downLeft == that || downRight == that
