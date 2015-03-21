@@ -12,6 +12,9 @@ import flash.events.Event;
 import flash.utils.getTimer;
 
 public class LockView extends Sprite {
+    private static const visibleDelay:int = 1000;
+    private static const rotateSpeed:Number = 5;
+
     private var bar:Sprite;
 
     public function LockView() {
@@ -20,9 +23,25 @@ public class LockView extends Sprite {
         visible = false;
     }
 
+    private var setVisibleTime:Number = NaN;
+
+    override public function set visible(value:Boolean):void {
+        if (value) {
+            setVisibleTime = getTimer();
+        } else {
+            super.visible = false;
+            setVisibleTime = NaN;
+        }
+    }
+
     private function onEnterFrame(event:Event):void {
-        const speed:Number = 5;
-        bar.rotation = (getTimer() / speed) % 360;
+        const time:int = getTimer();
+        bar.rotation = (time / rotateSpeed) % 360;
+
+        if (setVisibleTime && time - setVisibleTime > visibleDelay) {
+            super.visible = true;
+            setVisibleTime = NaN;
+        }
     }
 }
 }
