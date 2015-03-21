@@ -162,8 +162,6 @@ public class GameView extends Sprite {
     private function onKeyUp(event:KeyboardEvent):void {
         if (event.keyCode == Keyboard.ESCAPE) {
             dispatchEvent(new Event(GameViewEvents.SURRENDER));
-        } else {
-            onShake();
         }
     }
 

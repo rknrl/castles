@@ -70,6 +70,7 @@ object PlayerState extends Enumeration {
 class Game(players: Map[PlayerId, Player],
            big: Boolean,
            isTutor: Boolean,
+           isDev: Boolean,
            config: GameConfig,
            matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
@@ -77,11 +78,11 @@ class Game(players: Map[PlayerId, Player],
 
   val `accountId→playerId` =
     for ((playerId, player) ← players)
-    yield player.accountId → playerId
+      yield player.accountId → playerId
 
   val `playerId→accountId` =
     for ((playerId, player) ← players)
-    yield playerId → player.accountId
+      yield playerId → player.accountId
 
   /** Игроки, с которыми в данный момент установлено соединение
     * Добавление происходит на сообщение JoinMsg
@@ -91,7 +92,7 @@ class Game(players: Map[PlayerId, Player],
 
   var playerStates =
     for ((playerId, player) ← players)
-    yield playerId → PlayerState.GAME
+      yield playerId → PlayerState.GAME
 
   /** Игроки, которые завершили игру и их места */
   var gameOvers = Map[PlayerId, Int]()
@@ -106,20 +107,20 @@ class Game(players: Map[PlayerId, Player],
   def playersInGame =
     for ((playerId, playerState) ← playerStates
          if playerState == PlayerState.GAME)
-    yield playerId
+      yield playerId
 
   def getPlace = playersInGame.size
 
   /** Все люди вышли из игры */
   def allLeaved =
-    playerStates.count { case (playerId, playerState) ⇒ !players(playerId).isBot && playerState != PlayerState.LEAVED} == 0
+    playerStates.count { case (playerId, playerState) ⇒ !players(playerId).isBot && playerState != PlayerState.LEAVED } == 0
 
   def playersDto =
     for ((id, player) ← players)
-    yield PlayerDTO.newBuilder()
-      .setId(id.dto)
-      .setInfo(player.userInfo)
-      .build
+      yield PlayerDTO.newBuilder()
+        .setId(id.dto)
+        .setInfo(player.userInfo)
+        .build
 
   def placeToReward(place: Int) =
     if (place == 1) config.winReward else 0
@@ -131,7 +132,7 @@ class Game(players: Map[PlayerId, Player],
     for ((playerId, playerState) ← playerStates
          if playerState == PlayerState.GAME
          if gameState.isPlayerLose(playerId))
-    yield playerId
+      yield playerId
 
   val sendFps = 30
   val sendInterval = 1000 / sendFps
@@ -238,9 +239,11 @@ class Game(players: Map[PlayerId, Player],
 
     /** Игрок сдается */
     case Surrender ⇒
-      log.debug("Surrender")
-      if (playerStates(senderPlayerId) == PlayerState.GAME)
-        addLoser(senderPlayerId, getPlace)
+      if (isDev) {
+        log.debug("Surrender")
+        if (playerStates(senderPlayerId) == PlayerState.GAME)
+          addLoser(senderPlayerId, getPlace)
+      }
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case C2B.LeaveGame ⇒
@@ -319,11 +322,11 @@ class Game(players: Map[PlayerId, Player],
 
   def gameOverDto =
     for ((playerId, place) ← gameOvers)
-    yield GameOverDTO.newBuilder()
-      .setPlayerId(playerId.dto)
-      .setPlace(place)
-      .setReward(placeToReward(place))
-      .build()
+      yield GameOverDTO.newBuilder()
+        .setPlayerId(playerId.dto)
+        .setPlace(place)
+        .setReward(placeToReward(place))
+        .build()
 
   def addLeaved(playerId: PlayerId) {
     playerStates = playerStates.updated(playerId, PlayerState.LEAVED)

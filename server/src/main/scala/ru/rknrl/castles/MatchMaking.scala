@@ -225,7 +225,7 @@ class MatchMaking(interval: FiniteDuration,
       playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
     }
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.game, self), gameIdIterator.next)
+    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, config.game, self), gameIdIterator.next)
 
     new GameInfo(game, orders, isTutor)
   }
