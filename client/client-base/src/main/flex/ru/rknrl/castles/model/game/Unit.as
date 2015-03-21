@@ -54,7 +54,7 @@ public class Unit {
     }
 
     public function pos(time:int):Point {
-        const progress:Number = (time - startTime) / duration;
+        const progress:Number = Math.min(1, (time - startTime) / duration);
         return startPos.lerp(endPos, progress);
     }
 
