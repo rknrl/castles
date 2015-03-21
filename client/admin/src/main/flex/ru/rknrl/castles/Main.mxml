@@ -10,6 +10,9 @@
             <s:FormItem label="Password:">
                 <s:TextInput id="passwordTextInput" width="300"/>
             </s:FormItem>
+            <s:FormItem label="Host:">
+                <s:TextInput id="hostTextInput" text="127.0.0.1" width="300"/>
+            </s:FormItem>
             <s:FormItem>
                 <s:Button label="Connect" click="onConnectClick(event)"/>
             </s:FormItem>
@@ -81,7 +84,6 @@
         import ru.rknrl.rmi.AuthenticatedAsAdminEvent;
         import ru.rknrl.rmi.Server;
 
-        private static const host:String = "127.0.0.1";
         private static const port:int = 2337;
         private static const policyPort:int = 2336;
 
@@ -97,7 +99,7 @@
         private function onConnectClick(event:MouseEvent):void {
             authGroup.includeInLayout = authGroup.visible = false;
             loadingGroup.includeInLayout = loadingGroup.visible = true;
-            createConnection(host, port);
+            createConnection(hostTextInput.text, port);
         }
 
         private function createConnection(host:String, port:int):void {
