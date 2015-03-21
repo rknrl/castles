@@ -14,14 +14,20 @@ import ru.rknrl.castles.model.points.Point;
 public class ArrowsView extends Sprite {
     private const arrows:Vector.<ArrowView> = new <ArrowView>[];
 
-    public function addArrow(startPos:Point):void {
+    public function addArrow(startPos:Point):ArrowView {
         const arrow:ArrowView = new ArrowView(startPos);
         addChild(arrow);
         arrows.push(arrow);
+        return arrow;
     }
 
     public function orientArrows(endPos:Point):void {
         for each(var arrow:ArrowView in arrows) arrow.orient(endPos);
+    }
+
+    public function removeArrow(arrow:ArrowView):void {
+        arrows.splice(arrows.indexOf(arrow), 1);
+        removeChild(arrow);
     }
 
     public function removeArrows():void {

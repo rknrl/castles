@@ -8,8 +8,11 @@
 
 package ru.rknrl.castles.controller.game {
 
+import flash.utils.Dictionary;
+
 import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.game.area.arrows.ArrowView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.dto.BuildingIdDTO;
 
@@ -26,17 +29,13 @@ public class Arrows {
         return _drawing;
     }
 
-    private const _fromBuildingIds:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    private var fromBuildingIdToArrow:Dictionary = new Dictionary();
 
-    public function get fromBuildingIds():Vector.<BuildingIdDTO> {
-        return _fromBuildingIds;
-    }
-
-    private function exists(buildingId:BuildingIdDTO):Boolean {
-        for each(var id:BuildingIdDTO in _fromBuildingIds) {
-            if (buildingId.id == id.id) return true;
-        }
-        return false;
+    public function getFromBuildingsIds():Vector.<BuildingIdDTO> {
+        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+        for (var id:BuildingIdDTO in fromBuildingIdToArrow)
+            result.push(id);
+        return result;
     }
 
     public function startDraw(fromBuilding:Building):void {
@@ -44,12 +43,23 @@ public class Arrows {
         addArrow(fromBuilding);
     }
 
+    private function getArrow(fromBuildingId:BuildingIdDTO):ArrowView {
+        for (var id:BuildingIdDTO in fromBuildingIdToArrow)
+            if (id.id == fromBuildingId.id) return fromBuildingIdToArrow[id];
+        return null;
+    }
+
+    public function hasArrow(fromBuildingId:BuildingIdDTO):Boolean {
+        return getArrow(fromBuildingId);
+    }
+
     public function addArrow(fromBuilding:Building):void {
-        if (exists(fromBuilding.id)) return;
+        if (!hasArrow(fromBuilding.id))
+            fromBuildingIdToArrow[fromBuilding.id] = view.addArrow(fromBuilding.pos);
+    }
 
-        _fromBuildingIds.push(fromBuilding.id);
-
-        view.addArrow(fromBuilding.pos);
+    public function removeArrow(fromBuildingId:BuildingIdDTO):void {
+        view.removeArrow(getArrow(fromBuildingId));
     }
 
     public function mouseMove(mousePos:Point):void {
@@ -58,7 +68,7 @@ public class Arrows {
 
     public function endDraw():void {
         _drawing = false;
-        _fromBuildingIds.length = 0;
+        fromBuildingIdToArrow = new Dictionary();
         view.removeArrows();
     }
 }

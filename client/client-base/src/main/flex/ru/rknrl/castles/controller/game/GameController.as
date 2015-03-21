@@ -11,7 +11,6 @@ import flash.events.Event;
 import flash.utils.getTimer;
 
 import ru.rknrl.Log;
-
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -206,6 +205,7 @@ public class GameController {
             if (arrows.drawing) {
                 const building:Building = buildings.selfInXy(selfId, event.mousePos);
                 if (building) arrows.addArrow(building);
+
                 arrows.mouseMove(event.mousePos);
             }
         }
@@ -379,6 +379,11 @@ public class GameController {
         view.area.setBuildingCount(dto.id, dto.population);
         view.area.setBuildingOwner(dto.id, newOwner);
         view.area.setBuildingStrengthened(dto.id, dto.strengthened);
+
+        // Если ты вел стрелку из домика, а его захватили - убираем стрелку
+        if (arrows.hasArrow(building.id) && ownerChanged) {
+            arrows.removeArrow(building.id)
+        }
     }
 
     // magic items
@@ -496,8 +501,9 @@ public class GameController {
                 const toBuilding:Building = buildings.inXy(event.mousePos);
 
                 if (toBuilding) {
+                    const fromBuildingsIds:Vector.<BuildingIdDTO> = arrows.getFromBuildingsIds();
                     const filteredIds:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
-                    for each(var id:BuildingIdDTO in arrows.fromBuildingIds) {
+                    for each(var id:BuildingIdDTO in fromBuildingsIds) {
                         if (id.id != toBuilding.id.id) {
                             filteredIds.push(id);
                         }
