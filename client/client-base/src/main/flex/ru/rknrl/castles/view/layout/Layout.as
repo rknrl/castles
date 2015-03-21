@@ -51,6 +51,10 @@ public class Layout {
         return _contentsScaleFactor;
     }
 
+    public final function get gameOverAvatarBitmapSize(): Number {
+        return itemSize * _contentsScaleFactor
+    }
+
     private var _scale:Number;
 
     public final function get scale():Number {

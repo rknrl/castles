@@ -7,6 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.game {
+import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
@@ -73,8 +74,21 @@ public class GameView extends Sprite {
         }
 
         this.layout = layout;
+
+        preloadGameOverAvatars(playerInfos);
+
         addEventListener(GameViewEvents.SHAKE, onShake);
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+    }
+
+    /** Заранее загружаем аватарки для геймовер экрана, чтобы там не ждать */
+    private function preloadGameOverAvatars(playerInfos:Vector.<PlayerInfo>):void {
+        for each(var playerInfo:PlayerInfo in playerInfos) {
+            const gameOverAvatarBitmapSize:Number = _layout.gameOverAvatarBitmapSize;
+            const gameOverAvatarUrl:String = playerInfo.info.getPhotoUrl(gameOverAvatarBitmapSize, gameOverAvatarBitmapSize);
+            loadImageManager.load(gameOverAvatarUrl, function (url:String, bitmapData:BitmapData):void {
+            });
+        }
     }
 
     private function onAddedToStage(event:Event):void {

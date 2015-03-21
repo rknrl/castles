@@ -48,7 +48,7 @@ public class GameOverScreen extends Sprite {
         const losersWidth:Number = losers.length * Layout.itemSize + (losers.length - 1) * Layout.itemGap;
         holderWidth = winnersWidth + winnerLooserGap + animationOffset + losersWidth;
 
-        const avatarBitmapSize:Number = Layout.itemSize * layout.bitmapDataScale;
+        const avatarBitmapSize:Number = layout.gameOverAvatarBitmapSize;
 
         for (var i:int = 0; i < winners.length; i++) {
             const winner:PlayerInfo = winners[i];
