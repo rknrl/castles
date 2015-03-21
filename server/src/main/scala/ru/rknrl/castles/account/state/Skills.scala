@@ -8,6 +8,8 @@
 
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.AccountDTO.SkillLevelDTO
 import ru.rknrl.dto.CommonDTO.{SkillLevel, SkillType}
@@ -44,15 +46,12 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
       .build()
 
   val levelsCount = SkillLevel.values().size - 1
-  val maxAttack = 1.0
-  val maxDefence = 1.0
-  val maxSpeed = 0.75
 
-  def stat =
+  def stat(config: AccountConfig) =
     new Stat(
-      1 + levels(SkillType.ATTACK).getNumber * maxAttack / levelsCount,
-      1 + levels(SkillType.DEFENCE).getNumber * maxDefence / levelsCount,
-      1 + levels(SkillType.SPEED).getNumber * maxSpeed / levelsCount
+      1 + levels(SkillType.ATTACK).getNumber * config.maxAttack / levelsCount,
+      1 + levels(SkillType.DEFENCE).getNumber * config.maxDefence / levelsCount,
+      1 + levels(SkillType.SPEED).getNumber * config.maxSpeed / levelsCount
     )
 }
 

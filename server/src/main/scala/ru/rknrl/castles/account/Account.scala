@@ -54,7 +54,7 @@ class Account(matchmaking: ActorRef,
   def checkSecret(authenticate: AuthenticateDTO) =
     authenticate.getUserInfo.getAccountId.getType match {
       case AccountType.DEV ⇒
-        true
+        config.isDev
       case AccountType.VKONTAKTE ⇒
         if (authenticate.getSecret.hasAccessToken)
           true // todo: check access token
@@ -232,7 +232,7 @@ class Account(matchmaking: ActorRef,
   }
 
   def placeGameOrder(isTutor: Boolean) =
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills.stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills.stat(config.account), state.items, state.rating, state.gamesCount, isBot = false, isTutor))
 
   def connectToGame(game: ActorRef) = {
     game ! Game.Join(accountId, client)

@@ -27,24 +27,28 @@ object AccountConfig {
 }
 
 class AccountConfig(val initGold: Int,
+                    val initRating: Int,
                     val initItemCount: Int,
                     val buildingPrices: BuildingPrices,
                     val skillUpgradePrices: SkillUpgradePrices,
-                    val itemPrice: Int) {
+                    val itemPrice: Int,
+                    val maxAttack: Double,
+                    val maxDefence: Double,
+                    val maxSpeed: Double) {
 
   private def buildingPricesDto =
     for ((buildingLevel, price) ← buildingPrices.map)
-    yield BuildingPriceDTO.newBuilder()
-      .setLevel(buildingLevel)
-      .setPrice(price)
-      .build()
+      yield BuildingPriceDTO.newBuilder()
+        .setLevel(buildingLevel)
+        .setPrice(price)
+        .build()
 
   private def skillUpgradePricesDto =
     for ((totalLevel, price) ← skillUpgradePrices.map)
-    yield SkillUpgradePriceDTO.newBuilder()
-      .setTotalLevel(totalLevel)
-      .setPrice(price)
-      .build()
+      yield SkillUpgradePriceDTO.newBuilder()
+        .setTotalLevel(totalLevel)
+        .setPrice(price)
+        .build()
 
   def dto = AccountConfigDTO.newBuilder()
     .addAllBuildings(buildingPricesDto.asJava)

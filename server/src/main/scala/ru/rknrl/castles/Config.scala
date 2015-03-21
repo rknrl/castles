@@ -35,6 +35,7 @@ class Config(val host: String,
              val httpPort: Int,
              val adminLogin: String,
              val adminPassword: String,
+             val isDev: Boolean,
              val db: DbConfiguration,
              val products: List[Product],
              val social: SocialConfigs,
@@ -85,13 +86,13 @@ class Config(val host: String,
   def productsDto(platformType: PlatformType, accountType: AccountType) =
     for (p ← products;
          productInfo = socialByAccountType(platformType, accountType).get.productsInfo.find(_.id == p.id).get)
-    yield ProductDTO.newBuilder()
-      .setId(p.id)
-      .setTitle(p.title)
-      .setDescription(p.description)
-      .setPhotoUrl(p.photoUrl)
-      .setCount(productInfo.count)
-      .setPrice(productInfo.price)
-      .setCurrency(productInfo.currency)
-      .build()
+      yield ProductDTO.newBuilder()
+        .setId(p.id)
+        .setTitle(p.title)
+        .setDescription(p.description)
+        .setPhotoUrl(p.photoUrl)
+        .setCount(productInfo.count)
+        .setPrice(productInfo.price)
+        .setCurrency(productInfo.currency)
+        .build()
 }

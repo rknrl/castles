@@ -118,14 +118,12 @@ object AccountState {
 
   private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)
 
-  private val initRating = 1400
-
   def initAccount(config: AccountConfig) = new AccountState(
     slots = initSlots,
     skills = initSkills,
     items = initItems(config),
     gold = config.initGold,
-    rating = initRating,
+    rating = config.initRating,
     gamesCount = 0
   )
 
