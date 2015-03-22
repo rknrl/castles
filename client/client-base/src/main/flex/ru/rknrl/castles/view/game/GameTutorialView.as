@@ -8,20 +8,15 @@
 
 package ru.rknrl.castles.view.game {
 import flash.events.Event;
-import flash.text.TextField;
+import flash.geom.ColorTransform;
 import flash.utils.Dictionary;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.model.game.Building;
-import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.points.Points;
-import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.game.area.TornadoPathView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
-import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
-import ru.rknrl.castles.view.game.ui.GameAvatar;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
@@ -30,12 +25,10 @@ import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.easers.interpolate;
 import ru.rknrl.loaders.ILoadImageManager;
-import ru.rknrl.utils.createTextField;
 
 public class GameTutorialView extends TutorialView {
     private var arrows:ArrowsView;
@@ -47,21 +40,27 @@ public class GameTutorialView extends TutorialView {
         super(layout, deviceFactory);
         this.locale = locale;
         this.loadImageManager = loadImageManager;
+
         addChild(arrows = new ArrowsView());
+        arrows.transform.colorTransform = new ColorTransform(0, 0, 0);
+
         addChild(tornadoPath = new TornadoPathView());
+        tornadoPath.transform.colorTransform = new ColorTransform(0, 0, 0);
+
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    private var textField:TextField;
+    private var textField:AnimatedTextField;
 
     private function addText(text:String):ITutorCommand {
         return exec(function ():void {
-            textField = createTextField(Fonts.tutorial);
+            textField = new AnimatedTextField(Fonts.title);
             textField.text = text;
-            textField.scaleX = textField.scaleY = layout.scale;
-            textField.x = layout.screenCenterX - textField.width / 2;
+            textField.textScale = layout.scale;
+            textField.x = layout.screenCenterX;
             const areaHeight:Number = _areaV * CellSize.SIZE.id() * layout.scale;
-            textField.y = _areaPos.y + areaHeight / 2 - textField.height / 2;
+            textField.y = -8;
+            textField.bounce();
             itemsLayer.addChild(textField);
         });
     }
@@ -70,7 +69,7 @@ public class GameTutorialView extends TutorialView {
 
     private function addButton(text:String):ITutorCommand {
         return exec(function ():void {
-            buttonTextField = new AnimatedTextField(Fonts.tutorial);
+            buttonTextField = new AnimatedTextField(Fonts.play);
             buttonTextField.text = text;
             buttonTextField.textScale = layout.scale;
             buttonTextField.x = layout.screenCenterX;
@@ -175,41 +174,10 @@ public class GameTutorialView extends TutorialView {
         cast(ItemType.ASSISTANCE, buildingPos);
     }
 
-    public function playSelfBuildings(buildings:Vector.<Building>, playerInfo:PlayerInfo):void {
-        var buildingsView:BuildingsView;
-
-        function addBuildings():void {
-            const ownerId:PlayerIdDTO = new PlayerIdDTO();
-            ownerId.id = 0;
-
-            buildingsView = new BuildingsView();
-            buildingsView.scaleX = buildingsView.scaleY = layout.scale;
-            buildingsView.x = _areaPos.x;
-            buildingsView.y = _areaPos.y;
-            itemsLayer.addChild(buildingsView);
-
-            for each(var b:Building in buildings) {
-                buildingsView.addBuilding(b.id, b.buildingType, b.buildingLevel, new BuildingOwner(true, ownerId), b.population, b.strengthened, b.pos);
-            }
-        }
-
-        var avatar:GameAvatar;
-
-        function addAvatar():void {
-            avatar = new GameAvatar(playerInfo, layout, locale, loadImageManager);
-            avatar.bitmapDataScale = layout.bitmapDataScale;
-            avatar.scaleX = avatar.scaleY = layout.scale;
-            const avatarPos:Point = layout.gameAvatarPos(avatar.playerId, _areaH, _areaV);
-            avatar.x = avatarPos.x;
-            avatar.y = avatarPos.y;
-            itemsLayer.addChild(avatar);
-        }
-
+    public function playSelfBuildings():void {
         play(new <ITutorCommand>[
             hideCursor,
             open,
-            exec(addAvatar),
-            exec(addBuildings),
             addText("Твои домики желтого цвета"),
             wait(1500),
             addButton("Дальше"),
@@ -217,70 +185,14 @@ public class GameTutorialView extends TutorialView {
         ]);
     }
 
-    public function playEnemyBuildings(buildings:Vector.<Vector.<Building>>, playerInfos:Vector.<PlayerInfo>):void {
-        var buildingsView:BuildingsView;
-        var i:int = 0;
-
-        // todo переписать на visible всесто add/remove
-        function addBuildings():void {
-            const ownerId:PlayerIdDTO = new PlayerIdDTO();
-            ownerId.id = i + 1;
-
-            buildingsView = new BuildingsView();
-            buildingsView.scaleX = buildingsView.scaleY = layout.scale;
-            buildingsView.x = _areaPos.x;
-            buildingsView.y = _areaPos.y;
-            itemsLayer.addChild(buildingsView);
-
-            for each(var b:Building in buildings[i]) {
-                buildingsView.addBuilding(b.id, b.buildingType, b.buildingLevel, new BuildingOwner(true, ownerId), b.population, b.strengthened, b.pos);
-            }
-            i++;
-            if (i == playerInfos.length) i = 0; // todo
-        }
-
-        function removeBuildings():void {
-            itemsLayer.removeChild(buildingsView);
-        }
-
-        var avatar:GameAvatar;
-
-        function addAvatar():void {
-            avatar = new GameAvatar(playerInfos[i], layout, locale, loadImageManager);
-            avatar.bitmapDataScale = layout.bitmapDataScale;
-            avatar.scaleX = avatar.scaleY = layout.scale;
-            const avatarPos:Point = layout.gameAvatarPos(avatar.playerId, _areaH, _areaV);
-            avatar.x = avatarPos.x;
-            avatar.y = avatarPos.y;
-            itemsLayer.addChild(avatar);
-        }
-
-        function removeAvatar():void {
-            itemsLayer.removeChild(avatar);
-        }
-
-        const loopCommands:Vector.<ITutorCommand> = new <ITutorCommand>[];
-
-        for each(var builds:* in buildings) {
-            loopCommands.push(exec(addAvatar));
-            loopCommands.push(exec(addBuildings));
-            loopCommands.push(wait(1000));
-            loopCommands.push(exec(removeAvatar));
-            loopCommands.push(exec(removeBuildings));
-        }
-
+    public function playEnemyBuildings(bigGame:Boolean):void {
         play(new <ITutorCommand>[
             hideCursor,
             open,
-            addText(playerInfos.length == 3 ? "У тебя 3 противника" : "Твой противник бирюзовый"),
-            parallel(new <ITutorCommand>[
-                loop(loopCommands),
-                sequence(new <ITutorCommand>[
-                    wait(2000),
-                    addButton("Дальше"),
-                    waitForClick
-                ])
-            ])
+            addText(bigGame ? "У тебя 3 противника" : "Твой противник бирюзовый"),
+            wait(2000),
+            addButton("Дальше"),
+            waitForClick
         ]);
     }
 
@@ -342,9 +254,7 @@ public class GameTutorialView extends TutorialView {
             hideCursor,
             open,
             addText("Захвати все домики противников, чтобы выиграть"),
-            wait(1500),
-            addButton("В бой!"),
-            waitForClick
+            infinityWait
         ]);
     }
 

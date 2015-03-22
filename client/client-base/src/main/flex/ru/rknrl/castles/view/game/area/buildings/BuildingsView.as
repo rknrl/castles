@@ -51,5 +51,15 @@ public class BuildingsView extends Sprite {
     public function setBuildingStrengthened(id:BuildingIdDTO, strengthened:Boolean):void {
         byId(id).strengthened = strengthened;
     }
+
+    public function tutorBlur(buildingIds:Vector.<BuildingIdDTO>):void {
+        for each(var id:BuildingIdDTO in buildingIds)
+            byId(id).tutorBlur = true;
+    }
+
+    public function tutorUnblur():void {
+        for each(var building:BuildingView in buildings)
+            building.tutorBlur = false;
+    }
 }
 }

@@ -27,6 +27,17 @@ public class FirstGameTutorState {
     /** Захвати все домики противников, чтобы выиграть */
     public var win:Boolean;
 
+    public var fireballClick:Boolean;
+    public var fireballCast:Boolean;
+    public var strengtheningClick:Boolean;
+    public var strengtheningCast:Boolean;
+    public var volcanoClick:Boolean;
+    public var volcanoCast:Boolean;
+    public var tornadoClick:Boolean;
+    public var tornadoCast:Boolean;
+    public var assistanceClick:Boolean;
+    public var assistanceCast:Boolean;
+
     public static function empty():FirstGameTutorState {
         return new FirstGameTutorState();
     }
@@ -39,6 +50,11 @@ public class FirstGameTutorState {
         state.arrowsSended = true;
         state.arrowsCapture = true;
         state.win = true;
+        state.fireballCast = true;
+        state.strengtheningCast = true;
+        state.volcanoCast = true;
+        state.tornadoCast = true;
+        state.assistanceCast = true;
         return state;
     }
 }

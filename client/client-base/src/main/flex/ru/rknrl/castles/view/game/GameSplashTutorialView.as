@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.view.game {
 import flash.events.Event;
+import flash.geom.ColorTransform;
 
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
@@ -25,6 +26,7 @@ public class GameSplashTutorialView extends TutorialView {
         super(layout, deviceFactory);
         this.locale = locale;
         addChild(arrows = new ArrowsView());
+        arrows.transform.colorTransform = new ColorTransform(0, 0, 0);
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 

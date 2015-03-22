@@ -26,6 +26,7 @@ import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
@@ -189,6 +190,18 @@ public class GameView extends Sprite {
 
     public function setDeadAvatar(playerId:PlayerIdDTO):void {
         getAvatarById(playerId).dead = true;
+    }
+
+    public function tutorBlur(playerIds:Vector.<PlayerIdDTO>, buildingIds:Vector.<BuildingIdDTO>):void {
+        for each(var playerId:PlayerIdDTO in playerIds)
+            getAvatarById(playerId).tutorBlur = true;
+        area.tutorBlur(buildingIds);
+    }
+
+    public function tutorUnblur():void {
+        for each(var avatar:GameAvatar in avatars)
+            avatar.tutorBlur = false;
+        area.tutorUnblur();
     }
 }
 }

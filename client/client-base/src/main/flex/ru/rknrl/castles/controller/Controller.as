@@ -121,7 +121,7 @@ public class Controller {
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.createGame(playerInfos, h, v);
-        game = new GameController(gameView, server, gameState, tutorState, isFirstGame);
+        game = new GameController(gameView, server, gameState, isFirstGame);
 
         if (!gameSplash) {
             view.removeAnyLoadingScreen();

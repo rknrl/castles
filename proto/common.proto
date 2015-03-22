@@ -92,12 +92,6 @@ message TutorStateDTO {
     optional bool navigate = 3;
     optional bool magicItem = 4;
     optional bool skills = 5;
-
-    optional bool fireball = 6;
-    optional bool volcano = 7;
-    optional bool tornado = 8;
-    optional bool assistance = 9;
-    optional bool strengthened = 10;
 }
 
 enum SlotId {

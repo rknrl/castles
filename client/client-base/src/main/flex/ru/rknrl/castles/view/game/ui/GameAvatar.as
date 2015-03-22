@@ -23,8 +23,8 @@ public class GameAvatar extends Sprite {
     private var avatar:Avatar;
     private var textField:TextField;
 
-    private var playerInfo: PlayerInfo;
-    private var layout: Layout;
+    private var playerInfo:PlayerInfo;
+    private var layout:Layout;
     private var locale:CastlesLocale;
 
     public function get playerId():PlayerIdDTO {
@@ -55,12 +55,16 @@ public class GameAvatar extends Sprite {
         avatar.bitmapDataScale = value;
     }
 
-    public function set dead(value: Boolean):void {
+    public function set dead(value:Boolean):void {
         textField.text = value ? locale.dead : playerInfo.info.fullName;
 
         const textPos:Point = layout.gameAvatarTextPos(playerInfo.playerId, textField.width, textField.height);
         textField.x = textPos.x;
         textField.y = textPos.y;
+    }
+
+    public function set tutorBlur(value:Boolean):void {
+        alpha = value ? 0.3 : 1;
     }
 }
 }

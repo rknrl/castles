@@ -50,36 +50,32 @@ public class Buildings {
 
     // tutorial:
 
-    private function byPlayerId(id:PlayerIdDTO):Vector.<Building> {
-        const result:Vector.<Building> = new <Building>[];
+    private function byPlayerId(id:PlayerIdDTO):Vector.<BuildingIdDTO> {
+        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
         for each(var building:Building in buildings) {
-            if (building.owner.equalsId(id)) result.push(building);
+            if (building.owner.equalsId(id)) result.push(building.id);
         }
         return result;
     }
 
-    public function getEnemyBuildings(playerIds:Vector.<PlayerIdDTO>):Vector.<Vector.<Building>> {
-        const result:Vector.<Vector.<Building>> = new <Vector.<Building>>[];
-        for each(var id:PlayerIdDTO in playerIds) {
-            result.push(byPlayerId(id));
+    public function notPlayerId(id:PlayerIdDTO):Vector.<BuildingIdDTO> {
+        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+        for each(var building:Building in buildings) {
+            if (!building.owner.equalsId(id)) result.push(building.id);
         }
         return result;
     }
 
-    public function getSelfBuildings(selfId:PlayerIdDTO):Vector.<Building> {
+    public function getBuildingIds(selfId:PlayerIdDTO):Vector.<BuildingIdDTO> {
         return byPlayerId(selfId);
     }
 
-    public function getSelfBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
-        const selfBuildings:Vector.<Building> = getSelfBuildings(selfId);
-        return selfBuildings[0].id;
+    public function getBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
+        return getBuildingIds(selfId)[0];
     }
 
     public function getEnemyBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
-        for each(var building:Building in buildings) {
-            if (building.owner && !building.owner.equalsId(selfId)) return building.id;
-        }
-        throw new Error("no enemy buildings");
+        return notPlayerId(selfId)[0];
     }
 }
 }

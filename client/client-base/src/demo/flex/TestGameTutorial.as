@@ -106,22 +106,6 @@ public class TestGameTutorial extends Sprite {
 
     private function onKeyDown(event:KeyboardEvent):void {
         switch (event.keyCode) {
-            case Keyboard.NUMBER_1:
-                gameView.tutor.playSelfBuildings(buildingsByOwner(0), PlayerInfo.fromDto(playerInfos[0]));
-                break;
-            case Keyboard.NUMBER_2:
-                gameView.tutor.playEnemyBuildings(
-                        new <Vector.<Building>>[
-                            buildingsByOwner(1),
-                            buildingsByOwner(2),
-                            buildingsByOwner(3)
-                        ],
-                        new <PlayerInfo>[
-                            PlayerInfo.fromDto(playerInfos[1]),
-                            PlayerInfo.fromDto(playerInfos[2]),
-                            PlayerInfo.fromDto(playerInfos[3])
-                        ]);
-                break;
             case Keyboard.NUMBER_3:
                 gameView.tutor.playArrow(buildingPos(1),
                         buildingPos(44));

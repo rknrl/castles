@@ -94,5 +94,9 @@ public class BuildingView extends Sprite {
     public function set strengthened(value:Boolean):void {
         scaleX = scaleY = scale * (value ? Fla.strengtheningScale : 1);
     }
+
+    public function set tutorBlur(value:Boolean):void {
+        alpha = value ? 0.3 : 1;
+    }
 }
 }

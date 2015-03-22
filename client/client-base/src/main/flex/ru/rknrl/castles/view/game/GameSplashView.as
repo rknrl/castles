@@ -76,20 +76,20 @@ public class GameSplashView extends Sprite {
         area.addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
 
         area.addChild(titleTextField = createTextField(Fonts.gameSplashText));
-        titleTextField.text = "Захвати башню!";
+//        titleTextField.text = "Захвати башню!";
         area.addChild(textField = createTextField(Fonts.gameSplashText));
-        textField.text = "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
+//        textField.text = "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
         this.layout = layout;
     }
 
     private var _layout:Layout;
 
     public function get tower1Pos():Point {
-        return new Point(_layout.screenCenterX - 100 * _layout.scale, _layout.contentCenterY)
+        return new Point(_layout.screenCenterX - 100 * _layout.scale, _layout.screenHeight / 2)
     }
 
     public function get tower2Pos():Point {
-        return new Point(_layout.screenCenterX + 100 * _layout.scale, _layout.contentCenterY)
+        return new Point(_layout.screenCenterX + 100 * _layout.scale, _layout.screenHeight / 2)
     }
 
     public function set layout(value:Layout):void {

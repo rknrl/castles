@@ -10,6 +10,7 @@ package ru.rknrl.castles.view.utils.tutor {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.geom.ColorTransform;
 
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.points.Points;
@@ -51,6 +52,7 @@ public class TutorialView extends TutorialViewBase {
         cursorMC.alpha = 0.8;
         _cursor.addChild(cursorMC);
         _cursor.visible = false;
+        _cursor.transform.colorTransform = new ColorTransform(0, 0, 0);
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
         this.layout = layout;
@@ -66,19 +68,15 @@ public class TutorialView extends TutorialViewBase {
     protected function play(commands:Vector.<ITutorCommand>):void {
         if (command) throw new Error("tutor already playing");
         command = new TutorSequenceCommands(commands, false);
-        command.addEventListener(Event.COMPLETE, onTutorComplete);
+        command.addEventListener(Event.COMPLETE, hide);
         command.execute();
     }
 
-    private function onTutorComplete(event:Event = null):void {
-        startClose();
-    }
-
-    override public function close():void {
-        super.close();
+    override public function hide(event:Event = null):void {
+        super.hide(event);
         clear();
         _cursor.visible = false;
-        command.removeEventListener(Event.COMPLETE, onTutorComplete);
+        command.removeEventListener(Event.COMPLETE, hide);
         command = null;
         dispatchEvent(new Event(TUTOR_COMPLETE));
     }
@@ -104,7 +102,7 @@ public class TutorialView extends TutorialViewBase {
     }
 
     protected function get open():ITutorCommand {
-        return exec(startOpen);
+        return exec(show);
     }
 
     protected function cursorPos(point:Point):ITutorCommand {

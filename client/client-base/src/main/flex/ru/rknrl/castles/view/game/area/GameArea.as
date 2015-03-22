@@ -138,6 +138,14 @@ public class GameArea extends Sprite {
         buildings.setBuildingStrengthened(id, strengthened);
     }
 
+    public function tutorBlur(buildingIds:Vector.<BuildingIdDTO>):void {
+        buildings.tutorBlur(buildingIds);
+    }
+
+    public function tutorUnblur():void {
+        buildings.tutorUnblur();
+    }
+
     public function addSlots(dto:SlotsPosDTO):void {
         const cellSize:int = CellSize.SIZE.id();
         for each(var slotId:SlotId in SlotId.values) {
