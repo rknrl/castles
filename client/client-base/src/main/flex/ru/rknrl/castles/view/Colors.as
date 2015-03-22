@@ -86,6 +86,8 @@ public class Colors {
         return transform;
     }
 
+    public static const tutorTransform: ColorTransform = transformImpl(darkGrey);
+
     // bitmap dates
 
     public static const flaskFillBitmapData:BitmapData = new BitmapData(1, 1, false, flaskFillColor);

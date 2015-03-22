@@ -8,10 +8,8 @@
 
 package ru.rknrl.castles.controller.game {
 import flash.events.Event;
-import flash.utils.clearInterval;
+import flash.events.EventDispatcher;
 import flash.utils.getTimer;
-import flash.utils.setInterval;
-import flash.utils.setTimeout;
 
 import ru.rknrl.Log;
 import ru.rknrl.castles.model.events.GameMouseEvent;
@@ -20,21 +18,20 @@ import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
-import ru.rknrl.castles.model.game.FirstGameTutorState;
 import ru.rknrl.castles.model.game.GameMagicItems;
+import ru.rknrl.castles.model.game.GameTutorEvents;
+import ru.rknrl.castles.model.game.Players;
 import ru.rknrl.castles.model.game.Tornado;
 import ru.rknrl.castles.model.game.Volcano;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
-import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
 import ru.rknrl.dto.BulletDTO;
 import ru.rknrl.dto.CastTorandoDTO;
-import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
@@ -62,7 +59,7 @@ import ru.rknrl.rmi.UpdateBuildingEvent;
 import ru.rknrl.rmi.UpdateItemStatesEvent;
 import ru.rknrl.rmi.UpdateUnitEvent;
 
-public class GameController {
+public class GameController extends EventDispatcher {
     private var width:Number;
     private var height:Number;
     private var view:GameView;
@@ -78,33 +75,8 @@ public class GameController {
     private var tornadoPath:TornadoPath;
     private var magicItems:MagicItems;
 
-    private var firstGameTutorState:FirstGameTutorState;
-    private var players:Vector.<PlayerDTO>;
-
-    private function getPlayer(playerId:PlayerIdDTO):PlayerDTO {
-        for each(var player:PlayerDTO in players) {
-            if (player.id.id == playerId.id) return player;
-        }
-        throw new Error("can't find playerInfo " + playerId.id);
-    }
-
-    private function getSelfPlayer():PlayerDTO {
-        return getPlayer(selfId);
-    }
-
-    private function getEnemiesPlayers(playerId:PlayerIdDTO):Vector.<PlayerDTO> {
-        const result:Vector.<PlayerDTO> = new <PlayerDTO>[];
-        for each(var player:PlayerDTO in players) {
-            if (player.id.id != playerId.id) result.push(player);
-        }
-        return result;
-    }
-
-    private static function playersToIds(players:Vector.<PlayerDTO>):Vector.<PlayerIdDTO> {
-        const result:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
-        for each(var player:PlayerDTO in players) result.push(player.id);
-        return result;
-    }
+    private var tutor:GameTutorController;
+    private var players:Players;
 
     public function GameController(view:GameView,
                                    server:Server,
@@ -113,19 +85,11 @@ public class GameController {
         this.view = view;
         this.server = server;
 
-        firstGameTutorState = isFirstGame ? FirstGameTutorState.empty() : FirstGameTutorState.completed();
-
-        if (isFirstGame) {
-            view.mouseEnabled = false;
-            view.magicItems.visible = false;
-            view.y += 32; // todo
-        }
-
         width = gameState.width;
         height = gameState.height;
 
         selfId = gameState.selfId;
-        players = gameState.players;
+        players = new Players(gameState.players, selfId);
 
         bullets = new Bullets(view.area.bullets);
         fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
@@ -179,6 +143,11 @@ public class GameController {
 
         // Человек мог играть на компе, а потом перезайти в бой на мобиле
         if (gameState.players.length > view.supportedPlayersCount) onSurrender()
+
+        if (isFirstGame) {
+            tutor = new GameTutorController(view, this, players, buildings);
+            view.y += 32; // todo
+        }
     }
 
     public function destroy():void {
@@ -197,8 +166,6 @@ public class GameController {
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
 
-    private static const tutorInterval:int = 10000;
-    private var tutorLastTime:int = -8000;
     private var tutorStart:Boolean;
 
     private function onEnterFrame(event:GameMouseEvent):void {
@@ -216,22 +183,9 @@ public class GameController {
             }
         }
 
-        if (!isGameOver && !view.tutor.playing && !arrows.drawing && !tornadoPath.drawing && !magicItems.selected &&
-                time - tutorLastTime > tutorInterval) {
-
-            tutorLastTime = time;
-
-            if (!firstGameTutorState.intro) {
-                if (!tutorStart) {
-                    setTimeout(playSelfBuildingsTutor, 2000);
-                    tutorStart = true;
-                }
-            }
-            else if (!firstGameTutorState.arrowCapture) {
-                if (!firstGameTutorState.arrowSended) playArrowTutor();
-            } else if (!firstGameTutorState.arrowsCapture) {
-                if (!firstGameTutorState.arrowsSended) playArrowsTutor();
-            }
+        if (!tutorStart) {
+            tutorStart = true;
+            tutor.play();
         }
     }
 
@@ -362,11 +316,7 @@ public class GameController {
         const willOwned:Boolean = newOwner.equalsId(selfId);
 
         const capture:Boolean = !wasOwned && (building.population > dto.population || willOwned);
-
-        if (capture) {
-            if (firstGameTutorState.arrowSended && !firstGameTutorState.arrowCapture) onArrowTutorComplete();
-            else if (firstGameTutorState.arrowsSended && !firstGameTutorState.arrowsCapture) onArrowsTutorComplete();
-        }
+        if (capture) dispatchEvent(new Event(GameTutorEvents.BUILDING_CAPTURED));
 
         building.update(newOwner, dto.population, dto.strengthened);
 
@@ -398,35 +348,15 @@ public class GameController {
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {
-        if (magicItemStates.canUse(event.itemType, getTimer())) {
-            if (magicItems.selected == event.itemType) {
-                if (!view.tutor.playing) {
-                    magicItems.selected = null;
-                }
+        const itemType:ItemType = event.itemType;
+        if (magicItemStates.canUse(itemType, getTimer())) {
+            if (magicItems.selected == itemType) {
+                // В туторе нельзя задиселектить выбранный предмет
+                if (!view.tutor.playing) magicItems.selected = null;
             } else {
-                magicItems.selected = event.itemType;
-                playMagicItemTutor(event.itemType);
+                magicItems.selected = itemType;
+                dispatchEvent(new Event(GameTutorEvents.selected(itemType)));
             }
-        }
-    }
-
-    private function playMagicItemTutor(itemType:ItemType):void {
-        switch (itemType) {
-            case ItemType.FIREBALL:
-                if (!firstGameTutorState.fireballCast) playFireballTutor();
-                break;
-            case ItemType.STRENGTHENING:
-                if (!firstGameTutorState.strengtheningCast) playStrengthenedTutor();
-                break;
-            case ItemType.VOLCANO:
-                if (!firstGameTutorState.volcanoCast) playVolcanoTutor();
-                break;
-            case ItemType.TORNADO:
-                if (!firstGameTutorState.tornadoCast) playTornadoTutor();
-                break;
-            case ItemType.ASSISTANCE:
-                if (!firstGameTutorState.assistanceCast) playAssistanceTutor();
-                break;
         }
     }
 
@@ -436,14 +366,11 @@ public class GameController {
         gameOver(e.gameOver);
     }
 
-    private var isGameOver:Boolean;
-
     private function gameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
             view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
-            isGameOver = true;
-            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[getSelfPlayer()] : getEnemiesPlayers(selfId);
-            const losers:Vector.<PlayerDTO> = dto.place == 1 ? getEnemiesPlayers(selfId) : new <PlayerDTO>[getSelfPlayer()];
+            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[players.getSelfPlayer()] : players.getEnemiesPlayers(selfId);
+            const losers:Vector.<PlayerDTO> = dto.place == 1 ? players.getEnemiesPlayers(selfId) : new <PlayerDTO>[players.getSelfPlayer()];
             view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         } else {
             view.setDeadAvatar(dto.playerId);
@@ -476,17 +403,11 @@ public class GameController {
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
                 if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {
-                    if (!firstGameTutorState.tornadoCast) {
-                        firstGameTutorState.tornadoCast = true;
-                        onTornadoTutorComplete();
-                    }
-
                     const gameState:CastTorandoDTO = new CastTorandoDTO();
                     gameState.points = Point.pointsToDto(tornadoPath.points);
                     server.castTornado(gameState);
                     magicItems.useItem();
-                } else {
-                    if (!firstGameTutorState.tornadoCast) playTornadoTutor();
+                    dispatchEvent(new Event(GameTutorEvents.casted(ItemType.TORNADO)));
                 }
                 tornadoPath.endDraw()
             }
@@ -505,10 +426,10 @@ public class GameController {
 
                     if (filteredIds.length > 0) {
                         if (!toBuilding.owner.equalsId(selfId)) {
-                            if (!firstGameTutorState.arrowSended)
-                                firstGameTutorState.arrowSended = true;
-                            else if (!firstGameTutorState.arrowsSended && firstGameTutorState.arrowCapture && filteredIds.length > 1)
-                                firstGameTutorState.arrowsSended = true;
+                            if (filteredIds.length > 1)
+                                dispatchEvent(new Event(GameTutorEvents.ARROWS_SENDED));
+                            else
+                                dispatchEvent(new Event(GameTutorEvents.ARROW_SENDED));
                         }
 
                         const dto:MoveDTO = new MoveDTO();
@@ -534,247 +455,41 @@ public class GameController {
 
     private function itemMouseDown(mousePos:Point):void {
         switch (magicItems.selected) {
-            case ItemType.FIREBALL:
-                if (!firstGameTutorState.fireballCast) {
-                    firstGameTutorState.fireballCast = true;
-                    onFireballTutorComplete();
-                }
 
+            case ItemType.FIREBALL:
                 server.castFireball(mousePos.dto());
                 magicItems.useItem();
+                dispatchEvent(new Event(GameTutorEvents.casted(ItemType.FIREBALL)));
                 break;
+
             case ItemType.STRENGTHENING:
                 const strBuilding:Building = buildings.selfInXy(selfId, mousePos);
                 if (strBuilding) {
-                    if (!firstGameTutorState.strengtheningCast) {
-                        firstGameTutorState.strengtheningCast = true;
-                        onStrengtheningTutorComplete();
-                    }
-
                     server.castStrengthening(strBuilding.id);
                     magicItems.useItem();
+                    dispatchEvent(new Event(GameTutorEvents.casted(ItemType.STRENGTHENING)));
                 }
                 break;
-            case ItemType.VOLCANO:
-                if (!firstGameTutorState.volcanoCast) {
-                    firstGameTutorState.volcanoCast = true;
-                    onVolcanoTutorComplete();
-                }
 
+            case ItemType.VOLCANO:
                 server.castVolcano(mousePos.dto());
                 magicItems.useItem();
+                dispatchEvent(new Event(GameTutorEvents.casted(ItemType.VOLCANO)));
                 break;
+
             case ItemType.TORNADO:
                 tornadoPath.startDraw(mousePos);
-                closeTutorIfExists();
                 break;
+
             case ItemType.ASSISTANCE:
                 const building:Building = buildings.selfInXy(selfId, mousePos);
                 if (building) {
-                    if (!firstGameTutorState.assistanceCast) {
-                        firstGameTutorState.assistanceCast = true;
-                        onAssistanceTutorComplete();
-                    }
-
                     server.castAssistance(building.id);
                     magicItems.useItem();
+                    dispatchEvent(new Event(GameTutorEvents.casted(ItemType.ASSISTANCE)));
                 }
                 break;
         }
-    }
-
-    //----------------------------------------------
-    //
-    // TUTOR
-    //
-    //----------------------------------------------
-
-    private function closeTutorIfExists():void {
-        if (view.tutor.playing) view.tutor.hide();
-    }
-
-    // Твои домики желтого цвета
-
-    private function playSelfBuildingsTutor():void {
-        view.tutor.playSelfBuildings();
-        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsComplete);
-        view.tutorBlur(playersToIds(getEnemiesPlayers(selfId)), buildings.notPlayerId(selfId));
-    }
-
-    private function onSelfBuildingsComplete(e:Event):void {
-        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onSelfBuildingsComplete);
-        view.tutorUnblur();
-        playEnemyBuildingsTutor();
-    }
-
-    // У тебя 3 противника
-
-    private var enemyIndex:int;
-    private var highlightInterval:int;
-
-    private function playEnemyBuildingsTutor():void {
-        view.tutor.playEnemyBuildings(players.length == 4);
-        view.tutor.addEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsComplete);
-        highlightEnemyBuildings();
-        highlightInterval = setInterval(highlightEnemyBuildings, 1000);
-    }
-
-    private function highlightEnemyBuildings():void {
-        const player:PlayerDTO = getEnemiesPlayers(selfId)[enemyIndex];
-        view.tutorUnblur();
-        view.tutorBlur(playersToIds(getEnemiesPlayers(player.id)), buildings.notPlayerId(player.id));
-        enemyIndex++;
-        if (enemyIndex == 3) enemyIndex = 0;
-    }
-
-    private function onEnemyBuildingsComplete(e:Event):void {
-        view.tutor.removeEventListener(TutorialView.TUTOR_COMPLETE, onEnemyBuildingsComplete);
-
-        clearInterval(highlightInterval);
-        view.tutorUnblur();
-        firstGameTutorState.intro = true;
-
-        playArrowTutor();
-    }
-
-    // Отправляй отряды и захватывай чужие домики
-
-    private function playArrowTutor():void {
-        view.mouseEnabled = true;
-        view.tutor.playArrow(sourceBuilding1, targetBuilding1);
-    }
-
-    private function onArrowTutorComplete():void {
-        firstGameTutorState.arrowCapture = true;
-        playArrowsTutor();
-    }
-
-    // Можно отправлять отряды сразу из нескольких домиков
-
-    private function playArrowsTutor():void {
-        view.tutor.playArrows(sourceBuilding2_1, sourceBuilding2_2, targetBuilding2);
-    }
-
-    private function onArrowsTutorComplete():void {
-        firstGameTutorState.arrowsCapture = true;
-        closeTutorIfExists();
-
-        view.magicItems.visible = true;
-        view.tutor.itemClick(ItemType.FIREBALL)
-    }
-
-    // Запусти фаербол в противника
-
-    private function playFireballTutor():void {
-        closeTutorIfExists();
-        view.tutor.playFireball(buildings.byId(buildings.getEnemyBuildingId(selfId)).pos);
-    }
-
-    private function onFireballTutorComplete():void {
-        closeTutorIfExists();
-        setTimeout(function ():void {
-            view.tutor.itemClick(ItemType.STRENGTHENING)
-        }, 5000);
-    }
-
-    // Усилить свой домик
-
-    private function playStrengthenedTutor():void {
-        closeTutorIfExists();
-        view.tutor.playStrengthening(buildings.byId(buildings.getBuildingId(selfId)).pos);
-    }
-
-    private function onStrengtheningTutorComplete():void {
-        closeTutorIfExists();
-        setTimeout(function ():void {
-            view.tutor.itemClick(ItemType.VOLCANO)
-        }, 4000);
-    }
-
-    // Создай вулкан под башней противника
-
-    private function playVolcanoTutor():void {
-        closeTutorIfExists();
-        view.tutor.playVolcano(buildings.byId(buildings.getEnemyBuildingId(selfId)).pos);
-    }
-
-    private function onVolcanoTutorComplete():void {
-        closeTutorIfExists();
-        setTimeout(function ():void {
-            view.tutor.itemClick(ItemType.TORNADO)
-        }, 5000);
-    }
-
-    // Используй торнадо против противника
-
-    private function playTornadoTutor():void {
-        closeTutorIfExists();
-        view.tutor.playTornado(tornadoPoints);
-    }
-
-    private function get tornadoPoints():Vector.<Point> {
-        const points:Vector.<Point> = new <Point>[];
-        const deltaX:int = 200;
-        const deltaY:int = 50;
-        const pos:Point = new Point(width - deltaX, height - deltaY);
-        for (var x:int = 0; x < deltaX; x++) {
-            points.push(new Point(pos.x + x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
-        }
-        return points;
-    }
-
-    private function onTornadoTutorComplete():void {
-        closeTutorIfExists();
-        setTimeout(function ():void {
-            view.tutor.itemClick(ItemType.ASSISTANCE)
-        }, 5000);
-    }
-
-    // Вызывай подмогу
-
-    private function playAssistanceTutor():void {
-        closeTutorIfExists();
-        view.tutor.playAssistance(buildings.byId(buildings.getBuildingId(selfId)).pos);
-    }
-
-    private function onAssistanceTutorComplete():void {
-        closeTutorIfExists();
-        setTimeout(function ():void {
-            playWinTutor();
-        }, 4000);
-    }
-
-    // Захвати все домики противников, чтобы выиграть
-
-    private function playWinTutor():void {
-        view.tutor.playWin();
-        server.startTutorGame();
-    }
-
-    //
-
-    private static function ij(i:int, j:int):Point {
-        return new Point((i + 0.5) * CellSize.SIZE.id(), (j + 0.5) * CellSize.SIZE.id())
-    }
-
-    public function get sourceBuilding1():Point {
-        return players.length == 4 ? ij(2, 0) : ij(3, 0);
-    }
-
-    public function get targetBuilding1():Point {
-        return players.length == 4 ? ij(4, 3) : ij(6, 3);
-    }
-
-    public function get sourceBuilding2_1():Point {
-        return players.length == 4 ? ij(0, 0) : ij(1, 0);
-    }
-
-    public function get sourceBuilding2_2():Point {
-        return players.length == 4 ? ij(4, 0) : ij(5, 0);
-    }
-
-    public function get targetBuilding2():Point {
-        return players.length == 4 ? ij(2, 5) : ij(4, 3);
     }
 }
 }

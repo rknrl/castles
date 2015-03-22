@@ -9,11 +9,8 @@
 package ru.rknrl.castles.view.utils.tutor {
 import flash.display.Sprite;
 import flash.events.Event;
-import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.popups.ModalScreen;
-import ru.rknrl.utils.Tweener;
 
 public class TutorialViewBase extends Sprite {
     public function TutorialViewBase(layout:Layout) {

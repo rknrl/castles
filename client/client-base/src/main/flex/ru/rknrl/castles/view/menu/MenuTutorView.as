@@ -45,6 +45,7 @@ public class MenuTutorView extends TutorialView {
             itemsLayer.removeChild(arrow);
         }
 
+/*
         play(new <ITutorCommand>[
             wait(500),
             showCursor,
@@ -55,6 +56,7 @@ public class MenuTutorView extends TutorialView {
             wait(1000),
             exec(removeArrow)
         ]);
+*/
     }
 
     public function playSlot(slotId:SlotId):void {
@@ -70,6 +72,7 @@ public class MenuTutorView extends TutorialView {
     }
 
     private function tweenAndClick(clickPos:Point):void {
+/*
         play(new <ITutorCommand>[
             wait(500),
             showCursor,
@@ -79,6 +82,7 @@ public class MenuTutorView extends TutorialView {
             click,
             wait(1000)
         ]);
+*/
     }
 }
 }

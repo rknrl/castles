@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.view.game {
 import flash.events.Event;
-import flash.geom.ColorTransform;
 
 import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
@@ -26,26 +26,26 @@ public class GameSplashTutorialView extends TutorialView {
         super(layout, deviceFactory);
         this.locale = locale;
         addChild(arrows = new ArrowsView());
-        arrows.transform.colorTransform = new ColorTransform(0, 0, 0);
+        arrows.transform.colorTransform = Colors.tutorTransform;
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
     public function playArrow(startBuildingPos:Point, endBuildingPos:Point):void {
-        play(new <ITutorCommand>[
-            showCursor,
-            open,
-            tween(screenCorner, startBuildingPos),
-            mouseDown,
-            wait(400),
-            exec(function ():void {
-                arrows.addArrow(startBuildingPos);
-            }),
-            tween(startBuildingPos, endBuildingPos),
-            wait(400),
-            mouseUp,
-            exec(arrows.removeArrows),
-            wait(400)
-        ]);
+//        play(new <ITutorCommand>[
+//            showCursor,
+//            open,
+//            tween(screenCorner, startBuildingPos),
+//            mouseDown,
+//            wait(400),
+//            exec(function ():void {
+//                arrows.addArrow(startBuildingPos);
+//            }),
+//            tween(startBuildingPos, endBuildingPos),
+//            wait(400),
+//            mouseUp,
+//            exec(arrows.removeArrows),
+//            wait(400)
+//        ]);
     }
 
     private function onEnterFrame(event:Event):void {
