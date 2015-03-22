@@ -23,6 +23,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.utils.createTextField;
@@ -46,7 +47,12 @@ public class GameSplashView extends Sprite {
     private var mouseHolder:Bitmap;
     private var titleTextField:TextField;
     private var textField:TextField;
-    private var tutor:GameSplashTutorialView;
+
+    private var _tutor:GameSplashTutorialView;
+
+    public function get tutor():GameSplashTutorialView {
+        return _tutor;
+    }
 
     private var _arrows:ArrowsView;
 
@@ -73,7 +79,7 @@ public class GameSplashView extends Sprite {
         area.addChild(_arrows = new ArrowsView());
         arrows.transform.colorTransform = Colors.transform(Colors.yellow);
 
-        area.addChild(tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
+        area.addChild(_tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
 
         area.addChild(titleTextField = createTextField(Fonts.gameSplashText));
 //        titleTextField.text = "Захвати башню!";
@@ -113,12 +119,8 @@ public class GameSplashView extends Sprite {
         textField.x = value.screenCenterX - textField.width / 2;
         textField.y = _layout.footerCenterY + gap / 2;
 
-        tutor.layout = value;
+        _tutor.layout = value;
         if (loadingScreen) loadingScreen.layout = value;
-    }
-
-    public function playArrow():void {
-        tutor.playArrow(tower1Pos, tower2Pos);
     }
 
     public function addLoadingScreen():void {

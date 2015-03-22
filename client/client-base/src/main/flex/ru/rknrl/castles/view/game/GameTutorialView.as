@@ -151,19 +151,19 @@ public class GameTutorialView extends TutorialView {
     }
 
     public function tweenGame(a:Point, b:Point):ITutorCommand {
-        return tween(toGlobal(a), toGlobal(b));
+        return _tween(toGlobal(a), toGlobal(b));
     }
 
     public function tweenFromCorner(b:Point):ITutorCommand {
-        return tween(screenCorner, toGlobal(b));
+        return _tween(screenCorner, toGlobal(b));
     }
 
     public function tweenFromItem(itemType:ItemType, b:Point):ITutorCommand {
-        return tween(layout.gameMagicItem(indexOf(itemType)), toGlobal(b));
+        return _tween(layout.gameMagicItem(indexOf(itemType)), toGlobal(b));
     }
 
     public function tweenFromCornerToItem(itemType:ItemType):ITutorCommand {
-        return tween(screenCorner, layout.gameMagicItem(indexOf(itemType)));
+        return _tween(screenCorner, layout.gameMagicItem(indexOf(itemType)));
     }
 
     public function tweenPath(points:Vector.<Point>):ITutorCommand {

@@ -19,37 +19,28 @@ import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 
 public class GameSplashTutorialView extends TutorialView {
-    private var arrows:ArrowsView;
+    private var _arrows:ArrowsView;
+
+    public function get arrows():ArrowsView {
+        return _arrows;
+    }
+
     private var locale:CastlesLocale;
 
     public function GameSplashTutorialView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory) {
         super(layout, deviceFactory);
         this.locale = locale;
-        addChild(arrows = new ArrowsView());
-        arrows.transform.colorTransform = Colors.tutorTransform;
+        addChild(_arrows = new ArrowsView());
+        _arrows.transform.colorTransform = Colors.tutorTransform;
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    public function playArrow(startBuildingPos:Point, endBuildingPos:Point):void {
-//        play(new <ITutorCommand>[
-//            showCursor,
-//            open,
-//            tween(screenCorner, startBuildingPos),
-//            mouseDown,
-//            wait(400),
-//            exec(function ():void {
-//                arrows.addArrow(startBuildingPos);
-//            }),
-//            tween(startBuildingPos, endBuildingPos),
-//            wait(400),
-//            mouseUp,
-//            exec(arrows.removeArrows),
-//            wait(400)
-//        ]);
+    private function onEnterFrame(event:Event):void {
+        _arrows.orientArrows(new Point(cursor.x, cursor.y));
     }
 
-    private function onEnterFrame(event:Event):void {
-        arrows.orientArrows(new Point(cursor.x, cursor.y));
+    public function tween(a:Point, b:Point):ITutorCommand {
+        return _tween(a, b);
     }
 }
 }

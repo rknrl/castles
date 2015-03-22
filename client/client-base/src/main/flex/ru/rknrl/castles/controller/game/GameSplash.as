@@ -18,6 +18,12 @@ import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameSplashView;
+import ru.rknrl.castles.view.utils.tutor.commands.Exec;
+import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
+import ru.rknrl.castles.view.utils.tutor.commands.InfinityWait;
+import ru.rknrl.castles.view.utils.tutor.commands.TutorParallelCommands;
+import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
+import ru.rknrl.castles.view.utils.tutor.commands.Wait;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.UnitDTO;
@@ -32,13 +38,31 @@ public class GameSplash extends EventDispatcher {
 
     public function GameSplash(view:GameSplashView) {
         this.view = view;
+
         view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         view.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-    }
 
-    private static const tutorInterval:int = 5000;
-    private var lastTutorTime:int;
+        view.tutor.play(new <ITutorCommand>[
+            new TutorParallelCommands(new <ITutorCommand>[
+                new TutorSequenceCommands(new <ITutorCommand>[
+                    new Exec(view.tutor.showCursor),
+                    view.tutor.tween(view.tutor.screenCorner, view.tower1Pos),
+                    new Exec(view.tutor.mouseDown),
+                    new Wait(400),
+                    new Exec(function ():void {
+                        view.tutor.arrows.addArrow(view.tower1Pos);
+                    }),
+                    view.tutor.tween(view.tower1Pos, view.tower2Pos),
+                    new Wait(400),
+                    new Exec(view.tutor.mouseUp),
+                    new Exec(view.tutor.arrows.removeArrows),
+                    new Wait(400)
+                ], true),
+                new InfinityWait()
+            ])
+        ]);
+    }
 
     private function get mousePos():Point {
         return new Point(view.mouseX, view.mouseY);
@@ -46,10 +70,6 @@ public class GameSplash extends EventDispatcher {
 
     private function onEnterFrame(event:Event):void {
         const time:int = getTimer();
-        if (!down && !move && time - lastTutorTime > tutorInterval) {
-            view.playArrow();
-            lastTutorTime = time;
-        }
 
         view.arrows.orientArrows(mousePos);
 
@@ -76,6 +96,7 @@ public class GameSplash extends EventDispatcher {
     private var move:Boolean;
 
     private function onMouseDown(event:MouseEvent):void {
+        view.tutor.visible = false;
         if (mousePos.distance(view.tower1Pos) < buildingRadius) {
             down = true;
             view.arrows.addArrow(view.tower1Pos);
@@ -107,6 +128,8 @@ public class GameSplash extends EventDispatcher {
                 unit = new Unit(dto.id, dto.owner, startPos, endPos, getTimer(), dto.speed, dto.count);
                 view.units.addUnit(dto.id, dto.type, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, endPos);
                 view.tower1.count = 4;
+            } else {
+                view.tutor.visible = true;
             }
         }
     }

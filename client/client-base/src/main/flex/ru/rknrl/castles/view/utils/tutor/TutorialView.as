@@ -84,7 +84,7 @@ public class TutorialView extends Sprite {
 
     protected static const tweenDuration:int = 500;
 
-    protected function tween(a:Point, b:Point):ITutorCommand {
+    protected function _tween(a:Point, b:Point):ITutorCommand {
         return new Move(Points.two(a, b), _cursor, tweenDuration)
     }
 
