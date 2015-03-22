@@ -9,6 +9,7 @@
 package ru.rknrl.castles.view.locale {
 import ru.rknrl.Locale;
 import ru.rknrl.dto.BuildingType;
+import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.SkillType;
 
 public class CastlesLocale extends Locale {
@@ -36,7 +37,7 @@ public class CastlesLocale extends Locale {
     private static const SEARCH_OPPONENTS:String = "search_opponents";
     private static const NO_CONNECTION:String = "no_connection";
     private static const FAST_AND_TRUST:String = "fast_and_trust";
-    private static const DEAD: String = "dead";
+    private static const DEAD:String = "dead";
 
     public function CastlesLocale(data:String) {
         super(data);
@@ -140,6 +141,46 @@ public class CastlesLocale extends Locale {
 
     public function get dead():String {
         return translate(DEAD);
+    }
+
+    public function get tutorSelfBuildings():String {
+        return "Твои домики желтого цвета";
+    }
+
+    public function tutorEnemyBuildings(isBigGame:Boolean):String {
+        return isBigGame ? "У тебя 3 противника" : "Твой противник бирюзовый";
+    }
+
+    public function get next():String {
+        return "Дальше"
+    }
+
+    public function get tutorArrow():String {
+        return "Отправляй отряды и захватывай чужие домики";
+    }
+
+    public function get tutorArrows():String {
+        return "Можно отправлять отряды сразу из нескольких домиков";
+    }
+
+    public function get tutorWin():String {
+        return "Захвати все домики противников, чтобы выиграть";
+    }
+
+    public function tutorItem(itemType:ItemType):String {
+        switch (itemType) {
+            case ItemType.FIREBALL:
+                return "Запусти фаербол в противника";
+            case ItemType.STRENGTHENING:
+                return "Усилить свой домик";
+            case ItemType.VOLCANO:
+                return "Создай вулкан под башней противника";
+            case ItemType.TORNADO:
+                return "Используй торнадо против противника";
+            case ItemType.ASSISTANCE:
+                return "Вызывай подмогу";
+        }
+        throw new Error("unknown item type " + itemType);
     }
 }
 }

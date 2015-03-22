@@ -9,16 +9,11 @@
 package ru.rknrl.castles.controller.game {
 
 import flash.events.EventDispatcher;
-import flash.utils.Dictionary;
-import flash.utils.clearInterval;
-import flash.utils.setInterval;
 
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.model.points.Points;
-import ru.rknrl.castles.view.game.GameTutorialView;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
@@ -44,8 +39,8 @@ public class GameTutorController {
         this.buildings = buildings;
     }
 
-    public function play():void {
-        view.tutor.play(new <ITutorCommand>[
+    public function firstGame():ITutorCommand {
+        return sequence(new <ITutorCommand>[
             disableMouse,
             hideMagicItems,
             wait(2000),
@@ -53,41 +48,43 @@ public class GameTutorController {
 
             // self buildings
 
-            addText("Твои домики желтого цвета"),
+            addSelfBuildingsText,
             highlightSelfBuildings,
             wait(1500),
-            addButton("Дальше"),
+            addNextButton,
             waitForClick,
-            tutorUnblur,
+            unhighlightBuildings,
             clear,
 
             // enemies buildings
 
-            addText(players.isBigGame ? "У тебя 3 противника" : "Твой противник бирюзовый"),
+            addEnemyBuildingsText(players.isBigGame),
             parallel(new <ITutorCommand>[
-                startHighlightEnemyBuildings,
+                loop(new <ITutorCommand>[
+                    highlightNextEnemyBuildings,
+                    wait(1000)
+                ]),
                 sequence(new <ITutorCommand>[
                     wait(2000),
-                    addButton("Дальше"),
+                    addNextButton,
                     waitForClick
                 ])
             ]),
-            stopHighlightEnemyBuildings,
-            tutorUnblur,
+            unhighlightBuildings,
             clear,
 
             // arrow
 
             enableMouse,
             showCursor,
-            addText("Отправляй отряды и захватывай чужие домики"),
+            addArrowText,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
-                    tween(view.tutor.screenCorner, view.tutor.toGlobal(sourceBuilding1)),
+                    tweenFromCorner(sourceBuilding1),
                     mouseDown,
                     wait(400),
                     addArrow(sourceBuilding1),
-                    tween(view.tutor.toGlobal(sourceBuilding1), view.tutor.toGlobal(targetBuilding1)),
+                    tweenGame(sourceBuilding1, targetBuilding1),
                     wait(400),
                     mouseUp,
                     removeArrows,
@@ -102,17 +99,17 @@ public class GameTutorController {
             // arrows
 
             showCursor,
-            addText("Можно отправлять отряды сразу из нескольких домиков"),
+            addArrowsText,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
-                    tween(view.tutor.screenCorner, view.tutor.toGlobal(sourceBuilding2_1)),
+                    tweenFromCorner(sourceBuilding2_1),
                     mouseDown,
                     wait(400),
                     addArrow(sourceBuilding2_1),
-                    tween(view.tutor.toGlobal(sourceBuilding2_1), view.tutor.toGlobal(sourceBuilding2_2)),
+                    tweenGame(sourceBuilding2_1, sourceBuilding2_2),
                     wait(400),
                     addArrow(sourceBuilding2_2),
-                    tween(view.tutor.toGlobal(sourceBuilding2_2), view.tutor.toGlobal(targetBuilding2)),
+                    tweenGame(sourceBuilding2_2, targetBuilding2),
                     wait(400),
                     mouseUp,
                     removeArrows,
@@ -154,8 +151,7 @@ public class GameTutorController {
             // win
 
             hideCursor,
-            addText("Захвати все домики противников, чтобы выиграть"),
-//            exec(server.startTutorGame)
+            addWinText
         ]);
     }
 
@@ -164,14 +160,8 @@ public class GameTutorController {
     }
 
     private var enemyIndex:int;
-    private var highlightInterval:int;
 
-    private function _startHighlightEnemyBuildings():void {
-        highlightEnemyBuildings();
-        highlightInterval = setInterval(highlightEnemyBuildings, 1000);
-    }
-
-    private function highlightEnemyBuildings():void {
+    private function _highlightNextEnemyBuildings():void {
         const player:PlayerDTO = players.getEnemiesPlayers(players.selfId)[enemyIndex];
         view.tutorUnblur();
         view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers(player.id)), buildings.notPlayerId(player.id));
@@ -179,31 +169,13 @@ public class GameTutorController {
         if (enemyIndex == 3) enemyIndex = 0;
     }
 
-    private function _stopHighlightEnemyBuildings():void {
-        clearInterval(highlightInterval);
-    }
-
-    private static const itemsText:Dictionary = createItemsText();
-
-    private static function createItemsText():Dictionary {
-        const itemsText:Dictionary = new Dictionary();
-        itemsText[ItemType.FIREBALL] = "Запусти фаербол в противника";
-        itemsText[ItemType.VOLCANO] = "Создай вулкан под башней противника";
-        itemsText[ItemType.STRENGTHENING] = "Усилить свой домик";
-        itemsText[ItemType.ASSISTANCE] = "Вызывай подмогу";
-        itemsText[ItemType.TORNADO] = "Используй торнадо против противника";
-        return itemsText;
-    }
-
-    public function itemClick(itemType:ItemType):ITutorCommand {
-        const pos:Point = view.tutor.layout.gameMagicItem(GameTutorialView.indexOf(itemType));
-
+    private function itemClick(itemType:ItemType):ITutorCommand {
         return sequence(new <ITutorCommand>[
             showCursor,
-            addText(itemsText[itemType]),
+            addMagicItemText(itemType),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
-                    tween(view.tutor.screenCorner, pos),
+                    tweenFromCornerToItem(itemType),
                     wait(500),
                     click,
                     wait(500)
@@ -215,15 +187,13 @@ public class GameTutorController {
     }
 
     private function cast(itemType:ItemType, buildingPos:Point):ITutorCommand {
-        const pos:Point = view.tutor.layout.gameMagicItem(GameTutorialView.indexOf(itemType));
-
         return sequence(new <ITutorCommand>[
-            addText(itemsText[itemType]),
+            addMagicItemText(itemType),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(500),
                     showCursor,
-                    tween(pos, view.tutor.toGlobal(buildingPos)),
+                    tweenFromItem(itemType, buildingPos),
                     wait(500),
                     click,
                     wait(500)
@@ -238,33 +208,31 @@ public class GameTutorController {
         const points:Vector.<Point> = new <Point>[];
         const deltaX:int = 200;
         const deltaY:int = 50;
-        const pos:Point = new Point(0, 0);//new Point(width - deltaX, height - deltaY);
+        const corner:Point = view.tutor.screenCorner;
+        const pos:Point = new Point(corner.x - deltaX, corner.y - deltaY);
         for (var x:int = 0; x < deltaX; x++) {
             points.push(new Point(pos.x + x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
         }
         return points;
     }
 
-    public function playTornado():ITutorCommand {
+    private function playTornado():ITutorCommand {
         const points:Vector.<Point> = tornadoPoints;
-        view.tutor.tornadoPoints = new Points(points);
-
-        const pos:Point = view.tutor.layout.gameMagicItem(GameTutorialView.indexOf(ItemType.TORNADO));
 
         return sequence(new <ITutorCommand>[
-            addText(itemsText[ItemType.TORNADO]),
+            addMagicItemText(ItemType.TORNADO),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(400),
                     showCursor,
-                    tween(pos, view.tutor.toGlobal(points[0])),
+                    tweenFromItem(ItemType.TORNADO, points[0]),
                     mouseDown,
                     wait(400),
-                    addTornadoPath,
-                    tweenPath(new Points(view.tutor.toGlobalPoints(points))),
+                    startDrawTornado(points),
+                    tweenPath(points),
                     wait(400),
                     mouseUp,
-                    removeTornadoPath,
+                    endDrawTornado,
                     wait(400)
                 ]),
                 waitForEvent(GameTutorEvents.casted(ItemType.TORNADO))
@@ -279,83 +247,111 @@ public class GameTutorController {
         return exec(_highlightSelfBuildings);
     }
 
-    private function get startHighlightEnemyBuildings():ITutorCommand {
-        return exec(_startHighlightEnemyBuildings);
+    private function get highlightNextEnemyBuildings():ITutorCommand {
+        return exec(_highlightNextEnemyBuildings);
     }
 
-    private function get stopHighlightEnemyBuildings():ITutorCommand {
-        return exec(_stopHighlightEnemyBuildings);
-    }
-
-    private function get tutorUnblur():ITutorCommand {
+    private function get unhighlightBuildings():ITutorCommand {
         return exec(view.tutorUnblur);
     }
 
-    public function get disableMouse():ITutorCommand {
+    private function get disableMouse():ITutorCommand {
         return new Exec(function ():void {
             view.mouseEnabled = false;
         })
     }
 
-    public function get enableMouse():ITutorCommand {
+    private function get enableMouse():ITutorCommand {
         return new Exec(function ():void {
             view.mouseEnabled = true;
         })
     }
 
-    public function get hideMagicItems():ITutorCommand {
+    private function get hideMagicItems():ITutorCommand {
         return new Exec(function ():void {
             view.magicItems.visible = false;
         })
     }
 
-    public function get showMagicItems():ITutorCommand {
+    private function get showMagicItems():ITutorCommand {
         return new Exec(function ():void {
             view.magicItems.visible = true;
         })
     }
 
-    public function get showCursor():ITutorCommand {
+    private function get showCursor():ITutorCommand {
         return exec(view.tutor.showCursor);
     }
 
-    public function get hideCursor():ITutorCommand {
+    private function get hideCursor():ITutorCommand {
         return exec(view.tutor.hideCursor);
     }
 
-    public function get mouseDown():ITutorCommand {
+    private function get mouseDown():ITutorCommand {
         return exec(view.tutor.mouseDown);
     }
 
-    public function get mouseUp():ITutorCommand {
+    private function get mouseUp():ITutorCommand {
         return exec(view.tutor.mouseUp);
     }
 
-    public function get click():ITutorCommand {
+    private function get click():ITutorCommand {
         return exec(view.tutor.click);
     }
 
-    public function tween(a:Point, b:Point):ITutorCommand {
-        return view.tutor.tween(a, b);
+    private function tweenGame(a:Point, b:Point):ITutorCommand {
+        return view.tutor.tweenGame(a, b);
     }
 
-    public function tweenPath(points:Points):ITutorCommand {
+    private function tweenFromCorner(b:Point):ITutorCommand {
+        return view.tutor.tweenFromCorner(b);
+    }
+
+    private function tweenFromItem(itemType:ItemType, b:Point):ITutorCommand {
+        return view.tutor.tweenFromItem(itemType, b);
+    }
+
+    private function tweenFromCornerToItem(itemType:ItemType):ITutorCommand {
+        return view.tutor.tweenFromCornerToItem(itemType);
+    }
+
+    private function tweenPath(points:Vector.<Point>):ITutorCommand {
         return view.tutor.tweenPath(points);
     }
 
-    public function addText(text:String):ITutorCommand {
+    private function get addSelfBuildingsText():ITutorCommand {
+        return exec(view.tutor.addSelfBuildingsText);
+    }
+
+    private function addEnemyBuildingsText(isBigGame:Boolean):ITutorCommand {
         return exec(function ():void {
-            view.tutor.addText(text)
+            view.tutor.addEnemyBuildingsText(isBigGame)
         });
     }
 
-    public function addButton(text:String):ITutorCommand {
+    private function get addArrowText():ITutorCommand {
+        return exec(view.tutor.addArrowText);
+    }
+
+    private function get addArrowsText():ITutorCommand {
+        return exec(view.tutor.addArrowsText);
+    }
+
+    private function addMagicItemText(itemType:ItemType):ITutorCommand {
         return exec(function ():void {
-            view.tutor.addButton(text)
+            view.tutor.addMagicItemText(itemType)
         });
     }
 
-    public function addArrow(startPos:Point):ITutorCommand {
+    private function get addWinText():ITutorCommand {
+        return exec(view.tutor.addWinText);
+    }
+
+    private function get addNextButton():ITutorCommand {
+        return exec(view.tutor.addNextButton);
+    }
+
+    private function addArrow(startPos:Point):ITutorCommand {
         return exec(function ():void {
             view.tutor.arrows.addArrow(startPos)
         })
@@ -365,43 +361,45 @@ public class GameTutorController {
         return exec(view.tutor.arrows.removeArrows);
     }
 
-    public function get clear():ITutorCommand {
+    private function get clear():ITutorCommand {
         return exec(view.tutor.clear);
     }
 
-    public function get addTornadoPath():ITutorCommand {
-        return exec(view.tutor.addTornadoPath);
+    private function startDrawTornado(points:Vector.<Point>):ITutorCommand {
+        return exec(function ():void {
+            view.tutor.startDrawTornado(points)
+        });
     }
 
-    public function get removeTornadoPath():ITutorCommand {
-        return exec(view.tutor.removeTornadoPath);
+    private function get endDrawTornado():ITutorCommand {
+        return exec(view.tutor.endDrawTornado);
     }
 
-    public static function parallel(commands:Vector.<ITutorCommand>):ITutorCommand {
+    private static function parallel(commands:Vector.<ITutorCommand>):ITutorCommand {
         return new TutorParallelCommands(commands);
     }
 
-    public static function sequence(commands:Vector.<ITutorCommand>):ITutorCommand {
+    private static function sequence(commands:Vector.<ITutorCommand>):ITutorCommand {
         return new TutorSequenceCommands(commands, false);
     }
 
-    public static function loop(commands:Vector.<ITutorCommand>):ITutorCommand {
+    private static function loop(commands:Vector.<ITutorCommand>):ITutorCommand {
         return new TutorSequenceCommands(commands, true);
     }
 
-    public static function wait(duration:int):ITutorCommand {
+    private static function wait(duration:int):ITutorCommand {
         return new Wait(duration);
     }
 
-    public function get waitForClick():ITutorCommand {
+    private function get waitForClick():ITutorCommand {
         return new WaitForClick(view.stage);
     }
 
-    public function waitForEvent(eventName:String):ITutorCommand {
+    private function waitForEvent(eventName:String):ITutorCommand {
         return new WaitForEvent(dispatcher, eventName)
     }
 
-    public static function exec(func:Function):ITutorCommand {
+    private static function exec(func:Function):ITutorCommand {
         return new Exec(func);
     }
 
@@ -411,23 +409,23 @@ public class GameTutorController {
         return new Point((i + 0.5) * CellSize.SIZE.id(), (j + 0.5) * CellSize.SIZE.id())
     }
 
-    public function get sourceBuilding1():Point {
+    private function get sourceBuilding1():Point {
         return players.isBigGame ? ij(2, 0) : ij(3, 0);
     }
 
-    public function get targetBuilding1():Point {
+    private function get targetBuilding1():Point {
         return players.isBigGame ? ij(4, 3) : ij(6, 3);
     }
 
-    public function get sourceBuilding2_1():Point {
+    private function get sourceBuilding2_1():Point {
         return players.isBigGame ? ij(0, 0) : ij(1, 0);
     }
 
-    public function get sourceBuilding2_2():Point {
+    private function get sourceBuilding2_2():Point {
         return players.isBigGame ? ij(4, 0) : ij(5, 0);
     }
 
-    public function get targetBuilding2():Point {
+    private function get targetBuilding2():Point {
         return players.isBigGame ? ij(2, 5) : ij(4, 3);
     }
 }

@@ -20,7 +20,7 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
 
-public class TutorialView extends TutorialViewBase {
+public class TutorialView extends Sprite {
     private var _itemsLayer:Sprite;
 
     public function get itemsLayer():Sprite {
@@ -35,7 +35,7 @@ public class TutorialView extends TutorialViewBase {
     }
 
     public function TutorialView(layout:Layout, deviceFactory:DeviceFactory) {
-        super(layout);
+        mouseEnabled = mouseChildren = false;
 
         addChild(_itemsLayer = new Sprite());
 
@@ -51,8 +51,14 @@ public class TutorialView extends TutorialViewBase {
         this.layout = layout;
     }
 
-    override public function set layout(value:Layout):void {
-        super.layout = value;
+    private var _layout:Layout;
+
+    public function get layout():Layout {
+        return _layout;
+    }
+
+    public function set layout(value:Layout):void {
+        _layout = value;
         _cursor.scaleX = _cursor.scaleY = value.scale;
     }
 
@@ -60,7 +66,6 @@ public class TutorialView extends TutorialViewBase {
 
     public function play(commands:Vector.<ITutorCommand>):void {
         if (command) throw new Error("tutor already playing");
-        show();
         command = new TutorSequenceCommands(commands, false);
         command.execute();
     }
@@ -69,20 +74,18 @@ public class TutorialView extends TutorialViewBase {
         if (command) command.enterFrame();
     }
 
-    // commands
-
-    private static const duration:int = 500;
+    public final function get playing():Boolean {
+        return command;
+    }
 
     public function get screenCorner():Point {
         return new Point(layout.screenWidth, layout.screenHeight);
     }
 
-    public function tween(a:Point, b:Point):ITutorCommand {
-        return new Move(Points.two(a, b), _cursor, duration)
-    }
+    protected static const tweenDuration:int = 500;
 
-    public function tweenPath(points:Points):ITutorCommand {
-        return new Move(points, _cursor, duration)
+    protected function tween(a:Point, b:Point):ITutorCommand {
+        return new Move(Points.two(a, b), _cursor, tweenDuration)
     }
 
     public function cursorPos(point:Point):void {

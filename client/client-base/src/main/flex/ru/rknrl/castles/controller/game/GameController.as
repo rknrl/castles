@@ -27,6 +27,8 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
+import ru.rknrl.castles.view.utils.tutor.commands.Exec;
+import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
@@ -142,7 +144,7 @@ public class GameController extends EventDispatcher {
         server.addEventListener(GameOverEvent.GAMEOVER, onGameOver);
 
         // Человек мог играть на компе, а потом перезайти в бой на мобиле
-        if (gameState.players.length > view.supportedPlayersCount) onSurrender()
+        if (gameState.players.length > view.supportedPlayersCount) onSurrender();
 
         if (isFirstGame) {
             tutor = new GameTutorController(view, this, players, buildings);
@@ -185,7 +187,10 @@ public class GameController extends EventDispatcher {
 
         if (!tutorStart) {
             tutorStart = true;
-            tutor.play();
+            view.tutor.play(new <ITutorCommand>[
+                tutor.firstGame(),
+                new Exec(server.startTutorGame)
+            ])
         }
     }
 

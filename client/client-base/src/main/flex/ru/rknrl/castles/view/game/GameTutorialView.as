@@ -21,6 +21,8 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
+import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
+import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
@@ -28,7 +30,12 @@ import ru.rknrl.easers.interpolate;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameTutorialView extends TutorialView {
-    public var arrows:ArrowsView;
+    private var _arrows:ArrowsView;
+
+    public function get arrows():ArrowsView {
+        return _arrows;
+    }
+
     private var tornadoPath:TornadoPathView;
     private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
@@ -38,8 +45,8 @@ public class GameTutorialView extends TutorialView {
         this.locale = locale;
         this.loadImageManager = loadImageManager;
 
-        addChild(arrows = new ArrowsView());
-        arrows.transform.colorTransform = Colors.tutorTransform;
+        addChild(_arrows = new ArrowsView());
+        _arrows.transform.colorTransform = Colors.tutorTransform;
 
         addChild(tornadoPath = new TornadoPathView());
         tornadoPath.transform.colorTransform = Colors.tutorTransform;
@@ -47,7 +54,31 @@ public class GameTutorialView extends TutorialView {
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    public function addText(text:String):void {
+    public function addSelfBuildingsText():void {
+        addText(locale.tutorSelfBuildings)
+    }
+
+    public function addEnemyBuildingsText(isBigGame:Boolean):void {
+        addText(locale.tutorEnemyBuildings(isBigGame))
+    }
+
+    public function addArrowText():void {
+        addText(locale.tutorArrow)
+    }
+
+    public function addArrowsText():void {
+        addText(locale.tutorArrows)
+    }
+
+    public function addMagicItemText(itemType:ItemType):void {
+        addText(locale.tutorItem(itemType))
+    }
+
+    public function addWinText():void {
+        addText(locale.tutorWin)
+    }
+
+    private function addText(text:String):void {
         const textField:AnimatedTextField = new AnimatedTextField(Fonts.title);
         textField.text = text;
         textField.textScale = layout.scale;
@@ -57,9 +88,9 @@ public class GameTutorialView extends TutorialView {
         itemsLayer.addChild(textField);
     }
 
-    public function addButton(text:String):void {
+    public function addNextButton():void {
         const textField:AnimatedTextField = new AnimatedTextField(Fonts.play);
-        textField.text = text;
+        textField.text = locale.next;
         textField.textScale = layout.scale;
         textField.x = layout.screenCenterX;
         textField.y = layout.gameMagicItemsY;
@@ -67,25 +98,21 @@ public class GameTutorialView extends TutorialView {
         itemsLayer.addChild(textField);
     }
 
-    public static function indexOf(itemType:ItemType):int {
-        return ItemType.values.indexOf(itemType);
-    }
-
     private var _areaPos:Point;
 
-    public function setAreaRect(areaPos:Point, h:int, v:int):void {
-        _areaPos = areaPos;
-        arrows.scaleX = arrows.scaleY = layout.scale;
+    public function set areaPos(value:Point):void {
+        _areaPos = value;
+        _arrows.scaleX = _arrows.scaleY = layout.scale;
         tornadoPath.scaleX = tornadoPath.scaleY = layout.scale;
-        arrows.x = tornadoPath.x = _areaPos.x;
-        arrows.y = tornadoPath.y = _areaPos.y;
+        _arrows.x = tornadoPath.x = _areaPos.x;
+        _arrows.y = tornadoPath.y = _areaPos.y;
     }
 
-    public function toGlobal(buildingPos:Point):Point {
+    private function toGlobal(buildingPos:Point):Point {
         return new Point(_areaPos.x + buildingPos.x * layout.scale, _areaPos.y + buildingPos.y * layout.scale)
     }
 
-    public function toGlobalPoints(points:Vector.<Point>):Vector.<Point> {
+    private function toGlobalPoints(points:Vector.<Point>):Vector.<Point> {
         const result:Vector.<Point> = new <Point>[];
         for each(var point:Point in points) result.push(toGlobal(point));
         return result;
@@ -93,14 +120,15 @@ public class GameTutorialView extends TutorialView {
 
     private var tornado:Boolean;
     private var tornadoStartTime:int;
-    public var tornadoPoints:Points;
+    private var tornadoPoints:Points;
 
-    public function addTornadoPath():void {
+    public function startDrawTornado(points:Vector.<Point>):void {
+        tornadoPoints = new Points(points);
         tornadoStartTime = getTimer();
         tornado = true;
     }
 
-    public function removeTornadoPath():void {
+    public function endDrawTornado():void {
         tornado = false;
         tornadoPath.clear();
     }
@@ -108,7 +136,7 @@ public class GameTutorialView extends TutorialView {
     private static const easer:IEaser = new Linear(0, 1);
 
     private function onEnterFrame(event:Event):void {
-        arrows.orientArrows(new Point((cursor.x - _areaPos.x) / layout.scale, (cursor.y - _areaPos.y) / layout.scale));
+        _arrows.orientArrows(new Point((cursor.x - _areaPos.x) / layout.scale, (cursor.y - _areaPos.y) / layout.scale));
         if (tornado) {
             const progress:Number = interpolate(0, 1, getTimer(), tornadoStartTime, 500, easer);
             tornadoPath.drawPath(tornadoPoints, tornadoPoints.totalDistance * progress);
@@ -116,10 +144,34 @@ public class GameTutorialView extends TutorialView {
     }
 
     override public function clear():void {
-        arrows.removeArrows();
+        _arrows.removeArrows();
         tornado = false;
         tornadoPath.clear();
         super.clear();
+    }
+
+    public function tweenGame(a:Point, b:Point):ITutorCommand {
+        return tween(toGlobal(a), toGlobal(b));
+    }
+
+    public function tweenFromCorner(b:Point):ITutorCommand {
+        return tween(screenCorner, toGlobal(b));
+    }
+
+    public function tweenFromItem(itemType:ItemType, b:Point):ITutorCommand {
+        return tween(layout.gameMagicItem(indexOf(itemType)), toGlobal(b));
+    }
+
+    public function tweenFromCornerToItem(itemType:ItemType):ITutorCommand {
+        return tween(screenCorner, layout.gameMagicItem(indexOf(itemType)));
+    }
+
+    public function tweenPath(points:Vector.<Point>):ITutorCommand {
+        return new Move(new Points(toGlobalPoints(points)), cursor, tweenDuration)
+    }
+
+    private static function indexOf(itemType:ItemType):int {
+        return ItemType.values.indexOf(itemType);
     }
 }
 }

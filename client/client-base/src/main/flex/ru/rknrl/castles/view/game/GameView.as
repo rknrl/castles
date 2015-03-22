@@ -156,7 +156,7 @@ public class GameView extends Sprite {
         if (gameOverScreen) gameOverScreen.layout = value;
         if (_tutor) {
             _tutor.layout = value;
-            _tutor.setAreaRect(areaPos, _area.h, _area.v);
+            _tutor.areaPos = areaPos;
         }
     }
 
