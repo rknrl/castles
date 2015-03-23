@@ -67,10 +67,11 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
     if (time - lastTime > interval) {
       lastTime = time
 
-      val myBuildings = buildings.filter(my).toList
+      val myBuildings = getMyBuildings
+
       val fromBuildings = myBuildings.filter(_.population > 5)
 
-      val enemyBuildings = buildings.filterNot(my).toList
+      val enemyBuildings = getEnemyBuildings
 
       if (fromBuildings.size > 0 && enemyBuildings.size > 0) {
 
@@ -134,6 +135,10 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
   }
 
   def buildings = gameState.get.buildings.map.map { case (id, b) ⇒ b}
+
+  def getMyBuildings = buildings.filter(my).toList
+
+  def getEnemyBuildings = buildings.filterNot(my).toList
 
   def my(b: Building) = b.owner.isDefined && b.owner.get == playerId.get
 

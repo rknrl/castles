@@ -22,18 +22,21 @@ import ru.rknrl.castles.view.utils.tutor.commands.WaitForEvent;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;
+import ru.rknrl.rmi.Server;
 
 public class GameTutorController extends TutorControllerBase {
     private var view:GameView;
     private var dispatcher:EventDispatcher;
     private var players:Players;
     private var buildings:Buildings;
+    private var server:Server;
 
-    public function GameTutorController(view:GameView, dispatcher:EventDispatcher, players:Players, buildings:Buildings) {
+    public function GameTutorController(view:GameView, dispatcher:EventDispatcher, players:Players, buildings:Buildings, server:Server) {
         this.view = view;
         this.dispatcher = dispatcher;
         this.players = players;
         this.buildings = buildings;
+        this.server = server;
         super(view.tutor);
     }
 
@@ -63,7 +66,7 @@ public class GameTutorController extends TutorControllerBase {
                     wait(1000)
                 ]),
                 sequence(new <ITutorCommand>[
-                    wait(2000),
+                    wait(2500),
                     addNextButton,
                     waitForClick
                 ])
@@ -73,9 +76,10 @@ public class GameTutorController extends TutorControllerBase {
 
             // arrow
 
+            addArrowText,
+            wait(500),
             enableMouse,
             showCursor,
-            addArrowText,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     tweenFromCorner(sourceBuilding1),
@@ -96,8 +100,9 @@ public class GameTutorController extends TutorControllerBase {
 
             // arrows
 
-            showCursor,
             addArrowsText,
+            wait(500),
+            showCursor,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     tweenFromCorner(sourceBuilding2_1),
@@ -123,33 +128,43 @@ public class GameTutorController extends TutorControllerBase {
 
             showMagicItems,
 
+            exec(server.startTutorFireball),
+
+            wait(2000),
+
             itemClick(ItemType.FIREBALL),
-            cast(ItemType.FIREBALL, buildings.byId(buildings.getEnemyBuildingId(players.selfId)).pos),
-
-            // strengthening
-
-            itemClick(ItemType.STRENGTHENING),
-            cast(ItemType.STRENGTHENING, buildings.byId(buildings.getBuildingId(players.selfId)).pos),
+            cast(ItemType.FIREBALL, fireballBuilding),
+            wait(5000),
 
             // volcano
 
             itemClick(ItemType.VOLCANO),
-            cast(ItemType.VOLCANO, buildings.byId(buildings.getEnemyBuildingId(players.selfId)).pos),
+            cast(ItemType.VOLCANO, volcanoBuilding),
+            wait(5000),
 
             // tornado
 
             itemClick(ItemType.TORNADO),
             playTornado(),
+            wait(8000),
 
             // assistance
 
             itemClick(ItemType.ASSISTANCE),
             cast(ItemType.ASSISTANCE, buildings.byId(buildings.getBuildingId(players.selfId)).pos),
+            wait(3000),
+
+            // strengthening
+
+            itemClick(ItemType.STRENGTHENING),
+            cast(ItemType.STRENGTHENING, buildings.byId(buildings.getBuildingId(players.selfId)).pos),
+            wait(4000),
 
             // win
 
             hideCursor,
-            addWinText
+            addWinText,
+            exec(server.startTutorGame)
         ]);
     }
 
@@ -169,8 +184,9 @@ public class GameTutorController extends TutorControllerBase {
 
     private function itemClick(itemType:ItemType):ITutorCommand {
         return sequence(new <ITutorCommand>[
-            showCursor,
             addMagicItemText(itemType),
+            wait(500),
+            showCursor,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     tweenFromCornerToItem(itemType),
@@ -198,6 +214,7 @@ public class GameTutorController extends TutorControllerBase {
                 ]),
                 waitForEvent(GameTutorEvents.casted(itemType))
             ]),
+            hideCursor,
             clear
         ]);
     }
@@ -206,10 +223,16 @@ public class GameTutorController extends TutorControllerBase {
         const points:Vector.<Point> = new <Point>[];
         const deltaX:int = 200;
         const deltaY:int = 50;
-        const corner:Point = view.tutor.screenCorner;
-        const pos:Point = new Point(corner.x - deltaX, corner.y - deltaY);
+        const corner:Point = tornadoBuilding;
+        const pos:Point = new Point(corner.x - deltaX / 2, corner.y - deltaY / 2);
+        const angle:Number = Math.PI / 4;
         for (var x:int = 0; x < deltaX; x++) {
-            points.push(new Point(pos.x + x, pos.y + Math.sin(x * 2 * Math.PI / deltaX) * deltaY))
+            const y:Number = -deltaY / 2 + Math.sin(x * 2 * Math.PI / deltaX) * deltaY / 2;
+
+            const ax:Number = x * Math.cos(angle) - y * Math.sin(angle);
+            const ay:Number = x * Math.sin(angle) + y * Math.cos(angle);
+
+            points.push(new Point(pos.x + ax + 39, pos.y + ay));
         }
         return points;
     }
@@ -219,6 +242,7 @@ public class GameTutorController extends TutorControllerBase {
 
         return sequence(new <ITutorCommand>[
             addMagicItemText(ItemType.TORNADO),
+            wait(500),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(400),
@@ -235,6 +259,7 @@ public class GameTutorController extends TutorControllerBase {
                 ]),
                 waitForEvent(GameTutorEvents.casted(ItemType.TORNADO))
             ]),
+            hideCursor,
             clear
         ]);
     }
@@ -381,6 +406,18 @@ public class GameTutorController extends TutorControllerBase {
 
     private function get targetBuilding2():Point {
         return players.isBigGame ? ij(2, 5) : ij(4, 3);
+    }
+
+    private function get fireballBuilding():Point {
+        return players.isBigGame ? ij(10, 11) : ij(10, 11);
+    }
+
+    private function get volcanoBuilding():Point {
+        return players.isBigGame ? ij(8, 8) : ij(8, 8);
+    }
+
+    private function get tornadoBuilding():Point {
+        return players.isBigGame ? ij(10, 11) : ij(10, 11);
     }
 }
 }

@@ -13,7 +13,6 @@ import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
 object TutorMap {
-
   def buildings(buildingIdIterator: BuildingIdIterator, big: Boolean) = {
     def building(buildingType: BuildingType, buildingLevel: BuildingLevel, pos: IJ, population: Int) =
       new Building(
@@ -41,8 +40,8 @@ object TutorMap {
 
         building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 6), 1),
         building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 6), 1),
-        building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 8), 1),
-        building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 8), 1)
+        building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(6, 8), 1),
+        building(BuildingType.TOWER, BuildingLevel.LEVEL_2, new IJ(8, 8), 1)
       )
     else
       List(

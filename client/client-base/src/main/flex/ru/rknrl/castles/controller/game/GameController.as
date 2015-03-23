@@ -27,9 +27,6 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
-import ru.rknrl.castles.view.utils.tutor.commands.Exec;
-import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingIdDTO;
 import ru.rknrl.dto.BuildingUpdateDTO;
@@ -148,7 +145,7 @@ public class GameController extends EventDispatcher {
         if (gameState.players.length > view.supportedPlayersCount) onSurrender();
 
         if (isFirstGame) {
-            tutor = new GameTutorController(view, this, players, buildings);
+            tutor = new GameTutorController(view, this, players, buildings, server);
             view.y += 32; // todo
         }
     }
@@ -188,10 +185,7 @@ public class GameController extends EventDispatcher {
 
         if (tutor && !tutorStart) {
             tutorStart = true;
-            view.tutor.play(new TutorSequenceCommands(new <ITutorCommand>[
-                tutor.firstGame(),
-                new Exec(server.startTutorGame)
-            ], false))
+            view.tutor.play(tutor.firstGame());
         }
     }
 

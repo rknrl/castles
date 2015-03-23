@@ -33,38 +33,36 @@ object B2C {
 
   case class EnteredGame(node: NodeLocator) extends Msg(5)
 
+  case class AccountState(adminAccountState: AdminAccountStateDTO) extends Msg(6)
+
   // enter game
 
-  case class JoinedGame(gameState: GameStateDTO) extends Msg(6)
+  case class JoinedGame(gameState: GameStateDTO) extends Msg(7)
 
-  case object LeavedGame extends Msg(7)
+  case object LeavedGame extends Msg(8)
 
   // game
 
-  case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(8)
+  case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(9)
 
-  case class UpdateItemStates(states: ItemsStateDTO) extends Msg(9)
+  case class UpdateItemStates(states: ItemsStateDTO) extends Msg(10)
 
-  case class AddUnit(unit: UnitDTO) extends Msg(10)
+  case class AddUnit(unit: UnitDTO) extends Msg(11)
 
-  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(11)
+  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(12)
 
-  case class RemoveUnit(id: UnitIdDTO) extends Msg(12)
+  case class RemoveUnit(id: UnitIdDTO) extends Msg(13)
 
-  case class KillUnit(killedId: UnitIdDTO) extends Msg(19)
+  case class KillUnit(killedId: UnitIdDTO) extends Msg(14)
 
-  case class AddFireball(fireball: FireballDTO) extends Msg(13)
+  case class AddFireball(fireball: FireballDTO) extends Msg(15)
 
-  case class AddVolcano(volcano: VolcanoDTO) extends Msg(14)
+  case class AddVolcano(volcano: VolcanoDTO) extends Msg(16)
 
-  case class AddTornado(tornado: TornadoDTO) extends Msg(15)
+  case class AddTornado(tornado: TornadoDTO) extends Msg(17)
 
-  case class AddBullet(bullet: BulletDTO) extends Msg(16)
+  case class AddBullet(bullet: BulletDTO) extends Msg(18)
 
-  case class GameOver(gameOver: GameOverDTO) extends Msg(17)
-
-  // admin
-
-  case class AccountState(adminAccountState: AdminAccountStateDTO) extends Msg(18)
+  case class GameOver(gameOver: GameOverDTO) extends Msg(19)
 
 }

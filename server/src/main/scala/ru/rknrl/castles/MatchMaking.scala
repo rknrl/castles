@@ -13,7 +13,7 @@ import akka.actor._
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
-import ru.rknrl.castles.bot.{Bot, BotTutor}
+import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Stat
@@ -170,7 +170,7 @@ class MatchMaking(interval: FiniteDuration,
 
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
-      val botClass = if (isTutor) classOf[BotTutor] else classOf[Bot]
+      val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
       val bot = context.actorOf(Props(botClass, accountId, config.game), accountId.id)
       val botStat = if(isTutor) tutorBotStat else order.stat
       val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
