@@ -9,6 +9,8 @@
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingLevel;
+import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.PlayerIdDTO;
 
@@ -76,6 +78,22 @@ public class Buildings {
 
     public function getEnemyBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
         return notPlayerId(selfId)[0];
+    }
+
+    public function myTower(ownerId:PlayerIdDTO):BuildingIdDTO {
+        for each(var building:Building in buildings) {
+            if (building.owner.equalsId(ownerId) && building.buildingType == BuildingType.TOWER)
+                return building.id;
+        }
+        return null;
+    }
+
+    public function bigTower(ownerId:PlayerIdDTO):BuildingIdDTO {
+        for each(var building:Building in buildings) {
+            if (!building.owner.equalsId(ownerId) && building.buildingType == BuildingType.TOWER && building.buildingLevel == BuildingLevel.LEVEL_2)
+                return building.id;
+        }
+        return null;
     }
 }
 }

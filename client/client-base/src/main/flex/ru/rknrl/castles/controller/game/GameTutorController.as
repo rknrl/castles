@@ -134,22 +134,23 @@ public class GameTutorController extends TutorControllerBase {
             // assistance
 
             itemClick(ItemType.ASSISTANCE),
-            cast(ItemType.ASSISTANCE, assistanceBuilding),
+            castAssistance,
             wait(3000),
 
             // strengthening
 
             itemClick(ItemType.STRENGTHENING),
-            cast(ItemType.STRENGTHENING, strengtheningBuilding),
+            castStrengthening,
             wait(500),
 
             magicItemsEnableMouse,
 
             // capture big tower
 
+            enableCaptureBigTower,
             addArrowText,
             wait(500),
-            arrowTutor(strengtheningBuilding, bigTower),
+            captureBigTowerTutor,
             hideCursor,
             wait(1000),
 
@@ -292,9 +293,39 @@ public class GameTutorController extends TutorControllerBase {
         view.magicItems.tutorLock(itemType, false)
     }
 
+    private function get myTower():Point {
+        return buildings.byId(buildings.myTower(players.selfId)).pos;
+    }
+
+    private function get bigTower():Point {
+        return buildings.byId(buildings.bigTower(players.selfId)).pos;
+    }
+
+    private var _canCaptureBigTower:Boolean;
+
+    public function get canCaptureBigTower():Boolean {
+        return _canCaptureBigTower;
+    }
 
     // COMMANDS
 
+    private function get enableCaptureBigTower():ITutorCommand {
+        return exec(function ():void {
+            _canCaptureBigTower = true
+        })
+    }
+
+    private function get castAssistance():ITutorCommand {
+        return cast(ItemType.ASSISTANCE, myTower);
+    }
+
+    private function get castStrengthening():ITutorCommand {
+        return cast(ItemType.STRENGTHENING, myTower);
+    }
+
+    private function get captureBigTowerTutor():ITutorCommand {
+        return arrowTutor(myTower, bigTower);
+    }
 
     private function get lockAllItems():ITutorCommand {
         return exec(_lockAllItems)
@@ -470,18 +501,6 @@ public class GameTutorController extends TutorControllerBase {
 
     private function get tornadoBuilding():Point {
         return players.isBigGame ? ij(10, 11) : ij(10, 11);
-    }
-
-    private function get assistanceBuilding():Point {
-        return players.isBigGame ? ij(2, 5) : ij(10, 11);
-    }
-
-    private function get strengtheningBuilding():Point {
-        return players.isBigGame ? ij(2, 5) : ij(10, 11);
-    }
-
-    private function get bigTower():Point {
-        return players.isBigGame ? ij(6, 6) : ij(10, 11);
     }
 }
 }

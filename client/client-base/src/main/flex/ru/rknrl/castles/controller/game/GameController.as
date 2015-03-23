@@ -315,7 +315,7 @@ public class GameController extends EventDispatcher {
         const wasOwned:Boolean = building.owner.equalsId(selfId);
         const willOwned:Boolean = newOwner.equalsId(selfId);
 
-        const capture:Boolean = !wasOwned && willOwned;
+        const capture:Boolean = !wasOwned && (willOwned || dto.population < building.population);
         if (capture) dispatchEvent(new Event(GameTutorEvents.BUILDING_CAPTURED));
 
         building.update(newOwner, dto.population, dto.strengthened);
@@ -402,6 +402,8 @@ public class GameController extends EventDispatcher {
         }
     }
 
+    private static const tutorBigTowerId:int = 20; // todo hardcode
+
     private function onMouseUp(event:GameMouseEvent):void {
         view.tutor.visible = true;
 
@@ -429,12 +431,11 @@ public class GameController extends EventDispatcher {
                         }
                     }
 
-                    if (filteredIds.length > 0) {
+                    if (filteredIds.length > 0 && (toBuilding.id.id != tutorBigTowerId || (!tutor || tutor.canCaptureBigTower))) {
                         if (!toBuilding.owner.equalsId(selfId)) {
                             if (filteredIds.length > 1)
                                 dispatchEvent(new Event(GameTutorEvents.ARROWS_SENDED));
-                            else
-                                dispatchEvent(new Event(GameTutorEvents.ARROW_SENDED));
+                            dispatchEvent(new Event(GameTutorEvents.ARROW_SENDED));
                         }
 
                         const dto:MoveDTO = new MoveDTO();
