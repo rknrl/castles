@@ -32,7 +32,7 @@ public class GameMagicItems {
     public function count(itemType:ItemType):int {
         return getItemState(itemType).count;
     }
-
+    
     public function cooldownProgress(itemType:ItemType, time:int):Number {
         const state:ItemStateDTO = getItemState(itemType);
         const elapsed:int = time - startTime + (state.cooldownDuration - state.millisTillCooldownEnd);

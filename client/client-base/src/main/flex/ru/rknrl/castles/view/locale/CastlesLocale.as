@@ -182,5 +182,13 @@ public class CastlesLocale extends Locale {
         }
         throw new Error("unknown item type " + itemType);
     }
+
+    public function get gameSplash():String {
+        return "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
+    }
+
+    public function get enterFirstGame():String {
+        return "Отлично!\nЗаходим в бой";
+    }
 }
 }

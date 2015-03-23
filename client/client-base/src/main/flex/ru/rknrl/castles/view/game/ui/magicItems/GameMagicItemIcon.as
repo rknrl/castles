@@ -42,12 +42,11 @@ public class GameMagicItemIcon extends Animated {
         _count = value;
         textField.text = value.toString();
         centerize(textField);
-        frontIcon.visible = _count > 0;
-        backIcon.visible = _count == 0;
+        updateLock();
     }
 
     public function set cooldownProgress(value:Number):void {
-        if (_count > 0) {
+        if (!locked) {
             const border:Number = 4;
             const w:Number = backIcon.width + border;
             const h:Number = backIcon.height + border;
@@ -58,6 +57,22 @@ public class GameMagicItemIcon extends Animated {
             frontIcon.y = top;
             backIcon.visible = value < 1;
         }
+    }
+
+    private var _tutorLock:Boolean;
+
+    public function set tutorLock(value:Boolean):void {
+        _tutorLock = value;
+        updateLock();
+    }
+
+    public function get locked():Boolean {
+        return _count == 0 || _tutorLock
+    }
+
+    private function updateLock():void {
+        frontIcon.visible = !locked;
+        backIcon.visible = locked;
     }
 }
 }

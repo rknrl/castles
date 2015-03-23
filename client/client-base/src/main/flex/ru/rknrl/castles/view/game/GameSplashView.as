@@ -9,7 +9,6 @@
 package ru.rknrl.castles.view.game {
 import flash.display.Bitmap;
 import flash.display.Sprite;
-import flash.text.TextField;
 
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
@@ -23,9 +22,9 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.utils.createTextField;
 
 public class GameSplashView extends Sprite {
     private var area:Sprite;
@@ -44,8 +43,7 @@ public class GameSplashView extends Sprite {
     }
 
     private var mouseHolder:Bitmap;
-    private var titleTextField:TextField;
-    private var textField:TextField;
+    private var textField:AnimatedTextField;
 
     private var _tutor:GameSplashTutorialView;
 
@@ -65,8 +63,11 @@ public class GameSplashView extends Sprite {
         return _units;
     }
 
+    private var locale:CastlesLocale;
+
     public function GameSplashView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory) {
         mouseChildren = false;
+        this.locale = locale;
 
         addChild(area = new Sprite());
 
@@ -80,10 +81,8 @@ public class GameSplashView extends Sprite {
 
         area.addChild(_tutor = new GameSplashTutorialView(layout, locale, deviceFactory));
 
-        area.addChild(titleTextField = createTextField(Fonts.gameSplashText));
-//        titleTextField.text = "Захвати башню!";
-        area.addChild(textField = createTextField(Fonts.gameSplashText));
-//        textField.text = "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
+        area.addChild(textField = new AnimatedTextField(Fonts.title));
+        textField.text = locale.gameSplash;
         this.layout = layout;
     }
 
@@ -108,15 +107,9 @@ public class GameSplashView extends Sprite {
         _tower2.x = tower2Pos.x;
         _tower2.y = tower2Pos.y;
 
-        const textHeight:Number = 24 * value.scale;
-        const gap:Number = 8 * value.scale;
-        titleTextField.scaleX = titleTextField.scaleY = value.scale;
-        titleTextField.x = value.screenCenterX - titleTextField.width / 2;
-        titleTextField.y = _layout.footerCenterY - textHeight - gap / 2;
-
-        textField.scaleX = textField.scaleY = value.scale;
-        textField.x = value.screenCenterX - textField.width / 2;
-        textField.y = _layout.footerCenterY + gap / 2;
+        textField.textScale = value.scale;
+        textField.x = value.screenCenterX;
+        textField.y = _layout.footerCenterY;
 
         _tutor.layout = value;
         if (loadingScreen) loadingScreen.layout = value;
@@ -124,7 +117,7 @@ public class GameSplashView extends Sprite {
 
     public function addLoadingScreen():void {
         removeChild(area);
-        addChild(loadingScreen = new LoadingScreen("Отлично!\nЗаходим в бой", _layout));
+        addChild(loadingScreen = new LoadingScreen(locale.enterFirstGame, _layout));
     }
 }
 }

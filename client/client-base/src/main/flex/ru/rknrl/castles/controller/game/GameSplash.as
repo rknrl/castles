@@ -52,7 +52,7 @@ public class GameSplash extends TutorControllerBase {
                         wait(400),
                         mouseUp,
                         exec(view.tutor.arrows.removeArrows),
-                        wait(400)
+                        wait(1000)
                     ]),
                     infinityWait
                 ])

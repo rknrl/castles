@@ -315,7 +315,7 @@ public class GameController extends EventDispatcher {
         const wasOwned:Boolean = building.owner.equalsId(selfId);
         const willOwned:Boolean = newOwner.equalsId(selfId);
 
-        const capture:Boolean = !wasOwned && (building.population > dto.population || willOwned);
+        const capture:Boolean = !wasOwned && willOwned;
         if (capture) dispatchEvent(new Event(GameTutorEvents.BUILDING_CAPTURED));
 
         building.update(newOwner, dto.population, dto.strengthened);
@@ -351,8 +351,7 @@ public class GameController extends EventDispatcher {
         const itemType:ItemType = event.itemType;
         if (magicItemStates.canUse(itemType, getTimer())) {
             if (magicItems.selected == itemType) {
-                // В туторе нельзя задиселектить выбранный предмет
-                if (!view.tutor.playing) magicItems.selected = null;
+                magicItems.selected = null;
             } else {
                 magicItems.selected = itemType;
                 dispatchEvent(new Event(GameTutorEvents.selected(itemType)));
@@ -368,6 +367,8 @@ public class GameController extends EventDispatcher {
 
     private function gameOver(dto:GameOverDTO):void {
         if (dto.playerId.id == selfId.id) {
+            view.tutor.clear();
+            view.y = 0; // todo
             view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
             const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[players.getSelfPlayer()] : players.getEnemiesPlayers(selfId);
             const losers:Vector.<PlayerDTO> = dto.place == 1 ? players.getEnemiesPlayers(selfId) : new <PlayerDTO>[players.getSelfPlayer()];
@@ -389,6 +390,8 @@ public class GameController extends EventDispatcher {
     // mouse
 
     private function onMouseDown(event:GameMouseEvent):void {
+        view.tutor.visible = false;
+
         if (magicItems.selected) {
             if (event.mousePos.x > 0 && event.mousePos.y > 0 && event.mousePos.x < width && event.mousePos.y < height) {
                 itemMouseDown(event.mousePos);
@@ -400,6 +403,8 @@ public class GameController extends EventDispatcher {
     }
 
     private function onMouseUp(event:GameMouseEvent):void {
+        view.tutor.visible = true;
+
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
                 if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {

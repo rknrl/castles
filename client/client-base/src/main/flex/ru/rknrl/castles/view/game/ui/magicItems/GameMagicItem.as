@@ -77,6 +77,11 @@ public class GameMagicItem extends Sprite {
         mouseEnabled = !value;
     }
 
+    public function set tutorLock(value:Boolean):void {
+        mouseEnabled = !value;
+        magicItem.tutorLock = value;
+    }
+
     public function animate():void {
         shadow.bounce();
         magicItem.bounce();

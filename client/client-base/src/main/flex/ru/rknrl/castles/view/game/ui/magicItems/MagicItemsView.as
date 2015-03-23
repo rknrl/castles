@@ -79,5 +79,10 @@ public class MagicItemsView extends Sprite {
         item.animate();
         item.cooldownProgress = 0;
     }
+
+    public function tutorLock(itemType:ItemType, value:Boolean):void {
+        var item:GameMagicItem = getMagicItem(itemType);
+        item.tutorLock = value;
+    }
 }
 }

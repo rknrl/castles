@@ -43,6 +43,7 @@ public class GameTutorController extends TutorControllerBase {
     public function firstGame():ITutorCommand {
         return sequence(new <ITutorCommand>[
             disableMouse,
+            lockAllItems,
             hideMagicItems,
             wait(2000),
             hideCursor,
@@ -113,8 +114,7 @@ public class GameTutorController extends TutorControllerBase {
 
             exec(server.startTutorFireball),
 
-            wait(2000),
-
+            wait(4000),
             itemClick(ItemType.FIREBALL),
             cast(ItemType.FIREBALL, fireballBuilding),
             wait(5000),
@@ -143,18 +143,20 @@ public class GameTutorController extends TutorControllerBase {
             cast(ItemType.STRENGTHENING, strengtheningBuilding),
             wait(500),
 
+            magicItemsEnableMouse,
+
             // capture big tower
 
             addArrowText,
             wait(500),
             arrowTutor(strengtheningBuilding, bigTower),
             hideCursor,
-            wait(4000),
+            wait(1000),
 
             // win
 
             addWinText,
-            wait(500),
+            wait(3000),
             exec(server.startTutorGame)
         ]);
     }
@@ -198,7 +200,9 @@ public class GameTutorController extends TutorControllerBase {
 
     private function itemClick(itemType:ItemType):ITutorCommand {
         return sequence(new <ITutorCommand>[
+            unlockItem(itemType),
             addMagicItemText(itemType),
+            magicItemsEnableMouse,
             wait(500),
             showCursor,
             parallel(new <ITutorCommand>[
@@ -210,6 +214,7 @@ public class GameTutorController extends TutorControllerBase {
                 ]),
                 waitForEvent(GameTutorEvents.selected(itemType))
             ]),
+            magicItemsDisableMouse,
             clear
         ]);
     }
@@ -278,7 +283,28 @@ public class GameTutorController extends TutorControllerBase {
         ]);
     }
 
+    private function _lockAllItems():void {
+        for each(var itemType:ItemType in ItemType.values)
+            view.magicItems.tutorLock(itemType, true);
+    }
+
+    private function _unlockItem(itemType:ItemType):void {
+        view.magicItems.tutorLock(itemType, false)
+    }
+
+
     // COMMANDS
+
+
+    private function get lockAllItems():ITutorCommand {
+        return exec(_lockAllItems)
+    }
+
+    private function unlockItem(itemType:ItemType):ITutorCommand {
+        return exec(function ():void {
+            _unlockItem(itemType)
+        })
+    }
 
     private function get highlightSelfBuildings():ITutorCommand {
         return exec(_highlightSelfBuildings);
@@ -301,6 +327,18 @@ public class GameTutorController extends TutorControllerBase {
     private function get enableMouse():ITutorCommand {
         return new Exec(function ():void {
             view.mouseEnabled = true;
+        })
+    }
+
+    private function get magicItemsDisableMouse():ITutorCommand {
+        return new Exec(function ():void {
+            view.magicItems.mouseChildren = view.magicItems.mouseEnabled = false;
+        })
+    }
+
+    private function get magicItemsEnableMouse():ITutorCommand {
+        return new Exec(function ():void {
+            view.magicItems.mouseChildren = view.magicItems.mouseEnabled = true;
         })
     }
 
