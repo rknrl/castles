@@ -79,24 +79,7 @@ public class GameTutorController extends TutorControllerBase {
             addArrowText,
             wait(500),
             enableMouse,
-            showCursor,
-            parallel(new <ITutorCommand>[
-                loop(new <ITutorCommand>[
-                    tweenFromCorner(sourceBuilding1),
-                    mouseDown,
-                    wait(400),
-                    addArrow(sourceBuilding1),
-                    tweenGame(sourceBuilding1, targetBuilding1),
-                    wait(400),
-                    mouseUp,
-                    removeArrows,
-                    wait(400)
-                ]),
-                waitForEvent(GameTutorEvents.ARROW_SENDED)
-            ]),
-            hideCursor,
-            clear,
-            waitForEvent(GameTutorEvents.BUILDING_CAPTURED),
+            arrowTutor(sourceBuilding1, targetBuilding1),
 
             // arrows
 
@@ -151,19 +134,27 @@ public class GameTutorController extends TutorControllerBase {
             // assistance
 
             itemClick(ItemType.ASSISTANCE),
-            cast(ItemType.ASSISTANCE, buildings.byId(buildings.getBuildingId(players.selfId)).pos),
+            cast(ItemType.ASSISTANCE, assistanceBuilding),
             wait(3000),
 
             // strengthening
 
             itemClick(ItemType.STRENGTHENING),
-            cast(ItemType.STRENGTHENING, buildings.byId(buildings.getBuildingId(players.selfId)).pos),
+            cast(ItemType.STRENGTHENING, strengtheningBuilding),
+            wait(500),
+
+            // capture big tower
+
+            addArrowText,
+            wait(500),
+            arrowTutor(strengtheningBuilding, bigTower),
+            hideCursor,
             wait(4000),
 
             // win
 
-            hideCursor,
             addWinText,
+            wait(500),
             exec(server.startTutorGame)
         ]);
     }
@@ -180,6 +171,29 @@ public class GameTutorController extends TutorControllerBase {
         view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers(player.id)), buildings.notPlayerId(player.id));
         enemyIndex++;
         if (enemyIndex == 3) enemyIndex = 0;
+    }
+
+    public function arrowTutor(from:Point, to:Point):ITutorCommand {
+        return sequence(new <ITutorCommand>[
+            showCursor,
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    tweenFromCorner(from),
+                    mouseDown,
+                    wait(400),
+                    addArrow(from),
+                    tweenGame(from, to),
+                    wait(400),
+                    mouseUp,
+                    removeArrows,
+                    wait(400)
+                ]),
+                waitForEvent(GameTutorEvents.ARROW_SENDED)
+            ]),
+            hideCursor,
+            clear,
+            waitForEvent(GameTutorEvents.BUILDING_CAPTURED)
+        ]);
     }
 
     private function itemClick(itemType:ItemType):ITutorCommand {
@@ -418,6 +432,18 @@ public class GameTutorController extends TutorControllerBase {
 
     private function get tornadoBuilding():Point {
         return players.isBigGame ? ij(10, 11) : ij(10, 11);
+    }
+
+    private function get assistanceBuilding():Point {
+        return players.isBigGame ? ij(2, 5) : ij(10, 11);
+    }
+
+    private function get strengtheningBuilding():Point {
+        return players.isBigGame ? ij(2, 5) : ij(10, 11);
+    }
+
+    private function get bigTower():Point {
+        return players.isBigGame ? ij(6, 6) : ij(10, 11);
     }
 }
 }
