@@ -15,74 +15,55 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.SlotId;
 
 public class MenuTutorView extends TutorialView {
-    private var touchable:Boolean;
-
     public function MenuTutorView(layout:Layout, deviceFactory:DeviceFactory) {
-        touchable = deviceFactory.touchable();
+        _touchable = deviceFactory.touchable();
         super(layout, deviceFactory);
     }
 
-    public function playSwipe():void {
-        if (touchable) {
-            playMobileSwipe();
-        } else {
-            tweenAndClick(layout.middleNavigationPoint);
-        }
+    private var _touchable:Boolean;
+
+    public function get touchable():Boolean {
+        return _touchable;
     }
 
-    private function playMobileSwipe():void {
-        const y:Number = layout.navigationPointsY - 64 * layout.scale;
-        const startPos:Point = new Point(layout.screenCenterX - 80 * layout.scale, y);
-        const endPos:Point = new Point(layout.screenCenterX + 80 * layout.scale, y);
+    public function get middleNavigationPointPos():Point {
+        return layout.middleNavigationPoint;
+    }
 
+    private function get swipeY():Number {
+        return layout.navigationPointsY - 64 * layout.scale;
+    }
+
+    public function get swipeStartPos():Point {
+        return new Point(layout.screenCenterX - 80 * layout.scale, swipeY);
+    }
+
+    public function get swipeEndPos():Point {
+        return new Point(layout.screenCenterX + 80 * layout.scale, swipeY);
+    }
+
+    public function slotPos(slotId:SlotId):Point {
+        return layout.slotPosGlobal(slotId);
+    }
+
+    public function get firstMagicItemPos():Point {
+        return layout.firstMagicItem;
+    }
+
+    public function get firstFlaskPos():Point {
+        return layout.firstFlask;
+    }
+
+    public function tween(a:Point, b:Point):ITutorCommand {
+        return _tween(a, b);
+    }
+
+    public function addArrow():void {
         const arrow:SwipeArrowMC = new SwipeArrowMC();
         arrow.scaleX = arrow.scaleY = layout.scale;
         arrow.x = layout.screenCenterX;
         arrow.y = y;
         itemsLayer.addChild(arrow);
-
-        function removeArrow():void {
-            itemsLayer.removeChild(arrow);
-        }
-
-/*
-        play(new <ITutorCommand>[
-            wait(500),
-            showCursor,
-            open,
-            cursorPos(startPos),
-            wait(500),
-            tween(startPos, endPos),
-            wait(1000),
-            exec(removeArrow)
-        ]);
-*/
-    }
-
-    public function playSlot(slotId:SlotId):void {
-        tweenAndClick(layout.slotPosGlobal(slotId));
-    }
-
-    public function playMagicItem():void {
-        tweenAndClick(layout.firstMagicItem);
-    }
-
-    public function playFlask():void {
-        tweenAndClick(layout.firstFlask);
-    }
-
-    private function tweenAndClick(clickPos:Point):void {
-/*
-        play(new <ITutorCommand>[
-            wait(500),
-            showCursor,
-            open,
-            tween(screenCorner, clickPos),
-            wait(100),
-            click,
-            wait(1000)
-        ]);
-*/
     }
 }
 }

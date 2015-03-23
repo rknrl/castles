@@ -18,7 +18,6 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
-import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
 
 public class TutorialView extends Sprite {
     private var _itemsLayer:Sprite;
@@ -64,9 +63,8 @@ public class TutorialView extends Sprite {
 
     private var command:ITutorCommand;
 
-    public function play(commands:Vector.<ITutorCommand>):void {
-        if (command) throw new Error("tutor already playing");
-        command = new TutorSequenceCommands(commands, false);
+    public function play(c:ITutorCommand):void {
+        command = c;
         command.execute();
     }
 

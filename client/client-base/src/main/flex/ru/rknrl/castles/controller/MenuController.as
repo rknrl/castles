@@ -44,6 +44,8 @@ public class MenuController {
     private var tutorState:TutorStateDTO;
     private var gamesCount:int;
 
+    private var tutor:MenuTutorController;
+
     /** Показывался ли уже туториал для этого экрана за текущий запуск приложения */
     private const tutorShows:Dictionary = initTutorShows();
 
@@ -63,6 +65,8 @@ public class MenuController {
 
         this.tutorState = tutorState;
         this.gamesCount = gamesCount;
+
+        tutor = new MenuTutorController(view.tutor);
 
         server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
 
@@ -241,30 +245,30 @@ public class MenuController {
             }
         }
 
-        if (gamesCount >= 3 && !tutorShows[screenIndex] && !view.tutorPlaying) {
+        if (gamesCount >= 3 && !tutorShows[screenIndex]) {
             switch (screenIndex) {
                 case ScreenChangedEvent.SCREEN_MAIN:
                     if (!tutorState.navigate) {
                         tutorShows[screenIndex] = true;
-                        view.playSwipeTutor();
+                        view.tutor.play(tutor.playNavigate());
                     } else if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
                         tutorShows[screenIndex] = true;
-                        view.playSlotTutor(model.slots.getNotEmptySlot());
+                        view.tutor.play(tutor.playSlot(model.slots.getNotEmptySlot()));
                     } else if (!tutorState.emptySlot && model.slots.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
                         tutorShows[screenIndex] = true;
-                        view.playSlotTutor(model.slots.getEmptySlot());
+                        view.tutor.play(tutor.playSlot(model.slots.getEmptySlot()));
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SHOP:
                     if (!tutorState.magicItem && gamesCount >= 4 && model.gold >= model.itemPrice) {
                         tutorShows[screenIndex] = true;
-                        view.playMagicItemTutor();
+                        view.tutor.play(tutor.playMagicItem());
                     }
                     break;
                 case ScreenChangedEvent.SCREEN_SKILLS:
                     if (!tutorState.skills && gamesCount >= 4 && model.gold >= model.upgradePrices.firstUpgradePrice) {
                         tutorShows[screenIndex] = true;
-                        view.playFlaskTutor();
+                        view.tutor.play(tutor.playFlask());
                     }
                     break;
             }

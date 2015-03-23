@@ -31,31 +31,32 @@ public class GameSplash extends TutorControllerBase {
     private var unit:Unit;
 
     public function GameSplash(view:GameSplashView) {
+        super(view.tutor);
         this.view = view;
 
         view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         view.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
-        view.tutor.play(new <ITutorCommand>[
-            parallel(new <ITutorCommand>[
-                loop(new <ITutorCommand>[
-                    exec(view.tutor.showCursor),
-                    view.tutor.tween(view.tutor.screenCorner, view.tower1Pos),
-                    exec(view.tutor.mouseDown),
-                    wait(400),
-                    exec(function ():void {
-                        view.tutor.arrows.addArrow(view.tower1Pos);
-                    }),
-                    view.tutor.tween(view.tower1Pos, view.tower2Pos),
-                    wait(400),
-                    exec(view.tutor.mouseUp),
-                    exec(view.tutor.arrows.removeArrows),
-                    wait(400)
-                ]),
-                infinityWait
-            ])
-        ]);
+        view.tutor.play(
+                parallel(new <ITutorCommand>[
+                    loop(new <ITutorCommand>[
+                        showCursor,
+                        view.tutor.tween(view.tutor.screenCorner, view.tower1Pos),
+                        mouseDown,
+                        wait(400),
+                        exec(function ():void {
+                            view.tutor.arrows.addArrow(view.tower1Pos);
+                        }),
+                        view.tutor.tween(view.tower1Pos, view.tower2Pos),
+                        wait(400),
+                        mouseUp,
+                        exec(view.tutor.arrows.removeArrows),
+                        wait(400)
+                    ]),
+                    infinityWait
+                ])
+        );
     }
 
     private function get mousePos():Point {

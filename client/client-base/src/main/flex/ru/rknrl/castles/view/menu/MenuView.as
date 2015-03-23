@@ -47,7 +47,11 @@ public class MenuView extends Sprite {
     private var bankScreen:BankScreen;
     private var screenNavigator:ScreenNavigator;
     private var popupManager:PopupManager;
-    private var tutor:MenuTutorView;
+    private var _tutor:MenuTutorView;
+
+    public function get tutor():MenuTutorView {
+        return _tutor;
+    }
 
     public function MenuView(layout:Layout,
                              locale:CastlesLocale,
@@ -72,7 +76,7 @@ public class MenuView extends Sprite {
         ];
         addChild(screenNavigator = deviceFactory.screenNavigator(screens, model.gold, layout, locale));
         addChild(popupManager = new PopupManager(layout));
-        addChild(tutor = new MenuTutorView(layout, deviceFactory));
+        addChild(_tutor = new MenuTutorView(layout, deviceFactory));
 
         addEventListener(PopupEvent.CLOSE, popupManager.close);
     }
@@ -88,7 +92,7 @@ public class MenuView extends Sprite {
         _layout = value;
         screenNavigator.layout = value;
         popupManager.layout = value;
-        tutor.layout = value;
+        _tutor.layout = value;
     }
 
     public function set lock(value:Boolean):void {
@@ -162,28 +166,6 @@ public class MenuView extends Sprite {
         use namespace test;
 
         popupManager.openImmediate();
-    }
-
-    // tutor
-
-    public function playSwipeTutor():void {
-        tutor.playSwipe();
-    }
-
-    public function playSlotTutor(slotId:SlotId):void {
-        tutor.playSlot(slotId);
-    }
-
-    public function playMagicItemTutor():void {
-        tutor.playMagicItem();
-    }
-
-    public function playFlaskTutor():void {
-        tutor.playFlask();
-    }
-
-    public function get tutorPlaying():Boolean {
-        return tutor.playing;
     }
 }
 }

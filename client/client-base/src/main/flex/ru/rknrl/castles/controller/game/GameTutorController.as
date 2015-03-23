@@ -34,6 +34,7 @@ public class GameTutorController extends TutorControllerBase {
         this.dispatcher = dispatcher;
         this.players = players;
         this.buildings = buildings;
+        super(view.tutor);
     }
 
     public function firstGame():ITutorCommand {
@@ -276,26 +277,6 @@ public class GameTutorController extends TutorControllerBase {
         })
     }
 
-    private function get showCursor():ITutorCommand {
-        return exec(view.tutor.showCursor);
-    }
-
-    private function get hideCursor():ITutorCommand {
-        return exec(view.tutor.hideCursor);
-    }
-
-    private function get mouseDown():ITutorCommand {
-        return exec(view.tutor.mouseDown);
-    }
-
-    private function get mouseUp():ITutorCommand {
-        return exec(view.tutor.mouseUp);
-    }
-
-    private function get click():ITutorCommand {
-        return exec(view.tutor.click);
-    }
-
     private function tweenGame(a:Point, b:Point):ITutorCommand {
         return view.tutor.tweenGame(a, b);
     }
@@ -356,10 +337,6 @@ public class GameTutorController extends TutorControllerBase {
 
     private function get removeArrows():ITutorCommand {
         return exec(view.tutor.arrows.removeArrows);
-    }
-
-    private function get clear():ITutorCommand {
-        return exec(view.tutor.clear);
     }
 
     private function startDrawTornado(points:Vector.<Point>):ITutorCommand {

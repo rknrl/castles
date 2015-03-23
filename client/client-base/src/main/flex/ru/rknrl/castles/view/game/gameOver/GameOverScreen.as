@@ -12,7 +12,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
-import flash.utils.setTimeout;
+import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.points.Point;
@@ -35,6 +35,7 @@ public class GameOverScreen extends Sprite {
     private var holder:Sprite;
     private var holderWidth:Number;
     private var winnerAvatar:FlyAvatar;
+    private var startTime:int;
 
     public function GameOverScreen(winners:Vector.<PlayerInfo>, losers:Vector.<PlayerInfo>, win:Boolean, reward:int, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         addChild(mouseHolder = new Bitmap(Colors.transparent));
@@ -69,9 +70,8 @@ public class GameOverScreen extends Sprite {
 
         this.layout = layout;
 
-        setTimeout(function ():void {
-            addEventListener(MouseEvent.MOUSE_DOWN, onClick);
-        }, 1500);
+        startTime = getTimer();
+        addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
     public function set layout(value:Layout):void {
@@ -91,7 +91,10 @@ public class GameOverScreen extends Sprite {
     }
 
     private function onClick(event:MouseEvent):void {
-        dispatchEvent(new Event(GameViewEvents.LEAVE_BUTTON_CLICK, true));
+        // Чтобы игрок случайно не пролистнул этот экран, ничего не поняв
+        if (getTimer() - startTime > 1500) {
+            dispatchEvent(new Event(GameViewEvents.LEAVE_BUTTON_CLICK, true));
+        }
     }
 }
 }

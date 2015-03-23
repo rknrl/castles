@@ -23,7 +23,6 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.utils.createTextField;
