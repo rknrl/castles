@@ -8,7 +8,6 @@
 
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.Config
 import ru.rknrl.castles.Config.{BuildingLevelToFactor, BuildingsConfig}
 import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.state.Stat
@@ -37,7 +36,9 @@ class TornadoConfig(val damageVsUnit: Double,
                     val radius: Double)
 
 class StrengtheningConfig(val factor: Double,
-                          val duration: Long)
+                          val duration: Long) {
+  def tutorConfig = new StrengtheningConfig(factor, duration * 3)
+}
 
 class ShootingConfig(val damage: Double,
                      val speed: Double,
@@ -73,7 +74,7 @@ class GameConfig(val constants: Constants,
     (
       for (buildingType ← BuildingType.values();
            buildingLevel ← BuildingLevel.values())
-      yield new BuildingPrototype(buildingType, buildingLevel) → buildingConfig(buildingType, buildingLevel)
+        yield new BuildingPrototype(buildingType, buildingLevel) → buildingConfig(buildingType, buildingLevel)
       ).toMap
 
 
@@ -146,7 +147,7 @@ class GameConfig(val constants: Constants,
    * todo: Юниты после фаербола например могут облатать отрицательным count, поэтому проверка на Math.max
    */
   def populationAfterFriendlyUnitEnter(buildingPopulation: Double, unitCount: Double) =
-   Math.max(0, Math.min(buildingPopulation + unitCount, maxPopulation))
+    Math.max(0, Math.min(buildingPopulation + unitCount, maxPopulation))
 
   /**
    * Сколько юнитов будет в здании после входа в него вражеского отряда
@@ -229,6 +230,18 @@ class GameConfig(val constants: Constants,
 
   def unitSpeedInTornado(speed: Double) =
     speed / 2
+
+  def tutorConfig = new GameConfig(
+    constants,
+    buildingsConfig,
+    levelToFactor,
+    fireball,
+    volcano,
+    tornado,
+    strengthening.tutorConfig,
+    shooting,
+    assistance
+  )
 }
 
 object GameConfig {
