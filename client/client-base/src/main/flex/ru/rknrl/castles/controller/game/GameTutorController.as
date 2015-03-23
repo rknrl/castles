@@ -17,16 +17,13 @@ import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.castles.view.utils.tutor.commands.TutorParallelCommands;
-import ru.rknrl.castles.view.utils.tutor.commands.TutorSequenceCommands;
-import ru.rknrl.castles.view.utils.tutor.commands.Wait;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForClick;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForEvent;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;
 
-public class GameTutorController {
+public class GameTutorController extends TutorControllerBase {
     private var view:GameView;
     private var dispatcher:EventDispatcher;
     private var players:Players;
@@ -375,32 +372,12 @@ public class GameTutorController {
         return exec(view.tutor.endDrawTornado);
     }
 
-    private static function parallel(commands:Vector.<ITutorCommand>):ITutorCommand {
-        return new TutorParallelCommands(commands);
-    }
-
-    private static function sequence(commands:Vector.<ITutorCommand>):ITutorCommand {
-        return new TutorSequenceCommands(commands, false);
-    }
-
-    private static function loop(commands:Vector.<ITutorCommand>):ITutorCommand {
-        return new TutorSequenceCommands(commands, true);
-    }
-
-    private static function wait(duration:int):ITutorCommand {
-        return new Wait(duration);
-    }
-
     private function get waitForClick():ITutorCommand {
         return new WaitForClick(view.stage);
     }
 
     private function waitForEvent(eventName:String):ITutorCommand {
         return new WaitForEvent(dispatcher, eventName)
-    }
-
-    private static function exec(func:Function):ITutorCommand {
-        return new Exec(func);
     }
 
     // COORDS
