@@ -33,8 +33,10 @@ public class Arrows {
 
     public function getFromBuildingsIds():Vector.<BuildingIdDTO> {
         const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
-        for (var id:BuildingIdDTO in fromBuildingIdToArrow)
-            result.push(id);
+        for (var id:* in fromBuildingIdToArrow) {
+            const buildingId:BuildingIdDTO = id;
+            result.push(buildingId);
+        }
         return result;
     }
 
@@ -44,8 +46,10 @@ public class Arrows {
     }
 
     private function getArrow(fromBuildingId:BuildingIdDTO):ArrowView {
-        for (var id:BuildingIdDTO in fromBuildingIdToArrow)
-            if (id.id == fromBuildingId.id) return fromBuildingIdToArrow[id];
+        for (var id:* in fromBuildingIdToArrow) {
+            const buildingId:BuildingIdDTO = id;
+            if (buildingId.id == fromBuildingId.id) return fromBuildingIdToArrow[id];
+        }
         return null;
     }
 
