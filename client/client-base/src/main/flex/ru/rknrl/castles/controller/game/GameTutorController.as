@@ -201,10 +201,10 @@ public class GameTutorController extends TutorControllerBase {
 
     private function itemClick(itemType:ItemType):ITutorCommand {
         return sequence(new <ITutorCommand>[
-            unlockItem(itemType),
             addText(view.tutor.locale.tutorItemClick(itemType)),
-            magicItemsEnableMouse,
             wait(500),
+            magicItemsEnableMouse,
+            unlockItem(itemType),
             showCursor,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
