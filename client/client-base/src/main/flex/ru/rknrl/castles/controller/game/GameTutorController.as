@@ -45,12 +45,12 @@ public class GameTutorController extends TutorControllerBase {
             disableMouse,
             lockAllItems,
             hideMagicItems,
-            wait(2000),
             hideCursor,
+            wait(1000),
 
             // self buildings
 
-            addSelfBuildingsText,
+            addText(view.tutor.locale.tutorSelfBuildings),
             highlightSelfBuildings,
             wait(1500),
             addNextButton,
@@ -60,7 +60,7 @@ public class GameTutorController extends TutorControllerBase {
 
             // enemies buildings
 
-            addEnemyBuildingsText(players.isBigGame),
+            addText(view.tutor.locale.tutorEnemyBuildings(players.isBigGame)),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     highlightNextEnemyBuildings,
@@ -77,14 +77,14 @@ public class GameTutorController extends TutorControllerBase {
 
             // arrow
 
-            addArrowText,
+            addText(view.tutor.locale.tutorArrow),
             wait(500),
             enableMouse,
             arrowTutor(sourceBuilding1, targetBuilding1),
 
             // arrows
 
-            addArrowsText,
+            addText(view.tutor.locale.tutorArrows),
             wait(500),
             showCursor,
             parallel(new <ITutorCommand>[
@@ -109,7 +109,6 @@ public class GameTutorController extends TutorControllerBase {
             waitForEvent(GameTutorEvents.BUILDING_CAPTURED),
 
             // fireball
-
             showMagicItems,
 
             exec(server.startTutorFireball),
@@ -147,8 +146,9 @@ public class GameTutorController extends TutorControllerBase {
 
             // capture big tower
 
+            // Захвати большую башню усиленными отрядами
             enableCaptureBigTower,
-            addArrowText,
+            addText(view.tutor.locale.tutorBigTower),
             wait(500),
             captureBigTowerTutor,
             hideCursor,
@@ -156,7 +156,7 @@ public class GameTutorController extends TutorControllerBase {
 
             // win
 
-            addWinText,
+            addText(view.tutor.locale.tutorWin),
             wait(3000),
             exec(server.startTutorGame)
         ]);
@@ -202,7 +202,7 @@ public class GameTutorController extends TutorControllerBase {
     private function itemClick(itemType:ItemType):ITutorCommand {
         return sequence(new <ITutorCommand>[
             unlockItem(itemType),
-            addMagicItemText(itemType),
+            addText(view.tutor.locale.tutorItemClick(itemType)),
             magicItemsEnableMouse,
             wait(500),
             showCursor,
@@ -222,7 +222,7 @@ public class GameTutorController extends TutorControllerBase {
 
     private function cast(itemType:ItemType, buildingPos:Point):ITutorCommand {
         return sequence(new <ITutorCommand>[
-            addMagicItemText(itemType),
+            addText(view.tutor.locale.tutorItemCast(itemType)),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     wait(500),
@@ -261,7 +261,7 @@ public class GameTutorController extends TutorControllerBase {
         const points:Vector.<Point> = tornadoPoints;
 
         return sequence(new <ITutorCommand>[
-            addMagicItemText(ItemType.TORNADO),
+            addText(view.tutor.locale.tutorItemCast(ItemType.TORNADO)),
             wait(500),
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
@@ -405,32 +405,10 @@ public class GameTutorController extends TutorControllerBase {
         return view.tutor.tweenPath(points);
     }
 
-    private function get addSelfBuildingsText():ITutorCommand {
-        return exec(view.tutor.addSelfBuildingsText);
-    }
-
-    private function addEnemyBuildingsText(isBigGame:Boolean):ITutorCommand {
+    private function addText(text:String):ITutorCommand {
         return exec(function ():void {
-            view.tutor.addEnemyBuildingsText(isBigGame)
+            view.tutor.addText(text)
         });
-    }
-
-    private function get addArrowText():ITutorCommand {
-        return exec(view.tutor.addArrowText);
-    }
-
-    private function get addArrowsText():ITutorCommand {
-        return exec(view.tutor.addArrowsText);
-    }
-
-    private function addMagicItemText(itemType:ItemType):ITutorCommand {
-        return exec(function ():void {
-            view.tutor.addMagicItemText(itemType)
-        });
-    }
-
-    private function get addWinText():ITutorCommand {
-        return exec(view.tutor.addWinText);
     }
 
     private function get addNextButton():ITutorCommand {

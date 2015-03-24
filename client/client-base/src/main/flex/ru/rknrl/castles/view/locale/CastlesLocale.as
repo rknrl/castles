@@ -163,22 +163,42 @@ public class CastlesLocale extends Locale {
         return "Можно отправлять отряды сразу из нескольких домиков";
     }
 
+    public function get tutorBigTower():String {
+        return "Захвати большую башню усиленными отрядами";
+    }
+
     public function get tutorWin():String {
         return "Захвати все домики противников, чтобы выиграть";
     }
 
-    public function tutorItem(itemType:ItemType):String {
+    public function tutorItemClick(itemType:ItemType):String {
         switch (itemType) {
             case ItemType.FIREBALL:
-                return "Запусти фаербол в противника";
+                return "Внизу находятся твои магические предметы";
             case ItemType.STRENGTHENING:
-                return "Усилить свой домик";
+                return "Усиление";
             case ItemType.VOLCANO:
                 return "Создай вулкан под башней противника";
             case ItemType.TORNADO:
                 return "Используй торнадо против противника";
             case ItemType.ASSISTANCE:
                 return "Вызывай подмогу";
+        }
+        throw new Error("unknown item type " + itemType);
+    }
+
+    public function tutorItemCast(itemType:ItemType):String {
+        switch (itemType) {
+            case ItemType.FIREBALL:
+                return "Запусти фаербол в противника";
+            case ItemType.STRENGTHENING:
+                return "Выбери свой домик, все его параметры увеличатся";
+            case ItemType.VOLCANO:
+                return "Выбери место, где образуется вулкан";
+            case ItemType.TORNADO:
+                return "Нарисуй траекторию, по которой двинется торнадо";
+            case ItemType.ASSISTANCE:
+                return "Выбери свой домик, и к нему отправится подмога";
         }
         throw new Error("unknown item type " + itemType);
     }

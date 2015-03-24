@@ -36,13 +36,18 @@ public class GameTutorialView extends TutorialView {
         return _arrows;
     }
 
+    private var _locale:CastlesLocale;
+
+    public function get locale():CastlesLocale {
+        return _locale;
+    }
+
     private var tornadoPath:TornadoPathView;
-    private var locale:CastlesLocale;
     private var loadImageManager:ILoadImageManager;
 
     public function GameTutorialView(layout:Layout, locale:CastlesLocale, deviceFactory:DeviceFactory, loadImageManager:ILoadImageManager) {
         super(layout, deviceFactory);
-        this.locale = locale;
+        this._locale = locale;
         this.loadImageManager = loadImageManager;
 
         addChild(_arrows = new ArrowsView());
@@ -54,31 +59,7 @@ public class GameTutorialView extends TutorialView {
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    public function addSelfBuildingsText():void {
-        addText(locale.tutorSelfBuildings)
-    }
-
-    public function addEnemyBuildingsText(isBigGame:Boolean):void {
-        addText(locale.tutorEnemyBuildings(isBigGame))
-    }
-
-    public function addArrowText():void {
-        addText(locale.tutorArrow)
-    }
-
-    public function addArrowsText():void {
-        addText(locale.tutorArrows)
-    }
-
-    public function addMagicItemText(itemType:ItemType):void {
-        addText(locale.tutorItem(itemType))
-    }
-
-    public function addWinText():void {
-        addText(locale.tutorWin)
-    }
-
-    private function addText(text:String):void {
+    public function addText(text:String):void {
         const textField:AnimatedTextField = new AnimatedTextField(Fonts.title);
         textField.text = text;
         textField.textScale = layout.scale;
@@ -90,7 +71,7 @@ public class GameTutorialView extends TutorialView {
 
     public function addNextButton():void {
         const textField:AnimatedTextField = new AnimatedTextField(Fonts.play);
-        textField.text = locale.next;
+        textField.text = _locale.next;
         textField.textScale = layout.scale;
         textField.x = layout.screenCenterX;
         textField.y = layout.gameMagicItemsY;
