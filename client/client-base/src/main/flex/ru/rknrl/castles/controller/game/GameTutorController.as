@@ -87,6 +87,7 @@ public class GameTutorController extends TutorControllerBase {
             addText(view.tutor.locale.tutorArrows),
             wait(500),
             showCursor,
+            enableArrows,
             parallel(new <ITutorCommand>[
                 loop(new <ITutorCommand>[
                     tweenFromCorner(sourceBuilding2_1),
@@ -307,11 +308,23 @@ public class GameTutorController extends TutorControllerBase {
         return _canCaptureBigTower;
     }
 
+    private var _canArrows:Boolean;
+
+    public function get canArrows():Boolean {
+        return _canArrows;
+    }
+
     // COMMANDS
 
     private function get enableCaptureBigTower():ITutorCommand {
         return exec(function ():void {
             _canCaptureBigTower = true
+        })
+    }
+
+    private function get enableArrows():ITutorCommand {
+        return exec(function ():void {
+            _canArrows = true
         })
     }
 

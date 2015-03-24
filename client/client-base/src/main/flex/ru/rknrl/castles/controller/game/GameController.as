@@ -403,6 +403,7 @@ public class GameController extends EventDispatcher {
     }
 
     private static const tutorBigTowerId:int = 20; // todo hardcode
+    private static const tutorArrowsTowerId:int = 16; // todo hardcode
 
     private function onMouseUp(event:GameMouseEvent):void {
         view.tutor.visible = true;
@@ -431,7 +432,9 @@ public class GameController extends EventDispatcher {
                         }
                     }
 
-                    if (filteredIds.length > 0 && (toBuilding.id.id != tutorBigTowerId || (!tutor || tutor.canCaptureBigTower))) {
+                    if (filteredIds.length > 0 &&
+                            (toBuilding.id.id != tutorBigTowerId || (!tutor || tutor.canCaptureBigTower)) &&
+                            (toBuilding.id.id != tutorArrowsTowerId || (!tutor || tutor.canArrows))) {
                         if (!toBuilding.owner.equalsId(selfId)) {
                             if (filteredIds.length > 1)
                                 dispatchEvent(new Event(GameTutorEvents.ARROWS_SENDED));
