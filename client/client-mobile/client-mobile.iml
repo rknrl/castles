@@ -46,14 +46,14 @@
         <packaging-air-desktop />
         <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-android-descriptor.xml" package-file-name="Castles">
           <files-to-package>
-            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/locale - RU.tsv" path-in-package="locale - RU.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/icons_android" path-in-package="icons_android" />
           </files-to-package>
           <AirSigningOptions keystore-path="$MODULE_DIR$/../../../core/certificates/android/android.p12" use-temp-certificate="false" />
         </packaging-android>
         <packaging-ios enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/src/main/flex/ru/rknrl/castles/Castles-ios-descriptor.xml" package-file-name="Castles">
           <files-to-package>
-            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/castles - RU.tsv" path-in-package="castles - RU.tsv" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/locale - RU.tsv" path-in-package="locale - RU.tsv" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-568h@2x.png" path-in-package="Default-568h@2x.png" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape.png" path-in-package="Default-Landscape.png" />
             <FilePathAndPathInPackage file-path="$MODULE_DIR$/src/main/resources/splash/Default-Landscape@2x.png" path-in-package="Default-Landscape@2x.png" />

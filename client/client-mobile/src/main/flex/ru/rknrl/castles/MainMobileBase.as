@@ -43,7 +43,7 @@ import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.PlatformType;
 
 public class MainMobileBase extends Sprite {
-    [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
+    [Embed(source="/locale - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
     private static const facebookAppId:String = "370172643168842";

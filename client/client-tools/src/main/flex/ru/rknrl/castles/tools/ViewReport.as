@@ -108,7 +108,7 @@ public class ViewReport extends Sprite {
                 loaders.push(new BitmapLoader("reference/" + device + "/" + name + ".png"))
             }
         }
-        loaders.push(localeLoader = new TextLoader("castles - RU.tsv"));
+        loaders.push(localeLoader = new TextLoader("locale - RU.tsv"));
         const loader:ParallelLoader = new ParallelLoader(loaders);
         loader.addEventListener(Event.COMPLETE, onComplete);
         loader.load();

@@ -38,6 +38,18 @@ public class CastlesLocale extends Locale {
     private static const NO_CONNECTION:String = "no_connection";
     private static const FAST_AND_TRUST:String = "fast_and_trust";
     private static const DEAD:String = "dead";
+    private static const TUTOR_SELF_BUILDINGS:String = "tutor_self_buildings";
+    private static const TUTOR_ENEMY_BUILDINGS_BIG:String = "tutor_enemy_buildings_big";
+    private static const TUTOR_ENEMY_BUILDINGS_SMALL:String = "tutor_enemy_buildings_small";
+    private static const NEXT:String = "next";
+    private static const TUTOR_ARROW:String = "tutor_arrow";
+    private static const TUTOR_ARROWS:String = "tutor_arrows";
+    private static const TUTOR_BIG_TOWER:String = "tutor_big_tower";
+    private static const TUTOR_CLICK_PREFIX:String = "tutor_click_";
+    private static const TUTOR_CAST_PREFIX:String = "tutor_cast_";
+    private static const TUTOR_WIN:String = "tutor_win";
+    private static const GAME_SPLASH:String = "game_splash";
+    private static const ENTER_FIRST_GAME:String = "enter_first_game";
 
     public function CastlesLocale(data:String) {
         super(data);
@@ -144,71 +156,47 @@ public class CastlesLocale extends Locale {
     }
 
     public function get tutorSelfBuildings():String {
-        return "Твои домики желтого цвета";
+        return translate(TUTOR_SELF_BUILDINGS);
     }
 
     public function tutorEnemyBuildings(isBigGame:Boolean):String {
-        return isBigGame ? "У тебя 3 противника" : "Твой противник бирюзовый";
+        return isBigGame ? translate(TUTOR_ENEMY_BUILDINGS_BIG) : translate(TUTOR_ENEMY_BUILDINGS_SMALL);
     }
 
     public function get next():String {
-        return "Дальше"
+        return translate(NEXT)
     }
 
     public function get tutorArrow():String {
-        return "Отправляй отряды и захватывай чужие домики";
+        return translate(TUTOR_ARROW);
     }
 
     public function get tutorArrows():String {
-        return "Можно отправлять отряды сразу из нескольких домиков";
+        return translate(TUTOR_ARROWS);
     }
 
     public function get tutorBigTower():String {
-        return "Захвати большую башню усиленными отрядами";
-    }
-
-    public function get tutorWin():String {
-        return "Захвати все домики противников, чтобы выиграть";
+        return translate(TUTOR_BIG_TOWER);
     }
 
     public function tutorItemClick(itemType:ItemType):String {
-        switch (itemType) {
-            case ItemType.FIREBALL:
-                return "Внизу находятся твои магические предметы";
-            case ItemType.STRENGTHENING:
-                return "Усиление";
-            case ItemType.VOLCANO:
-                return "Создай вулкан под башней противника";
-            case ItemType.TORNADO:
-                return "Используй торнадо против противника";
-            case ItemType.ASSISTANCE:
-                return "Вызывай подмогу";
-        }
-        throw new Error("unknown item type " + itemType);
+        return translate(TUTOR_CLICK_PREFIX + itemType.name().toLowerCase());
     }
 
     public function tutorItemCast(itemType:ItemType):String {
-        switch (itemType) {
-            case ItemType.FIREBALL:
-                return "Запусти фаербол в противника";
-            case ItemType.STRENGTHENING:
-                return "Выбери свой домик, все его параметры увеличатся";
-            case ItemType.VOLCANO:
-                return "Выбери место, где образуется вулкан";
-            case ItemType.TORNADO:
-                return "Нарисуй траекторию, по которой двинется торнадо";
-            case ItemType.ASSISTANCE:
-                return "Выбери свой домик, и к нему отправится подмога";
-        }
-        throw new Error("unknown item type " + itemType);
+        return translate(TUTOR_CAST_PREFIX + itemType.name().toLowerCase());
+    }
+
+    public function get tutorWin():String {
+        return translate(TUTOR_WIN);
     }
 
     public function get gameSplash():String {
-        return "Нажимай мышкой на желтую башню и не отпуская тащи на другую";
+        return translate(GAME_SPLASH);
     }
 
     public function get enterFirstGame():String {
-        return "Отлично!\nЗаходим в бой";
+        return translate(ENTER_FIRST_GAME);
     }
 }
 }

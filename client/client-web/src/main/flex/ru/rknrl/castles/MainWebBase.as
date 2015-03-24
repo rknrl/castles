@@ -26,7 +26,7 @@ import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.PlatformType;
 
 public class MainWebBase extends Sprite {
-    [Embed(source="/castles - RU.tsv", mimeType="application/octet-stream")]
+    [Embed(source="/locale - RU.tsv", mimeType="application/octet-stream")]
     public static const DefaultLocaleByteArray:Class;
 
     private var host:String;
