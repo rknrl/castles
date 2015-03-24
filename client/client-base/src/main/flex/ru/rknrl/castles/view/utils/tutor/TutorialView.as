@@ -112,7 +112,9 @@ public class TutorialView extends Sprite {
     }
 
     public function clear():void {
-        while (itemsLayer.numChildren) itemsLayer.removeChildAt(0)
+        while (itemsLayer.numChildren) itemsLayer.removeChildAt(0);
+        _cursorHalo.clear();
+        cursorPos(screenCorner);
     }
 }
 }

@@ -53,7 +53,7 @@ public class CursorHalo extends Sprite {
         border.graphics.drawCircle(0, 0, radius);
         addChild(border);
 
-        circle.alpha = border.alpha = 0;
+        clear();
 
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
@@ -66,10 +66,16 @@ public class CursorHalo extends Sprite {
         play(MODE_MOUSE_UP);
     }
 
+    public function clear():void {
+        circle.alpha = border.alpha = 0;
+        startTime = 0;
+        mode = MODE_NONE;
+    }
+
     private function play(mode:int):void {
         this.mode = mode;
         startTime = getTimer();
-        onEnterFrame()
+        onEnterFrame();
     }
 
     private function onEnterFrame(event:Event = null):void {

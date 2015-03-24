@@ -148,6 +148,7 @@ public class GameController extends EventDispatcher {
             tutor = new GameTutorController(view, this, players, buildings, server);
             view.y += 32; // todo
         }
+        view.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 
     public function destroy():void {
@@ -166,7 +167,11 @@ public class GameController extends EventDispatcher {
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
 
-    private var tutorStart:Boolean;
+    private function onAddedToStage(event:Event):void {
+        view.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+
+        if (tutor) view.tutor.play(tutor.firstGame());
+    }
 
     private function onEnterFrame(event:GameMouseEvent):void {
         const time:int = getTimer();
@@ -181,11 +186,6 @@ public class GameController extends EventDispatcher {
 
                 arrows.mouseMove(event.mousePos);
             }
-        }
-
-        if (tutor && !tutorStart) {
-            tutorStart = true;
-            view.tutor.play(tutor.firstGame());
         }
     }
 

@@ -63,7 +63,8 @@ public class MenuTutorController extends TutorControllerBase {
             wait(100),
             click,
             wait(1000),
-            hideCursor
+            hideCursor,
+            clear
         ]);
     }
 }

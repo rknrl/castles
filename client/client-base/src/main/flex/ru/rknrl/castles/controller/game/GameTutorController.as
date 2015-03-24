@@ -147,7 +147,6 @@ public class GameTutorController extends TutorControllerBase {
 
             // capture big tower
 
-            // Захвати большую башню усиленными отрядами
             enableCaptureBigTower,
             addText(view.tutor.locale.tutorBigTower),
             wait(500),
