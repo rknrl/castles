@@ -113,7 +113,7 @@ class GameConfig(val constants: Constants,
   def tornadoSpeed = tornado.speed
 
   def strengtheningDuration(player: Option[PlayerState]) =
-    5000 + (if (player.isDefined) churchesPopulationToStrengtheningDuration(player.get.churchesPopulation) else 0)
+    strengthening.duration + (if (player.isDefined) churchesPopulationToStrengtheningDuration(player.get.churchesPopulation) else 0)
 
   def bulletSpeed = shooting.speed
 

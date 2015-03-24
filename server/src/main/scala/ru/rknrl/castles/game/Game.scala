@@ -202,7 +202,7 @@ class Game(players: Map[PlayerId, Player],
     (newGameState, messages, personalMessages)
   }
 
-  override def receive = {
+  def receive = {
     /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
       * Добавляем/Обнавляем рефы в мапах
       */
