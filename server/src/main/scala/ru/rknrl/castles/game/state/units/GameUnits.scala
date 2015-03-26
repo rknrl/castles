@@ -41,7 +41,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
         for (bullet ← myBullets) {
           val building = bullet.building
           val bulletPlayer = if (building.owner.isDefined) Some(playerStates(building.owner.get)) else None
-          newUnit = newUnit.setCount(config.unitCountAfterBulletHit(newUnit.count, building, playerStates(unit.owner), bulletPlayer))
+          newUnit = newUnit.setCount(config.unitCountAfterBulletHit(newUnit, building, playerStates(unit.owner), bulletPlayer))
         }
         newUnit
       }
@@ -54,7 +54,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
         val nearFireballs = Fireballs.inRadius(fireballs, unit.getPos(time), config, playerStates)
         var newUnit = unit
         for (fireball ← nearFireballs)
-          newUnit = newUnit.setCount(config.unitCountAfterFireballHit(newUnit.count, playerStates(unit.owner), playerStates(fireball.playerId)))
+          newUnit = newUnit.setCount(config.unitCountAfterFireballHit(newUnit, playerStates(unit.owner), playerStates(fireball.playerId)))
         newUnit
       }
     )
@@ -66,7 +66,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
         val nearTornadoes = Tornadoes.inRadius(tornadoes, unit.getPos(time), config, playerStates, time)
         var newUnit = unit
         for (tornado ← nearTornadoes)
-          newUnit = newUnit.setCount(config.unitCountAfterTornadoHit(newUnit.count, playerStates(unit.owner), playerStates(tornado.playerId)))
+          newUnit = newUnit.setCount(config.unitCountAfterTornadoHit(newUnit, playerStates(unit.owner), playerStates(tornado.playerId)))
         newUnit
       }
     )
@@ -78,7 +78,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
         val nearVolcanoes = Volcanoes.inRadius(volcanoes, unit.getPos(time), config, playerStates)
         var newUnit = unit
         for (volcano ← nearVolcanoes)
-          newUnit = newUnit.setCount(config.unitCountAfterVolcanoHit(newUnit.count, playerStates(unit.owner), playerStates(volcano.playerId)))
+          newUnit = newUnit.setCount(config.unitCountAfterVolcanoHit(newUnit, playerStates(unit.owner), playerStates(volcano.playerId)))
         newUnit
       }
     )

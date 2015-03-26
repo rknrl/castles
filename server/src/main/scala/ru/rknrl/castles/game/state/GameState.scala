@@ -257,7 +257,7 @@ class GameState(val time: Long,
       .add(createdBullets)
       .cleanup(time)
 
-    val newPlayerStates = playerStates.updateChurchesPopulation(buildings.map)
+    val newPlayerStates = playerStates.updateChurchesProportion(buildings.map)
 
     val newGameState = new GameState(
       newTime,

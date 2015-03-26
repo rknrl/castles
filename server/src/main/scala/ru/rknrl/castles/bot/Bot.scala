@@ -26,7 +26,8 @@ import ru.rknrl.dto.GameDTO.MoveDTO
 import scala.collection.JavaConverters._
 
 class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogging {
-  val interval = 2000L
+  val moveInterval = 5000
+  val castInterval = 10000
   var lastTime = 0L
 
   var mapDiagonal = Double.NaN
@@ -64,7 +65,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
     gameState = Some(newGameState)
     val time = newGameState.time
 
-    if (time - lastTime > interval) {
+    if (time - lastTime > moveInterval) {
       lastTime = time
 
       val myBuildings = getMyBuildings
@@ -102,7 +103,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
             .build()
         )
 
-        if (time - lastCastTime > 10000) {
+        if (time - lastCastTime > castInterval) {
           lastCastTime = time
 
           val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState}
@@ -159,7 +160,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
   def ownerWeight(owner: Option[PlayerId]) = if (owner.isDefined) 0.3 else 0.0
 
-  def populationWeight(population: Double) = population * 3 / config.maxPopulation
+  def populationWeight(population: Double) = population * 3 / 99
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
 

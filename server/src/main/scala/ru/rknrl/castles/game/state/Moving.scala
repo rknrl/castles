@@ -51,7 +51,7 @@ object Moving {
 
       val buildingPrototype = fromBuilding.prototype
       val playerState = playerStates(fromBuilding.owner.get)
-      val speed = config.getUnitSpeed(buildingPrototype, playerState, fromBuilding.strengthened)
+      val speed = config.unitSpeed(buildingPrototype, playerState, fromBuilding.strengthened)
 
       new GameUnit(unitId, buildingPrototype, count, starPos, endPos, time, speed, exitUnit.toBuildingId, exitUnit.playerId, fromBuilding.strengthened)
     }

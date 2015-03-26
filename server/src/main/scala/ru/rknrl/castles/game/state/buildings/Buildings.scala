@@ -22,10 +22,8 @@ class Buildings(val map: Map[BuildingId, Building]) {
   def apply(id: BuildingId) = map(id)
 
   def updatePopulation(deltaTime: Long, config: GameConfig) = {
-    def updateBuilding(b: Building) = {
-      val add = config.getRegeneration(b.prototype) * deltaTime
-      b.setPopulation(Math.min(b.population + add, config.maxPopulation))
-    }
+    def updateBuilding(b: Building) =
+      b.setPopulation(config.populationAfterRegen(b, deltaTime))
 
     new Buildings(for ((id, b) ← map) yield id → updateBuilding(b))
   }
@@ -46,7 +44,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
     for (enterUnit ← enterUnits) {
       val b = newBuildings(enterUnit.unit.targetBuildingId)
       if (b.owner.isDefined && b.owner.get == enterUnit.unit.owner) {
-        val newPopulation = config.populationAfterFriendlyUnitEnter(b.population, enterUnit.unit.count)
+        val newPopulation = config.populationAfterFriendlyUnitEnter(b, enterUnit.unit.count)
         newBuildings = newBuildings.updated(enterUnit.unit.targetBuildingId, b.setPopulation(newPopulation))
       } else {
         val buildingPlayer = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
@@ -70,8 +68,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
 
   def cleanupStrengthening(time: Long, config: GameConfig, playerStates: PlayerStates) = {
     def updateBuilding(b: Building) = {
-      val playerState = if (b.owner.isDefined) Some(playerStates(b.owner.get)) else None
-      if (b.strengthened && (time - b.strengtheningStartTime > config.strengtheningDuration(playerState)))
+      if (b.strengthened && (time - b.strengtheningStartTime > config.strengtheningDuration(playerStates(b.owner.get))))
         b.unstrength()
       else
         b

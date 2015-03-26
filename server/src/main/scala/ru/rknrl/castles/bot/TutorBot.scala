@@ -48,7 +48,7 @@ class TutorBot(accountId: AccountId, config: GameConfig) extends Bot(accountId, 
       case SEND_UNITS_TO_ONE_BUILDING ⇒
         val time = newGameState.time
 
-        if (time - lastTime > interval) {
+        if (time - lastTime > moveInterval) {
           lastTime = time
 
           sender ! Move(

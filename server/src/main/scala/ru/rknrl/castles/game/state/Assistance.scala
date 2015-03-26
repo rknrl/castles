@@ -31,7 +31,8 @@ object Assistance {
       val startPos = assistancePositions(playerId)
       val endPos = building.pos
       val prototype = config.assistanceBuildingPrototype
-      val speed = config.getUnitSpeed(prototype, playerStates(playerId), strengthened = false)
-      new GameUnit(unitIdIterator.next, prototype, config.assistanceCount(playerStates(playerId)), startPos, endPos, time, speed, buildingId, playerId, false)
+      val speed = config.unitSpeed(prototype, playerStates(playerId), strengthened = false)
+      val count = config.assistanceCount(building, playerStates(playerId))
+      new GameUnit(unitIdIterator.next, prototype, count, startPos, endPos, time, speed, buildingId, playerId, false)
     }
 }

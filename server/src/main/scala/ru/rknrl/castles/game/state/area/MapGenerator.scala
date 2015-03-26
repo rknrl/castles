@@ -33,7 +33,7 @@ object MapGenerator {
   }
 
   private def pickRandomFromList[T](list: List[T], count: Int) = {
-    var indices = (0 until count).toList
+    var indices = (0 until list.size).toList
     val rnd = new Random()
     var randomIndices = List.empty[Int]
     for (_ ← 0 until count) {
@@ -66,18 +66,18 @@ object MapGenerator {
   def getRandomBuildings(positions: Iterable[IJ], h: Int, v: Int, buildingIdIterator: BuildingIdIterator, config: GameConfig) = {
     val randomPositions = getRandomBuildingPositions(positions, h, v)
     for (pos ← randomPositions)
-    yield {
-      val prototype = randomBuildingPrototype
-      new Building(
-        id = buildingIdIterator.next,
-        prototype = prototype,
-        pos.toXY,
-        population = config.getStartPopulation(prototype),
-        owner = None,
-        strengthened = false,
-        strengtheningStartTime = 0,
-        lastShootTime = 0
-      )
-    }
+      yield {
+        val prototype = randomBuildingPrototype
+        new Building(
+          id = buildingIdIterator.next,
+          prototype = prototype,
+          pos.toXY,
+          population = config.getStartPopulation(prototype),
+          owner = None,
+          strengthened = false,
+          strengtheningStartTime = 0,
+          lastShootTime = 0
+        )
+      }
   }
 }

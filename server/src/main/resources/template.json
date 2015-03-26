@@ -13,6 +13,9 @@
     "username": "username",
     "password": "enter mysql password",
     "database": "castles"
+    "poolMaxObjects": 20,
+    "poolMaxIdle": 8,
+    "poolMaxQueueSize": 20
   },
   "products": [
     {
@@ -24,6 +27,7 @@
   ],
   "account": {
     "initGold": 1000,
+    "initRating": 1400,
     "initItemCount": 2,
     "buildingPrices": {
       "level1": 4,
@@ -41,78 +45,128 @@
       "8": 128,
       "9": 256
     },
-    "itemPrice": 1
+    "itemPrice": 1,
+    "maxAttack": 3.0,
+    "maxDefence": 3.0,
+    "maxSpeed": 1.75
   },
   "game": {
-    "buildingsConfig": {
-      "tower": {
-        "regeneration": 0.0002,
-        "startPopulation": 10,
-        "stat": {
-          "attack": 5,
-          "defence": 4,
-          "speed": 0.06
-        }
-      },
+    "units": {
       "house": {
-        "regeneration": 0.0004,
-        "startPopulation": 10,
-        "stat": {
-          "attack": 2,
-          "defence": 2,
-          "speed": 0.07
-        }
+        "attack": 2,
+        "defence": 2,
+        "speed": 0.025
+      },
+      "tower": {
+        "attack": 4.9,
+        "defence": 4,
+        "speed": 0.015
       },
       "church": {
-        "regeneration": 0.0002,
-        "startPopulation": 5,
-        "stat": {
-          "attack": 3,
-          "defence": 3,
-          "speed": 0.08
-        }
+        "attack": 3,
+        "defence": 3,
+        "speed": 0.035
       }
     },
-    "levelToFactor": {
-      "buildingLevel1": 1.0,
-      "buildingLevel2": 1.1,
-      "buildingLevel3": 1.2
+    "buildings": {
+      "house1": {
+        "regeneration": 0.0004,
+        "startPopulation": 10,
+        "maxPopulation": 30,
+        "fortification": 1.15
+      },
+      "house2": {
+        "regeneration": 0.00044,
+        "startPopulation": 15,
+        "maxPopulation": 50,
+        "fortification": 1.15
+      },
+      "house3": {
+        "regeneration": 0.00048,
+        "startPopulation": 20,
+        "maxPopulation": 99,
+        "fortification": 1.15
+      },
+      "tower1": {
+        "regeneration": 0.0002,
+        "startPopulation": 10,
+        "maxPopulation": 25,
+        "fortification": 1.25,
+        "shotPower": 2
+      },
+      "tower2": {
+        "regeneration": 0.0002,
+        "startPopulation": 16,
+        "maxPopulation": 40,
+        "fortification": 1.3,
+        "shotPower": 3.5
+      },
+      "tower3": {
+        "regeneration": 0.0002,
+        "startPopulation": 30,
+        "maxPopulation": 80,
+        "fortification": 1.45,
+        "shotPower": 4
+      },
+      "church1": {
+        "regeneration": 0.0002,
+        "startPopulation": 5,
+        "maxPopulation": 15,
+        "fortification": 1.15
+      },
+      "church2": {
+        "regeneration": 0.0002,
+        "startPopulation": 8,
+        "maxPopulation": 25,
+        "fortification": 1.15
+      },
+      "church3": {
+        "regeneration": 0.0002,
+        "startPopulation": 15,
+        "maxPopulation": 50,
+        "fortification": 1.15
+      }
     },
     "constants": {
       "unitToExitFactor": 0.5,
       "itemCooldown": 20000
     },
     "fireball": {
-      "damageVsUnit": 15,
-      "damageVsBuilding": 10,
+      "damageVsUnit": 40,
+      "damageVsBuilding": 20,
       "flyDuration": 1000,
-      "radius": 39
+      "radius": 39,
+      "maxPowerBonus": 0.8
     },
     "volcano": {
       "damageVsUnit": 0.06,
       "damageVsBuilding": 0.12,
       "duration": 6000,
-      "radius": 39
+      "radius": 39,
+      "maxPowerBonus": 0.3
     },
     "tornado": {
       "damageVsUnit": 0.24,
       "damageVsBuilding": 0.24,
       "duration": 10000,
       "speed": 0.033,
-      "radius": 39
+      "radius": 39,
+      "maxPowerBonus": 0.8
     },
     "strengthening": {
       "factor": 1.5,
-      "duration": 10000
+      "maxBonusFactor": 0.5,
+      "duration": 10000,
+      "maxBonusDuration": 4000
     },
     "shooting": {
-      "damage": 2,
-      "speed": 0.0004,
-      "shootInterval": 3000,
-      "shootRadius": 1
+      "speed": 0.4,
+      "shootInterval": 1000,
+      "shootRadius": 50
     },
     "assistance": {
-      "count": 50
+      "power": 0.5,
+      "maxBonusPower": 0.5
     }
   },
   "social": {
@@ -149,6 +203,18 @@
           "count": 100,
           "price": 1,
           "currency": "мэйлик"
+        }
+      ]
+    },
+    "fb": {
+      "appId": "enter fb id",
+      "appSecret": "enter fb secret",
+      "productsInfo": [
+        {
+          "id": 1,
+          "count": 100,
+          "price": 1,
+          "currency": "$"
         }
       ]
     }

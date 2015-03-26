@@ -24,7 +24,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 
 object Main {
-  implicit val formats = DefaultFormats + new BuildingPricesSerializer + new BuildingLevelToFactorSerializer + new BuildingsConfigSerializer + new SkillUpgradePricesSerializer
+  implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
     println(s"ver: 24 march 2015 19:29")

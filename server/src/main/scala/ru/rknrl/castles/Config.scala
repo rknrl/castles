@@ -15,18 +15,6 @@ import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto.AuthDTO.ProductDTO
 import ru.rknrl.dto.CommonDTO._
 
-object Config {
-
-  class BuildingsConfig(map: Map[BuildingType, BuildingConfig]) {
-    def apply(buildingType: BuildingType) = map(buildingType)
-  }
-
-  class BuildingLevelToFactor(map: Map[BuildingLevel, Double]) {
-    def apply(level: BuildingLevel) = map(level)
-  }
-
-}
-
 class Config(val host: String,
              val staticHost: String,
              val gamePort: Int,
