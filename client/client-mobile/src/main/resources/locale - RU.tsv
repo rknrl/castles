@@ -32,9 +32,9 @@ tutor_arrows	Можно отправлять отряды сразу из нес
 tutor_big_tower	Захвати большую башню усиленными отрядами
 tutor_click_fireball	Внизу находятся твои магические предметы
 tutor_click_strengthening	Усиление
-tutor_volcano	Создай вулкан под башней противника
-tutor_tornado	Используй торнадо против противника
-tutor_assistance	Вызывай подмогу
+tutor_click_volcano	Создай вулкан под башней противника
+tutor_click_tornado	Используй торнадо против противника
+tutor_click_assistance	Вызывай подмогу
 tutor_cast_fireball	Запусти фаербол в противника
 tutor_cast_strengthening	Выбери свой домик, все его параметры увеличатся
 tutor_cast_volcano	Выбери место, где образуется вулкан
