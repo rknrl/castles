@@ -14,6 +14,7 @@ import ru.rknrl.castles.account.state.{BuildingPrototype, IJ}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.map.GameMap.random
 import ru.rknrl.castles.game.state.BuildingIdIterator
+import ru.rknrl.castles.game.state.area.GameArea
 import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
@@ -26,7 +27,7 @@ class MapCell(val i: Int,
 
 class GameMap(val cells: Iterable[MapCell]) {
 
-  def buildings(iterator: BuildingIdIterator, config: GameConfig) =
+  private def topLeftBuildings(iterator: BuildingIdIterator, config: GameConfig) =
     for (cell ← cells) yield {
       val buildingType = cell.buildingType.getOrElse(random(BuildingType.values()))
       val buildingLevel = cell.buildingLevel.getOrElse(random(BuildingLevel.values()))
@@ -43,6 +44,45 @@ class GameMap(val cells: Iterable[MapCell]) {
         lastShootTime = 0
       )
     }
+
+  def buildings(gameArea: GameArea, iterator: BuildingIdIterator, config: GameConfig) = {
+    val topLeft = topLeftBuildings(iterator, config)
+    topLeft ++ mirrorBuildingsBigMap(gameArea, topLeft, iterator)
+  }
+
+  //  private def mirrorBuildingsSmallMap(gameArea: GameArea, topBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
+  //    for (b ← topBuildings)
+  //      yield {
+  //        val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
+  //        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+  //      }
+
+  private def mirrorBuildingsBigMap(gameArea: GameArea, topLeftBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) = {
+    // attention: только для карт нечетного размера
+    val half = new IJ(gameArea.v / 2, gameArea.h / 2).toXY
+
+    def getParts(b: Building) =
+      if (b.pos.x == half.x && b.pos.y == half.y)
+        List()
+      else if (b.pos.x == half.x)
+        List(2)
+      else if (b.pos.y == half.y)
+        List(1)
+      else
+        List(1, 2, 3)
+
+    for (b ← topLeftBuildings;
+         part ← getParts(b))
+      yield {
+        val pos = part match {
+          case 1 ⇒ gameArea.mirrorH(b.pos)
+          case 2 ⇒ gameArea.mirrorV(b.pos)
+          case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
+        }
+
+        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+      }
+  }
 }
 
 class GameMaps(val big: Array[GameMap],

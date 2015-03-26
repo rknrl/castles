@@ -92,7 +92,7 @@ object GameState {
       if (isTutor)
         playersBuildings ++ TutorMap.buildings(buildingIdIterator, big)
       else
-        playersBuildings ++ gameMap.buildings(buildingIdIterator, config)
+        playersBuildings ++ gameMap.buildings(gameArea, buildingIdIterator, config)
 
     val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 

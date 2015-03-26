@@ -77,8 +77,8 @@ public class EditorGround extends Sprite {
 
     public function getMap():String {
         var s:String = "";
-        for (var i:int = 0; i < h; i++) {
-            for (var j:int = 0; j < v; j++) {
+        for (var i:int = 0; i < h / 2; i++) {
+            for (var j:int = 0; j < v / 2; j++) {
                 if (getGround(i, j).bitmapData == yellow) {
                     s += i + "\t" + j + "\trandom\trandom\n";
                 }
