@@ -12,6 +12,10 @@ rm -rf ~/dev/rknrl/castles-deploy/castles-server/* &&
 
 cp server/src/main/resources/dev.json ~/dev/rknrl/castles-deploy/castles-server/dev.json &&
 
+# copy maps to out folder
+
+cp -a server/src/main/resources/maps/. ~/dev/rknrl/castles-deploy/castles-server/maps &&
+
 # copy server jar to out folder
 
 cp server/target/server-1.0-SNAPSHOT-allinone.jar ~/dev/rknrl/castles-deploy/castles-server/server.jar &&
@@ -22,7 +26,7 @@ cd ~/dev/rknrl/castles-deploy/castles-server/ &&
 
 # commit changes
 
-git add dev.json server.jar &&
+git add dev.json server.jar maps/* &&
 git diff --cached &&
 git commit -m "update version" &&
 git push

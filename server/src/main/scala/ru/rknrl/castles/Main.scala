@@ -28,7 +28,7 @@ object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
-    println(s"ver: 24 march 2015 19:29")
+    println(s"ver: 26 march 2015 20:55")
     configPaths.foreach(path ⇒ println(s"configPath='$path'"))
 
     val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
@@ -46,7 +46,7 @@ object Main {
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 3 seconds, database, top, config, gameMaps), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 7 seconds, database, top, config, gameMaps), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
