@@ -10,10 +10,11 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.account.state.IJ
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.map.GameMap
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.Moving._
+import ru.rknrl.castles.game.state.area.GameArea
 import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
-import ru.rknrl.castles.game.state.area.{GameArea, MapGenerator}
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
 import ru.rknrl.castles.game.state.bullets.Bullets._
 import ru.rknrl.castles.game.state.fireballs.Fireballs._
@@ -71,27 +72,7 @@ object GameState {
           .build()
       }
 
-  def mirrorBuildingsSmallMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
-    for (b ← topRandomBuildings)
-      yield {
-        val pos = gameArea.mirrorH(gameArea.mirrorV(b.pos))
-        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
-      }
-
-  def mirrorBuildingsBigMap(gameArea: GameArea, topRandomBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) =
-    for (b ← topRandomBuildings;
-         part ← List(1, 2, 3))
-      yield {
-        val pos = part match {
-          case 1 ⇒ gameArea.mirrorH(b.pos)
-          case 2 ⇒ gameArea.mirrorV(b.pos)
-          case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
-        }
-
-        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
-      }
-
-  def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig) = {
+  def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig, gameMap: GameMap) = {
     if (big)
       assert(players.size == 4)
     else
@@ -108,23 +89,10 @@ object GameState {
     val playersBuildings = getPlayerBuildings(players, playersSlotsPositions, buildingIdIterator, config)
 
     val buildings =
-      if (isTutor) {
+      if (isTutor)
         playersBuildings ++ TutorMap.buildings(buildingIdIterator, big)
-      } else {
-        val slotsIJs = GameArea.toIJs(playersSlotsPositions)
-
-        val randomBuildings = if (big)
-          MapGenerator.getRandomBuildings(slotsIJs, Math.floor(gameArea.h / 2).toInt, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
-        else
-          MapGenerator.getRandomBuildings(slotsIJs, gameArea.h, Math.floor(gameArea.v / 2).toInt, buildingIdIterator, config)
-
-        val mirrorRandomBuildings = if (big)
-          mirrorBuildingsBigMap(gameArea, randomBuildings, buildingIdIterator)
-        else
-          mirrorBuildingsSmallMap(gameArea, randomBuildings, buildingIdIterator)
-
-        playersBuildings ++ randomBuildings ++ mirrorRandomBuildings
-      }
+      else
+        playersBuildings ++ gameMap.buildings(buildingIdIterator, config)
 
     val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 

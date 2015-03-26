@@ -80,7 +80,7 @@ public class EditorGround extends Sprite {
         for (var i:int = 0; i < h; i++) {
             for (var j:int = 0; j < v; j++) {
                 if (getGround(i, j).bitmapData == yellow) {
-                    s += i + "\t" + j + "\tplace\n";
+                    s += i + "\t" + j + "\trandom\trandom\n";
                 }
             }
         }

@@ -16,6 +16,7 @@ import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
+import ru.rknrl.castles.game.map.GameMaps
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi.B2C.AdminOnline
@@ -84,7 +85,8 @@ object MatchMaking {
 class MatchMaking(interval: FiniteDuration,
                   database: ActorRef,
                   var top: List[TopItem],
-                  config: Config) extends Actor with ActorLogging {
+                  config: Config,
+                  gameMaps: GameMaps) extends Actor with ActorLogging {
   /** Если у бота случается ошибка - стопаем его
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
@@ -172,7 +174,7 @@ class MatchMaking(interval: FiniteDuration,
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
       val bot = context.actorOf(Props(botClass, accountId, config.game), accountId.id)
-      val botStat = if(isTutor) tutorBotStat else order.stat
+      val botStat = if (isTutor) tutorBotStat else order.stat
       val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
@@ -225,9 +227,11 @@ class MatchMaking(interval: FiniteDuration,
       playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
     }
 
-    val gameConfig = if(isTutor) config.game.tutorConfig else config.game
+    val gameConfig = if (isTutor) config.game.tutorConfig else config.game
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, self), gameIdIterator.next)
+    val gameMap = gameMaps.random(big)
+    
+    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self), gameIdIterator.next)
 
     new GameInfo(game, orders, isTutor)
   }
@@ -370,10 +374,10 @@ class MatchMaking(interval: FiniteDuration,
 
   def topDto =
     for (i ← 0 until top.size)
-    yield TopUserInfoDTO.newBuilder()
-      .setPlace(i + 1)
-      .setInfo(top(i).info)
-      .build
+      yield TopUserInfoDTO.newBuilder()
+        .setPlace(i + 1)
+        .setInfo(top(i).info)
+        .build
 
   def onGameOver(gameRef: ActorRef) = {
     val gameInfo = gameRefToGameInfo(gameRef)

@@ -13,6 +13,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.Join
+import ru.rknrl.castles.game.map.GameMap
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -72,6 +73,7 @@ class Game(players: Map[PlayerId, Player],
            isTutor: Boolean,
            isDev: Boolean,
            config: GameConfig,
+           gameMap: GameMap,
            matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
   val playersList = for ((id, player) ← players) yield player
@@ -166,7 +168,7 @@ class Game(players: Map[PlayerId, Player],
 
   def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, isTutor, config)
+  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, isTutor, config, gameMap)
 
   var moveActions = Map[PlayerId, MoveDTO]()
   var fireballCasts = Map[PlayerId, PointDTO]()

@@ -28,7 +28,8 @@ class Config(val host: String,
              val products: List[Product],
              val social: SocialConfigs,
              val account: AccountConfig,
-             val game: GameConfig) {
+             val game: GameConfig,
+             val mapsPath: String) {
 
   private def checkProductInfoConfig() =
     for (p ← products)
