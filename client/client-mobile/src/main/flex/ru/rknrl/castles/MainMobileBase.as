@@ -181,7 +181,7 @@ public class MainMobileBase extends Sprite {
         if (userInfo) {
             myUserInfo = userInfo;
             Log.info("myUserInfo: " + myUserInfo);
-            start(AccountType.DEVICE_ID, myUserInfo.uid, social.accessToken);
+            start(AccountType.DEVICE_ID /* todo <- неверно */, myUserInfo.uid, social.accessToken);
         } else {
             addLoginScreen();
             Log.info("myUserInfo fail");
