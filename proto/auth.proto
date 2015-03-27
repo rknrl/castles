@@ -26,7 +26,7 @@ message AuthenticatedDTO {
 
     required AccountConfigDTO config = 2;
 
-    repeated TopUserInfoDTO top = 3;
+    required TopDTO top = 3;
 
     repeated ProductDTO products = 4;
 
@@ -37,6 +37,10 @@ message AuthenticatedDTO {
 
     // Клиент находится в игре
     optional NodeLocator game = 7;
+}
+
+message TopDTO {
+    repeated TopUserInfoDTO users = 3;
 }
 
 message TopUserInfoDTO {

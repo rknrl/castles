@@ -18,6 +18,7 @@ import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.ProductDTO;
+import ru.rknrl.dto.TopDTO;
 
 public class MenuModel {
     private var _slots:Slots;
@@ -78,7 +79,7 @@ public class MenuModel {
         mergeAccountStateDto(authenticated.accountState);
         mergeConfigDto(authenticated.config);
         mergeProductsDto(authenticated.products);
-        _top = new Top(authenticated.top);
+        mergeTopDto(authenticated.top);
     }
 
     public function mergeAccountStateDto(dto:AccountStateDTO):void {
@@ -86,6 +87,10 @@ public class MenuModel {
         _gold = dto.gold;
         _itemsCount = new ItemsCount(dto.items);
         _skillLevels = new SkillLevels(dto.skills);
+    }
+
+    public function mergeTopDto(dto:TopDTO):void {
+        _top = new Top(dto.users);
     }
 
     public function mergeConfigDto(dto:AccountConfigDTO):void {

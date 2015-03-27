@@ -16,6 +16,7 @@ import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
 import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
+import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.bank.BankScreen;
@@ -134,6 +135,10 @@ public class MenuView extends Sprite {
 
     public function set upgradePrices(value:SkillUpgradePrices):void {
         skillScreen.upgradePrices = value;
+    }
+
+    public function set top(value:Top):void {
+        topScreen.top = value;
     }
 
     public function set products(value:Products):void {

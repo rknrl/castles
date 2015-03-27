@@ -140,7 +140,7 @@ class Account(matchmaking: ActorRef,
     val builder = AuthenticatedDTO.newBuilder()
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
-      .addAllTop(top.asJava)
+      .setTop(TopDTO.newBuilder().addAllUsers(top.asJava).build)
       .setTutor(tutorState)
       .addAllProducts(config.productsDto(platformType, accountId.accountType).asJava)
       .setSearchOpponents(searchOpponents)

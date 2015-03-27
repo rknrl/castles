@@ -33,6 +33,7 @@ import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.SlotsOrientation;
 import ru.rknrl.dto.SlotsPosDTO;
+import ru.rknrl.dto.TopDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
 import ru.rknrl.dto.UserInfoDTO;
 
@@ -175,13 +176,19 @@ public class DtoMock {
         return dto;
     }
 
-    public static function top():Vector.<TopUserInfoDTO> {
+    public static function topUsers():Vector.<TopUserInfoDTO> {
         const dto:Vector.<TopUserInfoDTO> = new <TopUserInfoDTO>[];
         dto.push(topUserInfo(1, "1", "mock_avatars/1.png"));
         dto.push(topUserInfo(2, "2", "mock_avatars/2.png"));
         dto.push(topUserInfo(3, "3", "mock_avatars/3.png"));
         dto.push(topUserInfo(4, "4", "mock_avatars/4.png"));
         dto.push(topUserInfo(5, "5", "mock_avatars/5.png"));
+        return dto;
+    }
+
+    public static function top():TopDTO {
+        const dto: TopDTO = new TopDTO();
+        dto.users = topUsers();
         return dto;
     }
 

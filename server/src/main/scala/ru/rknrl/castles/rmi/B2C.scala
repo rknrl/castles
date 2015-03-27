@@ -11,58 +11,60 @@ package ru.rknrl.castles.rmi
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AdminDTO.{AdminAccountStateDTO, AdminOnlineDTO}
-import ru.rknrl.dto.AuthDTO.AuthenticatedDTO
+import ru.rknrl.dto.AuthDTO.{TopDTO, AuthenticatedDTO}
 import ru.rknrl.dto.CommonDTO.NodeLocator
 import ru.rknrl.dto.GameDTO._
 
 object B2C {
 
-  // auth
+  // auth 0 - 9
 
   case class Authenticated(success: AuthenticatedDTO) extends Msg(1)
 
-  // admin
+  // admin 10 - 19
 
-  case object AuthenticatedAsAdmin extends Msg(2)
+  case object AuthenticatedAsAdmin extends Msg(10)
 
-  case class AdminOnline(online: AdminOnlineDTO) extends Msg(3)
+  case class AdminOnline(online: AdminOnlineDTO) extends Msg(11)
 
-  // account
+  // account 20 - 29
 
-  case class AccountStateUpdated(accountState: AccountStateDTO) extends Msg(4)
+  case class AccountStateUpdated(accountState: AccountStateDTO) extends Msg(20)
 
-  case class EnteredGame(node: NodeLocator) extends Msg(5)
+  case class EnteredGame(node: NodeLocator) extends Msg(21)
 
-  case class AccountState(adminAccountState: AdminAccountStateDTO) extends Msg(6)
+  case class AccountState(adminAccountState: AdminAccountStateDTO) extends Msg(22)
 
-  // enter game
+  case class TopUpdated(top: TopDTO) extends Msg(23)
 
-  case class JoinedGame(gameState: GameStateDTO) extends Msg(7)
+  // enter game 30 - 39
 
-  case object LeavedGame extends Msg(8)
+  case class JoinedGame(gameState: GameStateDTO) extends Msg(30)
 
-  // game
+  case object LeavedGame extends Msg(31)
 
-  case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(9)
+  // game 40-59
 
-  case class UpdateItemStates(states: ItemsStateDTO) extends Msg(10)
+  case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(40)
 
-  case class AddUnit(unit: UnitDTO) extends Msg(11)
+  case class UpdateItemStates(states: ItemsStateDTO) extends Msg(41)
 
-  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(12)
+  case class AddUnit(unit: UnitDTO) extends Msg(42)
 
-  case class RemoveUnit(id: UnitIdDTO) extends Msg(13)
+  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(43)
 
-  case class KillUnit(killedId: UnitIdDTO) extends Msg(14)
+  case class RemoveUnit(id: UnitIdDTO) extends Msg(44)
 
-  case class AddFireball(fireball: FireballDTO) extends Msg(15)
+  case class KillUnit(killedId: UnitIdDTO) extends Msg(45)
 
-  case class AddVolcano(volcano: VolcanoDTO) extends Msg(16)
+  case class AddFireball(fireball: FireballDTO) extends Msg(46)
 
-  case class AddTornado(tornado: TornadoDTO) extends Msg(17)
+  case class AddVolcano(volcano: VolcanoDTO) extends Msg(47)
 
-  case class AddBullet(bullet: BulletDTO) extends Msg(18)
+  case class AddTornado(tornado: TornadoDTO) extends Msg(48)
 
-  case class GameOver(gameOver: GameOverDTO) extends Msg(19)
+  case class AddBullet(bullet: BulletDTO) extends Msg(49)
+
+  case class GameOver(gameOver: GameOverDTO) extends Msg(50)
 
 }

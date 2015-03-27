@@ -13,6 +13,7 @@ import flash.utils.Dictionary;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
+import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -35,6 +36,7 @@ import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
 import ru.rknrl.rmi.AccountStateUpdatedEvent;
 import ru.rknrl.rmi.Server;
+import ru.rknrl.rmi.TopUpdatedEvent;
 
 public class MenuController {
     private var view:MenuView;
@@ -69,6 +71,7 @@ public class MenuController {
         tutor = new MenuTutorController(view.tutor);
 
         server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
+        server.addEventListener(TopUpdatedEvent.TOPUPDATED, onTopUpdated);
 
         social.addEventListener(PaymentDialogEvent.PAYMENT_DIALOG_CLOSED, onPaymentDialogClosed);
         social.addEventListener(PaymentDialogEvent.PAYMENT_SUCCESS, onPaymentSuccess);
@@ -94,6 +97,11 @@ public class MenuController {
         view.itemsCount = model.itemsCount;
         view.skillLevels = model.skillLevels;
         view.lock = false;
+    }
+
+    private function onTopUpdated(e:TopUpdatedEvent):void {
+        model.mergeTopDto(e.top);
+        view.top = model.top;
     }
 
     private function onSlotClick(event:SlotClickEvent):void {

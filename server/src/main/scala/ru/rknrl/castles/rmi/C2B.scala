@@ -19,68 +19,68 @@ object C2B {
 
   abstract class GameMsg(id: Byte) extends Msg(id)
 
-  // auth
+  // auth 60 - 69
 
-  case class Authenticate(authenticate: AuthenticateDTO) extends Msg(65)
+  case class Authenticate(authenticate: AuthenticateDTO) extends Msg(60)
 
-  case class AuthenticateAsAdmin(authenticate: AdminAuthenticateDTO) extends Msg(66)
+  case class AuthenticateAsAdmin(authenticate: AdminAuthenticateDTO) extends Msg(61)
 
-  // admin
+  // admin 70 - 79
 
-  case class GetAccountState(dto: AdminGetAccountStateDTO) extends Msg(67)
+  case class GetAccountState(dto: AdminGetAccountStateDTO) extends Msg(70)
 
-  case object GetOnline extends Msg(68)
+  case object GetOnline extends Msg(71)
 
-  case class AddGold(dto: AdminAddGoldDTO) extends Msg(69)
+  case class AddGold(dto: AdminAddGoldDTO) extends Msg(72)
 
-  case class AddItem(dto: AdminAddItemDTO) extends Msg(70)
+  case class AddItem(dto: AdminAddItemDTO) extends Msg(73)
 
-  case class SetSkill(dto: AdminSetSkillDTO) extends Msg(71)
+  case class SetSkill(dto: AdminSetSkillDTO) extends Msg(74)
 
-  case class SetSlot(dto: AdminSetSlotDTO) extends Msg(72)
+  case class SetSlot(dto: AdminSetSlotDTO) extends Msg(75)
 
-  case class DeleteAccount(accountId: AccountIdDTO) extends Msg(73)
+  case class DeleteAccount(accountId: AccountIdDTO) extends Msg(76)
 
-  // account
+  // account 80 - 89
 
-  case class BuyBuilding(buy: BuyBuildingDTO) extends Msg(74)
+  case class BuyBuilding(buy: BuyBuildingDTO) extends Msg(80)
 
-  case class UpgradeBuilding(id: UpgradeBuildingDTO) extends Msg(75)
+  case class UpgradeBuilding(id: UpgradeBuildingDTO) extends Msg(81)
 
-  case class RemoveBuilding(id: RemoveBuildingDTO) extends Msg(76)
+  case class RemoveBuilding(id: RemoveBuildingDTO) extends Msg(82)
 
-  case class UpgradeSkill(upgrade: UpgradeSkillDTO) extends Msg(77)
+  case class UpgradeSkill(upgrade: UpgradeSkillDTO) extends Msg(83)
 
-  case class BuyItem(buy: BuyItemDTO) extends Msg(78)
+  case class BuyItem(buy: BuyItemDTO) extends Msg(84)
 
-  case object EnterGame extends Msg(79)
+  case object EnterGame extends Msg(85)
 
-  case class UpdateTutorState(tutorState: TutorStateDTO) extends Msg(80)
+  case class UpdateTutorState(tutorState: TutorStateDTO) extends Msg(86)
 
-  // enter game
+  // enter game 90 - 99
 
-  case object JoinGame extends GameMsg(81)
+  case object JoinGame extends GameMsg(90)
 
-  case object Surrender extends GameMsg(82)
+  case object Surrender extends GameMsg(91)
 
-  case object LeaveGame extends GameMsg(83)
+  case object LeaveGame extends GameMsg(92)
 
-  // game
+  // game 100 - 119
 
-  case class Move(dto: MoveDTO) extends GameMsg(84)
+  case class Move(dto: MoveDTO) extends GameMsg(100)
 
-  case class CastFireball(point: PointDTO) extends GameMsg(85)
+  case class CastFireball(point: PointDTO) extends GameMsg(101)
 
-  case class CastStrengthening(buildingId: BuildingIdDTO) extends GameMsg(86)
+  case class CastStrengthening(buildingId: BuildingIdDTO) extends GameMsg(102)
 
-  case class CastVolcano(point: PointDTO) extends GameMsg(87)
+  case class CastVolcano(point: PointDTO) extends GameMsg(103)
 
-  case class CastTornado(cast: CastTorandoDTO) extends GameMsg(88)
+  case class CastTornado(cast: CastTorandoDTO) extends GameMsg(104)
 
-  case class CastAssistance(buildingId: BuildingIdDTO) extends GameMsg(89)
+  case class CastAssistance(buildingId: BuildingIdDTO) extends GameMsg(105)
 
-  case object StartTutorFireball extends GameMsg(90)
+  case object StartTutorFireball extends GameMsg(106)
 
-  case object StartTutorGame extends GameMsg(91)
+  case object StartTutorGame extends GameMsg(107)
 
 }
