@@ -28,32 +28,58 @@
                      includeInLayout="false" visible="false"
                      width="100%" height="100%">
 
+        <mx:VBox label="Graph" width="100%" height="100%">
 
-        <mx:HBox label="Graph" width="100%" height="100%">
-            <mx:LineChart id="chart" width="100%" height="100%" showDataTips="true">
+            <mx:HBox width="100%" height="100%">
+                <mx:LineChart id="onlineChart" width="100%" height="100%" showDataTips="true">
 
-                <mx:seriesFilters>
-                    <fx:Array/>
-                </mx:seriesFilters>
+                    <mx:seriesFilters>
+                        <fx:Array/>
+                    </mx:seriesFilters>
 
-                <mx:series>
-                    <mx:LineSeries yField="online" form="segment" displayName="Online"/>
-                    <mx:LineSeries yField="games" form="segment" displayName="Games"/>
-                    <mx:LineSeries yField="totalMem" form="segment" displayName="Mem (Mb)"/>
-                </mx:series>
+                    <mx:series>
+                        <mx:LineSeries xField="date" yField="online" form="segment" displayName="Online"/>
+                        <mx:LineSeries xField="date" yField="games" form="segment" displayName="Games"/>
+                    </mx:series>
 
-                <mx:verticalAxis>
-                    <mx:LinearAxis/>
-                </mx:verticalAxis>
+                    <mx:verticalAxis>
+                        <mx:LinearAxis/>
+                    </mx:verticalAxis>
 
-                <mx:horizontalAxis>
-                    <mx:LinearAxis/>
-                </mx:horizontalAxis>
+                    <mx:horizontalAxis>
+                        <mx:DateTimeAxis interval="1" dataUnits="minutes" displayLocalTime="true"/>
+                    </mx:horizontalAxis>
 
-            </mx:LineChart>
+                </mx:LineChart>
 
-            <mx:Legend dataProvider="{chart}"/>
-        </mx:HBox>
+                <mx:Legend dataProvider="{onlineChart}"/>
+            </mx:HBox>
+
+            <mx:HBox width="100%" height="100%">
+                <mx:LineChart id="memChart" width="100%" height="100%" showDataTips="true">
+
+                    <mx:seriesFilters>
+                        <fx:Array/>
+                    </mx:seriesFilters>
+
+                    <mx:series>
+                        <mx:LineSeries xField="date" yField="totalMem" form="segment" displayName="Mem (Mb)"/>
+                    </mx:series>
+
+                    <mx:verticalAxis>
+                        <mx:LinearAxis/>
+                    </mx:verticalAxis>
+
+                    <mx:horizontalAxis>
+                        <mx:DateTimeAxis interval="1" dataUnits="minutes" displayLocalTime="true"/>
+                    </mx:horizontalAxis>
+
+                </mx:LineChart>
+
+                <mx:Legend dataProvider="{memChart}"/>
+            </mx:HBox>
+
+        </mx:VBox>
 
         <mx:Box label="Admin" width="100%" height="100%">
             <s:Scroller width="100%" height="100%"
@@ -159,7 +185,7 @@
             server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState);
             server.addEventListener(ServerHealthEvent.SERVERHEALTH, onServerHealth);
 
-            getHealthInterval = setInterval(server.getServerHealth, 1000);
+            getHealthInterval = setInterval(server.getServerHealth, 60 * 1000);
             server.getServerHealth();
         }
 
@@ -254,9 +280,25 @@
         }
 
         private function onServerHealth(event:ServerHealthEvent):void {
-            const arr:Array = [];
-            for each(var item:ServerHealthItemDTO in event.serverHealth.items) arr.push(item);
-            chart.dataProvider = arr;
+            const online:Array = [];
+            const mem:Array = [];
+            const items:Vector.<ServerHealthItemDTO> = event.serverHealth.items;
+            const startTime:Number = event.serverHealth.startTime.toNumber();
+            for (var i:int = 0; i < items.length; i++) {
+                const item:ServerHealthItemDTO = items[i];
+                const date:Date = new Date(startTime + 60 * 1000 * i);
+                online.push({
+                    date: date,
+                    online: item.online,
+                    games: item.games
+                });
+                mem.push({
+                    date: date,
+                    totalMem: item.totalMem
+                })
+            }
+            onlineChart.dataProvider = online;
+            memChart.dataProvider = mem;
         }
 
         private function onDeleteClick(event:MouseEvent):void {

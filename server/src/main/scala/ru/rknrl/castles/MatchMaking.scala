@@ -241,7 +241,7 @@ class MatchMaking(interval: FiniteDuration,
     new GameInfo(game, orders, isTutor)
   }
 
-  val healthStartTime = System.currentTimeMillis() / 1000L
+  val healthStartTime = System.currentTimeMillis()
   var health = List.empty[ServerHealthItemDTO]
 
   def receive = {
