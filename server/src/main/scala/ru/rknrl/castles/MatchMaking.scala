@@ -19,14 +19,15 @@ import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.map.GameMaps
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
-import ru.rknrl.castles.rmi.B2C.AdminOnline
-import ru.rknrl.castles.rmi.C2B.GetOnline
+import ru.rknrl.castles.rmi.B2C.ServerHealth
+import ru.rknrl.castles.rmi.C2B.GetServerHealth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AdminDTO.AdminOnlineDTO
+import ru.rknrl.dto.AdminDTO.{ServerHealthDTO, ServerHealthItemDTO}
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 class BotIdIterator extends IdIterator {
@@ -123,9 +124,13 @@ class MatchMaking(interval: FiniteDuration,
 
   case object TryCreateGames
 
+  case object RegisterHealth
+
   import context.dispatcher
 
   context.system.scheduler.schedule(0 seconds, interval, self, TryCreateGames)
+
+  context.system.scheduler.schedule(0 seconds, 1 minute, self, RegisterHealth)
 
   /** Создать игры из имеющихся заявок
     */
@@ -230,13 +235,23 @@ class MatchMaking(interval: FiniteDuration,
     val gameConfig = if (isTutor) config.game.tutorConfig else config.game
 
     val gameMap = gameMaps.random(big)
-    
+
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self), gameIdIterator.next)
 
     new GameInfo(game, orders, isTutor)
   }
 
+  val healthStartTime = System.currentTimeMillis() / 1000L
+  var health = List.empty[ServerHealthItemDTO]
+
   def receive = {
+    case RegisterHealth ⇒
+      health = health :+ ServerHealthItemDTO.newBuilder()
+        .setOnline(accountIdToAccountRef.size)
+        .setGames(gameRefToGameInfo.size)
+        .setTotalMem((Runtime.getRuntime.totalMemory() / 1024 / 1024).toInt)
+        .build
+
     /** from Admin or PaymentTransaction */
     case msg@AdminSetAccountState(accountId, _) ⇒
       log.debug("AdminSetAccountState")
@@ -244,12 +259,14 @@ class MatchMaking(interval: FiniteDuration,
         accountIdToAccountRef(accountId) forward msg
 
     /** from Admin */
-    case GetOnline ⇒
-      log.debug("GetOnline")
-      sender ! AdminOnline(AdminOnlineDTO.newBuilder()
-        .setAccounts(accountIdToAccountRef.size)
-        .setGames(gameRefToGameInfo.size)
-        .build())
+    case GetServerHealth ⇒
+      log.debug("GetServerHealth")
+      sender ! ServerHealth(
+        ServerHealthDTO.newBuilder()
+          .setStartTime(healthStartTime)
+          .addAllItems(health.asJava)
+          .build
+      )
 
     /** from Admin */
     case Database.AccountDeleted(dto) ⇒

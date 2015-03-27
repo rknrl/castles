@@ -10,8 +10,8 @@ package ru.rknrl.castles.rmi
 
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AdminDTO.{AdminAccountStateDTO, AdminOnlineDTO}
-import ru.rknrl.dto.AuthDTO.{TopDTO, AuthenticatedDTO}
+import ru.rknrl.dto.AdminDTO.{AdminAccountStateDTO, ServerHealthDTO}
+import ru.rknrl.dto.AuthDTO.{AuthenticatedDTO, TopDTO}
 import ru.rknrl.dto.CommonDTO.NodeLocator
 import ru.rknrl.dto.GameDTO._
 
@@ -25,7 +25,7 @@ object B2C {
 
   case object AuthenticatedAsAdmin extends Msg(10)
 
-  case class AdminOnline(online: AdminOnlineDTO) extends Msg(11)
+  case class ServerHealth(serverHealth: ServerHealthDTO) extends Msg(11)
 
   // account 20 - 29
 

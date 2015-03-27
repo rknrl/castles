@@ -16,7 +16,7 @@ import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
-import ru.rknrl.castles.rmi.B2C.{AdminOnline, AuthenticatedAsAdmin}
+import ru.rknrl.castles.rmi.B2C.{ServerHealth, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
@@ -72,11 +72,11 @@ class Admin(database: ActorRef,
     case msg: Database.AccountDeleted ⇒
       matchmaking forward msg
 
-    case GetOnline ⇒
+    case GetServerHealth ⇒
       log.debug("GetOnline")
-      matchmaking ! GetOnline
+      matchmaking ! GetServerHealth
 
-    case msg: AdminOnline ⇒
+    case msg: ServerHealth ⇒
       log.debug("AdminOnline")
       client ! msg
 

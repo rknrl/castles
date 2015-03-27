@@ -29,7 +29,7 @@ object C2B {
 
   case class GetAccountState(dto: AdminGetAccountStateDTO) extends Msg(70)
 
-  case object GetOnline extends Msg(71)
+  case object GetServerHealth extends Msg(71)
 
   case class AddGold(dto: AdminAddGoldDTO) extends Msg(72)
 
