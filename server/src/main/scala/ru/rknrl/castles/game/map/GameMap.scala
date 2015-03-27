@@ -128,7 +128,7 @@ object GameMap {
 
   def fromFile(file: File) = {
     println("map file " + file.getName)
-    fromString(Source.fromFile(file).mkString)
+    fromString(Source.fromFile(file, "UTF-8").mkString)
   }
 }
 
