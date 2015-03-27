@@ -366,7 +366,7 @@ class MatchMaking(interval: FiniteDuration,
 
     top = insert(top, TopItem(accountId, newRating, userInfo))
 
-    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating) // todo - если он ушел в оффлайн, ничо не сохранится
+    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, topDto) // todo - если он ушел в оффлайн, ничо не сохранится
   }
 
   def insert(list: List[TopItem], item: TopItem) =

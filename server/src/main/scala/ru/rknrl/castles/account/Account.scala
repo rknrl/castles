@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
 
 object Account {
 
-  case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double)
+  case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double, top: Iterable[TopUserInfoDTO])
 
   case object DuplicateAccount
 
@@ -49,7 +49,6 @@ class Account(matchmaking: ActorRef,
   var platformType: PlatformType = null
   var userInfo: UserInfoDTO = null
   var state: AccountState = null
-  var top: Iterable[TopUserInfoDTO] = null
 
   def checkSecret(authenticate: AuthenticateDTO) =
     authenticate.getUserInfo.getAccountId.getType match {
@@ -119,7 +118,6 @@ class Account(matchmaking: ActorRef,
     /** Matchmaking ответил на InGame */
     case InGameResponse(game, searchOpponents, top) ⇒
       log.debug("InGameResponse")
-      this.top = top
       if (game.isDefined) {
         client ! authenticated(searchOpponents = false, Some(gameAddress), top, tutorState)
         connectToGame(game.get)
@@ -194,7 +192,7 @@ class Account(matchmaking: ActorRef,
     case msg: GameMsg ⇒ game forward msg
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
-    case LeaveGame(usedItems, reward, newRating) ⇒
+    case LeaveGame(usedItems, reward, newRating, top) ⇒
       log.debug("LeaveGame")
       client ! B2C.LeavedGame
 
@@ -206,6 +204,7 @@ class Account(matchmaking: ActorRef,
         state = state.addItem(itemType, -count)
 
       database ! UpdateAccountState(accountId.dto, state.dto)
+      client ! TopUpdated(TopDTO.newBuilder().addAllUsers(top.asJava).build())
       context become account
   }
 
