@@ -121,13 +121,13 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
             itemType match {
               case ItemType.FIREBALL ⇒
-                sender() ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                sender ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.VOLCANO ⇒
-                sender() ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
+                sender ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.STRENGTHENING ⇒
-                sender() ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
+                sender ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
               case ItemType.ASSISTANCE ⇒
-                sender() ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
+                sender ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
             }
           }
         }

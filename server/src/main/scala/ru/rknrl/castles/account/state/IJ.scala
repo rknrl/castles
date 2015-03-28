@@ -17,27 +17,7 @@ class IJ(val i: Int, val j: Int) {
     case _ ⇒ false
   }
 
-  def up = new IJ(i, j - 1)
-
-  def upLeft = new IJ(i - 1, j - 1)
-
-  def upRight = new IJ(i + 1, j - 1)
-
-  def left = new IJ(i - 1, j)
-
-  def right = new IJ(i + 1, j)
-
-  def down = new IJ(i, j + 1)
-
-  def downLeft = new IJ(i - 1, j + 1)
-
-  def downRight = new IJ(i + 1, j + 1)
-
   def toXY = new Point((i + 0.5) * CellSize.SIZE_VALUE, (j + 0.5) * CellSize.SIZE_VALUE)
 
   def leftTopXY = new Point(i * CellSize.SIZE_VALUE, j * CellSize.SIZE_VALUE)
-
-  def near(that: IJ) = up == that || upLeft == that || upRight == that ||
-    this == that || left == that || right == that ||
-    down == that || downLeft == that || downRight == that
 }
