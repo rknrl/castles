@@ -12,12 +12,12 @@ import java.net.URLDecoder
 
 import akka.actor.{ActorLogging, ActorRef}
 import akka.pattern.Patterns
-import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.payments.Bugs.Bug
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import spray.http.MediaTypes._
@@ -28,8 +28,7 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
-  val bugLog = LoggerFactory.getLogger("client")
+class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
 
   val crossdomain = """<?xml version="1.0"?>
                       |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
@@ -37,8 +36,6 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) exte
                       |<site-control permitted-cross-domain-policies="master-only"/>
                       |<allow-access-from domain="*" to-ports="*"/>
                       |</cross-domain-policy>""".stripMargin
-
-  val bugDelimiter = "===================================================================\n"
 
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
@@ -49,7 +46,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) exte
     path("bug") {
       post {
         entity(as[String]) { log =>
-          bugLog.info(bugDelimiter + log)
+          bugs ! Bug(BugType.CLIENT, log)
           complete(StatusCodes.OK)
         }
       }

@@ -11,6 +11,7 @@ package ru.rknrl.castles
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
+import ru.rknrl.castles.payments.BugsConfig
 import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto.AuthDTO.ProductDTO
 import ru.rknrl.dto.CommonDTO._
@@ -24,12 +25,13 @@ class Config(val host: String,
              val adminLogin: String,
              val adminPassword: String,
              val isDev: Boolean,
+             val mapsDir: String,
              val db: DbConfiguration,
              val products: List[Product],
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig,
-             val mapsPath: String) {
+             val bugs: BugsConfig) {
 
   private def checkProductInfoConfig() =
     for (p ← products)

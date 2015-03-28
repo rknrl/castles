@@ -17,7 +17,7 @@ import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
 import ru.rknrl.castles.game.map.GameMaps
-import ru.rknrl.castles.payments.HttpServer
+import ru.rknrl.castles.payments.{Bugs, HttpServer}
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -38,9 +38,11 @@ object Main {
     while (iterator.hasNext) mergedConfig = mergedConfig merge iterator.next()
     val config = mergedConfig.extract[Config]
 
-    val gameMaps = GameMaps.fromFiles(config.mapsPath)
+    val gameMaps = GameMaps.fromFiles(config.mapsDir)
 
     implicit val system = ActorSystem("main-actor-system")
+
+    val bugs = system.actorOf(Props(classOf[Bugs], config.bugs), "bugs")
 
     val database = system.actorOf(Props(classOf[Database], config.db), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
@@ -48,7 +50,7 @@ object Main {
 
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], 7 seconds, database, top, config, gameMaps), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
+    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
