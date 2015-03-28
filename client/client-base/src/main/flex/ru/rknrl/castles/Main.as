@@ -168,7 +168,6 @@ public class Main extends Sprite {
 
     private function onAuthenticated(e:AuthenticatedEvent):void {
         server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
-        Log.info("onAuthenticationResult");
 
         view.removeLoadingScreen();
         controller = new Controller(view, e.success, server, social, deviceType);

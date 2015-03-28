@@ -100,7 +100,6 @@ public class Controller {
     private var game:GameController;
 
     private function onEnteredGame(e:EnteredGameEvent):void {
-        Log.info("onEnteredGame");
         joinGame(e.node);
     }
 
@@ -110,7 +109,6 @@ public class Controller {
     }
 
     private function onJoinedGame(e:JoinedGameEvent):void {
-        Log.info("onJoinedGame");
         server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
         server.addEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
 
@@ -130,8 +128,6 @@ public class Controller {
     }
 
     private function onLeavedGame(e:LeavedGameEvent):void {
-        Log.info("onLeavedGame");
-
         view.removeGame();
         view.showMenuAndLock();
 

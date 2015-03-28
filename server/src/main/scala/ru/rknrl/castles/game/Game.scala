@@ -76,8 +76,6 @@ class Game(players: Map[PlayerId, Player],
            gameMap: GameMap,
            matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
 
-  val playersList = for ((id, player) ← players) yield player
-
   val `accountId→playerId` =
     for ((playerId, player) ← players)
       yield player.accountId → playerId
@@ -87,23 +85,23 @@ class Game(players: Map[PlayerId, Player],
       yield playerId → player.accountId
 
   /** Игроки, с которыми в данный момент установлено соединение
-    * Добавление происходит на сообщение JoinMsg
+    * Добавление происходит на сообщение JoinGame
     * Удаление происходит при потере коннекта, на сообщение Offline
     */
-  var online = Set[PlayerId]()
+  var online = Set.empty[PlayerId]
 
   var playerStates =
     for ((playerId, player) ← players)
       yield playerId → PlayerState.GAME
 
   /** Игроки, которые завершили игру и их места */
-  var gameOvers = Map[PlayerId, Int]()
+  var gameOvers = Map.empty[PlayerId, Int]
 
-  var `playerId→account` = Map[PlayerId, ActorRef]()
+  var `playerId→account` = Map.empty[PlayerId, ActorRef]
 
-  var `playerId→client` = Map[PlayerId, ActorRef]()
+  var `playerId→client` = Map.empty[PlayerId, ActorRef]
 
-  var `client→playerId` = Map[ActorRef, PlayerId]()
+  var `client→playerId` = Map.empty[ActorRef, PlayerId]
 
   /** Игроки еще не завершившие игру */
   def playersInGame =
@@ -157,8 +155,6 @@ class Game(players: Map[PlayerId, Player],
       client ! all
     }
 
-  def sendGameStateToBots() = sendToBots(gameState)
-
   def sendToBots(msg: Any) =
     for ((playerId, ref) ← `playerId→client`
          if players(playerId).isBot)
@@ -168,14 +164,14 @@ class Game(players: Map[PlayerId, Player],
 
   def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  var gameState = GameState.init(System.currentTimeMillis(), playersList.toList, big, isTutor, config, gameMap)
+  var gameState = GameState.init(System.currentTimeMillis(), players.values.toList, big, isTutor, config, gameMap)
 
-  var moveActions = Map[PlayerId, MoveDTO]()
-  var fireballCasts = Map[PlayerId, PointDTO]()
-  var strengtheningCasts = Map[PlayerId, BuildingId]()
-  var volcanoCasts = Map[PlayerId, PointDTO]()
-  var tornadoCasts = Map[PlayerId, CastTorandoDTO]()
-  var assistanceCasts = Map[PlayerId, BuildingId]()
+  var moveActions = Map.empty[PlayerId, MoveDTO]
+  var fireballCasts = Map.empty[PlayerId, PointDTO]
+  var strengtheningCasts = Map.empty[PlayerId, BuildingId]
+  var volcanoCasts = Map.empty[PlayerId, PointDTO]
+  var tornadoCasts = Map.empty[PlayerId, CastTorandoDTO]
+  var assistanceCasts = Map.empty[PlayerId, BuildingId]
 
   def clearMaps(): Unit = {
     moveActions = Map.empty
@@ -232,12 +228,14 @@ class Game(players: Map[PlayerId, Player],
       log.debug("C2B.JoinGame")
       val playerId = `client→playerId`(sender)
       online = online + playerId
-      val builder = gameState.dtoBuilder(playerId)
-      val dto = builder
-        .addAllPlayers(playersDto.asJava)
-        .addAllGameOvers(gameOverDto.asJava)
-        .build
-      sender ! B2C.JoinedGame(dto)
+
+      sender ! B2C.JoinedGame(
+        gameState
+          .dtoBuilder(playerId)
+          .addAllPlayers(playersDto.asJava)
+          .addAllGameOvers(gameOverDto.asJava)
+          .build
+      )
 
     /** Игрок сдается */
     case Surrender ⇒
@@ -259,7 +257,7 @@ class Game(players: Map[PlayerId, Player],
       gameState = newGameState
 
       sendToPlayers(messages, personalMessages)
-      sendGameStateToBots()
+      sendToBots(gameState)
 
       val newLosers = getNewLosers
       val place = getPlace
