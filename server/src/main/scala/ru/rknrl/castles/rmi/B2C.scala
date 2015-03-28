@@ -53,18 +53,16 @@ object B2C {
 
   case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(43)
 
-  case class RemoveUnit(id: UnitIdDTO) extends Msg(44)
+  case class KillUnit(killedId: UnitIdDTO) extends Msg(44)
 
-  case class KillUnit(killedId: UnitIdDTO) extends Msg(45)
+  case class AddFireball(fireball: FireballDTO) extends Msg(45)
 
-  case class AddFireball(fireball: FireballDTO) extends Msg(46)
+  case class AddVolcano(volcano: VolcanoDTO) extends Msg(46)
 
-  case class AddVolcano(volcano: VolcanoDTO) extends Msg(47)
+  case class AddTornado(tornado: TornadoDTO) extends Msg(47)
 
-  case class AddTornado(tornado: TornadoDTO) extends Msg(48)
+  case class AddBullet(bullet: BulletDTO) extends Msg(48)
 
-  case class AddBullet(bullet: BulletDTO) extends Msg(49)
-
-  case class GameOver(gameOver: GameOverDTO) extends Msg(50)
+  case class GameOver(gameOver: GameOverDTO) extends Msg(49)
 
 }

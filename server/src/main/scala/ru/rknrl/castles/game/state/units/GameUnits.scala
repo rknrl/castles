@@ -9,6 +9,7 @@
 package ru.rknrl.castles.game.state.units
 
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.state.Moving.EnterUnit
 import ru.rknrl.castles.game.state.bullets.Bullet
 import ru.rknrl.castles.game.state.fireballs.{Fireball, Fireballs}
 import ru.rknrl.castles.game.state.players.PlayerStates
@@ -20,8 +21,8 @@ class GameUnits(val units: Iterable[GameUnit]) {
   def add(newUnits: Iterable[GameUnit]) =
     new GameUnits(units ++ newUnits)
 
-  def applyRemoveMessages(messages: Iterable[RemoveUnit]) =
-    new GameUnits(units.filter(u ⇒ !messages.exists(_.id.getId == u.id.id)))
+  def applyEnterUnits(enters: Iterable[EnterUnit]) =
+    new GameUnits(units.filter(u ⇒ !enters.exists(_.unit.id == u.id)))
 
   def applyKillMessages(messages: Iterable[KillUnit]) =
     new GameUnits(units.filter(u ⇒ !messages.exists(_.killedId.getId == u.id.id)))
@@ -40,7 +41,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
         var newUnit = unit
         for (bullet ← myBullets) {
           val building = bullet.building
-          val bulletPlayer = if (building.owner.isDefined) Some(playerStates(building.owner.get)) else None
+          val bulletPlayer = playerStates(building.owner)
           newUnit = newUnit.setCount(config.unitCountAfterBulletHit(newUnit, building, playerStates(unit.owner), bulletPlayer))
         }
         newUnit

@@ -20,6 +20,11 @@ class PlayerState(val stat: Stat,
 
 class PlayerStates(val states: Map[PlayerId, PlayerState]) {
 
+  def apply(playerId: Option[PlayerId]) =
+    if (playerId.isDefined) Some(states(playerId.get)) else None
+
+  def apply(id: PlayerId) = states(id)
+
   private def totalChurchesPopulaton(buildings: Map[BuildingId, Building]) = {
     var total = 0.0
     for ((id, b) ← buildings if b.prototype.buildingType == BuildingType.CHURCH)
@@ -45,8 +50,6 @@ class PlayerStates(val states: Map[PlayerId, PlayerState]) {
     }
     new PlayerStates(newStates)
   }
-
-  def apply(id: PlayerId) = states(id)
 
   def setChurchesProportion(id: PlayerId, value: Double) =
     new PlayerStates(states.updated(id, states(id).setChurchesProportion(value)))

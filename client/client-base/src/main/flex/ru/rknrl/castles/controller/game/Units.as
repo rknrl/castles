@@ -34,7 +34,7 @@ public class Units {
         for each(var unit:Unit in units) {
             if (unit.id.id == id.id) return unit;
         }
-        throw new Error("can't find unit " + id.id);
+        return null;
     }
 
     public function add(endPos:Point, dto:UnitDTO):void {
@@ -47,29 +47,43 @@ public class Units {
 
     public function updateUnit(dto:UnitUpdateDTO):void {
         const unit:Unit = getUnit(dto.id);
-        const newPos:Point = new Point(dto.pos.x, dto.pos.y);
-        if (unit.count > dto.count) addBlood(unit.id);
-        unit.update(getTimer(), newPos, dto.speed, dto.count);
-        view.setUnitCount(dto.id, dto.count);
-        view.setPos(dto.id.id, newPos);
+        if (unit) {
+            const newPos:Point = new Point(dto.pos.x, dto.pos.y);
+            if (unit.count > dto.count) addBlood(unit.id);
+            unit.update(getTimer(), newPos, dto.speed, dto.count);
+            view.setUnitCount(dto.id, dto.count);
+            view.setPos(dto.id.id, newPos);
+        }
     }
 
-    public function remove(id:UnitIdDTO):void {
+    public function kill(id:UnitIdDTO):void {
+        const unit:Unit = getUnit(id);
+        if (unit) {
+            addBlood(id);
+            remove(id);
+        }
+    }
+
+    private function addBlood(id:UnitIdDTO):void {
+        const unit:Unit = getUnit(id);
+        bloodView.addBlood(unit.pos(getTimer()), Colors.playerColor(unit.owner));
+    }
+
+    private function remove(id:UnitIdDTO):void {
         const unit:Unit = getUnit(id);
         const index:int = units.indexOf(unit);
         units.splice(index, 1);
         view.remove(id.id);
     }
 
-    public function addBlood(id:UnitIdDTO):void {
-        const unit:Unit = getUnit(id);
-        bloodView.addBlood(unit.pos(getTimer()), Colors.playerColor(unit.owner));
-    }
-
     public function update(time:int):void {
+        const toRemove:Vector.<Unit> = new <Unit>[];
         for each(var unit:Unit in units) {
             view.setPos(unit.id.id, unit.pos(time));
+            if (unit.needRemove(time)) toRemove.push(unit);
         }
+
+        for each(unit in toRemove) remove(unit.id);
     }
 }
 }

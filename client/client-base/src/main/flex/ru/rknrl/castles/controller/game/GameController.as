@@ -22,6 +22,7 @@ import ru.rknrl.castles.model.game.GameMagicItems;
 import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
 import ru.rknrl.castles.model.game.Tornado;
+import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.game.Volcano;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -43,8 +44,6 @@ import ru.rknrl.dto.PlayerIdDTO;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
-import ru.rknrl.dto.UnitIdDTO;
-import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
 import ru.rknrl.rmi.AddBulletEvent;
 import ru.rknrl.rmi.AddFireballEvent;
@@ -53,7 +52,6 @@ import ru.rknrl.rmi.AddUnitEvent;
 import ru.rknrl.rmi.AddVolcanoEvent;
 import ru.rknrl.rmi.GameOverEvent;
 import ru.rknrl.rmi.KillUnitEvent;
-import ru.rknrl.rmi.RemoveUnitEvent;
 import ru.rknrl.rmi.Server;
 import ru.rknrl.rmi.UpdateBuildingEvent;
 import ru.rknrl.rmi.UpdateItemStatesEvent;
@@ -133,7 +131,6 @@ public class GameController extends EventDispatcher {
         server.addEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
         server.addEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
         server.addEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
-        server.addEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
         server.addEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
         server.addEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
         server.addEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
@@ -158,7 +155,6 @@ public class GameController extends EventDispatcher {
         server.removeEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
         server.removeEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
         server.removeEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
-        server.removeEventListener(RemoveUnitEvent.REMOVEUNIT, onRemoveUnit);
         server.removeEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
         server.removeEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
         server.removeEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
@@ -248,24 +244,11 @@ public class GameController extends EventDispatcher {
     }
 
     private function onUpdateUnit(e:UpdateUnitEvent):void {
-        updateUnit(e.unitUpdate);
-    }
-
-    private function updateUnit(dto:UnitUpdateDTO):void {
-        units.updateUnit(dto);
-    }
-
-    private function onRemoveUnit(e:RemoveUnitEvent):void {
-        removeUnit(e.id);
+        units.updateUnit(e.unitUpdate);
     }
 
     private function onKillUnit(e:KillUnitEvent):void {
-        units.addBlood(e.killedId);
-        removeUnit(e.killedId);
-    }
-
-    private function removeUnit(id:UnitIdDTO):void {
-        units.remove(id);
+        units.kill(e.killedId);
     }
 
     private function onAddFireball(e:AddFireballEvent):void {
@@ -297,19 +280,20 @@ public class GameController extends EventDispatcher {
     }
 
     private function addBullet(dto:BulletDTO):void {
-        const time:int = getTimer();
-        const startPos:Point = buildings.byId(dto.buildingId).pos;
-        const endPos:Point = units.getUnit(dto.unitId).pos(time + dto.duration);
-        bullets.add(time, startPos, endPos, dto.duration);
+        const unit:Unit = units.getUnit(dto.unitId);
+        if (unit) {
+            const time:int = getTimer();
+            const startPos:Point = buildings.byId(dto.buildingId).pos;
+            const endPos:Point = unit.pos(time + dto.duration);
+            bullets.add(time, startPos, endPos, dto.duration);
+        }
     }
 
     private var buildings:Buildings;
 
     private function onUpdateBuilding(e:UpdateBuildingEvent):void {
-        updateBuilding(e.building);
-    }
+        const dto:BuildingUpdateDTO = e.building;
 
-    private function updateBuilding(dto:BuildingUpdateDTO):void {
         const building:Building = buildings.byId(dto.id);
         const newOwner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
         const wasOwned:Boolean = building.owner.equalsId(selfId);

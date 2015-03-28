@@ -158,8 +158,7 @@ class GameState(val time: Long,
     val createdUnits = assistanceUnits ++ exitedUnits
     val addUnitMessages = `units→addMessages`(createdUnits, time)
     val enterUnits = `units→enterUnit`(units.units, time)
-    val removeUnitMessages = `enterUnit→removeUnitMsg`(enterUnits)
-    val killUnitMessages = units.`killed→killMessages`.filter(msg ⇒ !removeUnitMessages.exists(_.id == msg.killedId))
+    val killUnitMessages = units.`killed→killMessages`
 
     val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
     val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)
@@ -188,7 +187,7 @@ class GameState(val time: Long,
       .applyVolcanoes(volcanoes.list, playerStates, config, time)
       .applyTornadoes(tornadoes.list, playerStates, config, time)
       .applyBullets(finishedBullets, playerStates, config, time)
-      .applyRemoveMessages(removeUnitMessages)
+      .applyEnterUnits(enterUnits)
       .applyKillMessages(killUnitMessages)
 
     val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
@@ -246,7 +245,7 @@ class GameState(val time: Long,
       config
     )
 
-    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ removeUnitMessages ++ killUnitMessages ++
+    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ killUnitMessages ++
       updateBuildingMessages ++
       addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages
 
