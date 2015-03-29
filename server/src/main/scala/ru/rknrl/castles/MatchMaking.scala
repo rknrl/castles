@@ -25,7 +25,7 @@ import ru.rknrl.castles.rmi.C2B.GetServerHealth
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AdminDTO.{ServerHealthDTO, ServerHealthItemDTO}
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
-import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
+import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.utils.IdIterator
 import ru.rknrl.{Logged, Slf4j}
 
@@ -249,6 +249,20 @@ class MatchMaking(interval: FiniteDuration,
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self, bugs), gameIdIterator.next)
 
+    if(!isTutor) {
+      if (orders.count(_.isBot) == orders.size - 1) {
+        if (orders.size == 4)
+          database ! Database.Stat(StatAction.START_GAME_4_WITH_BOTS)
+        else
+          database ! Database.Stat(StatAction.START_GAME_2_WITH_BOTS)
+      } else {
+        if (orders.size == 4)
+          database ! Database.Stat(StatAction.START_GAME_4_WITH_PLAYERS)
+        else
+          database ! Database.Stat(StatAction.START_GAME_2_WITH_PLAYERS)
+      }
+    }
+
     new GameInfo(game, orders, isTutor)
   }
 
@@ -387,6 +401,35 @@ class MatchMaking(interval: FiniteDuration,
     top = insert(top, TopItem(accountId, newRating, userInfo))
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, topDto) // todo - если он ушел в оффлайн, ничо не сохранится
+
+    val gameWithBots = orders.count(_.isBot) == orders.size - 1
+    if (gameWithBots && !order.isBot) {
+      if (orders.size == 4) {
+        if (place == 1) {
+          if (gameInfo.isTutor)
+            database ! Database.Stat(StatAction.TUTOR_4_WIN)
+          else
+            database ! Database.Stat(StatAction.WIN_4_BOTS)
+        } else {
+          if (gameInfo.isTutor)
+            database ! Database.Stat(StatAction.TUTOR_4_LOSE)
+          else
+            database ! Database.Stat(StatAction.LOSE_4_BOTS)
+        }
+      } else if (orders.size == 2) {
+        if (place == 1) {
+          if (gameInfo.isTutor)
+            database ! Database.Stat(StatAction.TUTOR_2_WIN)
+          else
+            database ! Database.Stat(StatAction.WIN_2_BOTS)
+        } else {
+          if (gameInfo.isTutor)
+            database ! Database.Stat(StatAction.TUTOR_2_LOSE)
+          else
+            database ! Database.Stat(StatAction.LOSE_2_BOTS)
+        }
+      }
+    }
   }
 
   def insert(list: List[TopItem], item: TopItem) =

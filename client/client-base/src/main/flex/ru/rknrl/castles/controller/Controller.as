@@ -24,7 +24,6 @@ import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
-import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.rmi.EnteredGameEvent;
 import ru.rknrl.rmi.JoinedGameEvent;
 import ru.rknrl.rmi.LeavedGameEvent;
@@ -37,7 +36,6 @@ public class Controller {
 
     private var menu:MenuController;
     private var isFirstGame:Boolean;
-    private var tutorState:TutorStateDTO;
     private var deviceType:DeviceType;
 
     public function Controller(view:View,
@@ -50,7 +48,6 @@ public class Controller {
         this.social = social;
         this.deviceType = deviceType;
 
-        tutorState = authenticated.tutor;
         isFirstGame = authenticated.accountState.gamesCount == 0;
 
         server.addEventListener(EnteredGameEvent.ENTEREDGAME, onEnteredGame);
@@ -58,7 +55,7 @@ public class Controller {
 
         const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, server, model, social, tutorState, authenticated.accountState.gamesCount);
+        menu = new MenuController(menuView, server, model, social, authenticated.tutor, authenticated.accountState.gamesCount);
 
         if (authenticated.searchOpponents) {
             view.hideMenu();

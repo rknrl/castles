@@ -13,7 +13,7 @@ import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
+import ru.rknrl.dto.CommonDTO.{StatAction, BuildingLevel, BuildingType}
 import ru.rknrl.dto.GameDTO.MoveDTO
 
 import scala.collection.JavaConverters._
@@ -33,10 +33,10 @@ class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends
   var mode = NONE
 
   def tutorBotReceive: Receive = logged({
-    case StartTutorGame ⇒
+    case StatAction.TUTOR_WIN_CHALLENGE ⇒
       mode = GAME
 
-    case StartTutorFireball ⇒
+    case StatAction.TUTOR_ARROWS ⇒
       if (playerId.get.id == 3) mode = SEND_UNITS_TO_ONE_BUILDING
   })
 

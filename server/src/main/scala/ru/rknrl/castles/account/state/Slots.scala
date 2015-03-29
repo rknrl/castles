@@ -15,6 +15,8 @@ class Slots(val slots: Map[SlotId, Slot]) {
   for (slotId ← SlotId.values()) assert(slots.contains(slotId))
   assert(buildingsCount > 0)
 
+  def apply(id: SlotId) = slots(id)
+
   def buildingsCount =
     slots.count { case (id, slot) ⇒ slot.buildingPrototype.isDefined}
 

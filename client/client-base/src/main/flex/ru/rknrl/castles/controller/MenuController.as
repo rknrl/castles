@@ -31,6 +31,7 @@ import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.RemoveBuildingDTO;
 import ru.rknrl.dto.SkillLevel;
 import ru.rknrl.dto.SlotDTO;
+import ru.rknrl.dto.StatAction;
 import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
@@ -117,6 +118,7 @@ public class MenuController {
                 if (!tutorState.slot) {
                     tutorState.slot = true;
                     server.updateTutorState(tutorState);
+                    server.stat(DtoMock.stat(StatAction.TUTOR_SLOT_CLICK));
                 }
 
                 view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
@@ -126,6 +128,7 @@ public class MenuController {
             if (!tutorState.emptySlot) {
                 tutorState.emptySlot = true;
                 server.updateTutorState(tutorState);
+                server.stat(DtoMock.stat(StatAction.TUTOR_EMPTY_SLOT_CLICK));
             }
 
             view.openBuildPopup(event.slotId, model.buildingPrices.buildPrice);
@@ -190,6 +193,7 @@ public class MenuController {
             if (!tutorState.magicItem) {
                 tutorState.magicItem = true;
                 server.updateTutorState(tutorState);
+                server.stat(DtoMock.stat(StatAction.TUTOR_ITEM_CLICK));
             }
 
             const dto:BuyItemDTO = new BuyItemDTO();
@@ -209,6 +213,7 @@ public class MenuController {
                 if (!tutorState.skills) {
                     tutorState.skills = true;
                     server.updateTutorState(tutorState);
+                    server.stat(DtoMock.stat(StatAction.TUTOR_SKILL_CLICK));
                 }
 
                 const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
@@ -250,6 +255,7 @@ public class MenuController {
             if (!tutorState.navigate) {
                 tutorState.navigate = true;
                 server.updateTutorState(tutorState);
+                server.stat(DtoMock.stat(StatAction.TUTOR_NAVIGATE));
             }
         }
 

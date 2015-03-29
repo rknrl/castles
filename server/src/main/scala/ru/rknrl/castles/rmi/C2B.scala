@@ -12,7 +12,7 @@ import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.AccountDTO.{BuyBuildingDTO, BuyItemDTO, RemoveBuildingDTO, UpgradeBuildingDTO, UpgradeSkillDTO}
 import ru.rknrl.dto.AdminDTO._
 import ru.rknrl.dto.AuthDTO.AuthenticateDTO
-import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO}
+import ru.rknrl.dto.CommonDTO.{StatDTO, StatAction, AccountIdDTO, TutorStateDTO}
 import ru.rknrl.dto.GameDTO._
 
 object C2B {
@@ -57,6 +57,8 @@ object C2B {
 
   case class UpdateTutorState(tutorState: TutorStateDTO) extends Msg(86)
 
+  case class Stat(stat: StatDTO) extends Msg(87)
+
   // enter game 90 - 99
 
   case object JoinGame extends GameMsg(90)
@@ -78,9 +80,5 @@ object C2B {
   case class CastTornado(cast: CastTorandoDTO) extends GameMsg(104)
 
   case class CastAssistance(buildingId: BuildingIdDTO) extends GameMsg(105)
-
-  case object StartTutorFireball extends GameMsg(106)
-
-  case object StartTutorGame extends GameMsg(107)
 
 }

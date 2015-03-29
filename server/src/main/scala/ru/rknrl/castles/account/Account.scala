@@ -12,8 +12,8 @@ import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state.AccountState
-import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game
 import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C._
@@ -98,14 +98,17 @@ class Account(matchmaking: ActorRef,
         platformType = authenticate.getPlatformType
         userInfo = authenticate.getUserInfo
         database ! Database.GetAccountState(accountId.dto)
+        database ! Database.Stat(StatAction.AUTHENTICATED)
       } else {
         log.info("reject")
+        database ! Database.Stat(StatAction.NOT_AUTHENTICATED)
         sender ! CloseConnection
       }
 
     case AccountNoExists ⇒
       val initTutorState = TutorStateDTO.newBuilder().build()
       database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
+      database ! Database.Stat(StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(id, dto) ⇒
       state = AccountState(dto)
@@ -152,18 +155,23 @@ class Account(matchmaking: ActorRef,
   def account: Receive = persistent.orElse(logged({
     case BuyBuilding(buy: BuyBuildingDTO) ⇒
       updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
+      database ! Database.Stat(Statistics.buyBuilding(buy.getBuildingType, BuildingLevel.LEVEL_1))
 
     case UpgradeBuilding(dto: UpgradeBuildingDTO) ⇒
       updateState(state.upgradeBuilding(dto.getId, config.account))
+      database ! Database.Stat(Statistics.buyBuilding(state.slots(dto.getId).buildingPrototype.get))
 
     case RemoveBuilding(dto: RemoveBuildingDTO) ⇒
       updateState(state.removeBuilding(dto.getId))
+      database ! Database.Stat(StatAction.REMOVE_BUILDING)
 
     case UpgradeSkill(upgrade: UpgradeSkillDTO) ⇒
       updateState(state.upgradeSkill(upgrade.getType, config.account))
+      database ! Database.Stat(Statistics.buySkill(upgrade.getType, state.skills(upgrade.getType)))
 
     case BuyItem(buy: BuyItemDTO) ⇒
       updateState(state.buyItem(buy.getType, config.account))
+      database ! Database.Stat(Statistics.buyItem(buy.getType))
 
     case EnterGame ⇒
       placeGameOrder(isTutor = false)
@@ -182,8 +190,12 @@ class Account(matchmaking: ActorRef,
       connectToGame(game)
   }))
 
-  def inGame(game: ActorRef): Receive = persistent.orElse(logged({
+  def inGame(game: ActorRef): Receive = logged({
     case msg: GameMsg ⇒ game forward msg
+
+    case msg@C2B.Stat(dto) ⇒
+      game forward msg
+      database ! Database.Stat(dto.getAction)
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
     case LeaveGame(usedItems, reward, newRating, top) ⇒
@@ -199,9 +211,13 @@ class Account(matchmaking: ActorRef,
       database ! UpdateAccountState(accountId.dto, state.dto)
       client ! TopUpdated(TopDTO.newBuilder().addAllUsers(top.asJava).build())
       context become account
-  }))
+
+  }).orElse(persistent)
 
   def persistent: Receive = logged({
+    case C2B.Stat(dto) ⇒
+      database ! Database.Stat(dto.getAction)
+
     /** from Database, ответ на Update */
     case AccountStateResponse(_, accountStateDto) ⇒
       client ! AccountStateUpdated(accountStateDto)

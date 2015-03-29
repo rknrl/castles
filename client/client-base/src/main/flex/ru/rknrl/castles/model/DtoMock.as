@@ -33,6 +33,8 @@ import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.dto.SlotsOrientation;
 import ru.rknrl.dto.SlotsPosDTO;
+import ru.rknrl.dto.StatAction;
+import ru.rknrl.dto.StatDTO;
 import ru.rknrl.dto.TopDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
 import ru.rknrl.dto.UserInfoDTO;
@@ -45,6 +47,12 @@ public class DtoMock {
         "mock_avatars/4.png",
         "mock_avatars/5.png"
     ];
+
+    public static function stat(action: StatAction):StatDTO {
+        const dto: StatDTO = new StatDTO();
+        dto.action = action;
+        return dto;
+    }
 
     public static function product():ProductDTO {
         const dto:ProductDTO = new ProductDTO();

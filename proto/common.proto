@@ -35,6 +35,82 @@ enum ProductId {
     STARS = 1;
 }
 
+enum StatAction {
+    AUTHENTICATED = 1; // Успешная авторизация (первый запрос к серверу)
+    NOT_AUTHENTICATED = 2; // Сервер отказал в авторизации
+    FIRST_AUTHENTICATED = 3; // Первая авторизация игрока (был создан новый аккаунт)
+
+    TUTOR_GAME_SPLASH = 4;
+    TUTOR_SELF_BUILDINGS = 5;
+    TUTOR_ENEMY_BUILDINGS = 6;
+    TUTOR_NO_OWNER_BUILDINGS = 7;
+    TUTOR_ARROW = 8;
+    TUTOR_ARROWS = 9;
+    TUTOR_FIREBALL = 10;
+    TUTOR_VOLCANO = 11;
+    TUTOR_TORNADO = 12;
+    TUTOR_ASSISTANCE = 13;
+    TUTOR_STRENGTHENING = 14;
+    TUTOR_BIG_TOWER = 15;
+    TUTOR_WIN_CHALLENGE = 16;
+    TUTOR_2_WIN = 17; // Игрок выиграл тутор на 2-ух› игроков
+    TUTOR_2_LOSE = 18; // Игрок проиграл тутор на 2-ух игроков
+    TUTOR_4_WIN = 19; // Игрок выиграл тутор на 4-ех игроков
+    TUTOR_4_LOSE = 20; // Игрок проиграл тутор на 4-ех игроков
+
+    TUTOR_NAVIGATE = 21;
+    TUTOR_EMPTY_SLOT_CLICK = 22;
+    TUTOR_SLOT_CLICK = 23;
+    TUTOR_ITEM_CLICK = 24;
+    TUTOR_SKILL_CLICK = 25;
+
+    BUY_FIREBALL = 30;
+    BUY_STRENGTHENING = 31;
+    BUY_VOLCANO = 32;
+    BUY_TORNADO = 33;
+    BUY_ASSISTANCE = 34;
+
+    BUY_HOUSE1 = 35;
+    BUY_HOUSE2 = 36;
+    BUY_HOUSE3 = 37;
+
+    BUY_TOWER1 = 38;
+    BUY_TOWER2 = 39;
+    BUY_TOWER3 = 40;
+
+    BUY_CHURCH1 = 41;
+    BUY_CHURCH2 = 42;
+    BUY_CHURCH3 = 43;
+
+    REMOVE_BUILDING = 44;
+
+    BUY_ATTACK1 = 45;
+    BUY_ATTACK2 = 46;
+    BUY_ATTACK3 = 47;
+
+    BUY_DEFENCE1 = 48;
+    BUY_DEFENCE2 = 49;
+    BUY_DEFENCE3 = 60;
+
+    BUY_SPEED1 = 51;
+    BUY_SPEED2 = 52;
+    BUY_SPEED3 = 53;
+
+    WIN_2_BOTS = 54; // Игрок выиграл бота, в игре на 2-ух игроков, не тутор
+    LOSE_2_BOTS = 55; // Игрок проиграл боту, в игре на 2-ух игроков, не тутор
+    WIN_4_BOTS = 56; // Игрок выиграл ботов, в игре на 4-ех игроков, не тутор
+    LOSE_4_BOTS = 57; // Игрок проиграл ботам, в игре на 4-ех игроков, не тутор
+
+    START_GAME_2_WITH_BOTS = 58; // Создана игра на 2-ух игроков, реальный игрок с ботом, не тутор
+    START_GAME_2_WITH_PLAYERS = 59; // Создана игра на 2-ух игроков, два реальных игрока
+    START_GAME_4_WITH_BOTS = 60; // Создана игра на 4-ех игроков, реальный игрок с тремя ботами, не тутор
+    START_GAME_4_WITH_PLAYERS = 61; // Создана игра на 4-ех игроков, не меньше двух реальных игроков
+}
+
+message StatDTO {
+    required StatAction action = 1;
+}
+
 message AccountIdDTO {
     required AccountType type = 1;
     required string id = 2;

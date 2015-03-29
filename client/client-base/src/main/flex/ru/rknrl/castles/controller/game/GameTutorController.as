@@ -10,6 +10,8 @@ package ru.rknrl.castles.controller.game {
 
 import flash.events.EventDispatcher;
 
+import ru.rknrl.castles.model.DtoMock;
+
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
@@ -22,6 +24,8 @@ import ru.rknrl.castles.view.utils.tutor.commands.WaitForEvent;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;
+import ru.rknrl.dto.StatAction;
+import ru.rknrl.dto.StatDTO;
 import ru.rknrl.rmi.Server;
 
 public class GameTutorController extends TutorControllerBase {
@@ -46,6 +50,7 @@ public class GameTutorController extends TutorControllerBase {
             lockAllItems,
             hideMagicItems,
             hideCursor,
+            stat(StatAction.TUTOR_GAME_SPLASH),
             wait(1000),
 
             // self buildings
@@ -57,6 +62,7 @@ public class GameTutorController extends TutorControllerBase {
             waitForClick,
             unhighlightBuildings,
             clear,
+            stat(StatAction.TUTOR_SELF_BUILDINGS),
 
             // enemies buildings
 
@@ -74,6 +80,25 @@ public class GameTutorController extends TutorControllerBase {
             ]),
             unhighlightBuildings,
             clear,
+            stat(StatAction.TUTOR_ENEMY_BUILDINGS),
+
+            // no owner buildings
+
+            addText(view.tutor.locale.tutorEnemyBuildings(players.isBigGame)),
+            parallel(new <ITutorCommand>[
+                loop(new <ITutorCommand>[
+                    highlightNextEnemyBuildings,
+                    wait(1000)
+                ]),
+                sequence(new <ITutorCommand>[
+                    wait(2500),
+                    addNextButton,
+                    waitForClick
+                ])
+            ]),
+            unhighlightBuildings,
+            clear,
+            stat(StatAction.TUTOR_NO_OWNER_BUILDINGS),
 
             // arrow
 
@@ -81,6 +106,7 @@ public class GameTutorController extends TutorControllerBase {
             wait(500),
             enableMouse,
             arrowTutor(sourceBuilding1, targetBuilding1),
+            stat(StatAction.TUTOR_ARROW),
 
             // arrows
 
@@ -112,36 +138,41 @@ public class GameTutorController extends TutorControllerBase {
             // fireball
             showMagicItems,
 
-            exec(server.startTutorFireball),
+            stat(StatAction.TUTOR_ARROWS),
 
             wait(4000),
             itemClick(ItemType.FIREBALL),
             cast(ItemType.FIREBALL, fireballBuilding),
             wait(5000),
+            stat(StatAction.TUTOR_FIREBALL),
 
             // volcano
 
             itemClick(ItemType.VOLCANO),
             cast(ItemType.VOLCANO, volcanoBuilding),
             wait(5000),
+            stat(StatAction.TUTOR_VOLCANO),
 
             // tornado
 
             itemClick(ItemType.TORNADO),
             playTornado(),
             wait(8000),
+            stat(StatAction.TUTOR_TORNADO),
 
             // assistance
 
             itemClick(ItemType.ASSISTANCE),
             castAssistance,
             wait(3000),
+            stat(StatAction.TUTOR_ASSISTANCE),
 
             // strengthening
 
             itemClick(ItemType.STRENGTHENING),
             castStrengthening,
             wait(500),
+            stat(StatAction.TUTOR_STRENGTHENING),
 
             magicItemsEnableMouse,
 
@@ -153,12 +184,13 @@ public class GameTutorController extends TutorControllerBase {
             captureBigTowerTutor,
             hideCursor,
             wait(1000),
+            stat(StatAction.TUTOR_BIG_TOWER),
 
             // win
 
             addText(view.tutor.locale.tutorWin),
             wait(3000),
-            exec(server.startTutorGame)
+            stat(StatAction.TUTOR_WIN_CHALLENGE)
         ]);
     }
 
@@ -314,6 +346,12 @@ public class GameTutorController extends TutorControllerBase {
     }
 
     // COMMANDS
+
+    private function stat(action:StatAction):ITutorCommand {
+        return exec(function ():void {
+            server.stat(DtoMock.stat(action))
+        })
+    }
 
     private function get enableCaptureBigTower():ITutorCommand {
         return exec(function ():void {

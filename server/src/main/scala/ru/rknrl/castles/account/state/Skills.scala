@@ -17,6 +17,8 @@ import ru.rknrl.dto.CommonDTO.{SkillLevel, SkillType}
 class Skills(val levels: Map[SkillType, SkillLevel]) {
   for (skillType ← SkillType.values()) assert(levels.contains(skillType))
 
+  def apply(skillType: SkillType) = levels(skillType)
+
   def set(skillType: SkillType, skillLevel: SkillLevel) =
     new Skills(levels.updated(skillType, skillLevel))
 
