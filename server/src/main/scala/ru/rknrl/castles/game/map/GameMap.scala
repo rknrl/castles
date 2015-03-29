@@ -86,9 +86,14 @@ class GameMap(val cells: Iterable[MapCell]) {
 }
 
 class GameMaps(val big: Array[GameMap],
-               val small: Array[GameMap]) {
+               val small: Array[GameMap],
+               val bigTutor: GameMap,
+               val smallTutor: GameMap) {
   def random(isBig: Boolean) =
     if (isBig) GameMap.random(big) else GameMap.random(small)
+
+  def tutor(isBig: Boolean) =
+    if (isBig) bigTutor else smallTutor
 }
 
 object GameMap {
@@ -126,7 +131,12 @@ object GameMap {
   def fromString(s: String) =
     new GameMap(s.split('\n').map(lineToCell))
 
-  def fromFile(file: File) = {
+  def fromFile(file: String): GameMap = {
+    println("map file " + file)
+    fromString(Source.fromFile(file, "UTF-8").mkString)
+  }
+
+  def fromFile(file: File): GameMap = {
     println("map file " + file.getName)
     fromString(Source.fromFile(file, "UTF-8").mkString)
   }
@@ -137,5 +147,5 @@ object GameMaps {
     new File(dir).listFiles.map(GameMap.fromFile)
 
   def fromFiles(dir: String) =
-    new GameMaps(filesToMaps(dir + "big"), filesToMaps(dir + "small"))
+    new GameMaps(filesToMaps(dir + "big"), filesToMaps(dir + "small"), GameMap.fromFile(dir + "big/tutor"), GameMap.fromFile(dir + "small/tutor"))
 }

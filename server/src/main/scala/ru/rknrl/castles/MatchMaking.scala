@@ -245,7 +245,7 @@ class MatchMaking(interval: FiniteDuration,
 
     val gameConfig = if (isTutor) config.game.tutorConfig else config.game
 
-    val gameMap = gameMaps.random(big)
+    val gameMap = if(isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self, bugs), gameIdIterator.next)
 
