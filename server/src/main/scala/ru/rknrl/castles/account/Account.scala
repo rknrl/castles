@@ -15,6 +15,7 @@ import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game
+import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
@@ -98,17 +99,17 @@ class Account(matchmaking: ActorRef,
         platformType = authenticate.getPlatformType
         userInfo = authenticate.getUserInfo
         database ! Database.GetAccountState(accountId.dto)
-        database ! Database.Stat(StatAction.AUTHENTICATED)
+        database ! Database.UpdateStatistics(StatAction.AUTHENTICATED)
       } else {
         log.info("reject")
-        database ! Database.Stat(StatAction.NOT_AUTHENTICATED)
+        database ! Database.UpdateStatistics(StatAction.NOT_AUTHENTICATED)
         sender ! CloseConnection
       }
 
     case AccountNoExists ⇒
       val initTutorState = TutorStateDTO.newBuilder().build()
       database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
-      database ! Database.Stat(StatAction.FIRST_AUTHENTICATED)
+      database ! Database.UpdateStatistics(StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(id, dto) ⇒
       state = AccountState(dto)
@@ -131,7 +132,7 @@ class Account(matchmaking: ActorRef,
       } else if (state.gamesCount == 0) {
         placeGameOrder(isTutor = true); // При первом заходе сразу попадаем в бой
         client ! authenticated(searchOpponents = true, None, top, tutorState)
-        database ! Database.Stat(StatAction.START_TUTOR)
+        database ! Database.UpdateStatistics(StatAction.START_TUTOR)
         context become enterGame
       } else {
         client ! authenticated(searchOpponents = false, None, top, tutorState)
@@ -156,23 +157,23 @@ class Account(matchmaking: ActorRef,
   def account: Receive = persistent.orElse(logged({
     case BuyBuilding(buy: BuyBuildingDTO) ⇒
       updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
-      database ! Database.Stat(Statistics.buyBuilding(buy.getBuildingType, BuildingLevel.LEVEL_1))
+      database ! Database.UpdateStatistics(Statistics.buyBuilding(buy.getBuildingType, BuildingLevel.LEVEL_1))
 
     case UpgradeBuilding(dto: UpgradeBuildingDTO) ⇒
       updateState(state.upgradeBuilding(dto.getId, config.account))
-      database ! Database.Stat(Statistics.buyBuilding(state.slots(dto.getId).buildingPrototype.get))
+      database ! Database.UpdateStatistics(Statistics.buyBuilding(state.slots(dto.getId).buildingPrototype.get))
 
     case RemoveBuilding(dto: RemoveBuildingDTO) ⇒
       updateState(state.removeBuilding(dto.getId))
-      database ! Database.Stat(StatAction.REMOVE_BUILDING)
+      database ! Database.UpdateStatistics(StatAction.REMOVE_BUILDING)
 
     case UpgradeSkill(upgrade: UpgradeSkillDTO) ⇒
       updateState(state.upgradeSkill(upgrade.getType, config.account))
-      database ! Database.Stat(Statistics.buySkill(upgrade.getType, state.skills(upgrade.getType)))
+      database ! Database.UpdateStatistics(Statistics.buySkill(upgrade.getType, state.skills(upgrade.getType)))
 
     case BuyItem(buy: BuyItemDTO) ⇒
       updateState(state.buyItem(buy.getType, config.account))
-      database ! Database.Stat(Statistics.buyItem(buy.getType))
+      database ! Database.UpdateStatistics(Statistics.buyItem(buy.getType))
 
     case EnterGame ⇒
       placeGameOrder(isTutor = false)
@@ -194,9 +195,9 @@ class Account(matchmaking: ActorRef,
   def inGame(game: ActorRef): Receive = logged({
     case msg: GameMsg ⇒ game forward msg
 
-    case msg@C2B.Stat(dto) ⇒
+    case msg@C2B.UpdateStatistics(dto) ⇒
       game forward msg
-      database ! Database.Stat(dto.getAction)
+      database ! Database.UpdateStatistics(dto.getAction)
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
     case LeaveGame(usedItems, reward, newRating, top) ⇒
@@ -216,8 +217,8 @@ class Account(matchmaking: ActorRef,
   }).orElse(persistent)
 
   def persistent: Receive = logged({
-    case C2B.Stat(dto) ⇒
-      database ! Database.Stat(dto.getAction)
+    case C2B.UpdateStatistics(dto) ⇒
+      database ! Database.UpdateStatistics(dto.getAction)
 
     /** from Database, ответ на Update */
     case AccountStateResponse(_, accountStateDto) ⇒
@@ -236,8 +237,18 @@ class Account(matchmaking: ActorRef,
       client ! CloseConnection
   })
 
-  def placeGameOrder(isTutor: Boolean) =
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, state.skills.stat(config.account), state.items, state.rating, state.gamesCount, isBot = false, isTutor))
+  def placeGameOrder(isTutor: Boolean) = {
+    val realStat = state.skills.stat(config.account)
+    val stat = if (isTutor)
+      new Stat(
+        attack = realStat.attack * 3,
+        defence = realStat.defence * 3,
+        speed = realStat.speed
+      )
+    else
+      realStat
+    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
+  }
 
   def connectToGame(game: ActorRef) = {
     game ! Game.Join(accountId, client)

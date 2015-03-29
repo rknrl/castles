@@ -285,7 +285,7 @@ class Game(players: Map[PlayerId, Player],
     case CastAssistance(buildingId: BuildingIdDTO) ⇒
       if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
 
-    case C2B.Stat(dto) ⇒
+    case C2B.UpdateStatistics(dto) ⇒
       sendToBots(dto.getAction)
   })
 

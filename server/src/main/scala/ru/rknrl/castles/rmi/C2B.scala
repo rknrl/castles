@@ -57,7 +57,7 @@ object C2B {
 
   case class UpdateTutorState(tutorState: TutorStateDTO) extends Msg(86)
 
-  case class Stat(stat: StatDTO) extends Msg(87)
+  case class UpdateStatistics(stat: StatDTO) extends Msg(87)
 
   // enter game 90 - 99
 

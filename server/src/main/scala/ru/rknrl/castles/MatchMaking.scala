@@ -16,6 +16,7 @@ import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.UpdateStatistics
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.map.GameMaps
 import ru.rknrl.castles.game.state.Stat
@@ -155,12 +156,6 @@ class MatchMaking(interval: FiniteDuration,
   def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
     val (tutorOrders, notTutorOrders) = orders.span(_.isTutor)
 
-    if (tutorOrders.size > 0)
-      println("tutorOrders:" + tutorOrders.size)
-
-    if (notTutorOrders.size > 0)
-      println("notTutorOrders:" + notTutorOrders.size)
-
     var createdGames = tutorOrders.map(order ⇒ createGameWithBot(big, playersCount, List(order), isTutor = true))
 
     var sorted = notTutorOrders.sortBy(_.rating)(Ordering.Double.reverse)
@@ -252,14 +247,14 @@ class MatchMaking(interval: FiniteDuration,
     if(!isTutor) {
       if (orders.count(_.isBot) == orders.size - 1) {
         if (orders.size == 4)
-          database ! Database.Stat(StatAction.START_GAME_4_WITH_BOTS)
+          database ! UpdateStatistics(StatAction.START_GAME_4_WITH_BOTS)
         else
-          database ! Database.Stat(StatAction.START_GAME_2_WITH_BOTS)
+          database ! UpdateStatistics(StatAction.START_GAME_2_WITH_BOTS)
       } else {
         if (orders.size == 4)
-          database ! Database.Stat(StatAction.START_GAME_4_WITH_PLAYERS)
+          database ! UpdateStatistics(StatAction.START_GAME_4_WITH_PLAYERS)
         else
-          database ! Database.Stat(StatAction.START_GAME_2_WITH_PLAYERS)
+          database ! UpdateStatistics(StatAction.START_GAME_2_WITH_PLAYERS)
       }
     }
 
@@ -407,26 +402,26 @@ class MatchMaking(interval: FiniteDuration,
       if (orders.size == 4) {
         if (place == 1) {
           if (gameInfo.isTutor)
-            database ! Database.Stat(StatAction.TUTOR_4_WIN)
+            database ! UpdateStatistics(StatAction.TUTOR_4_WIN)
           else
-            database ! Database.Stat(StatAction.WIN_4_BOTS)
+            database ! UpdateStatistics(StatAction.WIN_4_BOTS)
         } else {
           if (gameInfo.isTutor)
-            database ! Database.Stat(StatAction.TUTOR_4_LOSE)
+            database ! UpdateStatistics(StatAction.TUTOR_4_LOSE)
           else
-            database ! Database.Stat(StatAction.LOSE_4_BOTS)
+            database ! UpdateStatistics(StatAction.LOSE_4_BOTS)
         }
       } else if (orders.size == 2) {
         if (place == 1) {
           if (gameInfo.isTutor)
-            database ! Database.Stat(StatAction.TUTOR_2_WIN)
+            database ! UpdateStatistics(StatAction.TUTOR_2_WIN)
           else
-            database ! Database.Stat(StatAction.WIN_2_BOTS)
+            database ! UpdateStatistics(StatAction.WIN_2_BOTS)
         } else {
           if (gameInfo.isTutor)
-            database ! Database.Stat(StatAction.TUTOR_2_LOSE)
+            database ! UpdateStatistics(StatAction.TUTOR_2_LOSE)
           else
-            database ! Database.Stat(StatAction.LOSE_2_BOTS)
+            database ! UpdateStatistics(StatAction.LOSE_2_BOTS)
         }
       }
     }

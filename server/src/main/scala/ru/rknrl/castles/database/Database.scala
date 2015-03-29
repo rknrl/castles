@@ -68,7 +68,7 @@ object Database {
   case class UpdateUserInfo(accountId: AccountIdDTO, userInfo: UserInfoDTO)
 
   /** Без ответа */
-  case class Stat(action: StatAction)
+  case class UpdateStatistics(action: StatAction)
 
 }
 
@@ -209,7 +209,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
         }
       )
 
-    case Stat(action) ⇒
+    case UpdateStatistics(action) ⇒
       pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(action.getNumber)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1) {

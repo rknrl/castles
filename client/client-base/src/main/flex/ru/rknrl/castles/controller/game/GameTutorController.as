@@ -347,7 +347,7 @@ public class GameTutorController extends TutorControllerBase {
         return exec(function ():void {
             const dto:StatDTO = new StatDTO();
             dto.action = action;
-            server.stat(DtoMock.stat(action))
+            server.updateStatistics(DtoMock.stat(action))
         })
     }
 
