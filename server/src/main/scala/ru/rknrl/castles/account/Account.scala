@@ -131,6 +131,7 @@ class Account(matchmaking: ActorRef,
       } else if (state.gamesCount == 0) {
         placeGameOrder(isTutor = true); // При первом заходе сразу попадаем в бой
         client ! authenticated(searchOpponents = true, None, top, tutorState)
+        database ! Database.Stat(StatAction.START_TUTOR)
         context become enterGame
       } else {
         client ! authenticated(searchOpponents = false, None, top, tutorState)

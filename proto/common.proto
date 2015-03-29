@@ -40,29 +40,31 @@ enum StatAction {
     NOT_AUTHENTICATED = 2; // Сервер отказал в авторизации
     FIRST_AUTHENTICATED = 3; // Первая авторизация игрока (был создан новый аккаунт)
 
-    TUTOR_GAME_SPLASH = 4;
-    TUTOR_SELF_BUILDINGS = 5;
-    TUTOR_ENEMY_BUILDINGS = 6;
-    TUTOR_NO_OWNER_BUILDINGS = 7;
-    TUTOR_ARROW = 8;
-    TUTOR_ARROWS = 9;
-    TUTOR_FIREBALL = 10;
-    TUTOR_VOLCANO = 11;
-    TUTOR_TORNADO = 12;
-    TUTOR_ASSISTANCE = 13;
-    TUTOR_STRENGTHENING = 14;
-    TUTOR_BIG_TOWER = 15;
-    TUTOR_WIN_CHALLENGE = 16;
-    TUTOR_2_WIN = 17; // Игрок выиграл тутор на 2-ух› игроков
-    TUTOR_2_LOSE = 18; // Игрок проиграл тутор на 2-ух игроков
-    TUTOR_4_WIN = 19; // Игрок выиграл тутор на 4-ех игроков
-    TUTOR_4_LOSE = 20; // Игрок проиграл тутор на 4-ех игроков
+    START_TUTOR = 4;
 
-    TUTOR_NAVIGATE = 21;
-    TUTOR_EMPTY_SLOT_CLICK = 22;
-    TUTOR_SLOT_CLICK = 23;
-    TUTOR_ITEM_CLICK = 24;
-    TUTOR_SKILL_CLICK = 25;
+    TUTOR_GAME_SPLASH = 5;
+    TUTOR_SELF_BUILDINGS = 6;
+    TUTOR_ENEMY_BUILDINGS = 7;
+    TUTOR_NO_OWNER_BUILDINGS = 8;
+    TUTOR_ARROW = 9;
+    TUTOR_ARROWS = 10;
+    TUTOR_FIREBALL = 11;
+    TUTOR_VOLCANO = 12;
+    TUTOR_TORNADO = 13;
+    TUTOR_ASSISTANCE = 14;
+    TUTOR_STRENGTHENING = 15;
+    TUTOR_BIG_TOWER = 16;
+    TUTOR_WIN_CHALLENGE = 17;
+    TUTOR_2_WIN = 18; // Игрок выиграл тутор на 2-ух› игроков
+    TUTOR_2_LOSE = 19; // Игрок проиграл тутор на 2-ух игроков
+    TUTOR_4_WIN = 20; // Игрок выиграл тутор на 4-ех игроков
+    TUTOR_4_LOSE = 21; // Игрок проиграл тутор на 4-ех игроков
+
+    TUTOR_NAVIGATE = 22;
+    TUTOR_EMPTY_SLOT_CLICK = 23;
+    TUTOR_SLOT_CLICK = 24;
+    TUTOR_ITEM_CLICK = 25;
+    TUTOR_SKILL_CLICK = 26;
 
     BUY_FIREBALL = 30;
     BUY_STRENGTHENING = 31;

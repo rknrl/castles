@@ -21,7 +21,7 @@ object AddHeaders {
                  |//     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
                  |//      \|__|     \|__|     \/__/     \|__|     \/__/
                  |
-                 | """.stripMargin
+                 |""".stripMargin
 
   val headerFirstLine = header.takeWhile(_ != '\n')
 
