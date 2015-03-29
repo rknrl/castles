@@ -68,6 +68,22 @@ public class Buildings {
         return result;
     }
 
+    public function notOwned():Vector.<BuildingIdDTO> {
+        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+        for each(var building:Building in buildings) {
+            if (!building.owner.hasOwner) result.push(building.id);
+        }
+        return result;
+    }
+
+    public function owned():Vector.<BuildingIdDTO> {
+        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+        for each(var building:Building in buildings) {
+            if (building.owner.hasOwner) result.push(building.id);
+        }
+        return result;
+    }
+
     public function getBuildingIds(selfId:PlayerIdDTO):Vector.<BuildingIdDTO> {
         return byPlayerId(selfId);
     }

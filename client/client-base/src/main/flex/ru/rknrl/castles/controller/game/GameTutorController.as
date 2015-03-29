@@ -11,7 +11,6 @@ package ru.rknrl.castles.controller.game {
 import flash.events.EventDispatcher;
 
 import ru.rknrl.castles.model.DtoMock;
-
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
@@ -84,18 +83,11 @@ public class GameTutorController extends TutorControllerBase {
 
             // no owner buildings
 
-            addText(view.tutor.locale.tutorEnemyBuildings(players.isBigGame)),
-            parallel(new <ITutorCommand>[
-                loop(new <ITutorCommand>[
-                    highlightNextEnemyBuildings,
-                    wait(1000)
-                ]),
-                sequence(new <ITutorCommand>[
-                    wait(2500),
-                    addNextButton,
-                    waitForClick
-                ])
-            ]),
+            addText(view.tutor.locale.tutorNoOwnerBuildings),
+            highlightNoOwnerBuildings,
+            wait(1500),
+            addNextButton,
+            waitForClick,
             unhighlightBuildings,
             clear,
             stat(StatAction.TUTOR_NO_OWNER_BUILDINGS),
@@ -196,6 +188,10 @@ public class GameTutorController extends TutorControllerBase {
 
     private function _highlightSelfBuildings():void {
         view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers(players.selfId)), buildings.notPlayerId(players.selfId));
+    }
+
+    private function _highlightNoOwnerBuildings():void {
+        view.tutorBlur(Players.playersToIds(players.getAll()), buildings.owned());
     }
 
     private var enemyIndex:int;
@@ -349,6 +345,8 @@ public class GameTutorController extends TutorControllerBase {
 
     private function stat(action:StatAction):ITutorCommand {
         return exec(function ():void {
+            const dto:StatDTO = new StatDTO();
+            dto.action = action;
             server.stat(DtoMock.stat(action))
         })
     }
@@ -389,6 +387,10 @@ public class GameTutorController extends TutorControllerBase {
 
     private function get highlightSelfBuildings():ITutorCommand {
         return exec(_highlightSelfBuildings);
+    }
+
+    private function get highlightNoOwnerBuildings():ITutorCommand {
+        return exec(_highlightNoOwnerBuildings);
     }
 
     private function get highlightNextEnemyBuildings():ITutorCommand {

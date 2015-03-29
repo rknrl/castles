@@ -39,6 +39,7 @@ public class CastlesLocale extends Locale {
     private static const FAST_AND_TRUST:String = "fast_and_trust";
     private static const DEAD:String = "dead";
     private static const TUTOR_SELF_BUILDINGS:String = "tutor_self_buildings";
+    private static const TUTOR_NO_OWNER_BUILDINGS:String = "tutor_no_owner_buildings";
     private static const TUTOR_ENEMY_BUILDINGS_BIG:String = "tutor_enemy_buildings_big";
     private static const TUTOR_ENEMY_BUILDINGS_SMALL:String = "tutor_enemy_buildings_small";
     private static const NEXT:String = "next";
@@ -157,6 +158,10 @@ public class CastlesLocale extends Locale {
 
     public function get tutorSelfBuildings():String {
         return translate(TUTOR_SELF_BUILDINGS);
+    }
+
+    public function get tutorNoOwnerBuildings():String {
+        return translate(TUTOR_NO_OWNER_BUILDINGS);
     }
 
     public function tutorEnemyBuildings(isBigGame:Boolean):String {

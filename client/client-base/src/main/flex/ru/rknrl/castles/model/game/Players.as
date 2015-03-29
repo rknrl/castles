@@ -47,6 +47,10 @@ public class Players {
         return result;
     }
 
+    public function getAll():Vector.<PlayerDTO> {
+        return players;
+    }
+
     public static function playersToIds(players:Vector.<PlayerDTO>):Vector.<PlayerIdDTO> {
         const result:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
         for each(var player:PlayerDTO in players) result.push(player.id);
