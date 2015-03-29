@@ -59,7 +59,7 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!-- sf4j logging -->
+        <!-- slf4j logging -->
 
         <dependency>
             <groupId>com.typesafe.akka</groupId>

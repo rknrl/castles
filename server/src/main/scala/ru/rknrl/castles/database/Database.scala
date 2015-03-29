@@ -8,18 +8,17 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.ActorLogging
-import akka.event.LoggingReceive
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
-import ru.rknrl.EscalateStrategyActor
+import org.slf4j.LoggerFactory
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO, UserInfoDTO}
+import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 class DbConfiguration(username: String,
                       host: String,
@@ -70,7 +69,13 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration) extends EscalateStrategyActor with ActorLogging {
+class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
+
+  val logger = LoggerFactory.getLogger(getClass)
+  val log = new Slf4j(logger)
+
+  def logged(r: Receive) = new Logged(r, log, any ⇒ true)
+
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
@@ -86,7 +91,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor wit
     TopItem(new AccountId(id), rating, userInfo)
   }
 
-  override def receive = LoggingReceive {
+  override def receive = logged {
     case GetTop ⇒
       val ref = sender()
       pool.sendQuery("SELECT id, rating, userInfo FROM account_state ORDER BY rating DESC LIMIT 5;").map(

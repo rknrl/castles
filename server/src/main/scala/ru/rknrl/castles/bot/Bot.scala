@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.bot
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
@@ -22,10 +22,11 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.MoveDTO
+import ru.rknrl.{Logged, SilentLog}
 
 import scala.collection.JavaConverters._
 
-class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogging {
+class Bot(accountId: AccountId, config: GameConfig) extends Actor {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L
@@ -46,20 +47,25 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
   case class Weight(id: BuildingId, weight: Double)
 
-  override def receive: Receive = {
+  val log = new SilentLog
+
+  def logged(r: Receive) = new Logged(r, log, {
+    case state: GameState ⇒ false
+    case _ ⇒ true
+  })
+
+  override def receive: Receive = logged({
     case ConnectToGame(gameRef) ⇒
-      log.debug("ConnectToGame")
       game = Some(gameRef)
       gameRef ! Join(accountId, self)
       gameRef ! C2B.JoinGame
 
     case JoinedGame(gameState) ⇒
-      log.debug("JoinedGame")
       playerId = Some(new PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
     case newGameState: GameState ⇒ update(newGameState)
-  }
+  })
 
   def update(newGameState: GameState) = {
     gameState = Some(newGameState)
@@ -106,7 +112,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
         if (time - lastCastTime > castInterval) {
           lastCastTime = time
 
-          val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState}
+          val items = newGameState.gameItems.states(playerId.get).items.map { case (_, itemState) ⇒ itemState }
 
           val availableCast = items.filter(itemState ⇒
             itemState.count > 0 &&
@@ -135,7 +141,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
     }
   }
 
-  def buildings = gameState.get.buildings.map.map { case (id, b) ⇒ b}
+  def buildings = gameState.get.buildings.map.map { case (id, b) ⇒ b }
 
   def getMyBuildings = buildings.filter(my).toList
 
@@ -145,13 +151,13 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
 
   def buildingsToWeights(enemyBuildings: Iterable[Building], myBuildings: Iterable[Building]) =
     for (b ← enemyBuildings)
-    yield Weight(
-      b.id,
-      distanceWeight(b.pos, myBuildings) +
-        ownerWeight(b.owner) +
-        populationWeight(b.population) +
-        strengthenedWeight(b.strengthened)
-    )
+      yield Weight(
+        b.id,
+        distanceWeight(b.pos, myBuildings) +
+          ownerWeight(b.owner) +
+          populationWeight(b.population) +
+          strengthenedWeight(b.strengthened)
+      )
 
   def distanceWeight(pos: Point, myBuildings: Iterable[Building]) = {
     val distances = myBuildings.map(_.pos.distance(pos))
@@ -163,6 +169,4 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor with ActorLogg
   def populationWeight(population: Double) = population * 3 / 99
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
-
-  override def postStop() = log.debug("bot stop")
 }

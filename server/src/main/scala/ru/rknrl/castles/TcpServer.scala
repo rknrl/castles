@@ -10,14 +10,16 @@ package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
-import akka.actor.{ActorLogging, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
+import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
-import ru.rknrl.castles.account.{AccountClientSession, Account}
-import ru.rknrl.rmi.Client
+import ru.rknrl.castles.account.AccountClientSession
 
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef) extends StoppingStrategyActor with ActorLogging {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef) extends StoppingStrategyActor {
 
   import akka.io.Tcp._
+
+  val log = LoggerFactory.getLogger(getClass)
 
   val address = new InetSocketAddress(config.host, config.gamePort)
 

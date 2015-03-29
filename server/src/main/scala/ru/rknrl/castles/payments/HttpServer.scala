@@ -10,8 +10,9 @@ package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
-import akka.actor.{ActorLogging, ActorRef}
+import akka.actor.ActorRef
 import akka.pattern.Patterns
+import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
@@ -28,7 +29,9 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends StoppingStrategyActor with HttpService with ActorLogging {
+class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends StoppingStrategyActor with HttpService {
+
+  val log = LoggerFactory.getLogger(getClass)
 
   val crossdomain = """<?xml version="1.0"?>
                       |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">

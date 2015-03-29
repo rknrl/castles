@@ -8,8 +8,7 @@
 
 package ru.rknrl.castles.game
 
-import akka.actor.{ActorLogging, ActorRef}
-import ru.rknrl.EscalateStrategyActor
+import akka.actor.ActorRef
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.Join
@@ -22,6 +21,7 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._
+import ru.rknrl.{SilentLog, EscalateStrategyActor, Logged}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -74,7 +74,7 @@ class Game(players: Map[PlayerId, Player],
            isDev: Boolean,
            config: GameConfig,
            gameMap: GameMap,
-           matchmaking: ActorRef) extends EscalateStrategyActor with ActorLogging {
+           matchmaking: ActorRef) extends EscalateStrategyActor {
 
   val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -145,19 +145,18 @@ class Game(players: Map[PlayerId, Player],
 
   def canSendMessage(playerId: PlayerId) =
     (online contains playerId) &&
-      (playerStates(playerId) != PlayerState.LEAVED) &&
-      !players(playerId).isBot
+      (playerStates(playerId) != PlayerState.LEAVED)
 
   def sendToPlayers(messages: Iterable[Msg], personalMessages: Iterable[PersonalMessage]): Unit =
     for ((playerId, client) ← `playerId→client`
-         if canSendMessage(playerId)) {
+         if canSendMessage(playerId) && !players(playerId).isBot) {
       val all = messages ++ personalMessages.filter(_.playerId == playerId).map(_.msg)
       client ! all
     }
 
   def sendToBots(msg: Any) =
     for ((playerId, ref) ← `playerId→client`
-         if players(playerId).isBot)
+         if canSendMessage(playerId) && players(playerId).isBot)
       ref ! msg
 
   def senderPlayerId = `client→playerId`(sender)
@@ -200,12 +199,18 @@ class Game(players: Map[PlayerId, Player],
     (newGameState, messages, personalMessages)
   }
 
-  def receive = {
+  val log = new SilentLog
+
+  def logged(r: Receive) = new Logged(r, log, {
+    case UpdateGameState ⇒ false
+    case _ ⇒ true
+  })
+
+  def receive = logged({
     /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
       * Добавляем/Обнавляем рефы в мапах
       */
     case Join(accountId, client) ⇒
-      log.debug("Join")
       val playerId = `accountId→playerId`(accountId)
       `playerId→account` = `playerId→account` + (playerId → sender)
 
@@ -216,7 +221,6 @@ class Game(players: Map[PlayerId, Player],
       * Убираем из его мапы online
       */
     case Offline(accountId) ⇒
-      log.debug("Offline")
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
 
@@ -225,7 +229,6 @@ class Game(players: Map[PlayerId, Player],
       * и отправляем стартовое сообщение JoinGameMsg
       */
     case C2B.JoinGame ⇒
-      log.debug("C2B.JoinGame")
       val playerId = `client→playerId`(sender)
       online = online + playerId
 
@@ -240,14 +243,12 @@ class Game(players: Map[PlayerId, Player],
     /** Игрок сдается */
     case Surrender ⇒
       if (isDev) {
-        log.debug("Surrender")
         if (playerStates(senderPlayerId) == PlayerState.GAME)
           addLoser(senderPlayerId, getPlace)
       }
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case C2B.LeaveGame ⇒
-      log.debug("C2B.LeaveGame")
       if (playerStates(senderPlayerId) == PlayerState.GAME_OVER)
         addLeaved(senderPlayerId)
 
@@ -287,7 +288,7 @@ class Game(players: Map[PlayerId, Player],
 
     case StartTutorGame ⇒
       sendToBots(StartTutorGame)
-  }
+  })
 
   def addLoser(playerId: PlayerId, place: Int) {
     playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
@@ -344,6 +345,4 @@ class Game(players: Map[PlayerId, Player],
 
     if (allLeaved) matchmaking ! AllPlayersLeaveGame
   }
-
-  override def postStop() = log.debug("game stop")
 }

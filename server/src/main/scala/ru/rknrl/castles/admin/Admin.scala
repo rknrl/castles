@@ -8,21 +8,22 @@
 
 package ru.rknrl.castles.admin
 
-import akka.actor.{ActorLogging, ActorRef}
+import akka.actor.ActorRef
 import akka.pattern.Patterns
-import ru.rknrl.EscalateStrategyActor
+import org.slf4j.LoggerFactory
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
-import ru.rknrl.castles.rmi.B2C.{ServerHealth, AuthenticatedAsAdmin}
+import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
 import ru.rknrl.dto.AdminDTO.AdminAccountStateDTO
 import ru.rknrl.dto.CommonDTO.AccountIdDTO
+import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -31,16 +32,19 @@ class Admin(database: ActorRef,
             matchmaking: ActorRef,
             login: String,
             password: String,
-            name: String) extends EscalateStrategyActor with ActorLogging {
+            name: String) extends EscalateStrategyActor  {
+
+  val logger = LoggerFactory.getLogger(getClass)
+  val log = new Slf4j(logger)
+  def logged(r: Receive) = new Logged(r, log, any ⇒ true)
 
   var client: ActorRef = null
 
   override def receive = auth
 
-  def auth: Receive = {
+  def auth: Receive = logged({
     /** from Client */
     case AuthenticateAsAdmin(authenticate) ⇒
-      log.debug("AuthenticateAsAdmin")
       if (authenticate.getLogin == login && authenticate.getPassword == password) {
         client = sender
         client ! AuthenticatedAsAdmin
@@ -49,57 +53,47 @@ class Admin(database: ActorRef,
         log.debug("reject")
         sender ! CloseConnection
       }
-  }
+  })
 
-  def admin: Receive = {
+  def admin: Receive = logged({
     /** from Database */
     case AccountStateResponse(accountId, accountState) ⇒
-      log.debug("AccountStateResponse")
       sendToClient(accountId, accountState)
 
     /** from Database */
     case AccountNoExists ⇒
-      log.debug("AccountNoExists")
 
     case C2B.GetAccountState(dto) ⇒
-      log.debug("C2B.GetAccountState")
       database ! Database.GetAccountState(dto.getAccountId)
 
     case C2B.DeleteAccount(accountId) ⇒
-      log.debug("C2B.DeleteAccount")
       database ! Database.DeleteAccount(accountId)
 
     case msg: Database.AccountDeleted ⇒
       matchmaking forward msg
 
     case GetServerHealth ⇒
-      log.debug("GetOnline")
       matchmaking ! GetServerHealth
 
     case msg: ServerHealth ⇒
-      log.debug("AdminOnline")
       client ! msg
 
     case AddGold(dto) ⇒
-      log.debug("AddGold")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.getAmount))
       )
 
     case AddItem(dto) ⇒
-      log.debug("AddItem")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.getItemType, dto.getAmount))
       )
 
     case SetSkill(dto) ⇒
-      log.debug("SetSkill")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.getSkilType, dto.getSkillLevel))
       )
 
     case SetSlot(dto) ⇒
-      log.debug("SetSlot")
       getState(dto.getAccountId,
         (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
@@ -107,7 +101,7 @@ class Admin(database: ActorRef,
           else
             update(accountId, accountState.removeBuilding(dto.getSlot.getId))
       )
-  }
+  })
 
   def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
     client ! B2C.AccountState(

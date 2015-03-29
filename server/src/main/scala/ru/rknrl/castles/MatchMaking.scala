@@ -10,6 +10,7 @@ package ru.rknrl.castles
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
+import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state._
@@ -26,6 +27,7 @@ import ru.rknrl.dto.AdminDTO.{ServerHealthDTO, ServerHealthItemDTO}
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO.{AccountType, DeviceType, ItemType, UserInfoDTO}
 import ru.rknrl.utils.IdIterator
+import ru.rknrl.{Logged, Slf4j}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -87,7 +89,7 @@ class MatchMaking(interval: FiniteDuration,
                   database: ActorRef,
                   var top: List[TopItem],
                   config: Config,
-                  gameMaps: GameMaps) extends Actor with ActorLogging {
+                  gameMaps: GameMaps) extends Actor {
   /** Если у бота случается ошибка - стопаем его
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
@@ -105,6 +107,14 @@ class MatchMaking(interval: FiniteDuration,
       } else
         Stop // stop bot
   }
+
+  val log = new Slf4j(LoggerFactory.getLogger(getClass))
+
+  def logged(r: Receive) = new Logged(r, log, {
+    case TryCreateGames ⇒ false
+    case RegisterHealth ⇒ false
+    case _ ⇒ true
+  })
 
   class GameInfo(val gameRef: ActorRef,
                  val orders: Iterable[GameOrder],
@@ -244,7 +254,7 @@ class MatchMaking(interval: FiniteDuration,
   val healthStartTime = System.currentTimeMillis()
   var health = List.empty[ServerHealthItemDTO]
 
-  def receive = {
+  def receive = logged({
     case RegisterHealth ⇒
       health = health :+ ServerHealthItemDTO.newBuilder()
         .setOnline(accountIdToAccountRef.size)
@@ -254,13 +264,11 @@ class MatchMaking(interval: FiniteDuration,
 
     /** from Admin or PaymentTransaction */
     case msg@AdminSetAccountState(accountId, _) ⇒
-      log.debug("AdminSetAccountState")
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
 
     /** from Admin */
     case GetServerHealth ⇒
-      log.debug("GetServerHealth")
       sender ! ServerHealth(
         ServerHealthDTO.newBuilder()
           .setStartTime(healthStartTime)
@@ -270,7 +278,6 @@ class MatchMaking(interval: FiniteDuration,
 
     /** from Admin */
     case Database.AccountDeleted(dto) ⇒
-      log.debug("AccountDeleted")
       val accountId = new AccountId(dto)
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) ! DuplicateAccount
@@ -279,7 +286,6 @@ class MatchMaking(interval: FiniteDuration,
       * В ответ отправляем InGameResponse
       */
     case InGame(accountId) ⇒
-      log.debug("InGame")
       if (accountIdToAccountRef.contains(accountId)) {
         val oldAccountRef = accountIdToAccountRef(accountId)
         oldAccountRef ! DuplicateAccount
@@ -294,7 +300,6 @@ class MatchMaking(interval: FiniteDuration,
 
     /** Аккаунт отсоединился */
     case Offline(accountId) ⇒
-      log.debug("Offline")
       if (accountIdToAccountRef.contains(accountId) && accountIdToAccountRef(accountId) == sender) {
         accountIdToAccountRef = accountIdToAccountRef - accountId
         val gameInfo = accountIdToGameInfo.get(accountId)
@@ -314,24 +319,21 @@ class MatchMaking(interval: FiniteDuration,
 
     /** Аккаунт присылает заявку на игру */
     case PlaceGameOrder(gameOrder) ⇒
-      log.debug("PlaceGameOrder")
       placeGameOrder(gameOrder, sender)
 
     /** Game оповещает, что игрок вышел из игры */
     case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
-      log.debug("PlayerLeaveGame")
       onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
     case AllPlayersLeaveGame ⇒
-      log.debug("AllPlayersLeaveGame")
       onGameOver(sender)
       context stop sender
 
     /** Scheduler говорит, что пора пробовать создавать игры из заявок */
     case TryCreateGames ⇒
       tryCreateGames(gameOrders).map(registerGame)
-  }
+  })
 
   def getSA(big: Boolean, place: Int) =
     if (big)

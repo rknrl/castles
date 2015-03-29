@@ -11,7 +11,8 @@
   "bugs": {
     "clientDir": "/Users/tolyayanot/bugs/client/",
     "gameDir": "/Users/tolyayanot/bugs/game/",
-    "botDir": "/Users/tolyayanot/bugs/bot/"
+    "botDir": "/Users/tolyayanot/bugs/bot/",
+    "accountDir": "/Users/tolyayanot/bugs/account/"
   },
   "db": {
     "host": "localhost",

@@ -8,7 +8,6 @@
 
 package ru.rknrl.castles.bot
 
-import akka.actor.ActorLogging
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
@@ -28,17 +27,17 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountId, config: GameConfig) extends Bot(accountId, config) with ActorLogging {
+class TutorBot(accountId: AccountId, config: GameConfig) extends Bot(accountId, config) {
 
   var mode = NONE
 
-  def tutorBotReceive: Receive = {
+  def tutorBotReceive: Receive = logged({
     case StartTutorGame ⇒
       mode = GAME
 
     case StartTutorFireball ⇒
       if (playerId.get.id == 3) mode = SEND_UNITS_TO_ONE_BUILDING
-  }
+  })
 
   override def receive = tutorBotReceive.orElse(super.receive)
 

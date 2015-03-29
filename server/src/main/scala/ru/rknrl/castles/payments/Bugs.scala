@@ -19,18 +19,21 @@ object BugType extends Enumeration {
   val CLIENT = Value
   val GAME = Value
   val BOT = Value
+  val ACCOUNT = Value
 }
 
 import ru.rknrl.castles.payments.BugType._
 
 class BugsConfig(clientDir: String,
                  gameDir: String,
-                 botDir: String) {
+                 botDir: String,
+                 accountDir: String) {
   def dir(bugType: BugType) =
     bugType match {
       case CLIENT ⇒ clientDir
       case GAME ⇒ gameDir
       case BOT ⇒ botDir
+      case ACCOUNT ⇒ accountDir
     }
 }
 
@@ -46,7 +49,8 @@ class Bugs(config: BugsConfig) extends Actor {
   var counts = Map(
     CLIENT → 0,
     GAME → 0,
-    BOT → 0
+    BOT → 0,
+    ACCOUNT → 0
   )
 
   def receive = {
