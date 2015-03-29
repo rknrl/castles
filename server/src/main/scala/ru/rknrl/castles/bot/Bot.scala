@@ -17,6 +17,7 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.castles.game.state.players.PlayerId
+import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
@@ -26,7 +27,7 @@ import ru.rknrl.{Logged, SilentLog}
 
 import scala.collection.JavaConverters._
 
-class Bot(accountId: AccountId, config: GameConfig) extends Actor {
+class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Actor {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L
@@ -49,7 +50,7 @@ class Bot(accountId: AccountId, config: GameConfig) extends Actor {
 
   val log = new SilentLog
 
-  def logged(r: Receive) = new Logged(r, log, {
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.BOT), {
     case state: GameState ⇒ false
     case _ ⇒ true
   })

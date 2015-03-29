@@ -9,11 +9,14 @@
 package ru.rknrl
 
 import akka.actor.Actor.Receive
-import akka.actor.ActorContext
+import akka.actor.{ActorContext, ActorRef}
 import org.slf4j.Logger
+import ru.rknrl.castles.payments.BugType.BugType
+import ru.rknrl.castles.payments.Bugs.Bug
 
 trait Log {
   def info(s: String)
+  def result: String
 }
 
 class SilentLog extends Log {
@@ -29,11 +32,15 @@ class SilentLog extends Log {
 
 class Slf4j(val logger: Logger) extends Log {
   def info(s: String) = logger.info(s)
+
   def error(s: String) = logger.error(s)
+
   def debug(s: String) = logger.debug(s)
+
+  def result = ???
 }
 
-class Logged(r: Receive, log: Log, filter: Any ⇒ Boolean)(implicit context: ActorContext) extends Receive {
+class Logged(r: Receive, log: Log, bugs: Option[ActorRef], bugType: Option[BugType], filter: Any ⇒ Boolean)(implicit context: ActorContext) extends Receive {
   def isDefinedAt(o: Any): Boolean = {
     val handled = r.isDefinedAt(o)
     if (filter(o))
@@ -41,5 +48,14 @@ class Logged(r: Receive, log: Log, filter: Any ⇒ Boolean)(implicit context: Ac
     handled
   }
 
-  def apply(o: Any): Unit = r(o)
+  def apply(o: Any): Unit =
+    try {
+      r(o)
+    } catch {
+      case t: Throwable ⇒
+        log.info(t.getMessage)
+        log.info(t.getStackTrace.mkString("\n"))
+        if (bugs.isDefined) bugs.get ! Bug(bugType.get, log.result)
+        throw t
+    }
 }

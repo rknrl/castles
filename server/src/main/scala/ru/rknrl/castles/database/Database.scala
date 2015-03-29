@@ -74,7 +74,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
   val logger = LoggerFactory.getLogger(getClass)
   val log = new Slf4j(logger)
 
-  def logged(r: Receive) = new Logged(r, log, any ⇒ true)
+  def logged(r: Receive) = new Logged(r, log, None, None, any ⇒ true)
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)

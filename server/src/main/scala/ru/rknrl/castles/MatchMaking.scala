@@ -87,6 +87,7 @@ object MatchMaking {
 
 class MatchMaking(interval: FiniteDuration,
                   database: ActorRef,
+                  bugs: ActorRef,
                   var top: List[TopItem],
                   config: Config,
                   gameMaps: GameMaps) extends Actor {
@@ -103,14 +104,14 @@ class MatchMaking(interval: FiniteDuration,
           onAccountLeaveGame(accountId, place = gameInfo.orders.size, reward = 0, usedItems = Map.empty, gameInfo.orders.find(_.accountId == accountId).get.userInfo)
         }
         onGameOver(sender)
-        Stop
-      } else
-        Stop // stop bot
+      }
+
+      Stop
   }
 
   val log = new Slf4j(LoggerFactory.getLogger(getClass))
 
-  def logged(r: Receive) = new Logged(r, log, {
+  def logged(r: Receive) = new Logged(r, log, None, None, {
     case TryCreateGames ⇒ false
     case RegisterHealth ⇒ false
     case _ ⇒ true
@@ -188,7 +189,7 @@ class MatchMaking(interval: FiniteDuration,
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
-      val bot = context.actorOf(Props(botClass, accountId, config.game), accountId.id)
+      val bot = context.actorOf(Props(botClass, accountId, config.game, bugs), accountId.id)
       val botStat = if (isTutor) tutorBotStat else order.stat
       val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
@@ -246,7 +247,7 @@ class MatchMaking(interval: FiniteDuration,
 
     val gameMap = gameMaps.random(big)
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self), gameIdIterator.next)
+    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self, bugs), gameIdIterator.next)
 
     new GameInfo(game, orders, isTutor)
   }

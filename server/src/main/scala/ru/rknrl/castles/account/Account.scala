@@ -15,6 +15,7 @@ import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.game.Game
+import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -38,12 +39,13 @@ object Account {
 
 class Account(matchmaking: ActorRef,
               database: ActorRef,
+              bugs: ActorRef,
               config: Config,
               name: String) extends EscalateStrategyActor {
 
   val log = new SilentLog
 
-  def logged(r: Receive) = new Logged(r, log, any ⇒ true)
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.ACCOUNT), any ⇒ true)
 
   // auth
 

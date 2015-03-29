@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.bot
 
+import akka.actor.ActorRef
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
@@ -27,7 +28,7 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountId, config: GameConfig) extends Bot(accountId, config) {
+class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Bot(accountId, config, bugs) {
 
   var mode = NONE
 

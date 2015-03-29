@@ -16,12 +16,13 @@ import ru.rknrl.castles.game.map.GameMap
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
+import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C.GameOver
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.GameDTO._
-import ru.rknrl.{SilentLog, EscalateStrategyActor, Logged}
+import ru.rknrl.{EscalateStrategyActor, Logged, SilentLog}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -74,7 +75,8 @@ class Game(players: Map[PlayerId, Player],
            isDev: Boolean,
            config: GameConfig,
            gameMap: GameMap,
-           matchmaking: ActorRef) extends EscalateStrategyActor {
+           matchmaking: ActorRef,
+           bugs: ActorRef) extends EscalateStrategyActor {
 
   val `accountId→playerId` =
     for ((playerId, player) ← players)
@@ -201,7 +203,7 @@ class Game(players: Map[PlayerId, Player],
 
   val log = new SilentLog
 
-  def logged(r: Receive) = new Logged(r, log, {
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.GAME), {
     case UpdateGameState ⇒ false
     case _ ⇒ true
   })

@@ -48,7 +48,7 @@ object Main {
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 7 seconds, database, top, config, gameMaps), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 7 seconds, database, bugs, top, config, gameMaps), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
@@ -56,6 +56,6 @@ object Main {
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
     system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking), "admin-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database), "tcp-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, bugs), "tcp-server")
   }
 }
