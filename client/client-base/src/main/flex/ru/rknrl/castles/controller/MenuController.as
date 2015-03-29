@@ -262,10 +262,7 @@ public class MenuController {
         if (gamesCount >= 3 && !tutorShows[screenIndex]) {
             switch (screenIndex) {
                 case ScreenChangedEvent.SCREEN_MAIN:
-                    if (!tutorState.navigate) {
-                        tutorShows[screenIndex] = true;
-                        view.tutor.play(tutor.playNavigate());
-                    } else if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
+                    if (!tutorState.slot && model.gold >= model.buildingPrices.getPrice(BuildingLevel.LEVEL_2)) {
                         tutorShows[screenIndex] = true;
                         view.tutor.play(tutor.playSlot(model.slots.getNotEmptySlot()));
                     } else if (!tutorState.emptySlot && model.slots.getEmptySlot() && model.gold >= model.buildingPrices.buildPrice) {
@@ -285,6 +282,11 @@ public class MenuController {
                         view.tutor.play(tutor.playFlask());
                     }
                     break;
+            }
+        } else {
+            if (screenIndex == ScreenChangedEvent.SCREEN_MAIN && !tutorState.navigate) {
+                tutorShows[screenIndex] = true;
+                view.tutor.play(tutor.playNavigate());
             }
         }
     }
