@@ -11,10 +11,18 @@ package ru.rknrl.castles.account.state
 import org.scalatest.{FreeSpec, Matchers}
 import ru.rknrl.TestUtils._
 import ru.rknrl.dto.CommonDTO.BuildingLevel._
-import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
 import ru.rknrl.dto.CommonDTO.BuildingType._
+import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
 class BuildingPrototypeTest extends FreeSpec with Matchers {
+  "upgraded" in {
+    BuildingPrototype(HOUSE, LEVEL_1).upgraded shouldBe BuildingPrototype(HOUSE, LEVEL_2)
+    BuildingPrototype(TOWER, LEVEL_2).upgraded shouldBe BuildingPrototype(TOWER, LEVEL_3)
+    a[Exception] shouldBe thrownBy {
+      BuildingPrototype(CHURCH, LEVEL_3).upgraded
+    }
+  }
+
   "dto" in {
     val dto = BuildingPrototype(HOUSE, LEVEL_1).dto
     dto.getType shouldEqual HOUSE
@@ -41,25 +49,15 @@ class BuildingPrototypeTest extends FreeSpec with Matchers {
     BuildingPrototype(dto2) shouldBe BuildingPrototype(TOWER, LEVEL_3)
   }
 
-  "upgraded" in {
-    BuildingPrototype(HOUSE, LEVEL_1).upgraded shouldBe BuildingPrototype(HOUSE, LEVEL_2)
-    BuildingPrototype(TOWER, LEVEL_2).upgraded shouldBe BuildingPrototype(TOWER, LEVEL_3)
-    a[Exception] shouldBe thrownBy {
-      BuildingPrototype(CHURCH, LEVEL_3).upgraded
-    }
-  }
+  val all = for (buildingType ← BuildingType.values;
+                 buildingLevel ← BuildingLevel.values)
+    yield () ⇒ BuildingPrototype(buildingType, buildingLevel)
 
   "equals" in {
-    checkEquals(
-      () ⇒ BuildingPrototype(HOUSE, LEVEL_1),
-      () ⇒ BuildingPrototype(CHURCH, LEVEL_2)
-    )
+    checkEquals(all)
   }
 
   "hashCode" in {
-    checkHashCode(
-      () ⇒ BuildingPrototype(HOUSE, LEVEL_1),
-      () ⇒ BuildingPrototype(CHURCH, LEVEL_2)
-    )
+    checkHashCode(all)
   }
 }

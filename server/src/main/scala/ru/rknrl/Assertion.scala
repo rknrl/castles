@@ -8,14 +8,13 @@
 
 package ru.rknrl
 
+/** В отличие от стандартного assert кидает эксепшн, а не эррор */
 object Assertion {
-  /** В отличие от стандартного assert кидает эксепшн, а не эррор */
   def check(assertion: Boolean) {
     if (!assertion)
       throw new Exception("assertion failed")
   }
 
-  /** В отличие от стандартного assert кидает эксепшн, а не эррор */
   def check(assertion: Boolean, message: => Any) {
     if (!assertion)
       throw new Exception("assertion failed: " + message)

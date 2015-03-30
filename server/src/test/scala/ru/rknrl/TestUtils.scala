@@ -11,23 +11,31 @@ package ru.rknrl
 import org.scalatest.Matchers
 
 object TestUtils extends Matchers {
-  def checkEquals[T](a: () ⇒ T, b: () ⇒ T): Unit = {
-    a() shouldEqual a()
-    b() shouldEqual b()
+  def checkEquals[T](factories: Seq[() ⇒ T]): Unit = {
+    for (a ← factories;
+         b ← factories
+         if a != b) {
 
-    a() shouldNot equal(b())
+      a() shouldEqual a()
+      b() shouldEqual b()
 
-    a() shouldNot equal(a().toString)
-    b() shouldNot equal(b().toString)
+      a() shouldNot equal(b())
+      b() shouldNot equal(a())
+
+      a() shouldNot equal(a().toString)
+      b() shouldNot equal(b().toString)
+    }
   }
 
-  def checkHashCode[T](a: () ⇒ T, b: () ⇒ T): Unit = {
-    a() shouldEqual a()
-    b() shouldEqual b()
+  def checkHashCode[T](factories: Seq[() ⇒ T]): Unit = {
+    for (a ← factories;
+         b ← factories
+         if a != b) {
+      a().hashCode shouldEqual a().hashCode
+      b().hashCode shouldEqual b().hashCode
 
-    a() shouldNot equal(b())
-
-    a() shouldNot equal(a().toString)
-    b() shouldNot equal(b().toString)
+      a().hashCode shouldNot equal(b().hashCode)
+      b().hashCode shouldNot equal(a().hashCode)
+    }
   }
 }
