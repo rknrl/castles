@@ -36,11 +36,6 @@ object BuildingPrototype {
       case BuildingLevel.LEVEL_2 ⇒ BuildingLevel.LEVEL_3
     }
 
-  val all =
-    for (buildingType ← BuildingType.values;
-         buildingLevel ← BuildingLevel.values)
-      yield BuildingPrototype(buildingType, buildingLevel)
-
   def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingPrototype =
     new BuildingPrototype(buildingType, buildingLevel)
 

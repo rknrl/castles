@@ -18,7 +18,7 @@ class Slots(val slots: Map[SlotId, Slot]) {
   def apply(id: SlotId) = slots(id)
 
   def buildingsCount =
-    slots.count { case (id, slot) ⇒ slot.buildingPrototype.isDefined}
+    slots.values.count(_.buildingPrototype.isDefined)
 
   def set(id: SlotId, buildingPrototype: BuildingPrototype) =
     update(id, slots(id).set(buildingPrototype))
@@ -37,7 +37,7 @@ class Slots(val slots: Map[SlotId, Slot]) {
   private def update(id: SlotId, newSlot: Slot) =
     new Slots(slots.updated(id, newSlot))
 
-  def dto = for ((id, slot) ← slots) yield slot.dto
+  def dto = slots.values.map(_.dto)
 }
 
 object Slots {
@@ -54,7 +54,7 @@ object Slots {
   val bottom = 0
 
   def apply(dto: Iterable[SlotDTO]) = {
-    val slots = for (slotDto ← dto) yield slotDto.getId → Slot.fromDto(slotDto)
+    val slots = for (slotDto ← dto) yield slotDto.getId → Slot(slotDto)
     new Slots(slots.toMap)
   }
 }

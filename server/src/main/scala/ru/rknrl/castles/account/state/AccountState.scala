@@ -92,22 +92,22 @@ class AccountState(val slots: Slots,
 
 object AccountState {
   private def initSlotBuildings =
-    Map(
-      SlotId.SLOT_1 → None,
-      SlotId.SLOT_2 → None,
-      SlotId.SLOT_3 → Some(BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
-      SlotId.SLOT_4 → Some(BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
-      SlotId.SLOT_5 → Some(BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
+    List(
+      Slot.empty(SlotId.SLOT_1),
+      Slot.empty(SlotId.SLOT_2),
+      Slot(SlotId.SLOT_3, BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
+      Slot(SlotId.SLOT_4, BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
+      Slot(SlotId.SLOT_5, BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
     )
 
   private def initSlotsList =
-    for ((slotId, building) ← initSlotBuildings)
-      yield slotId → new Slot(slotId, building)
+    for (slot ← initSlotBuildings)
+      yield slot.id → slot
 
-  private def initSlots = new Slots(initSlotsList)
+  private def initSlots = new Slots(initSlotsList.toMap)
 
   private def initSkillLevels =
-    for (skillType ← SkillType.values())
+    for (skillType ← SkillType.values)
       yield skillType → SkillLevel.SKILL_LEVEL_0
 
   private def initSkills = new Skills(initSkillLevels.toMap)

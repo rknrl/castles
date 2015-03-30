@@ -8,26 +8,28 @@
 
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.Assertion
 import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType, SlotId}
 
-class Slot(val id: SlotId,
-           val buildingPrototype: Option[BuildingPrototype]) {
+class Slot private(val id: SlotId,
+                   val buildingPrototype: Option[BuildingPrototype]) {
 
   def set(buildingPrototype: BuildingPrototype) =
-    new Slot(id, Some(buildingPrototype))
+    Slot(id, buildingPrototype)
 
-  def remove = new Slot(id, None)
+  def remove = {
+    Assertion.check(buildingPrototype.isDefined)
+    Slot.empty(id)
+  }
 
   def build(buildingType: BuildingType) = {
-    assert(buildingPrototype.isEmpty)
-    new Slot(id, Some(BuildingPrototype(buildingType, BuildingLevel.LEVEL_1)))
+    Assertion.check(buildingPrototype.isEmpty)
+    Slot(id, BuildingPrototype(buildingType, BuildingLevel.LEVEL_1))
   }
 
-  def upgrade = {
-    assert(buildingPrototype.isDefined)
-    new Slot(id, Some(buildingPrototype.get.upgraded))
-  }
+  def upgrade =
+    Slot(id, buildingPrototype.get.upgraded)
 
   def dto = {
     val builder = SlotDTO.newBuilder().setId(id)
@@ -37,7 +39,13 @@ class Slot(val id: SlotId,
 }
 
 object Slot {
-  def fromDto(dto: SlotDTO) =
+  def apply(id: SlotId, prototype: BuildingPrototype) =
+    new Slot(id, Some(prototype))
+
+  def empty(id: SlotId) =
+    new Slot(id, None)
+
+  def apply(dto: SlotDTO) =
     new Slot(
       dto.getId,
       if (dto.hasBuildingPrototype) Some(BuildingPrototype(dto.getBuildingPrototype)) else None

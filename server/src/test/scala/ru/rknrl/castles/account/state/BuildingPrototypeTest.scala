@@ -31,16 +31,14 @@ class BuildingPrototypeTest extends FunSuite with Matchers {
       .setLevel(LEVEL_1)
       .build
 
-    BuildingPrototype(dto).buildingType shouldBe HOUSE
-    BuildingPrototype(dto).level shouldBe LEVEL_1
+    BuildingPrototype(dto) shouldBe BuildingPrototype(HOUSE, LEVEL_1)
 
     val dto2 = BuildingPrototypeDTO.newBuilder()
       .setType(TOWER)
       .setLevel(LEVEL_3)
       .build
 
-    BuildingPrototype(dto2).buildingType shouldBe TOWER
-    BuildingPrototype(dto2).level shouldBe LEVEL_3
+    BuildingPrototype(dto2) shouldBe BuildingPrototype(TOWER, LEVEL_3)
   }
 
   test("upgraded") {
