@@ -30,8 +30,9 @@ object Item {
 }
 
 class Items(val items: Map[ItemType, Item]) {
-
   for (itemType ← ItemType.values) Assertion.check(items.contains(itemType))
+
+  def apply(itemType: ItemType) = items(itemType)
 
   def add(itemType: ItemType, value: Int) =
     new Items(items.updated(itemType, items(itemType) + value))
