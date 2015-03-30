@@ -13,9 +13,7 @@ import ru.rknrl.dto.GameDTO.PointDTO
 /**
  * todo equals with Point.as
  */
-class Point(val x: Double, val y: Double) {
-  def this(dto: PointDTO) = this(dto.getX, dto.getY)
-
+class Point private(val x: Double, val y: Double) {
   def distance(endPos: Point) = {
     val dx = endPos.x - x
     val dy = endPos.y - y
@@ -42,4 +40,10 @@ class Point(val x: Double, val y: Double) {
     .setX(x.toFloat)
     .setY(y.toFloat)
     .build()
+}
+
+object Point {
+  def apply(x: Double, y: Double): Point = new Point(x, y)
+
+  def apply(dto: PointDTO): Point = apply(dto.getX, dto.getY)
 }

@@ -1,0 +1,43 @@
+//       ___       ___       ___       ___       ___
+//      /\  \     /\__\     /\__\     /\  \     /\__\
+//     /::\  \   /:/ _/_   /:| _|_   /::\  \   /:/  /
+//    /::\:\__\ /::-"\__\ /::|/\__\ /::\:\__\ /:/__/
+//    \;:::/  / \;:;-",-" \/|::/  / \;:::/  / \:\  \
+//     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
+//      \|__|     \|__|     \/__/     \|__|     \/__/
+
+package ru.rknrl.castles.account.state
+
+import org.scalatest.{FunSuite, Matchers}
+import ru.rknrl.castles.game.points.Point
+
+class IJTest extends FunSuite with Matchers {
+  test("have correct equals function") {
+    checkEquals(
+      IJ(0, 0),
+      IJ(0, 0),
+      IJ(0, 1),
+      IJ(0, 1)
+    )
+  }
+
+  test("centerXY") {
+    IJ(0, 0).centerXY shouldEqual Point(19.5, 19.5)
+    IJ(11, 2).centerXY shouldEqual Point(448.5, 97.5)
+  }
+
+  test("leftTopXY") {
+    IJ(0, 0).leftTopXY shouldEqual Point(0, 0)
+    IJ(11, 2).leftTopXY shouldEqual Point(429, 78)
+  }
+
+  def checkEquals[T](a: T, sameA: T, b: T, sameB: T): Unit = {
+    a shouldEqual sameA
+    b shouldEqual sameB
+
+    a shouldNot equal(b)
+
+    a shouldNot equal(a.toString)
+    b shouldNot equal(b.toString)
+  }
+}

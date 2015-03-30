@@ -11,13 +11,19 @@ package ru.rknrl.castles.account.state
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.GameDTO.CellSize
 
-class IJ(val i: Int, val j: Int) {
+class IJ private (val i: Int, val j: Int) {
   override def equals(obj: scala.Any): Boolean = obj match {
     case that: IJ ⇒ this.i == that.i && this.j == that.j
     case _ ⇒ false
   }
 
-  def toXY = new Point((i + 0.5) * CellSize.SIZE_VALUE, (j + 0.5) * CellSize.SIZE_VALUE)
+  val cellSize = CellSize.SIZE_VALUE
 
-  def leftTopXY = new Point(i * CellSize.SIZE_VALUE, j * CellSize.SIZE_VALUE)
+  def centerXY = Point((i + 0.5) * cellSize, (j + 0.5) * cellSize)
+
+  def leftTopXY = Point(i * cellSize, j * cellSize)
+}
+
+object IJ {
+  def apply(i: Int, j: Int) = new IJ(i, j)
 }

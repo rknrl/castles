@@ -20,7 +20,7 @@ object Volcanoes {
 
   def `casts→volcanoes`(casts: Map[PlayerId, PointDTO], time: Long, config: GameConfig, playerStates: PlayerStates) =
     for ((playerId, dto) ← casts)
-    yield new Volcano(playerId, new Point(dto), time, config.volcanoDuration(playerStates(playerId)))
+    yield new Volcano(playerId, Point(dto), time, config.volcanoDuration(playerStates(playerId)))
 
   def `volcanoes→addMessages`(volcanoes: Iterable[Volcano], time: Long) =
     volcanoes.map(v ⇒ AddVolcano(v.dto(time)))

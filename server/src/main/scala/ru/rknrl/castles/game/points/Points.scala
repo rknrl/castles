@@ -50,14 +50,14 @@ class Points(val points: Vector[Point]) {
 
     val progress = (currentTime - d1) / (d2 - d1)
 
-    new Point(p1.x + dx * progress, p1.y + dy * progress)
+    Point(p1.x + dx * progress, p1.y + dy * progress)
   }
 
   def dto = points.map(_.dto)
 }
 
 object Points {
-  def dtoToPoints(dto: Iterable[PointDTO]) = dto.map(p ⇒ new Point(p.getX, p.getY)).toVector
+  def dtoToPoints(dto: Iterable[PointDTO]) = dto.map(p ⇒ Point(p.getX, p.getY)).toVector
 
   def getCurrentIndex(pointsDurations: Iterable[Double], time: Long): Int = {
     val it = pointsDurations.iterator

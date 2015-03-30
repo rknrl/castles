@@ -36,7 +36,7 @@ class GameMap(val cells: Iterable[MapCell]) {
       new Building(
         iterator.next,
         prototype,
-        new IJ(cell.i, cell.j).toXY,
+        IJ(cell.i, cell.j).centerXY,
         config.getStartPopulation(prototype),
         owner = None,
         strengthened = false,
@@ -59,7 +59,7 @@ class GameMap(val cells: Iterable[MapCell]) {
 
   private def mirrorBuildingsBigMap(gameArea: GameArea, topLeftBuildings: Iterable[Building], buildingIdIterator: BuildingIdIterator) = {
     // attention: только для карт нечетного размера
-    val half = new IJ(gameArea.v / 2, gameArea.h / 2).toXY
+    val half = IJ(gameArea.v / 2, gameArea.h / 2).centerXY
 
     def getParts(b: Building) =
       if (b.pos.x == half.x && b.pos.y == half.y)

@@ -40,13 +40,13 @@ trait GameArea {
 
   def playerIdToOrientation: Map[Int, SlotsOrientation]
 
-  def mirrorH(pos: Point) = new Point(width - pos.x, pos.y)
+  def mirrorH(pos: Point) = Point(width - pos.x, pos.y)
 
-  def mirrorV(pos: Point) = new Point(pos.x, height - pos.y)
+  def mirrorV(pos: Point) = Point(pos.x, height - pos.y)
 
-  protected def mirrorH(pos: IJ) = new IJ(h - 1 - pos.i, pos.j)
+  protected def mirrorH(pos: IJ) = IJ(h - 1 - pos.i, pos.j)
 
-  protected def mirrorV(pos: IJ) = new IJ(pos.i, v - 1 - pos.j)
+  protected def mirrorV(pos: IJ) = IJ(pos.i, v - 1 - pos.j)
 
   private def getPlayerSlotsPositions(playerId: Int, slotsPos: IJ) =
     for (slotId ← SlotId.values();
@@ -58,7 +58,7 @@ trait GameArea {
 
          i = if (isMirrorH) slotsPos.i - slotPos.i else slotsPos.i + slotPos.i;
          j = if (isMirrorV) slotsPos.j - slotPos.j else slotsPos.j + slotPos.j)
-      yield slotId → new IJ(i, j)
+      yield slotId → IJ(i, j)
 
 
   def getPlayersSlotPositions(slotsPos: Map[Int, IJ]): PlayerIdToSlotsPositions =
@@ -71,7 +71,7 @@ class GameAreaSmall extends GameArea {
   val h = 8
   val v = 11
 
-  def slotsPositions = createSlotsPositions(new IJ(3, 0))
+  def slotsPositions = createSlotsPositions(IJ(3, 0))
 
   private def createSlotsPositions(top: IJ) =
     Map(
@@ -85,8 +85,8 @@ class GameAreaSmall extends GameArea {
   )
 
   val assistancePositions = Map(
-    new PlayerId(0) → new Point(0, 0),
-    new PlayerId(1) → new IJ(h, v).toXY
+    new PlayerId(0) → Point(0, 0),
+    new PlayerId(1) → IJ(h, v).centerXY
   )
 }
 
@@ -95,7 +95,7 @@ class GameAreaBig extends GameArea {
   val h = 15
   val v = 15
 
-  val slotsPositions = createSlotsPositions(new IJ(2, 0))
+  val slotsPositions = createSlotsPositions(IJ(2, 0))
 
   private def createSlotsPositions(topLeft: IJ) =
     Map(
@@ -113,9 +113,9 @@ class GameAreaBig extends GameArea {
   )
 
   val assistancePositions = Map(
-    new PlayerId(0) → new Point(0, 0),
-    new PlayerId(1) → new IJ(h, 0).leftTopXY,
-    new PlayerId(2) → new IJ(0, v).leftTopXY,
-    new PlayerId(3) → new IJ(h, v).leftTopXY
+    new PlayerId(0) → Point(0, 0),
+    new PlayerId(1) → IJ(h, 0).leftTopXY,
+    new PlayerId(2) → IJ(0, v).leftTopXY,
+    new PlayerId(3) → IJ(h, v).leftTopXY
   )
 }

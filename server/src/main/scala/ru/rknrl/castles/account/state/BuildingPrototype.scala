@@ -15,10 +15,10 @@ class BuildingPrototype(val buildingType: BuildingType,
   def dto = BuildingPrototypeDTO.newBuilder()
     .setType(buildingType)
     .setLevel(level)
-    .build()
+    .build
 
   override def equals(obj: Any) = obj match {
-    case b: BuildingPrototype ⇒ b.buildingType.getNumber == buildingType.getNumber && b.level.getNumber == level.getNumber
+    case b: BuildingPrototype ⇒ b.buildingType == buildingType && b.level == level
     case _ ⇒ false
   }
 
@@ -33,10 +33,10 @@ object BuildingPrototype {
       case _ ⇒ throw new IllegalStateException("hasn't next level " + level)
     }
 
-  def all =
-    for (buildingType ← BuildingType.values();
-         level ← BuildingLevel.values())
-    yield new BuildingPrototype(buildingType, level)
+  val all =
+    for (buildingType ← BuildingType.values;
+         buildingLevel ← BuildingLevel.values)
+      yield new BuildingPrototype(buildingType, buildingLevel)
 
   def apply(dto: BuildingPrototypeDTO) = new BuildingPrototype(dto.getType, dto.getLevel)
 }

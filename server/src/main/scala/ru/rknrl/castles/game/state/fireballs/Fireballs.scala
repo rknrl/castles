@@ -20,7 +20,7 @@ object Fireballs {
 
   def `casts→fireballs`(casts: Map[PlayerId, PointDTO], config: GameConfig, time: Long) =
     for ((playerId, dto) ← casts)
-    yield new Fireball(playerId, new Point(dto.getX, dto.getY), config.fireballFlyDuration, time)
+    yield new Fireball(playerId, Point(dto), config.fireballFlyDuration, time)
 
   def `fireballs→addMessages`(fireballs: Iterable[Fireball], time: Long) =
     fireballs.map(f ⇒ AddFireball(f.dto(time)))

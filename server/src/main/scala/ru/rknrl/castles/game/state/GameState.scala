@@ -46,7 +46,7 @@ object GameState {
          if slot.buildingPrototype.isDefined)
       yield {
         val ij = playersSlotsPositions(player.id.id)(slotId)
-        val xy = ij.toXY
+        val xy = ij.centerXY
 
         val prototype = slot.buildingPrototype.get
         new Building(
@@ -67,7 +67,7 @@ object GameState {
         val pos = positions(id)
         SlotsPosDTO.newBuilder()
           .setPlayerId(player.id.dto)
-          .setPos(pos.toXY.dto)
+          .setPos(pos.centerXY.dto)
           .setOrientation(orientations(id))
           .build()
       }
