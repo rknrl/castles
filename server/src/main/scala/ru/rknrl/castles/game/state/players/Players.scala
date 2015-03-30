@@ -9,12 +9,12 @@
 package ru.rknrl.castles.game.state.players
 
 import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.account.state.{Items, Skills, Slots}
+import ru.rknrl.castles.account.state.{Items, Slots}
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
-class PlayerId(val id: Int) {
+class PlayerId private(val id: Int) {
   override def equals(obj: Any) = obj match {
     case playerId: PlayerId ⇒ playerId.id == id
     case _ ⇒ false
@@ -23,6 +23,10 @@ class PlayerId(val id: Int) {
   override def hashCode = id.hashCode
 
   def dto = PlayerIdDTO.newBuilder().setId(id).build()
+}
+
+object PlayerId {
+  def apply(id: Int) = new PlayerId(id)
 }
 
 class Player(val id: PlayerId,

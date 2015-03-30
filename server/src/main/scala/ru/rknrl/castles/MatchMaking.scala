@@ -42,7 +42,7 @@ class GameIdIterator extends IdIterator {
 }
 
 class PlayerIdIterator extends IdIterator {
-  def next = new PlayerId(nextInt)
+  def next = PlayerId(nextInt)
 }
 
 object MatchMaking {

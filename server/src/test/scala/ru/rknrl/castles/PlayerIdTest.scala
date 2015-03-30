@@ -13,7 +13,7 @@ import ru.rknrl.TestUtils._
 import ru.rknrl.castles.game.state.players.PlayerId
 
 class PlayerIdTest extends FreeSpec with Matchers {
-  val all = for (i ← 0 to 4) yield () ⇒ new PlayerId(i)
+  val all = for (i ← 0 to 4) yield () ⇒ PlayerId(i)
 
   "equals" in {
     checkEquals(all)
@@ -24,7 +24,7 @@ class PlayerIdTest extends FreeSpec with Matchers {
   }
 
   "dto" in {
-    new PlayerId(0).dto.getId should be(0)
-    new PlayerId(1).dto.getId should be(1)
+    PlayerId(0).dto.getId should be(0)
+    PlayerId(1).dto.getId should be(1)
   }
 }

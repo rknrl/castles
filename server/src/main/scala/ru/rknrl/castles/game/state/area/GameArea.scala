@@ -85,8 +85,8 @@ class GameAreaSmall extends GameArea {
   )
 
   val assistancePositions = Map(
-    new PlayerId(0) → Point(0, 0),
-    new PlayerId(1) → IJ(h, v).centerXY
+    PlayerId(0) → Point(0, 0),
+    PlayerId(1) → IJ(h, v).centerXY
   )
 }
 
@@ -113,9 +113,9 @@ class GameAreaBig extends GameArea {
   )
 
   val assistancePositions = Map(
-    new PlayerId(0) → Point(0, 0),
-    new PlayerId(1) → IJ(h, 0).leftTopXY,
-    new PlayerId(2) → IJ(0, v).leftTopXY,
-    new PlayerId(3) → IJ(h, v).leftTopXY
+    PlayerId(0) → Point(0, 0),
+    PlayerId(1) → IJ(h, 0).leftTopXY,
+    PlayerId(2) → IJ(0, v).leftTopXY,
+    PlayerId(3) → IJ(h, v).leftTopXY
   )
 }

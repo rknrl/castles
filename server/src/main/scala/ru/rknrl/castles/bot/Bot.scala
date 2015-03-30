@@ -62,7 +62,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
       gameRef ! C2B.JoinGame
 
     case JoinedGame(gameState) ⇒
-      playerId = Some(new PlayerId(gameState.getSelfId.getId))
+      playerId = Some(PlayerId(gameState.getSelfId.getId))
       mapDiagonal = Math.sqrt(gameState.getWidth * gameState.getHeight)
 
     case newGameState: GameState ⇒ update(newGameState)
