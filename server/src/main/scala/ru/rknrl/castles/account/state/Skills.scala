@@ -8,14 +8,14 @@
 
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountConfig
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.AccountDTO.SkillLevelDTO
 import ru.rknrl.dto.CommonDTO.{SkillLevel, SkillType}
 
 class Skills(val levels: Map[SkillType, SkillLevel]) {
-  for (skillType ← SkillType.values()) assert(levels.contains(skillType))
+  for (skillType ← SkillType.values) Assertion.check(levels.contains(skillType))
 
   def apply(skillType: SkillType) = levels(skillType)
 
@@ -23,7 +23,7 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
     new Skills(levels.updated(skillType, skillLevel))
 
   def upgrade(skillType: SkillType) = {
-    val nextLevel = Skills.getNextLevel(levels(skillType))
+    val nextLevel = Skills.nextLevel(levels(skillType))
     new Skills(levels.updated(skillType, nextLevel))
   }
 
@@ -36,18 +36,18 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
   def isLastTotalLevel = totalLevel == 9
 
   def nextTotalLevel = {
-    assert(!isLastTotalLevel)
+    Assertion.check(!isLastTotalLevel)
     totalLevel + 1
   }
 
   def dto =
     for ((skillType, level) ← levels)
-    yield SkillLevelDTO.newBuilder()
-      .setType(skillType)
-      .setLevel(level)
-      .build()
+      yield SkillLevelDTO.newBuilder
+        .setType(skillType)
+        .setLevel(level)
+        .build
 
-  val levelsCount = SkillLevel.values().size - 1
+  val levelsCount = SkillLevel.values.size - 1
 
   def stat(config: AccountConfig) =
     new Stat(
@@ -58,12 +58,11 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
 }
 
 object Skills {
-  def getNextLevel(level: SkillLevel) =
+  def nextLevel(level: SkillLevel) =
     level match {
       case SkillLevel.SKILL_LEVEL_0 ⇒ SkillLevel.SKILL_LEVEL_1
       case SkillLevel.SKILL_LEVEL_1 ⇒ SkillLevel.SKILL_LEVEL_2
       case SkillLevel.SKILL_LEVEL_2 ⇒ SkillLevel.SKILL_LEVEL_3
-      case _ ⇒ throw new IllegalStateException("hasn't next level " + level)
     }
 
   def apply(dto: Iterable[SkillLevelDTO]) = {

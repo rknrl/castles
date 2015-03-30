@@ -32,7 +32,7 @@ class Slot private(val id: SlotId,
     Slot(id, buildingPrototype.get.upgraded)
 
   def dto = {
-    val builder = SlotDTO.newBuilder().setId(id)
+    val builder = SlotDTO.newBuilder.setId(id)
     if (buildingPrototype.isDefined) builder.setBuildingPrototype(buildingPrototype.get.dto)
     builder.build
   }
