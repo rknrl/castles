@@ -100,7 +100,7 @@ public class Main extends Sprite {
         stage.quality = StageQuality.BEST;
 
         const verTextField:TextField = createTextField(Fonts.debug);
-        verTextField.text = "1.08";
+        verTextField.text = "1.09";
         stage.addChild(verTextField);
 
         localeLoader = new TextLoader(localesUrl + "castles - RU.tsv");
