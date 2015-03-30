@@ -100,17 +100,15 @@ object AccountState {
       Slot(SlotId.SLOT_5, BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
     )
 
-  private def initSlotsList =
-    for (slot ← initSlotBuildings)
-      yield slot.id → slot
+  private def initSlotsMap =
+    initSlotBuildings.map(slot ⇒ slot.id → slot).toMap
 
-  private def initSlots = new Slots(initSlotsList.toMap)
+  private def initSlots = new Slots(initSlotsMap)
 
   private def initSkillLevels =
-    for (skillType ← SkillType.values)
-      yield skillType → SkillLevel.SKILL_LEVEL_0
+    SkillType.values.map(_ → SkillLevel.SKILL_LEVEL_0).toMap
 
-  private def initSkills = new Skills(initSkillLevels.toMap)
+  private def initSkills = new Skills(initSkillLevels)
 
   private def initItemsCount(config: AccountConfig) =
     for (itemType ← ItemType.values())

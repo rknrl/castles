@@ -18,6 +18,7 @@ import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
 import ru.rknrl.castles.game.state.bullets.Bullets._
 import ru.rknrl.castles.game.state.fireballs.Fireballs._
+import ru.rknrl.castles.game.state.players.Players.Players
 import ru.rknrl.castles.game.state.players._
 import ru.rknrl.castles.game.state.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.state.units.GameUnits.{getUpdateMessages, _}
@@ -98,7 +99,7 @@ object GameState {
       time,
       gameArea.width,
       gameArea.height,
-      new Players(players.map(p ⇒ p.id → p).toMap),
+      players.map(p ⇒ p.id → p).toMap,
       new Buildings(buildings.map(b ⇒ b.id → b).toMap),
       new GameUnits(List.empty),
       new Fireballs(List.empty),

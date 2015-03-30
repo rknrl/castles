@@ -37,6 +37,6 @@ class Player(val id: PlayerId,
              val items: Items,
              val isBot: Boolean)
 
-class Players(val players: Map[PlayerId, Player]) {
-  def apply(id: PlayerId) = players(id)
+object Players {
+  type Players = Map[PlayerId, Player]
 }
