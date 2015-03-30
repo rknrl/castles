@@ -15,25 +15,24 @@ class Slot(val id: SlotId,
            val buildingPrototype: Option[BuildingPrototype]) {
 
   def set(buildingPrototype: BuildingPrototype) =
-    new Slot(id, Some(new BuildingPrototype(buildingPrototype.buildingType, buildingPrototype.level)))
+    new Slot(id, Some(buildingPrototype))
 
   def remove = new Slot(id, None)
 
   def build(buildingType: BuildingType) = {
     assert(buildingPrototype.isEmpty)
-    new Slot(id, Some(new BuildingPrototype(buildingType, BuildingLevel.LEVEL_1)))
+    new Slot(id, Some(BuildingPrototype(buildingType, BuildingLevel.LEVEL_1)))
   }
 
   def upgrade = {
     assert(buildingPrototype.isDefined)
-    val nextLevel = BuildingPrototype.getNextLevel(buildingPrototype.get.level)
-    new Slot(id, Some(new BuildingPrototype(buildingPrototype.get.buildingType, nextLevel)))
+    new Slot(id, Some(buildingPrototype.get.upgraded))
   }
 
   def dto = {
     val builder = SlotDTO.newBuilder().setId(id)
     if (buildingPrototype.isDefined) builder.setBuildingPrototype(buildingPrototype.get.dto)
-    builder.build()
+    builder.build
   }
 }
 

@@ -34,8 +34,6 @@ class Slots(val slots: Map[SlotId, Slot]) {
   def upgrade(id: SlotId) =
     update(id, slots(id).upgrade)
 
-  def getLevel(id: SlotId) = slots(id).buildingPrototype.get.level
-
   private def update(id: SlotId, newSlot: Slot) =
     new Slots(slots.updated(id, newSlot))
 

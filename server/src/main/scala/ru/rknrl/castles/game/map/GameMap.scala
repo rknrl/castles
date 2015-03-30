@@ -31,7 +31,7 @@ class GameMap(val cells: Iterable[MapCell]) {
     for (cell ← cells) yield {
       val buildingType = cell.buildingType.getOrElse(random(BuildingType.values()))
       val buildingLevel = cell.buildingLevel.getOrElse(random(BuildingLevel.values()))
-      val prototype = new BuildingPrototype(buildingType, buildingLevel)
+      val prototype = BuildingPrototype(buildingType, buildingLevel)
 
       new Building(
         iterator.next,

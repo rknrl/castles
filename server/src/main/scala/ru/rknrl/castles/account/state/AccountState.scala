@@ -29,8 +29,8 @@ class AccountState(val slots: Slots,
   }
 
   def upgradeBuilding(id: SlotId, config: AccountConfig) = {
-    val level = BuildingPrototype.getNextLevel(slots.getLevel(id))
-    val price = config.buildingPrices(level)
+    val upgraded = slots(id).upgrade
+    val price = config.buildingPrices(upgraded.buildingPrototype.get.level)
     assert(price <= gold)
     copy(newSlots = slots.upgrade(id), newGold = gold - price)
   }
@@ -95,9 +95,9 @@ object AccountState {
     Map(
       SlotId.SLOT_1 → None,
       SlotId.SLOT_2 → None,
-      SlotId.SLOT_3 → Some(new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
-      SlotId.SLOT_4 → Some(new BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
-      SlotId.SLOT_5 → Some(new BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
+      SlotId.SLOT_3 → Some(BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
+      SlotId.SLOT_4 → Some(BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
+      SlotId.SLOT_5 → Some(BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
     )
 
   private def initSlotsList =

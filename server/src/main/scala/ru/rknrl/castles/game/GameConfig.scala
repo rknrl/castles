@@ -55,7 +55,7 @@ class ShootingConfig(val speed: Double,
 
 class AssistanceConfig(val power: Double,
                        val maxBonusPower: Double) {
-  val buildingPrototype = new BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)
+  val buildingPrototype = BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)
 }
 
 class UnitsConfig(val house: Stat,

@@ -8,10 +8,14 @@
 
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.castles.account.state.BuildingPrototype._
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
-class BuildingPrototype(val buildingType: BuildingType,
-                        val level: BuildingLevel) {
+class BuildingPrototype private(val buildingType: BuildingType,
+                                val level: BuildingLevel) {
+
+  def upgraded = BuildingPrototype(buildingType, nextLevel(level))
+
   def dto = BuildingPrototypeDTO.newBuilder()
     .setType(buildingType)
     .setLevel(level)
@@ -26,17 +30,20 @@ class BuildingPrototype(val buildingType: BuildingType,
 }
 
 object BuildingPrototype {
-  def getNextLevel(level: BuildingLevel) =
+  private def nextLevel(level: BuildingLevel) =
     level match {
       case BuildingLevel.LEVEL_1 ⇒ BuildingLevel.LEVEL_2
       case BuildingLevel.LEVEL_2 ⇒ BuildingLevel.LEVEL_3
-      case _ ⇒ throw new IllegalStateException("hasn't next level " + level)
     }
 
   val all =
     for (buildingType ← BuildingType.values;
          buildingLevel ← BuildingLevel.values)
-      yield new BuildingPrototype(buildingType, buildingLevel)
+      yield BuildingPrototype(buildingType, buildingLevel)
 
-  def apply(dto: BuildingPrototypeDTO) = new BuildingPrototype(dto.getType, dto.getLevel)
+  def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingPrototype =
+    new BuildingPrototype(buildingType, buildingLevel)
+
+  def apply(dto: BuildingPrototypeDTO): BuildingPrototype =
+    apply(dto.getType, dto.getLevel)
 }
