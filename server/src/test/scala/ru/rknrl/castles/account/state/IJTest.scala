@@ -8,24 +8,24 @@
 
 package ru.rknrl.castles.account.state
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.{FreeSpec, Matchers}
 import ru.rknrl.TestUtils._
 import ru.rknrl.castles.game.points.Point
 
-class IJTest extends FunSuite with Matchers {
-  test("equals") {
+class IJTest extends FreeSpec with Matchers {
+  "equals" in {
     checkEquals(
       () ⇒ IJ(0, 0),
       () ⇒ IJ(0, 1)
     )
   }
 
-  test("centerXY") {
+  "centerXY" in {
     IJ(0, 0).centerXY shouldEqual Point(19.5, 19.5)
     IJ(11, 2).centerXY shouldEqual Point(448.5, 97.5)
   }
 
-  test("leftTopXY") {
+  "leftTopXY" in {
     IJ(0, 0).leftTopXY shouldEqual Point(0, 0)
     IJ(11, 2).leftTopXY shouldEqual Point(429, 78)
   }
