@@ -12,10 +12,8 @@ import ru.rknrl.dto.CommonDTO.StatAction
 
 object CreateStatTable {
   def main(args: Array[String]) {
-    val builder = new StringBuilder
-    builder.append("TRUNCATE stat;\n")
+    println("TRUNCATE stat;")
     for (action ← StatAction.values)
-      builder.append("INSERT INTO stat (action,count) VALUES (" + action.getNumber + ",0);\n")
-    println(builder.result)
+      println("INSERT INTO stat (action,count) VALUES (" + action.getNumber + ",0);")
   }
 }
