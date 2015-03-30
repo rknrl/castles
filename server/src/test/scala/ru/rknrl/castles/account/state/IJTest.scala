@@ -14,10 +14,10 @@ import ru.rknrl.castles.game.points.Point
 
 class IJTest extends FreeSpec with Matchers {
   "equals" in {
-    checkEquals(
+    checkEquals(Seq(
       () ⇒ IJ(0, 0),
       () ⇒ IJ(0, 1)
-    )
+    ))
   }
 
   "centerXY" in {

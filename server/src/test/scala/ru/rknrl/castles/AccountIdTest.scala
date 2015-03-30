@@ -15,9 +15,9 @@ import ru.rknrl.dto.CommonDTO.AccountType._
 
 class AccountIdTest extends FreeSpec with Matchers {
   val all = Seq(
-    () ⇒ new AccountId(VKONTAKTE, "264648879"),
-    () ⇒ new AccountId(VKONTAKTE, "9221545"),
-    () ⇒ new AccountId(DEV, "bot0")
+    () ⇒ AccountId(VKONTAKTE, "264648879"),
+    () ⇒ AccountId(VKONTAKTE, "9221545"),
+    () ⇒ AccountId(DEV, "bot0")
   )
 
   "equals" in {
@@ -25,20 +25,20 @@ class AccountIdTest extends FreeSpec with Matchers {
   }
 
   "hashCode" in {
-    checkEquals(all)
+    checkHashCode(all)
   }
 
   "dto" in {
-    new AccountId(VKONTAKTE, "264648879").dto.getType should be(VKONTAKTE)
-    new AccountId(VKONTAKTE, "264648879").dto.getId should be("264648879")
+    AccountId(VKONTAKTE, "264648879").dto.getType should be(VKONTAKTE)
+    AccountId(VKONTAKTE, "264648879").dto.getId should be("264648879")
 
-    new AccountId(DEV, "bot0").dto.getType should be(DEV)
-    new AccountId(DEV, "bot0").dto.getId should be("bot0")
+    AccountId(DEV, "bot0").dto.getType should be(DEV)
+    AccountId(DEV, "bot0").dto.getId should be("bot0")
   }
 
   "toString" in {
-    new AccountId(VKONTAKTE, "264648879").toString should be("VKONTAKTE 264648879")
-    new AccountId(DEV, "bot0").toString should be("DEV bot0")
+    AccountId(VKONTAKTE, "264648879").toString should be("VKONTAKTE 264648879")
+    AccountId(DEV, "bot0").toString should be("DEV bot0")
   }
 
   "parse from dto" in {
@@ -46,14 +46,14 @@ class AccountIdTest extends FreeSpec with Matchers {
       .setType(VKONTAKTE)
       .setId("264648879")
       .build
-    new AccountId(dto1).accountType should be(VKONTAKTE)
-    new AccountId(dto1).id should be("264648879")
+    AccountId(dto1).accountType should be(VKONTAKTE)
+    AccountId(dto1).id should be("264648879")
 
     val dto2 = AccountIdDTO.newBuilder()
       .setType(DEV)
       .setId("bot0")
       .build
-    new AccountId(dto2).accountType should be(DEV)
-    new AccountId(dto2).id should be("bot0")
+    AccountId(dto2).accountType should be(DEV)
+    AccountId(dto2).id should be("bot0")
   }
 }

@@ -129,7 +129,7 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        matchmaking ! AdminSetAccountState(new AccountId(accountId), accountStateDto)
+        matchmaking ! AdminSetAccountState(AccountId(accountId), accountStateDto)
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

@@ -108,7 +108,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       else
         PaymentResponse(
           orderId = transactionId,
-          accountId = new AccountId(AccountType.MOIMIR, uid),
+          accountId = AccountId(AccountType.MOIMIR, uid),
           productId = serviceId,
           price = mailikiPrice,
           httpResponse = HttpResponse(entity = successResponse())

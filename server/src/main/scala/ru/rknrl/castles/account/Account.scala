@@ -94,7 +94,7 @@ class Account(matchmaking: ActorRef,
     case Authenticate(authenticate) ⇒
       if (checkSecret(authenticate)) {
         client = sender
-        accountId = new AccountId(authenticate.getUserInfo.getAccountId)
+        accountId = AccountId(authenticate.getUserInfo.getAccountId)
         deviceType = authenticate.getDeviceType
         platformType = authenticate.getPlatformType
         userInfo = authenticate.getUserInfo

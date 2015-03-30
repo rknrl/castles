@@ -71,7 +71,7 @@ class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       else
         PaymentResponse(
           orderId = transactionId,
-          accountId = new AccountId(AccountType.ODNOKLASSNIKI, uid),
+          accountId = AccountId(AccountType.ODNOKLASSNIKI, uid),
           productId = productCode.toInt,
           price = amount,
           httpResponse = HttpResponse(entity = successResponse())

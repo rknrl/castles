@@ -75,7 +75,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
       // (Int) идентификатор пользователя, сделавшего заказ
       val userId = params.getParam("user_id")
 
-      val accountId = new AccountId(AccountType.VKONTAKTE, userId)
+      val accountId = AccountId(AccountType.VKONTAKTE, userId)
 
       // (Int) идентификатор получателя заказа (в данный момент совпадает с user_id, но в будущем может отличаться)
       val receiverId = params.getParam("receiver_id")

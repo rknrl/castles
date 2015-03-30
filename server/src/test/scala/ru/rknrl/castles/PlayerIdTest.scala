@@ -20,7 +20,7 @@ class PlayerIdTest extends FreeSpec with Matchers {
   }
 
   "hashCode" in {
-    checkEquals(all)
+    checkHashCode(all)
   }
 
   "dto" in {

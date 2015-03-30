@@ -10,11 +10,8 @@ package ru.rknrl.castles
 
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 
-class AccountId(val accountType: AccountType,
-                val id: String) {
-
-  def this(dto: AccountIdDTO) =
-    this(dto.getType, dto.getId)
+class AccountId private(val accountType: AccountType,
+                        val id: String) {
 
   override def equals(obj: scala.Any) = obj match {
     case accountId: AccountId ⇒ accountId.accountType == accountType && accountId.id == id
@@ -29,4 +26,12 @@ class AccountId(val accountType: AccountType,
     .setId(id)
     .setType(accountType)
     .build()
+}
+
+object AccountId {
+  def apply(accountType: AccountType, id: String): AccountId =
+    new AccountId(accountType, id)
+
+  def apply(dto: AccountIdDTO): AccountId =
+    apply(dto.getType, dto.getId)
 }

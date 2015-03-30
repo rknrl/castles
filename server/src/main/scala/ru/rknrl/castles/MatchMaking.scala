@@ -34,7 +34,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 class BotIdIterator extends IdIterator {
-  def next = new AccountId(AccountType.DEV, "bot" + nextInt)
+  def next = AccountId(AccountType.DEV, "bot" + nextInt)
 }
 
 class GameIdIterator extends IdIterator {
@@ -288,7 +288,7 @@ class MatchMaking(interval: FiniteDuration,
 
     /** from Admin */
     case Database.AccountDeleted(dto) ⇒
-      val accountId = new AccountId(dto)
+      val accountId = AccountId(dto)
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) ! DuplicateAccount
 

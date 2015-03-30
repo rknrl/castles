@@ -91,7 +91,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
     val userInfoByteArray = rowData("userInfo").asInstanceOf[Array[Byte]]
     val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
 
-    TopItem(new AccountId(id), rating, userInfo)
+    TopItem(AccountId(id), rating, userInfo)
   }
 
   override def receive = logged {
