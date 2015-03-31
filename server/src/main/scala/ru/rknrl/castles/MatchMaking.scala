@@ -18,7 +18,6 @@ import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.UpdateStatistics
 import ru.rknrl.castles.game._
-import ru.rknrl.castles.game.map.GameMaps
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
 import ru.rknrl.castles.rmi.B2C.ServerHealth

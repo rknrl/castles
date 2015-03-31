@@ -16,7 +16,7 @@ import ru.rknrl.PolicyServer
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
-import ru.rknrl.castles.game.map.GameMaps
+import ru.rknrl.castles.game.GameMaps
 import ru.rknrl.castles.payments.{Bugs, HttpServer}
 import spray.can.Http
 

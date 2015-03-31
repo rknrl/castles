@@ -10,8 +10,7 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.IJ
-import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.map.GameMap
+import ru.rknrl.castles.game.{GameMap, GameConfig}
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.Moving._

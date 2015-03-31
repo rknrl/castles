@@ -12,7 +12,7 @@ import akka.actor.ActorRef
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.map.GameMap
+import ru.rknrl.castles.game.GameMap
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
