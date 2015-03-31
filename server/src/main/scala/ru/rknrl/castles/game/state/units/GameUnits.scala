@@ -52,7 +52,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     new GameUnits(
       for (unit ← units)
       yield {
-        val nearFireballs = Fireballs.inRadius(fireballs, unit.getPos(time), config, playerStates)
+        val nearFireballs = Fireballs.inRadius(fireballs, unit.pos(time), config, playerStates)
         var newUnit = unit
         for (fireball ← nearFireballs)
           newUnit = newUnit.setCount(config.unitCountAfterFireballHit(newUnit, playerStates(unit.owner), playerStates(fireball.playerId)))
@@ -64,7 +64,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     new GameUnits(
       for (unit ← units)
       yield {
-        val nearTornadoes = Tornadoes.inRadius(tornadoes, unit.getPos(time), config, playerStates, time)
+        val nearTornadoes = Tornadoes.inRadius(tornadoes, unit.pos(time), config, playerStates, time)
         var newUnit = unit
         for (tornado ← nearTornadoes)
           newUnit = newUnit.setCount(config.unitCountAfterTornadoHit(newUnit, playerStates(unit.owner), playerStates(tornado.playerId)))
@@ -76,7 +76,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     new GameUnits(
       for (unit ← units)
       yield {
-        val nearVolcanoes = Volcanoes.inRadius(volcanoes, unit.getPos(time), config, playerStates)
+        val nearVolcanoes = Volcanoes.inRadius(volcanoes, unit.pos(time), config, playerStates)
         var newUnit = unit
         for (volcano ← nearVolcanoes)
           newUnit = newUnit.setCount(config.unitCountAfterVolcanoHit(newUnit, playerStates(unit.owner), playerStates(volcano.playerId)))

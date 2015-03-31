@@ -6,15 +6,16 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.account.state
+package ru.rknrl.castles.game
 
-import ru.rknrl.castles.game.points.Point
-import ru.rknrl.dto.GameDTO.CellSize
+import org.scalatest.{FreeSpec, Matchers}
+import ru.rknrl.castles.game.state.Stat
 
-case class IJ(i: Int, j: Int) {
-  val cellSize = CellSize.SIZE_VALUE
-
-  def centerXY = Point((i + 0.5) * cellSize, (j + 0.5) * cellSize)
-
-  def leftTopXY = Point(i * cellSize, j * cellSize)
+class StatTest extends FreeSpec with Matchers {
+  "*" in {
+    val newStat = new Stat(2, 4, 2.2) * new Stat(1.1, 1.2, 1.4)
+    newStat.attack shouldBe 2.2
+    newStat.defence shouldBe 4.8
+    newStat.speed shouldBe 3.08
+  }
 }

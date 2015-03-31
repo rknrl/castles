@@ -21,7 +21,7 @@ class Tornado(val playerId: PlayerId,
               val duration: Long,
               val speed: Double) extends PeriodObject[TornadoDTO] {
 
-  def getPos(time: Long) = points.getPos(millisFromsStart(time), speed)
+  def pos(time: Long) = points.getPos(millisFromsStart(time), speed)
 
   def dto(time: Long) =
     TornadoDTO.newBuilder

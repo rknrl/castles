@@ -30,13 +30,13 @@ class GameUnit(val id: UnitId,
                val owner: PlayerId,
                val strengthened: Boolean) {
 
-  // todo count может быть и не положительным, в ситуации после получения юнитами дамага
+  // todo count может быть 0, в ситуации после получения юнитами дамага
 
   def floorCount = GameConfig.truncatePopulation(count)
 
   def setCount(value: Double) = copy(newCount = value)
 
-  def getPos(time: Long) = startPos.lerp(endPos, startTime, time, speed)
+  def pos(time: Long) = startPos.lerp(endPos, startTime, time, speed)
 
   private def copy(newCount: Double = count,
                    newSpeed: Double = speed) =
@@ -50,33 +50,28 @@ class GameUnit(val id: UnitId,
       newSpeed,
       targetBuildingId,
       owner,
-      strengthened)
+      strengthened
+    )
 
   def differentWith(u: GameUnit) = count != u.count || speed != u.speed
 
-  def dto(time: Long) = {
-    val pos = getPos(time)
-
+  def dto(time: Long) = 
     UnitDTO.newBuilder
       .setId(id.dto)
       .setType(buildingPrototype.buildingType)
       .setCount(GameConfig.truncatePopulation(count))
-      .setPos(pos.dto)
+      .setPos(pos(time).dto)
       .setSpeed(speed.toFloat)
       .setTargetBuildingId(targetBuildingId.dto)
       .setOwner(owner.dto)
       .setStrengthened(strengthened)
       .build
-  }
 
-  def updateDto(time: Long) = {
-    val pos = getPos(time)
-
+  def updateDto(time: Long) = 
     UnitUpdateDTO.newBuilder
       .setId(id.dto)
-      .setPos(pos.dto)
+      .setPos(pos(time).dto)
       .setSpeed(speed.toFloat)
       .setCount(GameConfig.truncatePopulation(count))
       .build
-  }
 }

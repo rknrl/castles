@@ -28,5 +28,5 @@ object Tornadoes {
     tornadoes.map(v ⇒ AddTornado(v.dto(time)))
 
   def inRadius(tornadoes: Iterable[Tornado], pos: Point, config: GameConfig, playerStates: PlayerStates, time: Long) =
-    tornadoes.filter(t ⇒ t.getPos(time).distance(pos) < config.tornadoRadius(playerStates(t.playerId)))
+    tornadoes.filter(t ⇒ t.pos(time).distance(pos) < config.tornadoRadius(playerStates(t.playerId)))
 }

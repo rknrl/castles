@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 
 object AccountConfig {
 
-  class BuildingPrices(val map: Map[BuildingLevel, Int]) {
+  class BuildingPrices(map: Map[BuildingLevel, Int]) {
     def apply(level: BuildingLevel) = map(level)
 
     def dto =
@@ -27,7 +27,7 @@ object AccountConfig {
           .build
   }
 
-  class SkillUpgradePrices(val map: Map[Int, Int]) {
+  class SkillUpgradePrices(map: Map[Int, Int]) {
     def apply(totalLevel: Int) = map(totalLevel)
 
     def dto =

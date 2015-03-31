@@ -56,5 +56,5 @@ object Moving {
     }
 
   def `units→enterUnit`(units: Iterable[GameUnit], time: Long) =
-    for (unit ← units if unit.getPos(time) == unit.endPos) yield EnterUnit(unit)
+    for (unit ← units if unit.pos(time) == unit.endPos) yield EnterUnit(unit)
 }

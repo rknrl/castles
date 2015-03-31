@@ -32,7 +32,7 @@ object Bullets {
 
   private def getNearestUnits(buildingPos: Point, units: GameUnits, time: Long, config: GameConfig, shootRadius: Double) =
     for (u ← units.units;
-         unitPos = u.getPos(time)
+         unitPos = u.pos(time)
          if buildingPos.distance(unitPos) < shootRadius)
       yield u
 
@@ -40,10 +40,10 @@ object Bullets {
     nearestUnits
       .filter(u ⇒ Some(u.owner) != b.owner)
       .map(createBullet(b, _, time, config))
-      .filter(bullet ⇒ bullet.unit.getPos(time + bullet.duration) != bullet.unit.endPos)
+      .filter(bullet ⇒ bullet.unit.pos(time + bullet.duration) != bullet.unit.endPos)
 
   private def createBullet(b: Building, unit: GameUnit, time: Long, config: GameConfig) = {
-    val unitPos = unit.getPos(time)
+    val unitPos = unit.pos(time)
     val duration = b.pos.duration(unitPos, config.bulletSpeed)
     new Bullet(b, unit, startTime = time, duration = duration.toLong)
   }

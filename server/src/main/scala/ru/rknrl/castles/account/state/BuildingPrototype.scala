@@ -11,8 +11,8 @@ package ru.rknrl.castles.account.state
 import ru.rknrl.castles.account.state.BuildingPrototype._
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
-class BuildingPrototype private(val buildingType: BuildingType,
-                                val level: BuildingLevel) {
+case class BuildingPrototype(buildingType: BuildingType,
+                             level: BuildingLevel) {
 
   def upgraded = BuildingPrototype(buildingType, nextLevel(level))
 
@@ -20,13 +20,6 @@ class BuildingPrototype private(val buildingType: BuildingType,
     .setType(buildingType)
     .setLevel(level)
     .build
-
-  override def equals(obj: Any) = obj match {
-    case b: BuildingPrototype ⇒ b.buildingType == buildingType && b.level == level
-    case _ ⇒ false
-  }
-
-  override def hashCode = (buildingType.toString + "_" + level.toString).hashCode
 }
 
 object BuildingPrototype {
@@ -35,9 +28,6 @@ object BuildingPrototype {
       case BuildingLevel.LEVEL_1 ⇒ BuildingLevel.LEVEL_2
       case BuildingLevel.LEVEL_2 ⇒ BuildingLevel.LEVEL_3
     }
-
-  def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingPrototype =
-    new BuildingPrototype(buildingType, buildingLevel)
 
   def apply(dto: BuildingPrototypeDTO): BuildingPrototype =
     apply(dto.getType, dto.getLevel)
