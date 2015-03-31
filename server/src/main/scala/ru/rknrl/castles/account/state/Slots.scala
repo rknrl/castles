@@ -12,19 +12,19 @@ import ru.rknrl.Assertion
 import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO._
 
-class Slots(val slots: Map[SlotId, Slot]) {
+class Slots(val slots: Map[SlotId, SlotDTO]) {
   for (slotId ← SlotId.values) Assertion.check(slots.contains(slotId))
   Assertion.check(buildingsCount > 0)
 
   def apply(id: SlotId) = slots(id)
 
-  def updated(id: SlotId, slot: Slot) =
+  def updated(id: SlotId, slot: SlotDTO) =
     new Slots(slots.updated(id, slot))
 
   def buildingsCount =
-    slots.values.count(_.buildingPrototype.isDefined)
+    slots.values.count(_.hasBuildingPrototype)
 
-  def dto = slots.values.map(_.dto)
+  def dto = slots.values
 }
 
 object Slots {
@@ -37,7 +37,7 @@ object Slots {
   )
 
   def apply(dto: Iterable[SlotDTO]) = {
-    val slots = for (slotDto ← dto) yield slotDto.getId → Slot(slotDto)
+    val slots = for (slotDto ← dto) yield slotDto.getId → slotDto
     new Slots(slots.toMap)
   }
 }

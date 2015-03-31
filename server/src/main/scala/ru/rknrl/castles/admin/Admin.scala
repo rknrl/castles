@@ -97,7 +97,7 @@ class Admin(database: ActorRef,
       getState(dto.getAccountId,
         (accountId, accountState) ⇒
           if (dto.getSlot.hasBuildingPrototype)
-            update(accountId, accountState.setBuilding(dto.getSlot.getId, BuildingPrototype(dto.getSlot.getBuildingPrototype)))
+            update(accountId, accountState.setBuilding(dto.getSlot.getId, dto.getSlot.getBuildingPrototype))
           else
             update(accountId, accountState.removeBuilding(dto.getSlot.getId))
       )

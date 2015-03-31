@@ -17,8 +17,6 @@ class Item(val itemType: ItemType,
 
   Assertion.check(count >= 0)
 
-  def +(value: Int) = new Item(itemType, Math.max(0, count + value))
-
   def dto = ItemDTO.newBuilder
     .setType(itemType)
     .setCount(count)
@@ -34,8 +32,8 @@ class Items(val items: Map[ItemType, Item]) {
 
   def apply(itemType: ItemType) = items(itemType)
 
-  def add(itemType: ItemType, value: Int) =
-    new Items(items.updated(itemType, items(itemType) + value))
+  def updated(itemType: ItemType, item: Item) =
+    new Items(items.updated(itemType, item))
 
   def dto = items.values.map(_.dto)
 }

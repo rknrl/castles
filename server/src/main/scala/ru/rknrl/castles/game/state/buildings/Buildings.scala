@@ -79,7 +79,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
 
   def canShoot(time: Long, config: GameConfig) =
     for ((id, b) ← map
-         if b.prototype.buildingType == BuildingType.TOWER
+         if b.prototype.getType == BuildingType.TOWER
          if time - b.lastShootTime > config.shootingInterval)
       yield b
 

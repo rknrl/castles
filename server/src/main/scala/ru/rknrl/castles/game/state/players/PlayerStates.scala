@@ -27,7 +27,7 @@ class PlayerStates(states: Map[PlayerId, PlayerState]) {
 
   private def totalChurchesPopulation(buildings: Map[BuildingId, Building]) = {
     var total = 0.0
-    for ((id, b) ← buildings if b.prototype.buildingType == CHURCH)
+    for ((id, b) ← buildings if b.prototype.getType == CHURCH)
       total += b.population
     total
   }
@@ -35,7 +35,7 @@ class PlayerStates(states: Map[PlayerId, PlayerState]) {
   private def playerChurchesPopulation(buildings: Map[BuildingId, Building], playerId: PlayerId) = {
     var population = 0.0
     for ((id, b) ← buildings
-         if b.prototype.buildingType == CHURCH && b.owner == Some(playerId))
+         if b.prototype.getType == CHURCH && b.owner == Some(playerId))
       population += b.population
     population
   }

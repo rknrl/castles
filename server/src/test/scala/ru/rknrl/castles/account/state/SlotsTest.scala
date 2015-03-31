@@ -9,6 +9,7 @@
 package ru.rknrl.castles.account.state
 
 import org.scalatest.{FreeSpec, Matchers}
+import ru.rknrl.dto.AccountDTO.SlotDTO
 import ru.rknrl.dto.CommonDTO.BuildingLevel._
 import ru.rknrl.dto.CommonDTO.BuildingType._
 import ru.rknrl.dto.CommonDTO.SlotId
@@ -24,8 +25,8 @@ class SlotsTest extends FreeSpec with Matchers {
       Slot(SLOT_5, BuildingPrototype(CHURCH, LEVEL_1))
     )
 
-  def slotsMap(slotsBuildings: Iterable[Slot]) =
-    slotsBuildings.map(slot ⇒ slot.id → slot).toMap
+  def slotsMap(slotsBuildings: Iterable[SlotDTO]) =
+    slotsBuildings.map(slot ⇒ slot.getId → slot).toMap
 
   def slots = new Slots(slotsMap(slotsBuildings))
 

@@ -36,8 +36,8 @@ class AccountState(val slots: Slots,
   }
 
   def upgradeBuilding(id: SlotId, config: AccountConfig) = {
-    val upgraded = slots(id).buildingPrototype.get.upgraded
-    val price = config.buildingPrices(upgraded.level)
+    val upgraded = BuildingPrototype.upgraded(slots(id).getBuildingPrototype)
+    val price = config.buildingPrices(upgraded.getLevel)
     Assertion.check(price <= gold)
 
     setBuilding(id, upgraded)
@@ -47,31 +47,40 @@ class AccountState(val slots: Slots,
   def removeBuilding(id: SlotId): AccountState =
     setBuilding(id, None)
 
-  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype): AccountState =
+  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototypeDTO): AccountState =
     setBuilding(id, Some(buildingPrototype))
 
-  def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototype]): AccountState = {
-    val newSlot = new Slot(id, buildingPrototype)
+  def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototypeDTO]): AccountState = {
+    val newSlot = Slot(id, buildingPrototype)
     copy(newSlots = slots.updated(id, newSlot))
   }
 
   def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
     val price = config.skillUpgradePrices(skills.nextTotalLevel)
     Assertion.check(price <= gold)
-    copy(newSkills = skills.upgrade(skillType), newGold = gold - price)
+
+    val nextLevel = Skills.nextLevel(skills.levels(skillType))
+
+    setSkill(skillType, nextLevel)
+      .addGold(-price)
   }
 
   def setSkill(skillType: SkillType, skillLevel: SkillLevel) =
-    copy(newSkills = skills.set(skillType, skillLevel))
+    copy(newSkills = skills.updated(skillType, skillLevel))
 
   def buyItem(itemType: ItemType, config: AccountConfig) = {
     val price = config.itemPrice
     Assertion.check(price <= gold)
-    copy(newItems = items.add(itemType, 1), newGold = gold - price)
+
+    addItem(itemType, 1)
+      .addGold(-price)
   }
 
-  def addItem(itemType: ItemType, count: Int) =
-    copy(newItems = items.add(itemType, count))
+  def addItem(itemType: ItemType, count: Int) = {
+    val newCount = Math.max(0, items(itemType).count + count)
+    val newItem = new Item(itemType, newCount)
+    copy(newItems = items.updated(itemType, newItem))
+  }
 
   def addGold(value: Int) =
     copy(newGold = Math.max(0, gold + value))
@@ -115,7 +124,7 @@ object AccountState {
     )
 
   private def initSlotsMap =
-    initSlotBuildings.map(slot ⇒ slot.id → slot).toMap
+    initSlotBuildings.map(slot ⇒ slot.getId → slot).toMap
 
   private def initSlots = new Slots(initSlotsMap)
 

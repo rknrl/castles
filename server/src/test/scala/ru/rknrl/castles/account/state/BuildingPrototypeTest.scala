@@ -13,6 +13,7 @@ import ru.rknrl.dto.CommonDTO.BuildingLevel._
 import ru.rknrl.dto.CommonDTO.BuildingType._
 
 class BuildingPrototypeTest extends FreeSpec with Matchers {
+/*
   "upgraded" in {
     BuildingPrototype(HOUSE, LEVEL_1).upgraded shouldBe BuildingPrototype(HOUSE, LEVEL_2)
     BuildingPrototype(TOWER, LEVEL_2).upgraded shouldBe BuildingPrototype(TOWER, LEVEL_3)
@@ -20,4 +21,5 @@ class BuildingPrototypeTest extends FreeSpec with Matchers {
       BuildingPrototype(CHURCH, LEVEL_3).upgraded
     }
   }
+*/
 }

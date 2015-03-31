@@ -13,6 +13,7 @@ import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.game.points.Point
+import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
 import ru.rknrl.dto.GameDTO.{BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
 
 case class BuildingId(id: Int) {
@@ -20,7 +21,7 @@ case class BuildingId(id: Int) {
 }
 
 class Building(val id: BuildingId,
-               val prototype: BuildingPrototype,
+               val prototype: BuildingPrototypeDTO,
                val pos: Point,
                val population: Double,
                val owner: Option[PlayerId],
@@ -63,7 +64,7 @@ class Building(val id: BuildingId,
   def dto = {
     val builder = BuildingDTO.newBuilder
       .setId(id.dto)
-      .setBuilding(prototype.dto)
+      .setBuilding(prototype)
       .setPos(pos.dto)
       .setPopulation(floorPopulation)
       .setStrengthened(strengthened)

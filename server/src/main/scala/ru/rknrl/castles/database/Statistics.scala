@@ -21,8 +21,8 @@ object Statistics {
       case ItemType.ASSISTANCE ⇒ StatAction.BUY_ASSISTANCE
     }
 
-  def buyBuilding(prototype: BuildingPrototype): StatAction =
-    buyBuilding(prototype.buildingType, prototype.level)
+  def buyBuilding(prototype: BuildingPrototypeDTO): StatAction =
+    buyBuilding(prototype.getType, prototype.getLevel)
 
   def buyBuilding(buildingType: BuildingType, buildingLevel: BuildingLevel): StatAction =
     buildingType match {

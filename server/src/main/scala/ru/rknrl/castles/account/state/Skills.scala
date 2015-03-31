@@ -19,13 +19,8 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
 
   def apply(skillType: SkillType) = levels(skillType)
 
-  def set(skillType: SkillType, skillLevel: SkillLevel) =
+  def updated(skillType: SkillType, skillLevel: SkillLevel) =
     new Skills(levels.updated(skillType, skillLevel))
-
-  def upgrade(skillType: SkillType) = {
-    val nextLevel = Skills.nextLevel(levels(skillType))
-    new Skills(levels.updated(skillType, nextLevel))
-  }
 
   def totalLevel = {
     var total = 0
@@ -58,7 +53,7 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
 }
 
 object Skills {
-  private def nextLevel(level: SkillLevel) =
+  def nextLevel(level: SkillLevel) =
     level match {
       case SkillLevel.SKILL_LEVEL_0 ⇒ SkillLevel.SKILL_LEVEL_1
       case SkillLevel.SKILL_LEVEL_1 ⇒ SkillLevel.SKILL_LEVEL_2

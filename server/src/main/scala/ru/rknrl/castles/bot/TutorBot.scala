@@ -64,7 +64,7 @@ class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends
     }
 
     def towers = buildings
-      .filter(b ⇒ b.prototype.buildingType == BuildingType.TOWER &&
-      b.prototype.level == BuildingLevel.LEVEL_2)
+      .filter(b ⇒ b.prototype.getType == BuildingType.TOWER &&
+      b.prototype.getLevel == BuildingLevel.LEVEL_2)
   }
 }

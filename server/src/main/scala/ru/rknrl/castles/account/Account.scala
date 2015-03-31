@@ -161,7 +161,7 @@ class Account(matchmaking: ActorRef,
 
     case UpgradeBuilding(dto: UpgradeBuildingDTO) ⇒
       updateState(state.upgradeBuilding(dto.getId, config.account))
-      database ! Database.UpdateStatistics(Statistics.buyBuilding(state.slots(dto.getId).buildingPrototype.get))
+      database ! Database.UpdateStatistics(Statistics.buyBuilding(state.slots(dto.getId).getBuildingPrototype))
 
     case RemoveBuilding(dto: RemoveBuildingDTO) ⇒
       updateState(state.removeBuilding(dto.getId))

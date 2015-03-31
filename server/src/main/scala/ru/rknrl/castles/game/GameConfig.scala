@@ -13,7 +13,7 @@ import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.castles.game.state.players.PlayerState
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
+import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
 class Constants(val unitToExitFactor: Double,
                 val itemCooldown: Long)
@@ -62,7 +62,7 @@ class UnitsConfig(val house: Stat,
                   val tower: Stat,
                   val church: Stat) {
 
-  def apply(prototype: BuildingPrototype): Stat = apply(prototype.buildingType)
+  def apply(prototype: BuildingPrototypeDTO): Stat = apply(prototype.getType)
 
   def apply(buildingType: BuildingType): Stat =
     buildingType match {
@@ -88,7 +88,7 @@ class BuildingsConfig(val house1: BuildingConfig,
                       val church2: BuildingConfig,
                       val church3: BuildingConfig) {
 
-  def apply(prototype: BuildingPrototype): BuildingConfig = apply(prototype.buildingType, prototype.level)
+  def apply(prototype: BuildingPrototypeDTO): BuildingConfig = apply(prototype.getType, prototype.getLevel)
 
   def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingConfig =
     buildingType match {
@@ -123,7 +123,7 @@ class GameConfig(val constants: Constants,
                  shooting: ShootingConfig,
                  assistance: AssistanceConfig) {
 
-  def getStartPopulation(prototype: BuildingPrototype) =
+  def getStartPopulation(prototype: BuildingPrototypeDTO) =
     buildings(prototype).startPopulation
 
   private def maxPopulation(b: Building) =
@@ -262,7 +262,7 @@ class GameConfig(val constants: Constants,
 
   // stats
 
-  private def shotPower(prototype: BuildingPrototype, playerState: Option[PlayerState]) =
+  private def shotPower(prototype: BuildingPrototypeDTO, playerState: Option[PlayerState]) =
     buildings(prototype).shotPower.get
 
   private def fireballPowerVsBuilding(playerState: PlayerState) = {
@@ -295,19 +295,19 @@ class GameConfig(val constants: Constants,
     tornado.damageVsUnit + bonus
   }
 
-  def unitSpeed(prototype: BuildingPrototype, player: PlayerState, strengthened: Boolean) =
+  def unitSpeed(prototype: BuildingPrototypeDTO, player: PlayerState, strengthened: Boolean) =
     aggregatedStats(prototype, Some(player), strengthened).speed
 
-  private def unitAttack(prototype: BuildingPrototype, player: Option[PlayerState], strengthened: Boolean) =
+  private def unitAttack(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
     aggregatedStats(prototype, player, strengthened).attack
 
-  private def unitDefence(prototype: BuildingPrototype, player: Option[PlayerState], strengthened: Boolean) =
+  private def unitDefence(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
     aggregatedStats(prototype, player, strengthened).defence
 
-  private def fortification(prototype: BuildingPrototype, player: Option[PlayerState], strengthened: Boolean) =
+  private def fortification(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
     buildings(prototype).fortification
 
-  private def aggregatedStats(prototype: BuildingPrototype, player: Option[PlayerState], strengthened: Boolean) =
+  private def aggregatedStats(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
     units(prototype) * playerStateToStat(player) * strengtheningToStat(strengthened, player)
 
   private def playerStateToStat(player: Option[PlayerState]) =

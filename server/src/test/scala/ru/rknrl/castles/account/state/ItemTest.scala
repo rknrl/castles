@@ -17,21 +17,4 @@ class ItemTest extends FreeSpec with Matchers {
       new Item(FIREBALL, -1)
     }
   }
-
-  "+" in {
-    val newItem = new Item(TORNADO, 10) + 5
-    newItem.count shouldBe 15
-  }
-
-  "-" in {
-    val newItem = new Item(TORNADO, 10) + (-5)
-    newItem.count shouldBe 5
-  }
-
-  "При начислении отрицательных значений " +
-    "мы не можем создать предмет с отрицательным кол-вом" +
-    "т.к убавить предмет могут одновременно админ и игра" in {
-    val newItem = new Item(TORNADO, 10) + (-999)
-    newItem.count shouldBe 0
-  }
 }

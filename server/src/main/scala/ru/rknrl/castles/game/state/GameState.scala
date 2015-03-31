@@ -42,12 +42,12 @@ object GameState {
   def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
     for (player ← players;
          (slotId, slot) ← player.slots.slots
-         if slot.buildingPrototype.isDefined)
+         if slot.hasBuildingPrototype)
       yield {
         val ij = playersSlotsPositions(player.id.id)(slotId)
         val xy = ij.centerXY
 
-        val prototype = slot.buildingPrototype.get
+        val prototype = slot.getBuildingPrototype
         new Building(
           buildingIdIterator.next,
           prototype,

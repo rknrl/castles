@@ -8,27 +8,25 @@
 
 package ru.rknrl.castles.account.state
 
-import ru.rknrl.castles.account.state.BuildingPrototype._
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
-case class BuildingPrototype(buildingType: BuildingType,
-                             level: BuildingLevel) {
-
-  def upgraded = BuildingPrototype(buildingType, nextLevel(level))
-
-  def dto = BuildingPrototypeDTO.newBuilder
-    .setType(buildingType)
-    .setLevel(level)
-    .build
-}
-
 object BuildingPrototype {
+
+  def apply(buildingType: BuildingType, buildingLevel: BuildingLevel) =
+    BuildingPrototypeDTO.newBuilder
+      .setType(buildingType)
+      .setLevel(buildingLevel)
+      .build
+
+  def upgraded(prototypeDTO: BuildingPrototypeDTO) =
+    BuildingPrototypeDTO.newBuilder
+      .setType(prototypeDTO.getType)
+      .setLevel(nextLevel(prototypeDTO.getLevel))
+      .build
+
   private def nextLevel(level: BuildingLevel) =
     level match {
       case BuildingLevel.LEVEL_1 ⇒ BuildingLevel.LEVEL_2
       case BuildingLevel.LEVEL_2 ⇒ BuildingLevel.LEVEL_3
     }
-
-  def apply(dto: BuildingPrototypeDTO): BuildingPrototype =
-    apply(dto.getType, dto.getLevel)
 }

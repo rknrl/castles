@@ -36,10 +36,4 @@ class ItemsTest extends FreeSpec with Matchers {
       ))
     }
   }
-
-  "add" in {
-    val newItems = items.add(VOLCANO, 7)
-    newItems(VOLCANO).count shouldBe 10
-    checkEquals(newItems, Some(VOLCANO))
-  }
 }
