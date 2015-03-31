@@ -17,8 +17,8 @@ import ru.rknrl.castles.account.state.Item.Items
 import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Statistics.updateStatistics
-import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -48,7 +48,7 @@ class PlayerIdIterator extends IdIterator {
 
 object MatchMaking {
 
-  case class GameOrder(accountId: AccountId,
+  case class GameOrder(accountId: AccountIdDTO,
                        deviceType: DeviceType,
                        userInfo: UserInfoDTO,
                        slots: Slots,
@@ -61,15 +61,13 @@ object MatchMaking {
 
   // admin -> matchmaking
 
-  case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
+  case class AdminSetAccountState(accountId: AccountIdDTO, accountState: AccountStateDTO)
 
   // account -> matchmaking
 
-  case class PlaceGameOrder(gameOrder: GameOrder)
+  case class InGame(externalAccountId: AccountIdDTO)
 
-  case class InGame(externalAccountId: AccountId)
-
-  case class Offline(accountId: AccountId)
+  case class Offline(accountId: AccountIdDTO)
 
   // matchmaking -> account
 
@@ -79,11 +77,11 @@ object MatchMaking {
 
   // game -> matchmaking
 
-  case class PlayerLeaveGame(externalAccountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
+  case class PlayerLeaveGame(accountId: AccountIdDTO, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
 
   case object AllPlayersLeaveGame
 
-  case class TopItem(accountId: AccountId, rating: Double, info: UserInfoDTO)
+  case class TopItem(accountId: AccountIdDTO, rating: Double, info: UserInfoDTO)
 
 }
 
@@ -124,16 +122,16 @@ class MatchMaking(interval: FiniteDuration,
                  val isTutor: Boolean) {
     def big = orders.size == 4
 
-    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
+    def order(accountId: AccountIdDTO) = orders.find(_.accountId == accountId).get
   }
 
   var gameOrders = List[GameOrder]()
 
-  var accountIdToGameInfo = Map[AccountId, GameInfo]()
+  var accountIdToGameInfo = Map[AccountIdDTO, GameInfo]()
 
   var gameRefToGameInfo = Map[ActorRef, GameInfo]()
 
-  var accountIdToAccountRef = Map[AccountId, ActorRef]()
+  var accountIdToAccountRef = Map[AccountIdDTO, ActorRef]()
 
   case object TryCreateGames
 
@@ -184,7 +182,7 @@ class MatchMaking(interval: FiniteDuration,
     for (i ← 0 until botsCount) {
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
-      val bot = context.actorOf(Props(botClass, accountId, config.game, bugs), accountId.id)
+      val bot = context.actorOf(Props(botClass, accountId, config.game, bugs), accountId.getId)
       val botStat = if (isTutor) tutorBotStat else order.stat
       val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
@@ -199,11 +197,11 @@ class MatchMaking(interval: FiniteDuration,
       case (itemType, item) ⇒ (itemType, Item(itemType, item.getCount * 2))
     }
 
-  def botUserInfo(accountId: AccountId, number: Int) =
+  def botUserInfo(accountId: AccountIdDTO, number: Int) =
     number match {
       case 0 ⇒
         UserInfoDTO.newBuilder
-          .setAccountId(accountId.dto)
+          .setAccountId(accountId)
           .setFirstName("Sasha")
           .setLastName("Serova")
           .setPhoto96("http://" + config.staticHost + "/avatars/Sasha96.png")
@@ -211,7 +209,7 @@ class MatchMaking(interval: FiniteDuration,
           .build
       case 1 ⇒
         UserInfoDTO.newBuilder
-          .setAccountId(accountId.dto)
+          .setAccountId(accountId)
           .setFirstName("Napoleon")
           .setLastName("1769")
           .setPhoto96("http://" + config.staticHost + "/avatars/Napoleon96.png")
@@ -219,7 +217,7 @@ class MatchMaking(interval: FiniteDuration,
           .build
       case 2 ⇒
         UserInfoDTO.newBuilder
-          .setAccountId(accountId.dto)
+          .setAccountId(accountId)
           .setFirstName("Виктория")
           .setLastName("Викторовна")
           .setPhoto96("http://" + config.staticHost + "/avatars/Babka96.png")
@@ -287,8 +285,7 @@ class MatchMaking(interval: FiniteDuration,
       )
 
     /** from Admin */
-    case Database.AccountDeleted(dto) ⇒
-      val accountId = AccountId(dto)
+    case Database.AccountDeleted(accountId) ⇒
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) ! DuplicateAccount
 
@@ -328,7 +325,7 @@ class MatchMaking(interval: FiniteDuration,
       }
 
     /** Аккаунт присылает заявку на игру */
-    case PlaceGameOrder(gameOrder) ⇒
+    case gameOrder: GameOrder ⇒
       placeGameOrder(gameOrder, sender)
 
     /** Game оповещает, что игрок вышел из игры */
@@ -381,7 +378,7 @@ class MatchMaking(interval: FiniteDuration,
     }
   }
 
-  def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
+  def onAccountLeaveGame(accountId: AccountIdDTO, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
     accountIdToGameInfo = accountIdToGameInfo - accountId
 
     val gameInfo = gameRefToGameInfo(sender)

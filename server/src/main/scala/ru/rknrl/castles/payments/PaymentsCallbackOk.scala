@@ -102,9 +102,9 @@ class OkErrorCode private(val code: Int, val description: String) {
     s"""
        |<?xml version="1.0" encoding="UTF-8"?>
        |<ns2:error_response xmlns:ns2='http://api.forticom.com/1.0/'>
-       |   <error_code>$code</error_code>
-                              |   <error_msg>$description</error_msg>
-                                                           |</ns2:error_response>
+       |  <error_code>$code</error_code>
+                             |  <error_msg>$description</error_msg>
+                                                         |</ns2:error_response>
     """.stripMargin
 }
 

@@ -10,15 +10,7 @@ package ru.rknrl.castles
 
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, AccountType}
 
-case class AccountId(accountType: AccountType,
-                     id: String) {
-  def dto = AccountIdDTO.newBuilder
-    .setType(accountType)
-    .setId(id)
-    .build
-}
-
 object AccountId {
-  def apply(dto: AccountIdDTO): AccountId =
-    apply(dto.getType, dto.getId)
+  def apply(accountType: AccountType, id: String) =
+    AccountIdDTO.newBuilder.setType(accountType).setId(id).build
 }

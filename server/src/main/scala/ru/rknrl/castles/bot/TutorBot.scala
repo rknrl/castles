@@ -9,11 +9,10 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.ActorRef
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.CommonDTO.{StatAction, BuildingLevel, BuildingType}
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, BuildingLevel, BuildingType, StatAction}
 import ru.rknrl.dto.GameDTO.MoveDTO
 
 import scala.collection.JavaConverters._
@@ -28,7 +27,7 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Bot(accountId, config, bugs) {
+class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends Bot(accountId, config, bugs) {
 
   var mode = NONE
 

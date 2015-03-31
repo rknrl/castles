@@ -11,9 +11,8 @@ package ru.rknrl.castles.admin
 import akka.actor.ActorRef
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
-import ru.rknrl.castles.account.state.{AccountState, BuildingPrototype}
+import ru.rknrl.castles.account.state.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
@@ -32,10 +31,11 @@ class Admin(database: ActorRef,
             matchmaking: ActorRef,
             login: String,
             password: String,
-            name: String) extends EscalateStrategyActor  {
+            name: String) extends EscalateStrategyActor {
 
   val logger = LoggerFactory.getLogger(getClass)
   val log = new Slf4j(logger)
+
   def logged(r: Receive) = new Logged(r, log, None, None, any ⇒ true)
 
   var client: ActorRef = null
@@ -129,7 +129,7 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        matchmaking ! AdminSetAccountState(AccountId(accountId), accountStateDto)
+        matchmaking ! AdminSetAccountState(accountId, accountStateDto)
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

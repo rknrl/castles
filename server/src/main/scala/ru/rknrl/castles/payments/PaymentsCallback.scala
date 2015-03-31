@@ -11,6 +11,7 @@ package ru.rknrl.castles.payments
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.{Response, ResponseBase}
+import ru.rknrl.dto.CommonDTO.AccountIdDTO
 import spray.http.HttpResponse
 
 object PaymentsCallback {
@@ -24,7 +25,7 @@ object PaymentsCallback {
    * @param price         стоимость в валюте соц. cети
    * @param httpResponse  ответ для соц сети
    */
-  case class PaymentResponse(orderId: String, accountId: AccountId, productId: Int, price: Int, httpResponse: HttpResponse) extends ResponseBase
+  case class PaymentResponse(orderId: String, accountId: AccountIdDTO, productId: Int, price: Int, httpResponse: HttpResponse) extends ResponseBase
 
   /**
    * Не платеж

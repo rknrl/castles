@@ -9,7 +9,6 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameConfig
@@ -21,13 +20,13 @@ import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
-import ru.rknrl.dto.CommonDTO.ItemType
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, ItemType}
 import ru.rknrl.dto.GameDTO.MoveDTO
 import ru.rknrl.{Logged, SilentLog}
 
 import scala.collection.JavaConverters._
 
-class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Actor {
+class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends Actor {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L

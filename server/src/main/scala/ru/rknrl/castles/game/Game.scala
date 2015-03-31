@@ -9,10 +9,8 @@
 package ru.rknrl.castles.game
 
 import akka.actor.ActorRef
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
-import ru.rknrl.castles.game.Game.{PersonalMessage, Join}
-import ru.rknrl.castles.game.GameMap
+import ru.rknrl.castles.game.Game.{Join, PersonalMessage}
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -21,6 +19,7 @@ import ru.rknrl.castles.rmi.B2C.GameOver
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
+import ru.rknrl.dto.CommonDTO.AccountIdDTO
 import ru.rknrl.dto.GameDTO._
 import ru.rknrl.{EscalateStrategyActor, Logged, SilentLog}
 
@@ -29,7 +28,7 @@ import scala.concurrent.duration._
 
 object Game {
 
-  case class Join(accountId: AccountId, client: ActorRef)
+  case class Join(accountId: AccountIdDTO, client: ActorRef)
 
   case class PersonalMessage(playerId: PlayerId, msg: Msg)
 

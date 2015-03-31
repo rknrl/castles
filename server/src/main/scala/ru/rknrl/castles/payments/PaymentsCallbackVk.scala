@@ -177,8 +177,8 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     s"""
        |{
        |"response": {
-       |  "order_id":$orderId
-        |  $appOrderIdStr
+       | "order_id":$orderId
+        | $appOrderIdStr
         |}
         |}""".stripMargin
   }
@@ -204,11 +204,11 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     s"""
        |{
        |"response": {
-       |  "title":"$title",
-                           |  $photoUrlStr
-        |  $itemIdStr
-        |  $expirationStr
-        |  "price": $price
+       | "title":"$title",
+                          | $photoUrlStr
+        | $itemIdStr
+        | $expirationStr
+        | "price": $price
         |}
         |}""".stripMargin
   }
@@ -236,9 +236,9 @@ private class VkPaymentsError private(val errorCode: Int,
     s"""
        |{
        |"error": {
-       |  "error_code": $errorCode,
-                                    |  "error_msg": "$description",
-                                                                   |  "critical": $criticalToString
+       | "error_code": $errorCode,
+                                   | "error_msg": "$description",
+                                                                 | "critical": $criticalToString
         |}
         |}
     """.stripMargin

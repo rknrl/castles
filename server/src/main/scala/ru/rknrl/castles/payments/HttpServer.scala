@@ -111,14 +111,14 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
           } else {
             log.info("AddProduct")
 
-            val future = Patterns.ask(database, GetAccountState(accountId.dto), 5 seconds)
+            val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
             val result = Await.result(future, 5 seconds)
             result match {
               case AccountStateResponse(_, accountStateDto) ⇒
                 val state = AccountState(accountStateDto)
                 val newState = state.applyProduct(product, productInfo.count)
 
-                val future = Patterns.ask(database, UpdateAccountState(accountId.dto, newState.dto), 5 seconds)
+                val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto), 5 seconds)
                 val result = Await.result(future, 5 seconds)
 
                 result match {

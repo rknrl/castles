@@ -13,7 +13,6 @@ import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.rmi.C2B.UpdateStatistics
@@ -89,7 +88,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
     val userInfoByteArray = rowData("userInfo").asInstanceOf[Array[Byte]]
     val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
 
-    TopItem(AccountId(id), rating, userInfo)
+    TopItem(id, rating, userInfo)
   }
 
   override def receive = logged {

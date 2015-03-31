@@ -9,6 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.actor.ActorRef
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.state.{AccountState, Skills}
@@ -21,10 +22,8 @@ import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
-import ru.rknrl.castles.{AccountId, Config}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
-import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.AuthDTO._
 import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.{EscalateStrategyActor, Logged, SilentLog}
@@ -33,7 +32,10 @@ import scala.collection.JavaConverters._
 
 object Account {
 
-  case class LeaveGame(usedItems: Map[ItemType, Int], reward: Int, newRating: Double, top: Iterable[TopUserInfoDTO])
+  case class LeaveGame(usedItems: Map[ItemType, Int],
+                       reward: Int,
+                       newRating: Double,
+                       top: Iterable[TopUserInfoDTO])
 
   case object DuplicateAccount
 
@@ -52,7 +54,7 @@ class Account(matchmaking: ActorRef,
   // auth
 
   var client: ActorRef = null
-  var accountId: AccountId = null
+  var accountId: AccountIdDTO = null
   var deviceType: DeviceType = null
   var platformType: PlatformType = null
   var userInfo: UserInfoDTO = null
@@ -95,11 +97,11 @@ class Account(matchmaking: ActorRef,
     case Authenticate(authenticate) ⇒
       if (checkSecret(authenticate)) {
         client = sender
-        accountId = AccountId(authenticate.getUserInfo.getAccountId)
+        accountId = authenticate.getUserInfo.getAccountId
         deviceType = authenticate.getDeviceType
         platformType = authenticate.getPlatformType
         userInfo = authenticate.getUserInfo
-        database ! Database.GetAccountState(accountId.dto)
+        database ! Database.GetAccountState(accountId)
         database ! updateStatistics(StatAction.AUTHENTICATED)
       } else {
         log.info("reject")
@@ -109,12 +111,12 @@ class Account(matchmaking: ActorRef,
 
     case AccountNoExists ⇒
       val initTutorState = TutorStateDTO.newBuilder.build
-      database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
+      database ! Insert(accountId, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
       database ! updateStatistics(StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(id, dto) ⇒
       state = AccountState(dto)
-      database ! GetTutorState(accountId.dto)
+      database ! GetTutorState(accountId)
 
     case TutorStateResponse(id, tutorState) ⇒
       matchmaking ! InGame(accountId)
@@ -147,7 +149,7 @@ class Account(matchmaking: ActorRef,
       .setConfig(config.account.dto)
       .setTop(TopDTO.newBuilder.addAllUsers(top.asJava).build)
       .setTutor(tutorState)
-      .addAllProducts(config.productsDto(platformType, accountId.accountType).asJava)
+      .addAllProducts(config.productsDto(platformType, accountId.getType).asJava)
       .setSearchOpponents(searchOpponents)
 
     if (gameAddress.isDefined) builder.setGame(gameAddress.get)
@@ -156,25 +158,25 @@ class Account(matchmaking: ActorRef,
   }
 
   def account: Receive = persistent.orElse(logged({
-    case BuyBuilding(buy: BuyBuildingDTO) ⇒
-      updateState(state.buyBuilding(buy.getId, buy.getBuildingType, config.account))
-      database ! updateStatistics(Statistics.buyBuilding(buy.getBuildingType, BuildingLevel.LEVEL_1))
+    case BuyBuilding(dto) ⇒
+      updateState(state.buyBuilding(dto.getId, dto.getBuildingType, config.account))
+      database ! updateStatistics(Statistics.buyBuilding(dto.getBuildingType, BuildingLevel.LEVEL_1))
 
-    case UpgradeBuilding(dto: UpgradeBuildingDTO) ⇒
+    case UpgradeBuilding(dto) ⇒
       updateState(state.upgradeBuilding(dto.getId, config.account))
       database ! updateStatistics(Statistics.buyBuilding(state.slots(dto.getId).getBuildingPrototype))
 
-    case RemoveBuilding(dto: RemoveBuildingDTO) ⇒
+    case RemoveBuilding(dto) ⇒
       updateState(state.removeBuilding(dto.getId))
       database ! updateStatistics(StatAction.REMOVE_BUILDING)
 
-    case UpgradeSkill(upgrade: UpgradeSkillDTO) ⇒
-      updateState(state.upgradeSkill(upgrade.getType, config.account))
-      database ! updateStatistics(Statistics.buySkill(upgrade.getType, state.skills(upgrade.getType)))
+    case UpgradeSkill(dto) ⇒
+      updateState(state.upgradeSkill(dto.getType, config.account))
+      database ! updateStatistics(Statistics.buySkill(dto.getType, state.skills(dto.getType)))
 
-    case BuyItem(buy: BuyItemDTO) ⇒
-      updateState(state.buyItem(buy.getType, config.account))
-      database ! updateStatistics(Statistics.buyItem(buy.getType))
+    case BuyItem(dto) ⇒
+      updateState(state.buyItem(dto.getType, config.account))
+      database ! updateStatistics(Statistics.buyItem(dto.getType))
 
     case EnterGame ⇒
       placeGameOrder(isTutor = false)
@@ -183,7 +185,7 @@ class Account(matchmaking: ActorRef,
 
   def updateState(newState: AccountState) = {
     state = newState
-    database ! UpdateAccountState(accountId.dto, state.dto)
+    database ! UpdateAccountState(accountId, state.dto)
   }
 
   def enterGame: Receive = persistent.orElse(logged({
@@ -211,7 +213,7 @@ class Account(matchmaking: ActorRef,
       for ((itemType, count) ← usedItems)
         state = state.addItem(itemType, -count)
 
-      database ! UpdateAccountState(accountId.dto, state.dto)
+      database ! UpdateAccountState(accountId, state.dto)
       client ! TopUpdated(TopDTO.newBuilder.addAllUsers(top.asJava).build)
       context become account
 
@@ -231,7 +233,7 @@ class Account(matchmaking: ActorRef,
       client ! AccountStateUpdated(accountStateDto)
 
     case C2B.UpdateTutorState(state) ⇒
-      database ! Database.UpdateTutorState(accountId.dto, state)
+      database ! Database.UpdateTutorState(accountId, state)
 
     /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
     case DuplicateAccount ⇒
@@ -248,7 +250,7 @@ class Account(matchmaking: ActorRef,
       )
     else
       realStat
-    matchmaking ! PlaceGameOrder(new GameOrder(accountId, deviceType, userInfo, state.slots, stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor))
+    matchmaking ! GameOrder(accountId, deviceType, userInfo, state.slots, stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor)
   }
 
   def connectToGame(game: ActorRef) = {
