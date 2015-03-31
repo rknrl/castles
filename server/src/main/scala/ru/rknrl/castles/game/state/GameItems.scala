@@ -9,6 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
+import ru.rknrl.castles.account.state.Item.Items
+import ru.rknrl.castles.account.state.Items
 import ru.rknrl.castles.account.state.Items
 import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.GameConfig
@@ -72,8 +74,8 @@ class GameItemsState(val playerId: PlayerId,
 
 object GameItems {
   private def initMap(items: Items) =
-    for ((itemType, item) ← items.items)
-      yield itemType → new GameItemState(itemType, item.count, lastUseTime = 0, useCount = 0)
+    for ((itemType, item) ← items)
+      yield itemType → new GameItemState(itemType, item.getCount, lastUseTime = 0, useCount = 0)
 
   def init(playerId: PlayerId, items: Items) =
     new GameItemsState(playerId, initMap(items))

@@ -10,6 +10,8 @@ package ru.rknrl.castles.account.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.account.state.Item.Items
+import ru.rknrl.castles.account.state.Skills.Skills
 import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.AccountDTO._
@@ -57,10 +59,10 @@ class AccountState(val slots: Slots,
   }
 
   def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
-    val price = config.skillUpgradePrices(skills.nextTotalLevel)
+    val price = config.skillUpgradePrices(Skills.nextTotalLevel(skills))
     Assertion.check(price <= gold)
 
-    val nextLevel = Skills.nextLevel(skills.levels(skillType))
+    val nextLevel = Skills.nextLevel(skills(skillType))
 
     setSkill(skillType, nextLevel)
       .addGold(-price)
@@ -78,8 +80,8 @@ class AccountState(val slots: Slots,
   }
 
   def addItem(itemType: ItemType, count: Int) = {
-    val newCount = Math.max(0, items(itemType).count + count)
-    val newItem = new Item(itemType, newCount)
+    val newCount = Math.max(0, items(itemType).getCount + count)
+    val newItem = Item(itemType, newCount)
     copy(newItems = items.updated(itemType, newItem))
   }
 
@@ -106,8 +108,8 @@ class AccountState(val slots: Slots,
 
   def dto = AccountStateDTO.newBuilder
     .addAllSlots(slots.values.asJava)
-    .addAllSkills(skills.dto.asJava)
-    .addAllItems(items.dto.asJava)
+    .addAllSkills(Skills.dto(skills).asJava)
+    .addAllItems(items.values.asJava)
     .setGold(gold)
     .setRating(rating)
     .setGamesCount(gamesCount)
@@ -127,21 +129,17 @@ object AccountState {
   private def initSlots =
     initSlotBuildings.map(slot ⇒ slot.getId → slot).toMap
 
-  private def initSkillLevels =
+  private def initSkills =
     SkillType.values.map(_ → SKILL_LEVEL_0).toMap
 
-  private def initSkills = new Skills(initSkillLevels)
-
-  private def initItemsCount(config: AccountConfig) =
+  private def initItems(config: AccountConfig) =
     for (itemType ← ItemType.values)
-      yield itemType → new Item(itemType, config.initItemCount)
-
-  private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)
+      yield itemType → Item(itemType, config.initItemCount)
 
   def initAccount(config: AccountConfig) = new AccountState(
     slots = initSlots,
     skills = initSkills,
-    items = initItems(config),
+    items = initItems(config).toMap,
     gold = config.initGold,
     rating = config.initRating,
     gamesCount = 0

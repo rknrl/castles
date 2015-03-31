@@ -13,6 +13,7 @@ import akka.actor._
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
+import ru.rknrl.castles.account.state.Item.Items
 import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
@@ -195,9 +196,9 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def botItems(playerItems: Items) =
-    new Items(playerItems.items.map {
-      case (itemType, item) ⇒ (itemType, new Item(itemType, item.count * 2))
-    })
+    playerItems.map {
+      case (itemType, item) ⇒ (itemType, Item(itemType, item.getCount * 2))
+    }
 
   def botUserInfo(accountId: AccountId, number: Int) =
     number match {

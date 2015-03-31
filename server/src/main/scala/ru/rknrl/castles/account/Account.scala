@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
-import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.account.state.{AccountState, Skills}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game
@@ -238,7 +238,7 @@ class Account(matchmaking: ActorRef,
   })
 
   def placeGameOrder(isTutor: Boolean) = {
-    val realStat = state.skills.stat(config.account)
+    val realStat = Skills.stat(config.account, state.skills)
     val stat = if (isTutor)
       new Stat(
         attack = realStat.attack * 3,

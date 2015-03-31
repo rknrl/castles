@@ -14,45 +14,9 @@ import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.AccountDTO.SkillLevelDTO
 import ru.rknrl.dto.CommonDTO.{SkillLevel, SkillType}
 
-class Skills(val levels: Map[SkillType, SkillLevel]) {
-  for (skillType ← SkillType.values) Assertion.check(levels.contains(skillType))
-
-  def apply(skillType: SkillType) = levels(skillType)
-
-  def updated(skillType: SkillType, skillLevel: SkillLevel) =
-    new Skills(levels.updated(skillType, skillLevel))
-
-  def totalLevel = {
-    var total = 0
-    for ((skillType, level) ← levels) total += level.getNumber
-    total
-  }
-
-  def isLastTotalLevel = totalLevel == 9
-
-  def nextTotalLevel = {
-    Assertion.check(!isLastTotalLevel)
-    totalLevel + 1
-  }
-
-  val levelsCount = SkillLevel.values.size - 1
-
-  def stat(config: AccountConfig) =
-    new Stat(
-      1 + levels(SkillType.ATTACK).getNumber * config.maxAttack / levelsCount,
-      1 + levels(SkillType.DEFENCE).getNumber * config.maxDefence / levelsCount,
-      1 + levels(SkillType.SPEED).getNumber * config.maxSpeed / levelsCount
-    )
-
-  def dto =
-    for ((skillType, level) ← levels)
-      yield SkillLevelDTO.newBuilder
-        .setType(skillType)
-        .setLevel(level)
-        .build
-}
-
 object Skills {
+  type Skills = Map[SkillType, SkillLevel]
+
   def nextLevel(level: SkillLevel) =
     level match {
       case SkillLevel.SKILL_LEVEL_0 ⇒ SkillLevel.SKILL_LEVEL_1
@@ -62,6 +26,36 @@ object Skills {
 
   def apply(dto: Iterable[SkillLevelDTO]) = {
     val skills = for (skillDto ← dto) yield skillDto.getType → skillDto.getLevel
-    new Skills(skills.toMap)
+    skills.toMap
   }
+
+  def totalLevel(levels: Skills) = {
+    var total = 0
+    for ((skillType, level) ← levels) total += level.getNumber
+    total
+  }
+
+  def isLastTotalLevel(levels: Skills) = totalLevel(levels) == 9
+
+  def nextTotalLevel(levels: Skills) = {
+    Assertion.check(!isLastTotalLevel(levels))
+    totalLevel(levels) + 1
+  }
+
+  val levelsCount = SkillLevel.values.size - 1
+
+  def stat(config: AccountConfig, levels: Skills) =
+    new Stat(
+      1 + levels(SkillType.ATTACK).getNumber * config.maxAttack / levelsCount,
+      1 + levels(SkillType.DEFENCE).getNumber * config.maxDefence / levelsCount,
+      1 + levels(SkillType.SPEED).getNumber * config.maxSpeed / levelsCount
+    )
+
+  def dto(levels: Skills) =
+    for ((skillType, level) ← levels)
+      yield SkillLevelDTO.newBuilder
+        .setType(skillType)
+        .setLevel(level)
+        .build
+
 }

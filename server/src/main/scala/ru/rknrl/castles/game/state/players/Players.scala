@@ -9,7 +9,7 @@
 package ru.rknrl.castles.game.state.players
 
 import ru.rknrl.castles.AccountId
-import ru.rknrl.castles.account.state.Items
+import ru.rknrl.castles.account.state.Item.Items
 import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
