@@ -10,6 +10,7 @@ package ru.rknrl.castles.game.map
 
 import java.io.File
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.{BuildingPrototype, IJ}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.map.GameMap.random
@@ -118,7 +119,7 @@ object GameMap {
 
   private def lineToCell(line: String) = {
     val split = line.split('\t')
-    assert(split.length == 4, split.length)
+    Assertion.check(split.length == 4, split.length)
 
     new MapCell(
       i = split(0).toInt,

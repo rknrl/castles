@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game.state
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.IJ
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.map.GameMap
@@ -74,9 +75,9 @@ object GameState {
 
   def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig, gameMap: GameMap) = {
     if (big)
-      assert(players.size == 4)
+      Assertion.check(players.size == 4)
     else
-      assert(players.size == 2)
+      Assertion.check(players.size == 2)
 
     val gameArea = GameArea(big)
 

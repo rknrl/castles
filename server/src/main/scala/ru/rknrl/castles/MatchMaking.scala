@@ -28,7 +28,7 @@ import ru.rknrl.dto.AdminDTO.{ServerHealthDTO, ServerHealthItemDTO}
 import ru.rknrl.dto.AuthDTO.TopUserInfoDTO
 import ru.rknrl.dto.CommonDTO._
 import ru.rknrl.utils.IdIterator
-import ru.rknrl.{Logged, Slf4j}
+import ru.rknrl.{Assertion, Logged, Slf4j}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -176,7 +176,7 @@ class MatchMaking(interval: FiniteDuration,
 
   def createGameWithBot(big: Boolean, playerCount: Int, orders: List[GameOrder], isTutor: Boolean) = {
     val botsCount = if (big) playerCount - orders.size else playerCount - orders.size
-    assert(botsCount >= 1, botsCount)
+    Assertion.check(botsCount >= 1, botsCount)
 
     val order = orders.head
     var result = orders
@@ -366,7 +366,7 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def placeGameOrder(gameOrder: GameOrder, accountRef: ActorRef) = {
-    assert(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
+    Assertion.check(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
     accountIdToAccountRef = accountIdToAccountRef.updated(gameOrder.accountId, accountRef)
     gameOrders = gameOrders :+ gameOrder
   }

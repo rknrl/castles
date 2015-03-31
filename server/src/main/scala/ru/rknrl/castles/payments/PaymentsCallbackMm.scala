@@ -9,6 +9,7 @@
 package ru.rknrl.castles.payments
 
 import akka.util.Crypt
+import ru.rknrl.Assertion
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
@@ -76,7 +77,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
       // (Int) идентификатор вашего приложения
       val appId = params.getParam("app_id")
 
-      assert(appId == config.appId)
+      Assertion.check(appId == config.appId)
 
       // (Int) идентификатор денежной транзакции
       val transactionId = params.getParam("transaction_id")

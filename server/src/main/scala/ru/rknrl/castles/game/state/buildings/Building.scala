@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game.state.buildings
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.PlayerId
@@ -27,7 +28,7 @@ class Building(val id: BuildingId,
                val strengtheningStartTime: Long,
                val lastShootTime: Long) {
 
-  assert(population >= 0, population)
+  Assertion.check(population >= 0, population)
 
   def floorPopulation = GameConfig.truncatePopulation(population)
 

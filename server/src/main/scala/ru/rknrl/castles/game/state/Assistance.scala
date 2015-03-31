@@ -25,7 +25,7 @@ object Assistance {
     for ((playerId, buildingId) ← casts) yield {
       val building = buildings(buildingId)
 
-      // assert(building.owner.get == playerId)
+      // Assertion.check(building.owner.get == playerId)
       // здание может быть захвачено противником до каста, в этом случае все равно отправляем отряд
 
       val startPos = assistancePositions(playerId)

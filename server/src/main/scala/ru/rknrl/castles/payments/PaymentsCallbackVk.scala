@@ -9,6 +9,7 @@
 package ru.rknrl.castles.payments
 
 import akka.util.Crypt
+import ru.rknrl.Assertion
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
@@ -70,7 +71,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
       // (Int) идентификатор приложения
       val appId = params.getParam("app_id")
 
-      assert(appId == config.appId, "appId=" + appId + ",expect " + config.appId)
+      Assertion.check(appId == config.appId, "appId=" + appId + ",expect " + config.appId)
 
       // (Int) идентификатор пользователя, сделавшего заказ
       val userId = params.getParam("user_id")
@@ -80,7 +81,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
       // (Int) идентификатор получателя заказа (в данный момент совпадает с user_id, но в будущем может отличаться)
       val receiverId = params.getParam("receiver_id")
 
-      assert(userId == receiverId, "userId=" + userId + ",expect " + receiverId)
+      Assertion.check(userId == receiverId, "userId=" + userId + ",expect " + receiverId)
 
       // (Int) идентификатор заказа
       val orderId = params.getParam("order_id")
@@ -107,7 +108,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
             // (String) новый статус заказа
             val status = params.getParam("status")
 
-            assert(status == VkStatus.CHARGEABLE, "status=" + status + ", expect " + VkStatus.CHARGEABLE)
+            Assertion.check(status == VkStatus.CHARGEABLE, "status=" + status + ", expect " + VkStatus.CHARGEABLE)
 
             // (String) идентификатор товара в приложении
             val itemId = params.getParam("item_id")
@@ -175,10 +176,10 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
 
     s"""
        |{
-       | "response": {
-       |   "order_id":$orderId
-        |   $appOrderIdStr
-        | }
+       |"response": {
+       |  "order_id":$orderId
+        |  $appOrderIdStr
+        |}
         |}""".stripMargin
   }
 
@@ -202,13 +203,13 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
 
     s"""
        |{
-       | "response": {
-       |   "title":"$title",
-                            |   $photoUrlStr
-        |   $itemIdStr
-        |   $expirationStr
-        |   "price": $price
-        | }
+       |"response": {
+       |  "title":"$title",
+                           |  $photoUrlStr
+        |  $itemIdStr
+        |  $expirationStr
+        |  "price": $price
+        |}
         |}""".stripMargin
   }
 }
@@ -234,11 +235,11 @@ private class VkPaymentsError private(val errorCode: Int,
   override def toString =
     s"""
        |{
-       | "error": {
-       |   "error_code": $errorCode,
-                                     |   "error_msg": "$description",
-                                                                     |   "critical": $criticalToString
-        | }
+       |"error": {
+       |  "error_code": $errorCode,
+                                    |  "error_msg": "$description",
+                                                                   |  "critical": $criticalToString
+        |}
         |}
     """.stripMargin
 }

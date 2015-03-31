@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game.state.buildings
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Moving.{EnterUnit, ExitUnit}
 import ru.rknrl.castles.game.state.bullets.Bullet
@@ -31,7 +32,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
   def applyExitUnits(exitUnits: Iterable[ExitUnit], config: GameConfig) = {
     def updateBuilding(b: Building) =
       if (exitUnits.exists(_.fromBuildingId == b.id)) {
-        assert(config.unitsToExit(b.floorPopulation) >= 1)
+        Assertion.check(config.unitsToExit(b.floorPopulation) >= 1)
         b.setPopulation(config.buildingAfterUnitToExit(b.population))
       } else
         b

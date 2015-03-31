@@ -267,23 +267,23 @@ class Game(players: Map[PlayerId, Player],
       for (playerId ← newLosers) addLoser(playerId, place)
 
 
-    case Move(dto: MoveDTO) ⇒
-      if (senderCanPlay) moveActions = moveActions + (senderPlayerId → dto)
+    case Move(moveDto) ⇒
+      if (senderCanPlay) moveActions = moveActions + (senderPlayerId → moveDto)
 
-    case CastFireball(point: PointDTO) ⇒
-      if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
+    case CastFireball(pointDto) ⇒
+      if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → pointDto)
 
-    case CastStrengthening(buildingId: BuildingIdDTO) ⇒
-      if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → BuildingId(buildingId.getId))
+    case CastStrengthening(buildingIdDto) ⇒
+      if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → BuildingId(buildingIdDto.getId))
 
-    case CastVolcano(point: PointDTO) ⇒
-      if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
+    case CastVolcano(pointDto) ⇒
+      if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → pointDto)
 
-    case CastTornado(dto: CastTorandoDTO) ⇒
-      if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
+    case CastTornado(castTornadoDto) ⇒
+      if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → castTornadoDto)
 
-    case CastAssistance(buildingId: BuildingIdDTO) ⇒
-      if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → BuildingId(buildingId.getId))
+    case CastAssistance(buildingIdDto) ⇒
+      if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → BuildingId(buildingIdDto.getId))
 
     case C2B.UpdateStatistics(dto) ⇒
       sendToBots(dto.getAction)

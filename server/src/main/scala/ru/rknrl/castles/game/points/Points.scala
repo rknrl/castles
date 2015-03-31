@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game.points
 
+import ru.rknrl.Assertion
 import ru.rknrl.dto.GameDTO.PointDTO
 
 /**
@@ -16,7 +17,7 @@ import ru.rknrl.dto.GameDTO.PointDTO
 class Points(val points: Vector[Point]) {
   def this(dto: Iterable[PointDTO]) = this(Points.dtoToPoints(dto))
 
-  assert(points.size >= 2)
+  Assertion.check(points.size >= 2)
 
   def getDurations(speed: Double) = {
     var pointsDurations = List[Double]()
@@ -37,7 +38,7 @@ class Points(val points: Vector[Point]) {
   def getPos(currentTime: Long, speed: Double) = {
     val pointsDurations = getDurations(speed)
     val currentIndex = Points.getCurrentIndex(pointsDurations, currentTime)
-    assert(currentIndex != 0)
+    Assertion.check(currentIndex != 0)
     val oldIndex = currentIndex - 1
 
     val p1 = points(oldIndex)
