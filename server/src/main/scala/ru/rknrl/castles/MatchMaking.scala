@@ -13,6 +13,7 @@ import akka.actor._
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
+import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
@@ -239,11 +240,11 @@ class MatchMaking(interval: FiniteDuration,
 
     val gameConfig = if (isTutor) config.game.tutorConfig else config.game
 
-    val gameMap = if(isTutor) gameMaps.tutor(big) else gameMaps.random(big)
+    val gameMap = if (isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
     val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self, bugs), gameIdIterator.next)
 
-    if(!isTutor) {
+    if (!isTutor) {
       if (orders.count(_.isBot) == orders.size - 1) {
         if (orders.size == 4)
           database ! UpdateStatistics(StatAction.START_GAME_4_WITH_BOTS)

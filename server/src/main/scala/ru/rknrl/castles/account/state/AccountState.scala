@@ -10,6 +10,7 @@ package ru.rknrl.castles.account.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountConfig
+import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.AccountDTO._
 import ru.rknrl.dto.CommonDTO.BuildingLevel._
@@ -104,7 +105,7 @@ class AccountState(val slots: Slots,
     }
 
   def dto = AccountStateDTO.newBuilder
-    .addAllSlots(slots.dto.asJava)
+    .addAllSlots(slots.values.asJava)
     .addAllSkills(skills.dto.asJava)
     .addAllItems(items.dto.asJava)
     .setGold(gold)
@@ -123,10 +124,8 @@ object AccountState {
       Slot(SLOT_5, BuildingPrototype(CHURCH, LEVEL_1))
     )
 
-  private def initSlotsMap =
+  private def initSlots =
     initSlotBuildings.map(slot ⇒ slot.getId → slot).toMap
-
-  private def initSlots = new Slots(initSlotsMap)
 
   private def initSkillLevels =
     SkillType.values.map(_ → SKILL_LEVEL_0).toMap
