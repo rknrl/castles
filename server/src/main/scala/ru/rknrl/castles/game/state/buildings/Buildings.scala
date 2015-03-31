@@ -18,10 +18,10 @@ import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
 import ru.rknrl.castles.rmi.B2C.UpdateBuilding
 import ru.rknrl.dto.CommonDTO.BuildingType
-import ru.rknrl.dto.GameDTO.PlayerIdDTO
+import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO}
 
-class Buildings(val map: Map[BuildingId, Building]) {
-  def apply(id: BuildingId) = map(id)
+class Buildings(val map: Map[BuildingIdDTO, Building]) {
+  def apply(id: BuildingIdDTO) = map(id)
 
   def updatePopulation(deltaTime: Long, config: GameConfig) = {
     def updateBuilding(b: Building) =
@@ -59,7 +59,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
     new Buildings(newBuildings)
   }
 
-  def applyStrengtheningCasts(actions: Map[PlayerIdDTO, BuildingId], time: Long) = {
+  def applyStrengtheningCasts(actions: Map[PlayerIdDTO, BuildingIdDTO], time: Long) = {
     def updateBuilding(b: Building) =
       if (actions.exists { case (id, buildingId) ⇒ buildingId == b.id })
         b.strength(time)
@@ -143,7 +143,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
 }
 
 object Buildings {
-  def getUpdateMessages(oldBuildings: Map[BuildingId, Building], newBuildings: Map[BuildingId, Building]) =
+  def getUpdateMessages(oldBuildings: Map[BuildingIdDTO, Building], newBuildings: Map[BuildingIdDTO, Building]) =
     for ((id, newBuilding) ← newBuildings
          if oldBuildings contains id
          if oldBuildings(id) differentWith newBuilding

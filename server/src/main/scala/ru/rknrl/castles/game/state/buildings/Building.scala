@@ -9,18 +9,16 @@
 package ru.rknrl.castles.game.state.buildings
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.state.BuildingPrototype
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
-import ru.rknrl.dto.GameDTO.{PlayerIdDTO, BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
+import ru.rknrl.dto.GameDTO.{BuildingDTO, BuildingIdDTO, BuildingUpdateDTO, PlayerIdDTO}
 
-case class BuildingId(id: Int) {
-  def dto = BuildingIdDTO.newBuilder.setId(id).build
+object BuildingId {
+  def apply(id: Int) = BuildingIdDTO.newBuilder.setId(id).build
 }
 
-class Building(val id: BuildingId,
+class Building(val id: BuildingIdDTO,
                val prototype: BuildingPrototypeDTO,
                val pos: Point,
                val population: Double,
@@ -63,7 +61,7 @@ class Building(val id: BuildingId,
 
   def dto = {
     val builder = BuildingDTO.newBuilder
-      .setId(id.dto)
+      .setId(id)
       .setBuilding(prototype)
       .setPos(pos.dto)
       .setPopulation(floorPopulation)
@@ -77,7 +75,7 @@ class Building(val id: BuildingId,
 
   def updateDto = {
     val builder = BuildingUpdateDTO.newBuilder
-      .setId(id.dto)
+      .setId(id)
       .setPopulation(floorPopulation)
       .setStrengthened(strengthened)
 

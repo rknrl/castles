@@ -13,7 +13,7 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
-import ru.rknrl.dto.GameDTO.{PlayerIdDTO, UnitDTO, UnitIdDTO, UnitUpdateDTO}
+import ru.rknrl.dto.GameDTO._
 
 case class UnitId(id: Int) {
   def dto = UnitIdDTO.newBuilder.setId(id).build
@@ -26,7 +26,7 @@ class GameUnit(val id: UnitId,
                val endPos: Point,
                val startTime: Long,
                val speed: Double,
-               val targetBuildingId: BuildingId,
+               val targetBuildingId: BuildingIdDTO,
                val owner: PlayerIdDTO,
                val strengthened: Boolean) {
 
@@ -62,7 +62,7 @@ class GameUnit(val id: UnitId,
       .setCount(GameConfig.truncatePopulation(count))
       .setPos(pos(time).dto)
       .setSpeed(speed.toFloat)
-      .setTargetBuildingId(targetBuildingId.dto)
+      .setTargetBuildingId(targetBuildingId)
       .setOwner(owner)
       .setStrengthened(strengthened)
       .build

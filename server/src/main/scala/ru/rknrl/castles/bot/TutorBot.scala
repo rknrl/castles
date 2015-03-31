@@ -52,8 +52,8 @@ class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) exte
 
           sender ! Move(
             MoveDTO.newBuilder
-              .addAllFromBuildings(getMyBuildings.map(_.id.dto).asJava)
-              .setToBuilding(towers.last.id.dto)
+              .addAllFromBuildings(getMyBuildings.map(_.id).asJava)
+              .setToBuilding(towers.last.id)
               .build
           )
         }

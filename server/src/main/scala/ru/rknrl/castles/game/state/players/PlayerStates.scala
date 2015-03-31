@@ -11,7 +11,7 @@ package ru.rknrl.castles.game.state.players
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.dto.CommonDTO.BuildingType._
-import ru.rknrl.dto.GameDTO.PlayerIdDTO
+import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO}
 
 class PlayerState(val stat: Stat,
                   val churchesProportion: Double) {
@@ -26,14 +26,14 @@ class PlayerStates(states: Map[PlayerIdDTO, PlayerState]) {
 
   def apply(id: PlayerIdDTO) = states(id)
 
-  private def totalChurchesPopulation(buildings: Map[BuildingId, Building]) = {
+  private def totalChurchesPopulation(buildings: Map[BuildingIdDTO, Building]) = {
     var total = 0.0
     for ((id, b) ← buildings if b.prototype.getType == CHURCH)
       total += b.population
     total
   }
 
-  private def playerChurchesPopulation(buildings: Map[BuildingId, Building], playerId: PlayerIdDTO) = {
+  private def playerChurchesPopulation(buildings: Map[BuildingIdDTO, Building], playerId: PlayerIdDTO) = {
     var population = 0.0
     for ((id, b) ← buildings
          if b.prototype.getType == CHURCH && b.owner == Some(playerId))
@@ -41,7 +41,7 @@ class PlayerStates(states: Map[PlayerIdDTO, PlayerState]) {
     population
   }
 
-  def updateChurchesProportion(buildings: Map[BuildingId, Building]) = {
+  def updateChurchesProportion(buildings: Map[BuildingIdDTO, Building]) = {
     var newStates = states
     val total = totalChurchesPopulation(buildings)
     for ((playerId, state) ← states) {

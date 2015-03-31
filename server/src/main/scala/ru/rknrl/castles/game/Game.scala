@@ -170,10 +170,10 @@ class Game(players: Map[PlayerIdDTO, Player],
 
   var moveActions = Map.empty[PlayerIdDTO, MoveDTO]
   var fireballCasts = Map.empty[PlayerIdDTO, PointDTO]
-  var strengtheningCasts = Map.empty[PlayerIdDTO, BuildingId]
+  var strengtheningCasts = Map.empty[PlayerIdDTO, BuildingIdDTO]
   var volcanoCasts = Map.empty[PlayerIdDTO, PointDTO]
   var tornadoCasts = Map.empty[PlayerIdDTO, CastTorandoDTO]
-  var assistanceCasts = Map.empty[PlayerIdDTO, BuildingId]
+  var assistanceCasts = Map.empty[PlayerIdDTO, BuildingIdDTO]
 
   def clearMaps(): Unit = {
     moveActions = Map.empty

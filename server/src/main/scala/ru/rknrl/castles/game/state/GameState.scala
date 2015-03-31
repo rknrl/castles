@@ -134,10 +134,10 @@ class GameState(val time: Long,
   def update(newTime: Long,
              moveActions: Map[PlayerIdDTO, MoveDTO],
              newFireballCasts: Map[PlayerIdDTO, PointDTO],
-             newStrengtheningCasts: Map[PlayerIdDTO, BuildingId],
+             newStrengtheningCasts: Map[PlayerIdDTO, BuildingIdDTO],
              newVolcanoCasts: Map[PlayerIdDTO, PointDTO],
              newTornadoCasts: Map[PlayerIdDTO, CastTorandoDTO],
-             newAssistanceCasts: Map[PlayerIdDTO, BuildingId]) = {
+             newAssistanceCasts: Map[PlayerIdDTO, BuildingIdDTO]) = {
 
     val deltaTime = newTime - time
 

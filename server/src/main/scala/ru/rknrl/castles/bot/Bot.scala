@@ -21,7 +21,7 @@ import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, ItemType}
-import ru.rknrl.dto.GameDTO.{PlayerIdDTO, MoveDTO}
+import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO, MoveDTO}
 import ru.rknrl.{Logged, SilentLog}
 
 import scala.collection.JavaConverters._
@@ -37,7 +37,7 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
   var gameState: Option[GameState] = None
   var playerId: Option[PlayerIdDTO] = None
 
-  var toBuildingId: Option[BuildingId] = None
+  var toBuildingId: Option[BuildingIdDTO] = None
   var myBuildingsSize = 0
 
   var toBuildingSetTime = 0L
@@ -45,7 +45,7 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
 
   var lastCastTime = 0L
 
-  case class Weight(id: BuildingId, weight: Double)
+  case class Weight(id: BuildingIdDTO, weight: Double)
 
   val log = new SilentLog
 
@@ -104,8 +104,8 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
 
         sender ! Move(
           MoveDTO.newBuilder
-            .addAllFromBuildings(fromBuildings.map(_.id.dto).asJava)
-            .setToBuilding(toBuildingId.get.dto)
+            .addAllFromBuildings(fromBuildings.map(_.id).asJava)
+            .setToBuilding(toBuildingId.get)
             .build
         )
 
@@ -131,9 +131,9 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
               case ItemType.VOLCANO ⇒
                 sender ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Double.reverse).head.pos.dto)
               case ItemType.STRENGTHENING ⇒
-                sender ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id.dto)
+                sender ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Double.reverse).head.id)
               case ItemType.ASSISTANCE ⇒
-                sender ! CastAssistance(myBuildings.sortBy(_.population).head.id.dto)
+                sender ! CastAssistance(myBuildings.sortBy(_.population).head.id)
             }
           }
         }

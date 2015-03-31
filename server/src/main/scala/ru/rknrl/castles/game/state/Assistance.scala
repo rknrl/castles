@@ -13,10 +13,10 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.GameDTO.PlayerIdDTO
+import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO}
 
 object Assistance {
-  def `casts→units`(casts: Map[PlayerIdDTO, BuildingId],
+  def `casts→units`(casts: Map[PlayerIdDTO, BuildingIdDTO],
                     buildings: Buildings,
                     config: GameConfig,
                     playerStates: PlayerStates,

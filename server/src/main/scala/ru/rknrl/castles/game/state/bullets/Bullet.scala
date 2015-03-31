@@ -20,7 +20,7 @@ class Bullet(val building: Building,
 
   def dto(time: Long) =
     BulletDTO.newBuilder
-      .setBuildingId(building.id.dto)
+      .setBuildingId(building.id)
       .setUnitId(unit.id.dto)
       .setDuration(duration.toInt)
       .build
