@@ -13,9 +13,8 @@ import ru.rknrl.castles.account.state.IJ
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.map.GameMap
 import ru.rknrl.castles.game.points.Point
+import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.Moving._
-import ru.rknrl.castles.game.state.area.GameArea
-import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
 import ru.rknrl.castles.game.state.bullets.Bullets._
 import ru.rknrl.castles.game.state.fireballs.Fireballs._

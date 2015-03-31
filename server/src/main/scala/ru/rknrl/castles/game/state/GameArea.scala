@@ -6,11 +6,11 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game.state.area
+package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.account.state.{IJ, Slots}
 import ru.rknrl.castles.game.points.Point
-import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.SlotId
 import ru.rknrl.dto.GameDTO.{CellSize, SlotsOrientation}

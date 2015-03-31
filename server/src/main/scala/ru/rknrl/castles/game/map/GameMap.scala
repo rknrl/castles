@@ -14,8 +14,7 @@ import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.{BuildingPrototype, IJ}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.map.GameMap.random
-import ru.rknrl.castles.game.state.BuildingIdIterator
-import ru.rknrl.castles.game.state.area.GameArea
+import ru.rknrl.castles.game.state.{GameArea, BuildingIdIterator}
 import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
 
