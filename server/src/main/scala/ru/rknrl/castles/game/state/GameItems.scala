@@ -10,8 +10,9 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.Items
+import ru.rknrl.castles.game.Game.PersonalMessage
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.PlayerId
-import ru.rknrl.castles.game.{GameConfig, PersonalMessage}
 import ru.rknrl.castles.rmi.B2C.UpdateItemStates
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO.{ItemStateDTO, ItemsStateDTO}
@@ -81,7 +82,7 @@ object GameItems {
     for ((playerId, state) ← item.states;
          oldState = oldItems.states(playerId)
          if state differentWith oldState
-    ) yield new PersonalMessage(playerId, new UpdateItemStates(state.dto(time, config)))
+    ) yield PersonalMessage(playerId, new UpdateItemStates(state.dto(time, config)))
 }
 
 class GameItems(val states: Map[PlayerId, GameItemsState]) {

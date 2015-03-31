@@ -11,7 +11,7 @@ package ru.rknrl.castles.game
 import akka.actor.ActorRef
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
-import ru.rknrl.castles.game.Game.Join
+import ru.rknrl.castles.game.Game.{PersonalMessage, Join}
 import ru.rknrl.castles.game.GameMap
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.state.buildings.BuildingId
@@ -30,6 +30,8 @@ import scala.concurrent.duration._
 object Game {
 
   case class Join(accountId: AccountId, client: ActorRef)
+
+  case class PersonalMessage(playerId: PlayerId, msg: Msg)
 
 }
 
