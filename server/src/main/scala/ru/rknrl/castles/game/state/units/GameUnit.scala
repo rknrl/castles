@@ -10,16 +10,14 @@ package ru.rknrl.castles.game.state.units
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.points.Point
-import ru.rknrl.castles.game.state.buildings.BuildingId
-import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
 import ru.rknrl.dto.GameDTO._
 
-case class UnitId(id: Int) {
-  def dto = UnitIdDTO.newBuilder.setId(id).build
+object UnitId {
+  def apply(id: Int) = UnitIdDTO.newBuilder.setId(id).build
 }
 
-class GameUnit(val id: UnitId,
+class GameUnit(val id: UnitIdDTO,
                val buildingPrototype: BuildingPrototypeDTO,
                val count: Double,
                val startPos: Point,
@@ -57,7 +55,7 @@ class GameUnit(val id: UnitId,
 
   def dto(time: Long) =
     UnitDTO.newBuilder
-      .setId(id.dto)
+      .setId(id)
       .setType(buildingPrototype.getType)
       .setCount(GameConfig.truncatePopulation(count))
       .setPos(pos(time).dto)
@@ -69,7 +67,7 @@ class GameUnit(val id: UnitId,
 
   def updateDto(time: Long) =
     UnitUpdateDTO.newBuilder
-      .setId(id.dto)
+      .setId(id)
       .setPos(pos(time).dto)
       .setSpeed(speed.toFloat)
       .setCount(GameConfig.truncatePopulation(count))

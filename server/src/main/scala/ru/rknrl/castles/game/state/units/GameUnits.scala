@@ -25,7 +25,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     new GameUnits(units.filter(u ⇒ !enters.exists(_.unit.id == u.id)))
 
   def applyKillMessages(messages: Iterable[KillUnit]) =
-    new GameUnits(units.filter(u ⇒ !messages.exists(_.killedId.getId == u.id.id)))
+    new GameUnits(units.filter(u ⇒ !messages.exists(_.killedId.getId == u.id)))
 
   def dto(time: Long) =
     for (unit ← units) yield unit.dto(time)
@@ -85,7 +85,7 @@ class GameUnits(val units: Iterable[GameUnit]) {
     )
 
   def `killed→killMessages` =
-    for (unit ← units if unit.floorCount <= 0) yield KillUnit(unit.id.dto)
+    for (unit ← units if unit.floorCount <= 0) yield KillUnit(unit.id)
 }
 
 object GameUnits {
