@@ -14,14 +14,7 @@ import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.GameDTO.{BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
 
-class BuildingId(val id: Int) {
-  override def equals(obj: Any) = obj match {
-    case buildingId: BuildingId ⇒ buildingId.id == id
-    case _ ⇒ false
-  }
-
-  override def hashCode = id.hashCode
-
+case class BuildingId(id: Int) {
   def dto = BuildingIdDTO.newBuilder.setId(id).build
 }
 

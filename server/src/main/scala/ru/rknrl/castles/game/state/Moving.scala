@@ -26,10 +26,10 @@ object Moving {
     for ((playerId, moveDto) ← moveActions;
          fromBuildingsDto = moveDto.getFromBuildingsList.asScala.toList;
          fromBuildingDto ← fromBuildingsDto;
-         fromBuildingId = new BuildingId(fromBuildingDto.getId);
+         fromBuildingId = BuildingId(fromBuildingDto.getId);
          fromBuilding = buildings(fromBuildingId)
          if config.unitsToExit(fromBuilding.floorPopulation) >= 1;
-         toBuildingId = new BuildingId(moveDto.getToBuilding.getId)
+         toBuildingId = BuildingId(moveDto.getToBuilding.getId)
          if fromBuildingId != toBuildingId
          if fromBuilding.owner.get == playerId
     ) yield

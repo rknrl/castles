@@ -274,7 +274,7 @@ class Game(players: Map[PlayerId, Player],
       if (senderCanPlay) fireballCasts = fireballCasts + (senderPlayerId → point)
 
     case CastStrengthening(buildingId: BuildingIdDTO) ⇒
-      if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+      if (senderCanPlay) strengtheningCasts = strengtheningCasts + (senderPlayerId → BuildingId(buildingId.getId))
 
     case CastVolcano(point: PointDTO) ⇒
       if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → point)
@@ -283,7 +283,7 @@ class Game(players: Map[PlayerId, Player],
       if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → dto)
 
     case CastAssistance(buildingId: BuildingIdDTO) ⇒
-      if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → new BuildingId(buildingId.getId))
+      if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → BuildingId(buildingId.getId))
 
     case C2B.UpdateStatistics(dto) ⇒
       sendToBots(dto.getAction)

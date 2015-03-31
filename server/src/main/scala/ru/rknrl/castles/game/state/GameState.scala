@@ -31,11 +31,11 @@ import ru.rknrl.utils.IdIterator
 import scala.collection.JavaConverters._
 
 class BuildingIdIterator extends IdIterator {
-  def next = new BuildingId(nextInt)
+  def next = BuildingId(nextInt)
 }
 
 class UnitIdIterator extends IdIterator {
-  def next = new UnitId(nextInt)
+  def next = UnitId(nextInt)
 }
 
 object GameState {
