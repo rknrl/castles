@@ -18,6 +18,7 @@ import ru.rknrl.castles.game.state.tornadoes.{Tornado, Tornadoes}
 import ru.rknrl.castles.game.state.volcanoes.{Volcano, Volcanoes}
 import ru.rknrl.castles.rmi.B2C.UpdateBuilding
 import ru.rknrl.dto.CommonDTO.BuildingType
+import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
 class Buildings(val map: Map[BuildingId, Building]) {
   def apply(id: BuildingId) = map(id)
@@ -58,7 +59,7 @@ class Buildings(val map: Map[BuildingId, Building]) {
     new Buildings(newBuildings)
   }
 
-  def applyStrengtheningCasts(actions: Map[PlayerId, BuildingId], time: Long) = {
+  def applyStrengtheningCasts(actions: Map[PlayerIdDTO, BuildingId], time: Long) = {
     def updateBuilding(b: Building) =
       if (actions.exists { case (id, buildingId) ⇒ buildingId == b.id })
         b.strength(time)

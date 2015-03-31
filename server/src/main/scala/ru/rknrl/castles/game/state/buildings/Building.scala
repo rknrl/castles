@@ -14,7 +14,7 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
-import ru.rknrl.dto.GameDTO.{BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, BuildingDTO, BuildingIdDTO, BuildingUpdateDTO}
 
 case class BuildingId(id: Int) {
   def dto = BuildingIdDTO.newBuilder.setId(id).build
@@ -24,7 +24,7 @@ class Building(val id: BuildingId,
                val prototype: BuildingPrototypeDTO,
                val pos: Point,
                val population: Double,
-               val owner: Option[PlayerId],
+               val owner: Option[PlayerIdDTO],
                val strengthened: Boolean,
                val strengtheningStartTime: Long,
                val lastShootTime: Long) {
@@ -35,7 +35,7 @@ class Building(val id: BuildingId,
 
   def setPopulation(value: Double) = copy(newPopulation = value)
 
-  def setOwner(value: Option[PlayerId]) = copy(newOwner = value)
+  def setOwner(value: Option[PlayerIdDTO]) = copy(newOwner = value)
 
   def strength(time: Long) = copy(newStrengthened = true, newStrengtheningStartTime = time)
 
@@ -44,7 +44,7 @@ class Building(val id: BuildingId,
   def shoot(time: Long) = copy(newLastShootTime = time)
 
   private def copy(newPopulation: Double = population,
-                   newOwner: Option[PlayerId] = owner,
+                   newOwner: Option[PlayerIdDTO] = owner,
                    newStrengthened: Boolean = strengthened,
                    newStrengtheningStartTime: Long = strengtheningStartTime,
                    newLastShootTime: Long = lastShootTime) =
@@ -70,7 +70,7 @@ class Building(val id: BuildingId,
       .setStrengthened(strengthened)
 
     if (owner.isDefined)
-      builder.setOwner(owner.get.dto)
+      builder.setOwner(owner.get)
 
     builder.build
   }
@@ -82,7 +82,7 @@ class Building(val id: BuildingId,
       .setStrengthened(strengthened)
 
     if (owner.isDefined)
-      builder.setOwner(owner.get.dto)
+      builder.setOwner(owner.get)
 
     builder.build
   }

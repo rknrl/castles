@@ -13,7 +13,7 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.buildings.BuildingId
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.BuildingPrototypeDTO
-import ru.rknrl.dto.GameDTO.{UnitDTO, UnitIdDTO, UnitUpdateDTO}
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, UnitDTO, UnitIdDTO, UnitUpdateDTO}
 
 case class UnitId(id: Int) {
   def dto = UnitIdDTO.newBuilder.setId(id).build
@@ -27,7 +27,7 @@ class GameUnit(val id: UnitId,
                val startTime: Long,
                val speed: Double,
                val targetBuildingId: BuildingId,
-               val owner: PlayerId,
+               val owner: PlayerIdDTO,
                val strengthened: Boolean) {
 
   // todo count может быть 0, в ситуации после получения юнитами дамага
@@ -63,7 +63,7 @@ class GameUnit(val id: UnitId,
       .setPos(pos(time).dto)
       .setSpeed(speed.toFloat)
       .setTargetBuildingId(targetBuildingId.dto)
-      .setOwner(owner.dto)
+      .setOwner(owner)
       .setStrengthened(strengthened)
       .build
 

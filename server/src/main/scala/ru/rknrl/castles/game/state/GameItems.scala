@@ -10,14 +10,11 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.Item.Items
-import ru.rknrl.castles.account.state.Items
-import ru.rknrl.castles.account.state.Items
 import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.rmi.B2C.UpdateItemStates
 import ru.rknrl.dto.CommonDTO.ItemType
-import ru.rknrl.dto.GameDTO.{ItemStateDTO, ItemsStateDTO}
+import ru.rknrl.dto.GameDTO.{ItemStateDTO, ItemsStateDTO, PlayerIdDTO}
 
 import scala.collection.JavaConverters._
 
@@ -43,7 +40,7 @@ class GameItemState(val itemType: ItemType,
   }
 }
 
-class GameItemsState(val playerId: PlayerId,
+class GameItemsState(val playerId: PlayerIdDTO,
                      val items: Map[ItemType, GameItemState]) {
 
   def use(itemType: ItemType, time: Long) = {
@@ -77,7 +74,7 @@ object GameItems {
     for ((itemType, item) ← items)
       yield itemType → new GameItemState(itemType, item.getCount, lastUseTime = 0, useCount = 0)
 
-  def init(playerId: PlayerId, items: Items) =
+  def init(playerId: PlayerIdDTO, items: Items) =
     new GameItemsState(playerId, initMap(items))
 
   def getUpdateItemsStatesMessages(oldItems: GameItems, item: GameItems, config: GameConfig, time: Long) =
@@ -87,8 +84,8 @@ object GameItems {
     ) yield PersonalMessage(playerId, new UpdateItemStates(state.dto(time, config)))
 }
 
-class GameItems(val states: Map[PlayerId, GameItemsState]) {
-  def applyCasts(casts: Map[PlayerId, _], itemType: ItemType, time: Long) =
+class GameItems(val states: Map[PlayerIdDTO, GameItemsState]) {
+  def applyCasts(casts: Map[PlayerIdDTO, _], itemType: ItemType, time: Long) =
     new GameItems(
       for ((playerId, state) ← states)
         yield
@@ -98,11 +95,11 @@ class GameItems(val states: Map[PlayerId, GameItemsState]) {
           playerId → state
     )
 
-  def canCast(playerId: PlayerId, itemType: ItemType, config: GameConfig, time: Long) =
+  def canCast(playerId: PlayerIdDTO, itemType: ItemType, config: GameConfig, time: Long) =
     time - states(playerId).items(itemType).lastUseTime >= config.constants.itemCooldown
 
-  def checkCasts[T](casts: Map[PlayerId, T], itemType: ItemType, config: GameConfig, time: Long) =
+  def checkCasts[T](casts: Map[PlayerIdDTO, T], itemType: ItemType, config: GameConfig, time: Long) =
     casts.filter { case (playerId, _) ⇒ canCast(playerId, itemType, config, time) }
 
-  def dto(playerId: PlayerId, time: Long, config: GameConfig) = states(playerId).dto(time, config)
+  def dto(playerId: PlayerIdDTO, time: Long, config: GameConfig) = states(playerId).dto(time, config)
 }

@@ -13,7 +13,7 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.dto.CommonDTO.SlotId
-import ru.rknrl.dto.GameDTO.{CellSize, SlotsOrientation}
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, CellSize, SlotsOrientation}
 
 object GameArea {
   type SlotsPositions = Map[SlotId, IJ]
@@ -34,7 +34,7 @@ trait GameArea {
 
   def height = v * CellSize.SIZE_VALUE
 
-  def assistancePositions: Map[PlayerId, Point]
+  def assistancePositions: Map[PlayerIdDTO, Point]
 
   def slotsPositions: Map[Int, IJ]
 

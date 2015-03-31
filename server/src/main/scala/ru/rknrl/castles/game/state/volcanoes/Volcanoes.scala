@@ -12,13 +12,13 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.rmi.B2C.AddVolcano
-import ru.rknrl.dto.GameDTO.{PointDTO, VolcanoDTO}
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, PointDTO, VolcanoDTO}
 import ru.rknrl.utils.PeriodObjectCollection
 
 object Volcanoes {
   type Volcanoes = PeriodObjectCollection[VolcanoDTO, Volcano]
 
-  def `casts→volcanoes`(casts: Map[PlayerId, PointDTO], time: Long, config: GameConfig, playerStates: PlayerStates) =
+  def `casts→volcanoes`(casts: Map[PlayerIdDTO, PointDTO], time: Long, config: GameConfig, playerStates: PlayerStates) =
     for ((playerId, dto) ← casts)
     yield new Volcano(playerId, Point(dto), time, config.volcanoDuration(playerStates(playerId)))
 

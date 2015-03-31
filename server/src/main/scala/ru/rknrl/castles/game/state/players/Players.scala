@@ -14,11 +14,11 @@ import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, UserInfoDTO}
 import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
-case class PlayerId(id: Int) {
-  def dto = PlayerIdDTO.newBuilder.setId(id).build
+object PlayerId {
+  def apply(id: Int) = PlayerIdDTO.newBuilder.setId(id).build
 }
 
-class Player(val id: PlayerId,
+class Player(val id: PlayerIdDTO,
              val accountId: AccountIdDTO,
              val userInfo: UserInfoDTO,
              val slots: Slots,

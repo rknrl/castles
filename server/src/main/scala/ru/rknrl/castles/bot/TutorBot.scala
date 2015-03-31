@@ -36,7 +36,7 @@ class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) exte
       mode = GAME
 
     case StatAction.TUTOR_ARROWS ⇒
-      if (playerId.get.id == 3) mode = SEND_UNITS_TO_ONE_BUILDING
+      if (playerId.get.getId == 3) mode = SEND_UNITS_TO_ONE_BUILDING
   })
 
   override def receive = tutorBotReceive.orElse(super.receive)

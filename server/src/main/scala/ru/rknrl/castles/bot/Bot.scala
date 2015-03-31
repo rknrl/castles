@@ -21,7 +21,7 @@ import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.dto.CommonDTO.{AccountIdDTO, ItemType}
-import ru.rknrl.dto.GameDTO.MoveDTO
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, MoveDTO}
 import ru.rknrl.{Logged, SilentLog}
 
 import scala.collection.JavaConverters._
@@ -35,7 +35,7 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
 
   var game: Option[ActorRef] = None
   var gameState: Option[GameState] = None
-  var playerId: Option[PlayerId] = None
+  var playerId: Option[PlayerIdDTO] = None
 
   var toBuildingId: Option[BuildingId] = None
   var myBuildingsSize = 0
@@ -164,7 +164,7 @@ class Bot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends A
     (distances.sum / myBuildings.size) / mapDiagonal // from 0 to 1
   }
 
-  def ownerWeight(owner: Option[PlayerId]) = if (owner.isDefined) 0.3 else 0.0
+  def ownerWeight(owner: Option[PlayerIdDTO]) = if (owner.isDefined) 0.3 else 0.0
 
   def populationWeight(population: Double) = population * 3 / 99
 

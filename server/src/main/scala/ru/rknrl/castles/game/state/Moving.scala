@@ -12,17 +12,17 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.GameDTO.MoveDTO
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, MoveDTO}
 
 import scala.collection.JavaConverters._
 
 object Moving {
 
-  case class ExitUnit(playerId: PlayerId, fromBuildingId: BuildingId, toBuildingId: BuildingId)
+  case class ExitUnit(playerId: PlayerIdDTO, fromBuildingId: BuildingId, toBuildingId: BuildingId)
 
   case class EnterUnit(unit: GameUnit)
 
-  def `moveActions→exitUnits`(moveActions: Map[PlayerId, MoveDTO], buildings: Buildings, config: GameConfig) =
+  def `moveActions→exitUnits`(moveActions: Map[PlayerIdDTO, MoveDTO], buildings: Buildings, config: GameConfig) =
     for ((playerId, moveDto) ← moveActions;
          fromBuildingsDto = moveDto.getFromBuildingsList.asScala.toList;
          fromBuildingDto ← fromBuildingsDto;

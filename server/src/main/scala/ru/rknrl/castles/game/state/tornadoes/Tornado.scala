@@ -10,12 +10,12 @@ package ru.rknrl.castles.game.state.tornadoes
 
 import ru.rknrl.castles.game.state.players.PlayerId
 import ru.rknrl.castles.game.points.Points
-import ru.rknrl.dto.GameDTO.TornadoDTO
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, TornadoDTO}
 import ru.rknrl.utils.PeriodObject
 
 import scala.collection.JavaConverters._
 
-class Tornado(val playerId: PlayerId,
+class Tornado(val playerId: PlayerIdDTO,
               val points: Points,
               val startTime: Long,
               val duration: Long,

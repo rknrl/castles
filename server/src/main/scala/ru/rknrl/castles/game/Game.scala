@@ -30,7 +30,7 @@ object Game {
 
   case class Join(accountId: AccountIdDTO, client: ActorRef)
 
-  case class PersonalMessage(playerId: PlayerId, msg: Msg)
+  case class PersonalMessage(playerId: PlayerIdDTO, msg: Msg)
 
 }
 
@@ -70,7 +70,7 @@ object PlayerState extends Enumeration {
  *
  * Когда все игроки перешли в состояние leaved отправляем Matchmaking сообщение GameOver, а он нам в ответ StopGame, удаляем актор игры
  */
-class Game(players: Map[PlayerId, Player],
+class Game(players: Map[PlayerIdDTO, Player],
            big: Boolean,
            isTutor: Boolean,
            isDev: Boolean,
@@ -91,20 +91,20 @@ class Game(players: Map[PlayerId, Player],
     * Добавление происходит на сообщение JoinGame
     * Удаление происходит при потере коннекта, на сообщение Offline
     */
-  var online = Set.empty[PlayerId]
+  var online = Set.empty[PlayerIdDTO]
 
   var playerStates =
     for ((playerId, player) ← players)
       yield playerId → PlayerState.GAME
 
   /** Игроки, которые завершили игру и их места */
-  var gameOvers = Map.empty[PlayerId, Int]
+  var gameOvers = Map.empty[PlayerIdDTO, Int]
 
-  var `playerId→account` = Map.empty[PlayerId, ActorRef]
+  var `playerId→account` = Map.empty[PlayerIdDTO, ActorRef]
 
-  var `playerId→client` = Map.empty[PlayerId, ActorRef]
+  var `playerId→client` = Map.empty[PlayerIdDTO, ActorRef]
 
-  var `client→playerId` = Map.empty[ActorRef, PlayerId]
+  var `client→playerId` = Map.empty[ActorRef, PlayerIdDTO]
 
   /** Игроки еще не завершившие игру */
   def playersInGame =
@@ -121,14 +121,14 @@ class Game(players: Map[PlayerId, Player],
   def playersDto =
     for ((id, player) ← players)
       yield PlayerDTO.newBuilder
-        .setId(id.dto)
+        .setId(id)
         .setInfo(player.userInfo)
         .build
 
   def placeToReward(place: Int) =
     if (place == 1) config.winReward else 0
 
-  def getReward(playerId: PlayerId) =
+  def getReward(playerId: PlayerIdDTO) =
     placeToReward(gameOvers(playerId))
 
   def getNewLosers =
@@ -146,7 +146,7 @@ class Game(players: Map[PlayerId, Player],
 
   val scheduler = context.system.scheduler.schedule(0 seconds, sendInterval milliseconds, self, UpdateGameState)
 
-  def canSendMessage(playerId: PlayerId) =
+  def canSendMessage(playerId: PlayerIdDTO) =
     (online contains playerId) &&
       (playerStates(playerId) != PlayerState.LEAVED)
 
@@ -168,12 +168,12 @@ class Game(players: Map[PlayerId, Player],
 
   var gameState = GameState.init(System.currentTimeMillis(), players.values.toList, big, isTutor, config, gameMap)
 
-  var moveActions = Map.empty[PlayerId, MoveDTO]
-  var fireballCasts = Map.empty[PlayerId, PointDTO]
-  var strengtheningCasts = Map.empty[PlayerId, BuildingId]
-  var volcanoCasts = Map.empty[PlayerId, PointDTO]
-  var tornadoCasts = Map.empty[PlayerId, CastTorandoDTO]
-  var assistanceCasts = Map.empty[PlayerId, BuildingId]
+  var moveActions = Map.empty[PlayerIdDTO, MoveDTO]
+  var fireballCasts = Map.empty[PlayerIdDTO, PointDTO]
+  var strengtheningCasts = Map.empty[PlayerIdDTO, BuildingId]
+  var volcanoCasts = Map.empty[PlayerIdDTO, PointDTO]
+  var tornadoCasts = Map.empty[PlayerIdDTO, CastTorandoDTO]
+  var assistanceCasts = Map.empty[PlayerIdDTO, BuildingId]
 
   def clearMaps(): Unit = {
     moveActions = Map.empty
@@ -290,7 +290,7 @@ class Game(players: Map[PlayerId, Player],
       sendToBots(dto.getAction)
   })
 
-  def addLoser(playerId: PlayerId, place: Int) {
+  def addLoser(playerId: PlayerIdDTO, place: Int) {
     playerStates = playerStates.updated(playerId, PlayerState.GAME_OVER)
 
     val dto = getLoseDto(playerId, place)
@@ -310,16 +310,16 @@ class Game(players: Map[PlayerId, Player],
     }
   }
 
-  def getWinDto(playerId: PlayerId) =
+  def getWinDto(playerId: PlayerIdDTO) =
     GameOverDTO.newBuilder
-      .setPlayerId(playerId.dto)
+      .setPlayerId(playerId)
       .setPlace(1)
       .setReward(config.winReward)
       .build
 
-  def getLoseDto(playerId: PlayerId, place: Int) =
+  def getLoseDto(playerId: PlayerIdDTO, place: Int) =
     GameOverDTO.newBuilder
-      .setPlayerId(playerId.dto)
+      .setPlayerId(playerId)
       .setPlace(place)
       .setReward(0)
       .build
@@ -327,12 +327,12 @@ class Game(players: Map[PlayerId, Player],
   def gameOverDto =
     for ((playerId, place) ← gameOvers)
       yield GameOverDTO.newBuilder
-        .setPlayerId(playerId.dto)
+        .setPlayerId(playerId)
         .setPlace(place)
         .setReward(placeToReward(place))
         .build
 
-  def addLeaved(playerId: PlayerId) {
+  def addLeaved(playerId: PlayerIdDTO) {
     playerStates = playerStates.updated(playerId, PlayerState.LEAVED)
 
     // Говорим матчмейкингу, что игрок вышел

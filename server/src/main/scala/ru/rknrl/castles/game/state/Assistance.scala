@@ -13,14 +13,15 @@ import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.state.units.GameUnit
+import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
 object Assistance {
-  def `casts→units`(casts: Map[PlayerId, BuildingId],
+  def `casts→units`(casts: Map[PlayerIdDTO, BuildingId],
                     buildings: Buildings,
                     config: GameConfig,
                     playerStates: PlayerStates,
                     unitIdIterator: UnitIdIterator,
-                    assistancePositions: Map[PlayerId, Point],
+                    assistancePositions: Map[PlayerIdDTO, Point],
                     time: Long) =
     for ((playerId, buildingId) ← casts) yield {
       val building = buildings(buildingId)

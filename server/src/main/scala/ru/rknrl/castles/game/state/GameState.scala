@@ -10,7 +10,6 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.state.IJ
-import ru.rknrl.castles.game.{GameMap, GameConfig}
 import ru.rknrl.castles.game.points.Point
 import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.Moving._
@@ -22,6 +21,7 @@ import ru.rknrl.castles.game.state.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.state.units.GameUnits.{getUpdateMessages, _}
 import ru.rknrl.castles.game.state.units.{GameUnits, UnitId}
 import ru.rknrl.castles.game.state.volcanoes.Volcanoes._
+import ru.rknrl.castles.game.{GameConfig, GameMap}
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.CommonDTO.ItemType
 import ru.rknrl.dto.GameDTO._
@@ -44,7 +44,7 @@ object GameState {
          (slotId, slot) ← player.slots
          if slot.hasBuildingPrototype)
       yield {
-        val ij = playersSlotsPositions(player.id.id)(slotId)
+        val ij = playersSlotsPositions(player.id.getId)(slotId)
         val xy = ij.centerXY
 
         val prototype = slot.getBuildingPrototype
@@ -62,10 +62,10 @@ object GameState {
   def slotsPosDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, SlotsOrientation]) =
     for (player ← players)
       yield {
-        val id = player.id.id
+        val id = player.id.getId
         val pos = positions(id)
         SlotsPosDTO.newBuilder
-          .setPlayerId(player.id.dto)
+          .setPlayerId(player.id)
           .setPos(pos.centerXY.dto)
           .setOrientation(orientations(id))
           .build
@@ -117,7 +117,7 @@ object GameState {
 class GameState(val time: Long,
                 val width: Int,
                 val height: Int,
-                val players: Map[PlayerId, Player],
+                val players: Map[PlayerIdDTO, Player],
                 val buildings: Buildings,
                 val units: GameUnits,
                 val fireballs: Fireballs,
@@ -128,16 +128,16 @@ class GameState(val time: Long,
                 val unitIdIterator: UnitIdIterator,
                 val slotsPos: Iterable[SlotsPosDTO],
                 val playerStates: PlayerStates,
-                val assistancePositions: Map[PlayerId, Point],
+                val assistancePositions: Map[PlayerIdDTO, Point],
                 val config: GameConfig) {
 
   def update(newTime: Long,
-             moveActions: Map[PlayerId, MoveDTO],
-             newFireballCasts: Map[PlayerId, PointDTO],
-             newStrengtheningCasts: Map[PlayerId, BuildingId],
-             newVolcanoCasts: Map[PlayerId, PointDTO],
-             newTornadoCasts: Map[PlayerId, CastTorandoDTO],
-             newAssistanceCasts: Map[PlayerId, BuildingId]) = {
+             moveActions: Map[PlayerIdDTO, MoveDTO],
+             newFireballCasts: Map[PlayerIdDTO, PointDTO],
+             newStrengtheningCasts: Map[PlayerIdDTO, BuildingId],
+             newVolcanoCasts: Map[PlayerIdDTO, PointDTO],
+             newTornadoCasts: Map[PlayerIdDTO, CastTorandoDTO],
+             newAssistanceCasts: Map[PlayerIdDTO, BuildingId]) = {
 
     val deltaTime = newTime - time
 
@@ -249,14 +249,14 @@ class GameState(val time: Long,
     (newGameState, messages, personalMessages)
   }
 
-  def isPlayerLose(playerId: PlayerId) =
+  def isPlayerLose(playerId: PlayerIdDTO) =
     !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId) }
 
-  def dtoBuilder(id: PlayerId) =
+  def dtoBuilder(id: PlayerIdDTO) =
     GameStateDTO.newBuilder
       .setWidth(width)
       .setHeight(height)
-      .setSelfId(id.dto)
+      .setSelfId(id)
       .addAllSlots(slotsPos.asJava)
       .addAllBuildings(buildings.dto.asJava)
       .addAllUnits(units.dto(time).asJava)

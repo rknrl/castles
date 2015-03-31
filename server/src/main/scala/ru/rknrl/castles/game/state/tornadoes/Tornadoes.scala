@@ -12,7 +12,7 @@ import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
 import ru.rknrl.castles.game.points.{Point, Points}
 import ru.rknrl.castles.rmi.B2C.AddTornado
-import ru.rknrl.dto.GameDTO.{CastTorandoDTO, TornadoDTO}
+import ru.rknrl.dto.GameDTO.{PlayerIdDTO, CastTorandoDTO, TornadoDTO}
 import ru.rknrl.utils.PeriodObjectCollection
 
 import scala.collection.JavaConverters._
@@ -20,7 +20,7 @@ import scala.collection.JavaConverters._
 object Tornadoes {
   type Tornadoes = PeriodObjectCollection[TornadoDTO, Tornado]
 
-  def `casts→tornadoes`(casts: Map[PlayerId, CastTorandoDTO], time: Long, config: GameConfig, playerStates: PlayerStates) =
+  def `casts→tornadoes`(casts: Map[PlayerIdDTO, CastTorandoDTO], time: Long, config: GameConfig, playerStates: PlayerStates) =
     for ((playerId, dto) ← casts)
     yield new Tornado(playerId, new Points(dto.getPointsList.asScala), time, config.tornadoDuration(playerStates(playerId)), config.tornadoSpeed)
 

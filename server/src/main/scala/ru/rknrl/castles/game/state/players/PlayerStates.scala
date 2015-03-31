@@ -11,6 +11,7 @@ package ru.rknrl.castles.game.state.players
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
 import ru.rknrl.dto.CommonDTO.BuildingType._
+import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
 class PlayerState(val stat: Stat,
                   val churchesProportion: Double) {
@@ -18,12 +19,12 @@ class PlayerState(val stat: Stat,
     new PlayerState(stat, value)
 }
 
-class PlayerStates(states: Map[PlayerId, PlayerState]) {
+class PlayerStates(states: Map[PlayerIdDTO, PlayerState]) {
 
-  def apply(playerId: Option[PlayerId]) =
+  def apply(playerId: Option[PlayerIdDTO]) =
     if (playerId.isDefined) Some(states(playerId.get)) else None
 
-  def apply(id: PlayerId) = states(id)
+  def apply(id: PlayerIdDTO) = states(id)
 
   private def totalChurchesPopulation(buildings: Map[BuildingId, Building]) = {
     var total = 0.0
@@ -32,7 +33,7 @@ class PlayerStates(states: Map[PlayerId, PlayerState]) {
     total
   }
 
-  private def playerChurchesPopulation(buildings: Map[BuildingId, Building], playerId: PlayerId) = {
+  private def playerChurchesPopulation(buildings: Map[BuildingId, Building], playerId: PlayerIdDTO) = {
     var population = 0.0
     for ((id, b) ← buildings
          if b.prototype.getType == CHURCH && b.owner == Some(playerId))
