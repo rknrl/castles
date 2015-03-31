@@ -34,10 +34,4 @@ class ItemTest extends FreeSpec with Matchers {
     val newItem = new Item(TORNADO, 10) + (-999)
     newItem.count shouldBe 0
   }
-
-  "dto" in {
-    val dto = new Item(VOLCANO, 18).dto
-    dto.getType shouldBe VOLCANO
-    dto.getCount shouldBe 18
-  }
 }

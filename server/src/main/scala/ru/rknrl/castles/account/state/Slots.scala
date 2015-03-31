@@ -18,23 +18,11 @@ class Slots(val slots: Map[SlotId, Slot]) {
 
   def apply(id: SlotId) = slots(id)
 
+  def updated(id: SlotId, slot: Slot) =
+    new Slots(slots.updated(id, slot))
+
   def buildingsCount =
     slots.values.count(_.buildingPrototype.isDefined)
-
-  def set(id: SlotId, buildingPrototype: BuildingPrototype) =
-    update(id, slots(id).set(buildingPrototype))
-
-  def remove(id: SlotId) =
-    update(id, slots(id).remove)
-
-  def build(id: SlotId, buildingType: BuildingType) =
-    update(id, slots(id).build(buildingType))
-
-  def upgrade(id: SlotId) =
-    update(id, slots(id).upgrade)
-
-  private def update(id: SlotId, newSlot: Slot) =
-    new Slots(slots.updated(id, newSlot))
 
   def dto = slots.values.map(_.dto)
 }

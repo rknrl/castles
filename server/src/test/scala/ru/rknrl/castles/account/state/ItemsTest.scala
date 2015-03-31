@@ -42,21 +42,4 @@ class ItemsTest extends FreeSpec with Matchers {
     newItems(VOLCANO).count shouldBe 10
     checkEquals(newItems, Some(VOLCANO))
   }
-
-  "dto" in {
-    val dto = items.dto
-
-    def get(itemType: ItemType) =
-      dto.find(_.getType == itemType).get
-
-    get(FIREBALL).getCount shouldBe 1
-    get(STRENGTHENING).getCount shouldBe 2
-    get(TORNADO).getCount shouldBe 2
-    get(VOLCANO).getCount shouldBe 3
-    get(ASSISTANCE).getCount shouldBe 0
-  }
-
-  "parse from dto" in {
-    checkEquals(Items(items.dto), None)
-  }
 }

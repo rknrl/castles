@@ -12,6 +12,10 @@ import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.AccountDTO._
+import ru.rknrl.dto.CommonDTO.BuildingLevel._
+import ru.rknrl.dto.CommonDTO.BuildingType._
+import ru.rknrl.dto.CommonDTO.SkillLevel._
+import ru.rknrl.dto.CommonDTO.SlotId._
 import ru.rknrl.dto.CommonDTO._
 
 import scala.collection.JavaConverters._
@@ -24,23 +28,32 @@ class AccountState(val slots: Slots,
                    val gamesCount: Int) {
 
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
-    val price = config.buildingPrices(BuildingLevel.LEVEL_1)
+    val price = config.buildingPrices(LEVEL_1)
     Assertion.check(price <= gold)
-    copy(newSlots = slots.build(id, buildingType), newGold = gold - price)
+
+    setBuilding(id, BuildingPrototype(buildingType, LEVEL_1))
+      .addGold(-price)
   }
 
   def upgradeBuilding(id: SlotId, config: AccountConfig) = {
-    val upgraded = slots(id).upgrade
-    val price = config.buildingPrices(upgraded.buildingPrototype.get.level)
+    val upgraded = slots(id).buildingPrototype.get.upgraded
+    val price = config.buildingPrices(upgraded.level)
     Assertion.check(price <= gold)
-    copy(newSlots = slots.upgrade(id), newGold = gold - price)
+
+    setBuilding(id, upgraded)
+      .addGold(-price)
   }
 
-  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype) =
-    copy(newSlots = slots.set(id, buildingPrototype))
-
   def removeBuilding(id: SlotId): AccountState =
-    copy(newSlots = slots.remove(id))
+    setBuilding(id, None)
+
+  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype): AccountState =
+    setBuilding(id, Some(buildingPrototype))
+
+  def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototype]): AccountState = {
+    val newSlot = new Slot(id, buildingPrototype)
+    copy(newSlots = slots.updated(id, newSlot))
+  }
 
   def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
     val price = config.skillUpgradePrices(skills.nextTotalLevel)
@@ -94,11 +107,11 @@ class AccountState(val slots: Slots,
 object AccountState {
   private def initSlotBuildings =
     List(
-      Slot.empty(SlotId.SLOT_1),
-      Slot.empty(SlotId.SLOT_2),
-      Slot(SlotId.SLOT_3, BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)),
-      Slot(SlotId.SLOT_4, BuildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1)),
-      Slot(SlotId.SLOT_5, BuildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1))
+      Slot.empty(SLOT_1),
+      Slot.empty(SLOT_2),
+      Slot(SLOT_3, BuildingPrototype(HOUSE, LEVEL_1)),
+      Slot(SLOT_4, BuildingPrototype(TOWER, LEVEL_1)),
+      Slot(SLOT_5, BuildingPrototype(CHURCH, LEVEL_1))
     )
 
   private def initSlotsMap =
@@ -107,7 +120,7 @@ object AccountState {
   private def initSlots = new Slots(initSlotsMap)
 
   private def initSkillLevels =
-    SkillType.values.map(_ → SkillLevel.SKILL_LEVEL_0).toMap
+    SkillType.values.map(_ → SKILL_LEVEL_0).toMap
 
   private def initSkills = new Skills(initSkillLevels)
 

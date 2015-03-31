@@ -8,29 +8,11 @@
 
 package ru.rknrl.castles.account.state
 
-import ru.rknrl.Assertion
 import ru.rknrl.dto.AccountDTO.SlotDTO
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType, SlotId}
+import ru.rknrl.dto.CommonDTO.SlotId
 
-class Slot private(val id: SlotId,
-                   val buildingPrototype: Option[BuildingPrototype]) {
-
-  def set(buildingPrototype: BuildingPrototype) =
-    Slot(id, buildingPrototype)
-
-  def remove = {
-    Assertion.check(buildingPrototype.isDefined)
-    Slot.empty(id)
-  }
-
-  def build(buildingType: BuildingType) = {
-    Assertion.check(buildingPrototype.isEmpty)
-    Slot(id, BuildingPrototype(buildingType, BuildingLevel.LEVEL_1))
-  }
-
-  def upgrade =
-    Slot(id, buildingPrototype.get.upgraded)
-
+class Slot(val id: SlotId,
+           val buildingPrototype: Option[BuildingPrototype]) {
   def dto = {
     val builder = SlotDTO.newBuilder.setId(id)
     if (buildingPrototype.isDefined) builder.setBuildingPrototype(buildingPrototype.get.dto)
