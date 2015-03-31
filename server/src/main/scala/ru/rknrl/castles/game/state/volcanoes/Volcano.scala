@@ -19,9 +19,9 @@ class Volcano(val playerId: PlayerId,
               val duration: Long) extends PeriodObject[VolcanoDTO] {
 
   def dto(time: Long) =
-    VolcanoDTO.newBuilder()
+    VolcanoDTO.newBuilder
       .setPos(pos.dto)
       .setMillisTillEnd(millisTillEnd(time))
-      .build()
+      .build
 }
 

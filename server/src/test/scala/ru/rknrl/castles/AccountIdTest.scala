@@ -36,11 +36,6 @@ class AccountIdTest extends FreeSpec with Matchers {
     AccountId(DEV, "bot0").dto.getId should be("bot0")
   }
 
-  "toString" in {
-    AccountId(VKONTAKTE, "264648879").toString should be("VKONTAKTE 264648879")
-    AccountId(DEV, "bot0").toString should be("DEV bot0")
-  }
-
   "parse from dto" in {
     val dto1 = AccountIdDTO.newBuilder()
       .setType(VKONTAKTE)

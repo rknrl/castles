@@ -40,13 +40,6 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
     totalLevel + 1
   }
 
-  def dto =
-    for ((skillType, level) ← levels)
-      yield SkillLevelDTO.newBuilder
-        .setType(skillType)
-        .setLevel(level)
-        .build
-
   val levelsCount = SkillLevel.values.size - 1
 
   def stat(config: AccountConfig) =
@@ -55,10 +48,17 @@ class Skills(val levels: Map[SkillType, SkillLevel]) {
       1 + levels(SkillType.DEFENCE).getNumber * config.maxDefence / levelsCount,
       1 + levels(SkillType.SPEED).getNumber * config.maxSpeed / levelsCount
     )
+
+  def dto =
+    for ((skillType, level) ← levels)
+      yield SkillLevelDTO.newBuilder
+        .setType(skillType)
+        .setLevel(level)
+        .build
 }
 
 object Skills {
-  def nextLevel(level: SkillLevel) =
+  private def nextLevel(level: SkillLevel) =
     level match {
       case SkillLevel.SKILL_LEVEL_0 ⇒ SkillLevel.SKILL_LEVEL_1
       case SkillLevel.SKILL_LEVEL_1 ⇒ SkillLevel.SKILL_LEVEL_2

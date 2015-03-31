@@ -19,7 +19,7 @@ class Bullet(val building: Building,
              val duration: Long) extends PeriodObject[BulletDTO] {
 
   def dto(time: Long) =
-    BulletDTO.newBuilder()
+    BulletDTO.newBuilder
       .setBuildingId(building.id.dto)
       .setUnitId(unit.id.dto)
       .setDuration(duration.toInt)

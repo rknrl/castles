@@ -105,10 +105,10 @@ class Admin(database: ActorRef,
 
   def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
     client ! B2C.AccountState(
-      AdminAccountStateDTO.newBuilder()
+      AdminAccountStateDTO.newBuilder
         .setAccountId(accountId)
         .setAccountState(accountState)
-        .build())
+        .build)
 
   def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
     val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)

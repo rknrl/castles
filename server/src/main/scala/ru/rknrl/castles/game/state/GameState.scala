@@ -18,7 +18,6 @@ import ru.rknrl.castles.game.state.area.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
 import ru.rknrl.castles.game.state.bullets.Bullets._
 import ru.rknrl.castles.game.state.fireballs.Fireballs._
-import ru.rknrl.castles.game.state.players.Players.Players
 import ru.rknrl.castles.game.state.players._
 import ru.rknrl.castles.game.state.tornadoes.Tornadoes._
 import ru.rknrl.castles.game.state.units.GameUnits.{getUpdateMessages, _}
@@ -66,11 +65,11 @@ object GameState {
       yield {
         val id = player.id.id
         val pos = positions(id)
-        SlotsPosDTO.newBuilder()
+        SlotsPosDTO.newBuilder
           .setPlayerId(player.id.dto)
           .setPos(pos.centerXY.dto)
           .setOrientation(orientations(id))
-          .build()
+          .build
       }
 
   def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig, gameMap: GameMap) = {
@@ -119,7 +118,7 @@ object GameState {
 class GameState(val time: Long,
                 val width: Int,
                 val height: Int,
-                val players: Players,
+                val players: Map[PlayerId, Player],
                 val buildings: Buildings,
                 val units: GameUnits,
                 val fireballs: Fireballs,
@@ -255,7 +254,7 @@ class GameState(val time: Long,
     !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId) }
 
   def dtoBuilder(id: PlayerId) =
-    GameStateDTO.newBuilder()
+    GameStateDTO.newBuilder
       .setWidth(width)
       .setHeight(height)
       .setSelfId(id.dto)

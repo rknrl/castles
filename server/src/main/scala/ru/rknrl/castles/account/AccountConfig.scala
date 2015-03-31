@@ -18,10 +18,24 @@ object AccountConfig {
 
   class BuildingPrices(val map: Map[BuildingLevel, Int]) {
     def apply(level: BuildingLevel) = map(level)
+
+    def dto =
+      for ((buildingLevel, price) ← map)
+        yield BuildingPriceDTO.newBuilder
+          .setLevel(buildingLevel)
+          .setPrice(price)
+          .build
   }
 
   class SkillUpgradePrices(val map: Map[Int, Int]) {
     def apply(totalLevel: Int) = map(totalLevel)
+
+    def dto =
+      for ((totalLevel, price) ← map)
+        yield SkillUpgradePriceDTO.newBuilder
+          .setTotalLevel(totalLevel)
+          .setPrice(price)
+          .build
   }
 
 }
@@ -36,23 +50,9 @@ class AccountConfig(val initGold: Int,
                     val maxDefence: Double,
                     val maxSpeed: Double) {
 
-  private def buildingPricesDto =
-    for ((buildingLevel, price) ← buildingPrices.map)
-      yield BuildingPriceDTO.newBuilder()
-        .setLevel(buildingLevel)
-        .setPrice(price)
-        .build()
-
-  private def skillUpgradePricesDto =
-    for ((totalLevel, price) ← skillUpgradePrices.map)
-      yield SkillUpgradePriceDTO.newBuilder()
-        .setTotalLevel(totalLevel)
-        .setPrice(price)
-        .build()
-
-  def dto = AccountConfigDTO.newBuilder()
-    .addAllBuildings(buildingPricesDto.asJava)
-    .addAllSkillUpgradePrices(skillUpgradePricesDto.asJava)
+  def dto = AccountConfigDTO.newBuilder
+    .addAllBuildings(buildingPrices.dto.asJava)
+    .addAllSkillUpgradePrices(skillUpgradePrices.dto.asJava)
     .setItemPrice(itemPrice)
-    .build()
+    .build
 }

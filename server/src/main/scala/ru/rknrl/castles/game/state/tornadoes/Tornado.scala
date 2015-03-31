@@ -24,10 +24,10 @@ class Tornado(val playerId: PlayerId,
   def getPos(time: Long) = points.getPos(millisFromsStart(time), speed)
 
   def dto(time: Long) =
-    TornadoDTO.newBuilder()
+    TornadoDTO.newBuilder
       .addAllPoints(points.dto.asJava)
       .setSpeed(speed.toFloat)
       .setMillisFromStart(millisFromsStart(time))
       .setMillisTillEnd(millisTillEnd(time))
-      .build()
+      .build
 }

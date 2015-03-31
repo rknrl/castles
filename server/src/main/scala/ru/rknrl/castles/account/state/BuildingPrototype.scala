@@ -16,7 +16,7 @@ class BuildingPrototype private(val buildingType: BuildingType,
 
   def upgraded = BuildingPrototype(buildingType, nextLevel(level))
 
-  def dto = BuildingPrototypeDTO.newBuilder()
+  def dto = BuildingPrototypeDTO.newBuilder
     .setType(buildingType)
     .setLevel(level)
     .build

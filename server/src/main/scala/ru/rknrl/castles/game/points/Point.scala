@@ -36,10 +36,10 @@ class Point private(val x: Double, val y: Double) {
 
   override def toString = "{" + x + "," + y + "}"
 
-  def dto = PointDTO.newBuilder()
+  def dto = PointDTO.newBuilder
     .setX(x.toFloat)
     .setY(y.toFloat)
-    .build()
+    .build
 }
 
 object Point {

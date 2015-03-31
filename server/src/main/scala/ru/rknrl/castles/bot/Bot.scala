@@ -104,10 +104,10 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
         myBuildingsSize = myBuildings.size
 
         sender ! Move(
-          MoveDTO.newBuilder()
+          MoveDTO.newBuilder
             .addAllFromBuildings(fromBuildings.map(_.id.dto).asJava)
             .setToBuilding(toBuildingId.get.dto)
-            .build()
+            .build
         )
 
         if (time - lastCastTime > castInterval) {

@@ -22,7 +22,7 @@ class BuildingId(val id: Int) {
 
   override def hashCode = id.hashCode
 
-  def dto = BuildingIdDTO.newBuilder().setId(id).build()
+  def dto = BuildingIdDTO.newBuilder.setId(id).build
 }
 
 class Building(val id: BuildingId,
@@ -67,7 +67,7 @@ class Building(val id: BuildingId,
   def differentWith(b: Building) = floorPopulation != b.floorPopulation || owner != b.owner || strengthened != b.strengthened
 
   def dto = {
-    val builder = BuildingDTO.newBuilder()
+    val builder = BuildingDTO.newBuilder
       .setId(id.dto)
       .setBuilding(prototype.dto)
       .setPos(pos.dto)
@@ -77,11 +77,11 @@ class Building(val id: BuildingId,
     if (owner.isDefined)
       builder.setOwner(owner.get.dto)
 
-    builder.build()
+    builder.build
   }
 
   def updateDto = {
-    val builder = BuildingUpdateDTO.newBuilder()
+    val builder = BuildingUpdateDTO.newBuilder
       .setId(id.dto)
       .setPopulation(floorPopulation)
       .setStrengthened(strengthened)
@@ -89,6 +89,6 @@ class Building(val id: BuildingId,
     if (owner.isDefined)
       builder.setOwner(owner.get.dto)
 
-    builder.build()
+    builder.build
   }
 }

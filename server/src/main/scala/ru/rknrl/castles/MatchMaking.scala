@@ -202,29 +202,29 @@ class MatchMaking(interval: FiniteDuration,
   def botUserInfo(accountId: AccountId, number: Int) =
     number match {
       case 0 ⇒
-        UserInfoDTO.newBuilder()
+        UserInfoDTO.newBuilder
           .setAccountId(accountId.dto)
           .setFirstName("Sasha")
           .setLastName("Serova")
           .setPhoto96("http://" + config.staticHost + "/avatars/Sasha96.png")
           .setPhoto256("http://" + config.staticHost + "/avatars/Sasha256.png")
-          .build()
+          .build
       case 1 ⇒
-        UserInfoDTO.newBuilder()
+        UserInfoDTO.newBuilder
           .setAccountId(accountId.dto)
           .setFirstName("Napoleon")
           .setLastName("1769")
           .setPhoto96("http://" + config.staticHost + "/avatars/Napoleon96.png")
           .setPhoto256("http://" + config.staticHost + "/avatars/Napoleon256.png")
-          .build()
+          .build
       case 2 ⇒
-        UserInfoDTO.newBuilder()
+        UserInfoDTO.newBuilder
           .setAccountId(accountId.dto)
           .setFirstName("Виктория")
           .setLastName("Викторовна")
           .setPhoto96("http://" + config.staticHost + "/avatars/Babka96.png")
           .setPhoto256("http://" + config.staticHost + "/avatars/Babka256.png")
-          .build()
+          .build
     }
 
   val gameIdIterator = new GameIdIterator
@@ -266,7 +266,7 @@ class MatchMaking(interval: FiniteDuration,
 
   def receive = logged({
     case RegisterHealth ⇒
-      health = health :+ ServerHealthItemDTO.newBuilder()
+      health = health :+ ServerHealthItemDTO.newBuilder
         .setOnline(accountIdToAccountRef.size)
         .setGames(gameRefToGameInfo.size)
         .setTotalMem((Runtime.getRuntime.totalMemory() / 1024 / 1024).toInt)
@@ -280,7 +280,7 @@ class MatchMaking(interval: FiniteDuration,
     /** from Admin */
     case GetServerHealth ⇒
       sender ! ServerHealth(
-        ServerHealthDTO.newBuilder()
+        ServerHealthDTO.newBuilder
           .setStartTime(healthStartTime)
           .addAllItems(health.asJava)
           .build
@@ -432,7 +432,7 @@ class MatchMaking(interval: FiniteDuration,
 
   def topDto =
     for (i ← 0 until top.size)
-      yield TopUserInfoDTO.newBuilder()
+      yield TopUserInfoDTO.newBuilder
         .setPlace(i + 1)
         .setInfo(top(i).info)
         .build

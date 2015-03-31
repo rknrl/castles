@@ -30,12 +30,12 @@ class GameItemState(val itemType: ItemType,
 
   def dto(time: Long, config: GameConfig) = {
     val millisTillCooldownEnd: Long = Math.max(0, config.constants.itemCooldown - (time - lastUseTime))
-    ItemStateDTO.newBuilder()
+    ItemStateDTO.newBuilder
       .setItemType(itemType)
       .setCount(count)
       .setMillisTillCooldownEnd(millisTillCooldownEnd.toInt)
       .setCooldownDuration(config.constants.itemCooldown.toInt)
-      .build()
+      .build
   }
 }
 
@@ -63,9 +63,9 @@ class GameItemsState(val playerId: PlayerId,
     yield state.dto(time, config)
 
   def dto(time: Long, config: GameConfig) =
-    ItemsStateDTO.newBuilder()
+    ItemsStateDTO.newBuilder
       .addAllItems(itemsDto(time, config).asJava)
-      .build()
+      .build
 }
 
 object GameItems {

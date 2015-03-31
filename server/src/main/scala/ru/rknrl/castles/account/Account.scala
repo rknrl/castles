@@ -107,7 +107,7 @@ class Account(matchmaking: ActorRef,
       }
 
     case AccountNoExists ⇒
-      val initTutorState = TutorStateDTO.newBuilder().build()
+      val initTutorState = TutorStateDTO.newBuilder.build
       database ! Insert(accountId.dto, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
       database ! Database.UpdateStatistics(StatAction.FIRST_AUTHENTICATED)
 
@@ -141,10 +141,10 @@ class Account(matchmaking: ActorRef,
   })
 
   def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO], tutorState: TutorStateDTO) = {
-    val builder = AuthenticatedDTO.newBuilder()
+    val builder = AuthenticatedDTO.newBuilder
       .setAccountState(state.dto)
       .setConfig(config.account.dto)
-      .setTop(TopDTO.newBuilder().addAllUsers(top.asJava).build)
+      .setTop(TopDTO.newBuilder.addAllUsers(top.asJava).build)
       .setTutor(tutorState)
       .addAllProducts(config.productsDto(platformType, accountId.accountType).asJava)
       .setSearchOpponents(searchOpponents)
@@ -211,7 +211,7 @@ class Account(matchmaking: ActorRef,
         state = state.addItem(itemType, -count)
 
       database ! UpdateAccountState(accountId.dto, state.dto)
-      client ! TopUpdated(TopDTO.newBuilder().addAllUsers(top.asJava).build())
+      client ! TopUpdated(TopDTO.newBuilder.addAllUsers(top.asJava).build)
       context become account
 
   }).orElse(persistent)
@@ -255,10 +255,10 @@ class Account(matchmaking: ActorRef,
     context become inGame(game)
   }
 
-  def gameAddress = NodeLocator.newBuilder()
+  def gameAddress = NodeLocator.newBuilder
     .setHost(config.host)
     .setPort(config.gamePort)
-    .build()
+    .build
 
   override def postStop() = {
     matchmaking ! Offline(accountId)

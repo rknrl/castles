@@ -77,7 +77,7 @@ class Config(val host: String,
   def productsDto(platformType: PlatformType, accountType: AccountType) =
     for (p ← products;
          productInfo = socialByAccountType(platformType, accountType).get.productsInfo.find(_.id == p.id).get)
-      yield ProductDTO.newBuilder()
+      yield ProductDTO.newBuilder
         .setId(p.id)
         .setTitle(p.title)
         .setDescription(p.description)
@@ -85,5 +85,5 @@ class Config(val host: String,
         .setCount(productInfo.count)
         .setPrice(productInfo.price)
         .setCurrency(productInfo.currency)
-        .build()
+        .build
 }

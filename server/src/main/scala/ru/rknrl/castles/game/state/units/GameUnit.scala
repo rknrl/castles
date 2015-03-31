@@ -23,7 +23,7 @@ class UnitId(val id: Int) {
 
   override def hashCode = id.hashCode
 
-  def dto = UnitIdDTO.newBuilder().setId(id).build()
+  def dto = UnitIdDTO.newBuilder.setId(id).build
 }
 
 class GameUnit(val id: UnitId,
@@ -64,7 +64,7 @@ class GameUnit(val id: UnitId,
   def dto(time: Long) = {
     val pos = getPos(time)
 
-    UnitDTO.newBuilder()
+    UnitDTO.newBuilder
       .setId(id.dto)
       .setType(buildingPrototype.buildingType)
       .setCount(GameConfig.truncatePopulation(count))
@@ -73,17 +73,17 @@ class GameUnit(val id: UnitId,
       .setTargetBuildingId(targetBuildingId.dto)
       .setOwner(owner.dto)
       .setStrengthened(strengthened)
-      .build()
+      .build
   }
 
   def updateDto(time: Long) = {
     val pos = getPos(time)
 
-    UnitUpdateDTO.newBuilder()
+    UnitUpdateDTO.newBuilder
       .setId(id.dto)
       .setPos(pos.dto)
       .setSpeed(speed.toFloat)
       .setCount(GameConfig.truncatePopulation(count))
-      .build()
+      .build
   }
 }

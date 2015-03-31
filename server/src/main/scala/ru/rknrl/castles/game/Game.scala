@@ -119,7 +119,7 @@ class Game(players: Map[PlayerId, Player],
 
   def playersDto =
     for ((id, player) ← players)
-      yield PlayerDTO.newBuilder()
+      yield PlayerDTO.newBuilder
         .setId(id.dto)
         .setInfo(player.userInfo)
         .build
@@ -310,26 +310,26 @@ class Game(players: Map[PlayerId, Player],
   }
 
   def getWinDto(playerId: PlayerId) =
-    GameOverDTO.newBuilder()
+    GameOverDTO.newBuilder
       .setPlayerId(playerId.dto)
       .setPlace(1)
       .setReward(config.winReward)
-      .build()
+      .build
 
   def getLoseDto(playerId: PlayerId, place: Int) =
-    GameOverDTO.newBuilder()
+    GameOverDTO.newBuilder
       .setPlayerId(playerId.dto)
       .setPlace(place)
       .setReward(0)
-      .build()
+      .build
 
   def gameOverDto =
     for ((playerId, place) ← gameOvers)
-      yield GameOverDTO.newBuilder()
+      yield GameOverDTO.newBuilder
         .setPlayerId(playerId.dto)
         .setPlace(place)
         .setReward(placeToReward(place))
-        .build()
+        .build
 
   def addLeaved(playerId: PlayerId) {
     playerStates = playerStates.updated(playerId, PlayerState.LEAVED)

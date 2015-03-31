@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.account.state
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.AccountDTO._
@@ -24,14 +25,14 @@ class AccountState(val slots: Slots,
 
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
     val price = config.buildingPrices(BuildingLevel.LEVEL_1)
-    assert(price <= gold)
+    Assertion.check(price <= gold)
     copy(newSlots = slots.build(id, buildingType), newGold = gold - price)
   }
 
   def upgradeBuilding(id: SlotId, config: AccountConfig) = {
     val upgraded = slots(id).upgrade
     val price = config.buildingPrices(upgraded.buildingPrototype.get.level)
-    assert(price <= gold)
+    Assertion.check(price <= gold)
     copy(newSlots = slots.upgrade(id), newGold = gold - price)
   }
 
@@ -43,7 +44,7 @@ class AccountState(val slots: Slots,
 
   def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
     val price = config.skillUpgradePrices(skills.nextTotalLevel)
-    assert(price <= gold)
+    Assertion.check(price <= gold)
     copy(newSkills = skills.upgrade(skillType), newGold = gold - price)
   }
 
@@ -52,7 +53,7 @@ class AccountState(val slots: Slots,
 
   def buyItem(itemType: ItemType, config: AccountConfig) = {
     val price = config.itemPrice
-    assert(price <= gold)
+    Assertion.check(price <= gold)
     copy(newItems = items.add(itemType, 1), newGold = gold - price)
   }
 
@@ -80,14 +81,14 @@ class AccountState(val slots: Slots,
       case _ ⇒ throw new IllegalArgumentException("unknown product id " + product.id)
     }
 
-  def dto = AccountStateDTO.newBuilder()
+  def dto = AccountStateDTO.newBuilder
     .addAllSlots(slots.dto.asJava)
     .addAllSkills(skills.dto.asJava)
     .addAllItems(items.dto.asJava)
     .setGold(gold)
     .setRating(rating)
     .setGamesCount(gamesCount)
-    .build()
+    .build
 }
 
 object AccountState {
@@ -111,7 +112,7 @@ object AccountState {
   private def initSkills = new Skills(initSkillLevels)
 
   private def initItemsCount(config: AccountConfig) =
-    for (itemType ← ItemType.values())
+    for (itemType ← ItemType.values)
       yield itemType → new Item(itemType, config.initItemCount)
 
   private def initItems(config: AccountConfig) = new Items(initItemsCount(config).toMap)

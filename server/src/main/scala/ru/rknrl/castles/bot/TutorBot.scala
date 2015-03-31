@@ -52,10 +52,10 @@ class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends
           lastTime = time
 
           sender ! Move(
-            MoveDTO.newBuilder()
+            MoveDTO.newBuilder
               .addAllFromBuildings(getMyBuildings.map(_.id.dto).asJava)
               .setToBuilding(towers.last.id.dto)
-              .build()
+              .build
           )
         }
       case GAME ⇒

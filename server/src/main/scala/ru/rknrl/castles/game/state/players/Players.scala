@@ -14,19 +14,8 @@ import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.dto.CommonDTO.UserInfoDTO
 import ru.rknrl.dto.GameDTO.PlayerIdDTO
 
-class PlayerId private(val id: Int) {
-  override def equals(obj: Any) = obj match {
-    case playerId: PlayerId ⇒ playerId.id == id
-    case _ ⇒ false
-  }
-
-  override def hashCode = id.hashCode
-
-  def dto = PlayerIdDTO.newBuilder().setId(id).build()
-}
-
-object PlayerId {
-  def apply(id: Int) = new PlayerId(id)
+case class PlayerId(id: Int) {
+  def dto = PlayerIdDTO.newBuilder.setId(id).build
 }
 
 class Player(val id: PlayerId,
@@ -36,7 +25,3 @@ class Player(val id: PlayerId,
              val stat: Stat,
              val items: Items,
              val isBot: Boolean)
-
-object Players {
-  type Players = Map[PlayerId, Player]
-}
