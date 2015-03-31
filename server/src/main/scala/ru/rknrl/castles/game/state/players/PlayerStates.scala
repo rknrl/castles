@@ -10,7 +10,7 @@ package ru.rknrl.castles.game.state.players
 
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.{Building, BuildingId}
-import ru.rknrl.dto.CommonDTO.BuildingType
+import ru.rknrl.dto.CommonDTO.BuildingType._
 
 class PlayerState(val stat: Stat,
                   val churchesProportion: Double) {
@@ -18,16 +18,16 @@ class PlayerState(val stat: Stat,
     new PlayerState(stat, value)
 }
 
-class PlayerStates(val states: Map[PlayerId, PlayerState]) {
+class PlayerStates(states: Map[PlayerId, PlayerState]) {
 
   def apply(playerId: Option[PlayerId]) =
     if (playerId.isDefined) Some(states(playerId.get)) else None
 
   def apply(id: PlayerId) = states(id)
 
-  private def totalChurchesPopulaton(buildings: Map[BuildingId, Building]) = {
+  private def totalChurchesPopulation(buildings: Map[BuildingId, Building]) = {
     var total = 0.0
-    for ((id, b) ← buildings if b.prototype.buildingType == BuildingType.CHURCH)
+    for ((id, b) ← buildings if b.prototype.buildingType == CHURCH)
       total += b.population
     total
   }
@@ -35,22 +35,18 @@ class PlayerStates(val states: Map[PlayerId, PlayerState]) {
   private def playerChurchesPopulation(buildings: Map[BuildingId, Building], playerId: PlayerId) = {
     var population = 0.0
     for ((id, b) ← buildings
-         if b.prototype.buildingType == BuildingType.CHURCH && b.owner.isDefined && b.owner.get == playerId) {
+         if b.prototype.buildingType == CHURCH && b.owner == Some(playerId))
       population += b.population
-    }
     population
   }
 
   def updateChurchesProportion(buildings: Map[BuildingId, Building]) = {
     var newStates = states
-    val total = totalChurchesPopulaton(buildings)
+    val total = totalChurchesPopulation(buildings)
     for ((playerId, state) ← states) {
       val churchesPopulation = playerChurchesPopulation(buildings, playerId)
       newStates = newStates.updated(playerId, state.setChurchesProportion(churchesPopulation / total))
     }
     new PlayerStates(newStates)
   }
-
-  def setChurchesProportion(id: PlayerId, value: Double) =
-    new PlayerStates(states.updated(id, states(id).setChurchesProportion(value)))
 }
