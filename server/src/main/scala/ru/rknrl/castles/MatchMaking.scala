@@ -17,8 +17,8 @@ import ru.rknrl.castles.account.state.Item.Items
 import ru.rknrl.castles.account.state.Slots.Slots
 import ru.rknrl.castles.account.state._
 import ru.rknrl.castles.bot.{Bot, TutorBot}
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.UpdateStatistics
+import ru.rknrl.castles.database.Statistics.updateStatistics
+import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.players.{Player, PlayerId}
@@ -48,18 +48,18 @@ class PlayerIdIterator extends IdIterator {
 
 object MatchMaking {
 
-  class GameOrder(val accountId: AccountId,
-                  val deviceType: DeviceType,
-                  val userInfo: UserInfoDTO,
-                  val slots: Slots,
-                  val stat: Stat,
-                  val items: Items,
-                  val rating: Double,
-                  val gamesCount: Int,
-                  val isBot: Boolean,
-                  val isTutor: Boolean)
+  case class GameOrder(accountId: AccountId,
+                       deviceType: DeviceType,
+                       userInfo: UserInfoDTO,
+                       slots: Slots,
+                       stat: Stat,
+                       items: Items,
+                       rating: Double,
+                       gamesCount: Int,
+                       isBot: Boolean,
+                       isTutor: Boolean)
 
-  // admin -> matchmakin
+  // admin -> matchmaking
 
   case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
 
@@ -145,8 +145,7 @@ class MatchMaking(interval: FiniteDuration,
 
   context.system.scheduler.schedule(0 seconds, 1 minute, self, RegisterHealth)
 
-  /** Создать игры из имеющихся заявок
-    */
+  /** Создать игры из имеющихся заявок */
   def tryCreateGames(gameOrders: List[GameOrder]) = {
     val (smallGameOrders, bigGameOrders) = gameOrders.span(_.deviceType == DeviceType.PHONE)
 
@@ -248,14 +247,14 @@ class MatchMaking(interval: FiniteDuration,
     if (!isTutor) {
       if (orders.count(_.isBot) == orders.size - 1) {
         if (orders.size == 4)
-          database ! UpdateStatistics(StatAction.START_GAME_4_WITH_BOTS)
+          database ! updateStatistics(StatAction.START_GAME_4_WITH_BOTS)
         else
-          database ! UpdateStatistics(StatAction.START_GAME_2_WITH_BOTS)
+          database ! updateStatistics(StatAction.START_GAME_2_WITH_BOTS)
       } else {
         if (orders.size == 4)
-          database ! UpdateStatistics(StatAction.START_GAME_4_WITH_PLAYERS)
+          database ! updateStatistics(StatAction.START_GAME_4_WITH_PLAYERS)
         else
-          database ! UpdateStatistics(StatAction.START_GAME_2_WITH_PLAYERS)
+          database ! updateStatistics(StatAction.START_GAME_2_WITH_PLAYERS)
       }
     }
 
@@ -403,26 +402,26 @@ class MatchMaking(interval: FiniteDuration,
       if (orders.size == 4) {
         if (place == 1) {
           if (gameInfo.isTutor)
-            database ! UpdateStatistics(StatAction.TUTOR_4_WIN)
+            database ! updateStatistics(StatAction.TUTOR_4_WIN)
           else
-            database ! UpdateStatistics(StatAction.WIN_4_BOTS)
+            database ! updateStatistics(StatAction.WIN_4_BOTS)
         } else {
           if (gameInfo.isTutor)
-            database ! UpdateStatistics(StatAction.TUTOR_4_LOSE)
+            database ! updateStatistics(StatAction.TUTOR_4_LOSE)
           else
-            database ! UpdateStatistics(StatAction.LOSE_4_BOTS)
+            database ! updateStatistics(StatAction.LOSE_4_BOTS)
         }
       } else if (orders.size == 2) {
         if (place == 1) {
           if (gameInfo.isTutor)
-            database ! UpdateStatistics(StatAction.TUTOR_2_WIN)
+            database ! updateStatistics(StatAction.TUTOR_2_WIN)
           else
-            database ! UpdateStatistics(StatAction.WIN_2_BOTS)
+            database ! updateStatistics(StatAction.WIN_2_BOTS)
         } else {
           if (gameInfo.isTutor)
-            database ! UpdateStatistics(StatAction.TUTOR_2_LOSE)
+            database ! updateStatistics(StatAction.TUTOR_2_LOSE)
           else
-            database ! UpdateStatistics(StatAction.LOSE_2_BOTS)
+            database ! updateStatistics(StatAction.LOSE_2_BOTS)
         }
       }
     }

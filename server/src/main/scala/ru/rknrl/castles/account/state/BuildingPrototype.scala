@@ -18,10 +18,10 @@ object BuildingPrototype {
       .setLevel(buildingLevel)
       .build
 
-  def upgraded(prototypeDTO: BuildingPrototypeDTO) =
+  def upgraded(prototype: BuildingPrototypeDTO) =
     BuildingPrototypeDTO.newBuilder
-      .setType(prototypeDTO.getType)
-      .setLevel(nextLevel(prototypeDTO.getLevel))
+      .setType(prototype.getType)
+      .setLevel(nextLevel(prototype.getLevel))
       .build
 
   private def nextLevel(level: BuildingLevel) =

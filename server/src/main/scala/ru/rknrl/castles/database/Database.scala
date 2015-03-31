@@ -16,8 +16,9 @@ import org.slf4j.LoggerFactory
 import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.rmi.C2B.UpdateStatistics
 import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.CommonDTO.{AccountIdDTO, StatAction, TutorStateDTO, UserInfoDTO}
+import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO, UserInfoDTO}
 import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 class DbConfiguration(username: String,
@@ -66,9 +67,6 @@ object Database {
 
   /** Без ответа */
   case class UpdateUserInfo(accountId: AccountIdDTO, userInfo: UserInfoDTO)
-
-  /** Без ответа */
-  case class UpdateStatistics(action: StatAction)
 
 }
 
@@ -209,8 +207,8 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
         }
       )
 
-    case UpdateStatistics(action) ⇒
-      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(action.getNumber)).map(
+    case UpdateStatistics(dto) ⇒
+      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(dto.getAction.getNumber)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1) {
             // ok

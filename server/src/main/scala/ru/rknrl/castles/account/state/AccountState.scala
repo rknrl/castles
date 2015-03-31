@@ -47,13 +47,18 @@ class AccountState(val slots: Slots,
       .addGold(-price)
   }
 
-  def removeBuilding(id: SlotId): AccountState =
-    setBuilding(id, None)
+  def removeBuilding(id: SlotId): AccountState = {
+    val buildingsCount = slots.values.count(_.hasBuildingPrototype)
+    if (buildingsCount > 1)
+      setBuilding(id, None)
+    else
+      this
+  }
 
   def setBuilding(id: SlotId, buildingPrototype: BuildingPrototypeDTO): AccountState =
     setBuilding(id, Some(buildingPrototype))
 
-  def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototypeDTO]): AccountState = {
+  private def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototypeDTO]): AccountState = {
     val newSlot = Slot(id, buildingPrototype)
     copy(newSlots = slots.updated(id, newSlot))
   }

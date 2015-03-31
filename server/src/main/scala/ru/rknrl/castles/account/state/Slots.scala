@@ -14,9 +14,6 @@ import ru.rknrl.dto.CommonDTO._
 object Slots {
   type Slots = Map[SlotId, SlotDTO]
 
-  def buildingsCount(slots: Slots) =
-    slots.values.count(_.hasBuildingPrototype)
-
   def apply(dto: Iterable[SlotDTO]) = {
     val slots = for (slotDto ← dto) yield slotDto.getId → slotDto
     slots.toMap
