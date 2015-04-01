@@ -13,6 +13,8 @@ import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.game.state.buildings.Building
 import ru.rknrl.castles.game.state.players.PlayerState
 import ru.rknrl.castles.game.state.units.GameUnit
+import ru.rknrl.dto.CommonDTO.BuildingLevel._
+import ru.rknrl.dto.CommonDTO.BuildingType._
 import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
 
 class Constants(val unitToExitFactor: Double,
@@ -55,7 +57,7 @@ class ShootingConfig(val speed: Double,
 
 class AssistanceConfig(val power: Double,
                        val maxBonusPower: Double) {
-  val buildingPrototype = BuildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1)
+  val buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
 }
 
 class UnitsConfig(val house: Stat,
@@ -66,9 +68,9 @@ class UnitsConfig(val house: Stat,
 
   def apply(buildingType: BuildingType): Stat =
     buildingType match {
-      case BuildingType.HOUSE ⇒ house
-      case BuildingType.TOWER ⇒ tower
-      case BuildingType.CHURCH ⇒ church
+      case HOUSE ⇒ house
+      case TOWER ⇒ tower
+      case CHURCH ⇒ church
     }
 }
 
@@ -92,23 +94,23 @@ class BuildingsConfig(val house1: BuildingConfig,
 
   def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingConfig =
     buildingType match {
-      case BuildingType.HOUSE ⇒
+      case HOUSE ⇒
         buildingLevel match {
-          case BuildingLevel.LEVEL_1 ⇒ house1
-          case BuildingLevel.LEVEL_2 ⇒ house2
-          case BuildingLevel.LEVEL_3 ⇒ house3
+          case LEVEL_1 ⇒ house1
+          case LEVEL_2 ⇒ house2
+          case LEVEL_3 ⇒ house3
         }
-      case BuildingType.TOWER ⇒
+      case TOWER ⇒
         buildingLevel match {
-          case BuildingLevel.LEVEL_1 ⇒ tower1
-          case BuildingLevel.LEVEL_2 ⇒ tower2
-          case BuildingLevel.LEVEL_3 ⇒ tower3
+          case LEVEL_1 ⇒ tower1
+          case LEVEL_2 ⇒ tower2
+          case LEVEL_3 ⇒ tower3
         }
-      case BuildingType.CHURCH ⇒
+      case CHURCH ⇒
         buildingLevel match {
-          case BuildingLevel.LEVEL_1 ⇒ church1
-          case BuildingLevel.LEVEL_2 ⇒ church2
-          case BuildingLevel.LEVEL_3 ⇒ church3
+          case LEVEL_1 ⇒ church1
+          case LEVEL_2 ⇒ church2
+          case LEVEL_3 ⇒ church3
         }
     }
 }
