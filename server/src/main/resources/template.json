@@ -19,7 +19,7 @@
     "port": 3306,
     "username": "username",
     "password": "enter mysql password",
-    "database": "castles"
+    "database": "castles",
     "poolMaxObjects": 20,
     "poolMaxIdle": 8,
     "poolMaxQueueSize": 20
@@ -78,59 +78,59 @@
     "buildings": {
       "house1": {
         "regeneration": 0.0004,
-        "startPopulation": 10,
-        "maxPopulation": 30,
+        "startCount": 10,
+        "maxCount": 30,
         "fortification": 1.15
       },
       "house2": {
         "regeneration": 0.00044,
-        "startPopulation": 15,
-        "maxPopulation": 50,
+        "startCount": 15,
+        "maxCount": 50,
         "fortification": 1.15
       },
       "house3": {
         "regeneration": 0.00048,
-        "startPopulation": 20,
-        "maxPopulation": 99,
+        "startCount": 20,
+        "maxCount": 99,
         "fortification": 1.15
       },
       "tower1": {
         "regeneration": 0.0002,
-        "startPopulation": 10,
-        "maxPopulation": 25,
+        "startCount": 10,
+        "maxCount": 25,
         "fortification": 1.25,
         "shotPower": 2
       },
       "tower2": {
         "regeneration": 0.0002,
-        "startPopulation": 16,
-        "maxPopulation": 40,
+        "startCount": 16,
+        "maxCount": 40,
         "fortification": 1.3,
         "shotPower": 3.5
       },
       "tower3": {
         "regeneration": 0.0002,
-        "startPopulation": 30,
-        "maxPopulation": 80,
+        "startCount": 30,
+        "maxCount": 80,
         "fortification": 1.45,
         "shotPower": 4
       },
       "church1": {
         "regeneration": 0.0002,
-        "startPopulation": 5,
-        "maxPopulation": 15,
+        "startCount": 5,
+        "maxCount": 15,
         "fortification": 1.15
       },
       "church2": {
         "regeneration": 0.0002,
-        "startPopulation": 8,
-        "maxPopulation": 25,
+        "startCount": 8,
+        "maxCount": 25,
         "fortification": 1.15
       },
       "church3": {
         "regeneration": 0.0002,
-        "startPopulation": 15,
-        "maxPopulation": 50,
+        "startCount": 15,
+        "maxCount": 50,
         "fortification": 1.15
       }
     },
