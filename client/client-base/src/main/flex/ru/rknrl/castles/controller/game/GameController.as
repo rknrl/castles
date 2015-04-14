@@ -29,10 +29,10 @@ import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingUpdateDTO;
 import ru.rknrl.dto.BulletDTO;
-import ru.rknrl.dto.CastTorandoDTO;
+import ru.rknrl.dto.CastTornadoDTO;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
@@ -40,7 +40,7 @@ import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.ItemsStateDTO;
 import ru.rknrl.dto.MoveDTO;
 import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
@@ -62,7 +62,7 @@ public class GameController extends EventDispatcher {
     private var height:Number;
     private var view:GameView;
     private var server:Server;
-    private var selfId:PlayerIdDTO;
+    private var selfId:PlayerId;
 
     private var bullets:Bullets;
     private var fireballs:Fireballs;
@@ -108,7 +108,7 @@ public class GameController extends EventDispatcher {
 
             const owner:BuildingOwner = new BuildingOwner(b.hasOwner, b.owner);
             const pos:Point = Point.fromDto(b.pos);
-            view.area.addBuilding(b.id, b.building.type, b.building.level, owner, b.population, b.strengthened, pos);
+            view.area.addBuilding(b.id, b.building.buildingType, b.building.buildingLevel, owner, b.population, b.strengthened, pos);
         }
         buildings = new Buildings(buildingList);
 
@@ -395,7 +395,7 @@ public class GameController extends EventDispatcher {
         if (magicItems.selected) {
             if (tornadoPath.drawing) {
                 if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {
-                    const gameState:CastTorandoDTO = new CastTorandoDTO();
+                    const gameState:CastTornadoDTO = new CastTornadoDTO();
                     gameState.points = Point.pointsToDto(tornadoPath.points);
                     server.castTornado(gameState);
                     magicItems.useItem();
@@ -408,9 +408,9 @@ public class GameController extends EventDispatcher {
                 const toBuilding:Building = buildings.inXy(event.mousePos);
 
                 if (toBuilding) {
-                    const fromBuildingsIds:Vector.<BuildingIdDTO> = arrows.getFromBuildingsIds();
-                    const filteredIds:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
-                    for each(var id:BuildingIdDTO in fromBuildingsIds) {
+                    const fromBuildingsIds:Vector.<BuildingId> = arrows.getFromBuildingsIds();
+                    const filteredIds:Vector.<BuildingId> = new <BuildingId>[];
+                    for each(var id:BuildingId in fromBuildingsIds) {
                         if (id.id != toBuilding.id.id) {
                             filteredIds.push(id);
                         }

@@ -9,11 +9,7 @@
 package ru.rknrl.castles.rmi
 
 import ru.rknrl.core.rmi.Msg
-import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AdminDTO.{AdminAccountStateDTO, ServerHealthDTO}
-import ru.rknrl.dto.AuthDTO.{AuthenticatedDTO, TopDTO}
-import ru.rknrl.dto.CommonDTO.NodeLocator
-import ru.rknrl.dto.GameDTO._
+import ru.rknrl.dto._
 
 object B2C {
 
@@ -53,7 +49,7 @@ object B2C {
 
   case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(43)
 
-  case class KillUnit(killedId: UnitIdDTO) extends Msg(44)
+  case class KillUnit(killedId: UnitId) extends Msg(44)
 
   case class AddFireball(fireball: FireballDTO) extends Msg(45)
 

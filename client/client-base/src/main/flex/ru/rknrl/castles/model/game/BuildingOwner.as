@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.game {
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 
 public class BuildingOwner {
     private var _hasOwner:Boolean;
@@ -16,14 +16,14 @@ public class BuildingOwner {
         return _hasOwner;
     }
 
-    private var _ownerId:PlayerIdDTO;
+    private var _ownerId:PlayerId;
 
-    public function get ownerId():PlayerIdDTO {
+    public function get ownerId():PlayerId {
         if (!hasOwner) throw new Error("hasn't owner");
         return _ownerId;
     }
 
-    public function BuildingOwner(hasOwner:Boolean, ownerId:PlayerIdDTO = null) {
+    public function BuildingOwner(hasOwner:Boolean, ownerId:PlayerId = null) {
         _hasOwner = hasOwner;
         _ownerId = ownerId;
     }
@@ -33,7 +33,7 @@ public class BuildingOwner {
         return !hasOwner && !owner.hasOwner || (ownerId.id == owner.ownerId.id);
     }
 
-    public function equalsId(playerId:PlayerIdDTO):Boolean {
+    public function equalsId(playerId:PlayerId):Boolean {
         return hasOwner && ownerId.id == playerId.id;
     }
 }

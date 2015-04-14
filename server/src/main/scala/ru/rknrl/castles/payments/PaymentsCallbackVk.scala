@@ -10,10 +10,9 @@ package ru.rknrl.castles.payments
 
 import akka.util.Crypt
 import ru.rknrl.Assertion
-import ru.rknrl.castles.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.CommonDTO.AccountType
+import ru.rknrl.dto.{AccountId, AccountType}
 import spray.http.HttpResponse
 
 object VkNotificationType {
@@ -177,7 +176,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     s"""
        |{
        |"response": {
-       | "order_id":$orderId
+       |"order_id":$orderId
         | $appOrderIdStr
         |}
         |}""".stripMargin
@@ -204,11 +203,11 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     s"""
        |{
        |"response": {
-       | "title":"$title",
-                          | $photoUrlStr
+       |"title":"$title",
+                         | $photoUrlStr
         | $itemIdStr
         | $expirationStr
-        | "price": $price
+        |"price": $price
         |}
         |}""".stripMargin
   }
@@ -236,9 +235,9 @@ private class VkPaymentsError private(val errorCode: Int,
     s"""
        |{
        |"error": {
-       | "error_code": $errorCode,
-                                   | "error_msg": "$description",
-                                                                 | "critical": $criticalToString
+       |"error_code": $errorCode,
+                                  |"error_msg": "$description",
+                                                               |"critical": $criticalToString
         |}
         |}
     """.stripMargin

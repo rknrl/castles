@@ -8,63 +8,63 @@
 
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.account.state.BuildingPrototype
-import ru.rknrl.castles.game.state.Stat
-import ru.rknrl.castles.game.state.buildings.Building
-import ru.rknrl.castles.game.state.players.PlayerState
-import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.CommonDTO.BuildingLevel._
-import ru.rknrl.dto.CommonDTO.BuildingType._
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingPrototypeDTO, BuildingType}
+import ru.rknrl.castles.game.state.{Building, GameUnit, Stat}
+import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2, LEVEL_3}
+import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
+import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
 
-class Constants(val unitToExitFactor: Double,
-                val itemCooldown: Long)
+case class DamagerConfig(powerVsUnit: Double,
+                         powerVsBuilding: Double,
+                         maxPowerBonus: Double,
+                         radius: Double) {
 
-class FireballConfig(val damageVsUnit: Double,
-                     val damageVsBuilding: Double,
-                     val flyDuration: Long,
-                     val radius: Double,
-                     val maxPowerBonus: Double)
+  def bonused(churchesProportion: Double) =
+    new DamagerConfig(
+      powerVsUnit + maxPowerBonus * churchesProportion,
+      powerVsBuilding + maxPowerBonus * churchesProportion,
+      maxPowerBonus,
+      radius
+    )
+}
 
-class VolcanoConfig(val damageVsUnit: Double,
-                    val damageVsBuilding: Double,
-                    val duration: Long,
-                    val radius: Double,
-                    val maxPowerBonus: Double)
+case class Constants(itemCooldown: Long)
 
-class TornadoConfig(val damageVsUnit: Double,
-                    val damageVsBuilding: Double,
-                    val duration: Long,
-                    val speed: Double,
-                    val radius: Double,
-                    val maxPowerBonus: Double)
+case class FireballConfig(damage: DamagerConfig,
+                          flyDuration: Long)
 
-class StrengtheningConfig(val factor: Double,
-                          val maxBonusFactor: Double,
-                          val duration: Long,
-                          val maxBonusDuration: Long) {
-  def stat(bonus: Double) = {
-    val f = factor + bonus * maxBonusFactor
+case class VolcanoConfig(damage: DamagerConfig,
+                         duration: Long)
+
+case class TornadoConfig(damage: DamagerConfig,
+                         duration: Long,
+                         speed: Double)
+
+case class StrengtheningConfig(factor: Double,
+                               maxBonusFactor: Double,
+                               duration: Long,
+                               maxBonusDuration: Long) {
+  def stat(churchesProportion: Double) = {
+    val f = factor + churchesProportion * maxBonusFactor
     new Stat(attack = f, defence = f, speed = 1)
   }
 
   def tutorConfig = new StrengtheningConfig(factor, maxBonusFactor, duration * 3, maxBonusDuration)
 }
 
-class ShootingConfig(val speed: Double,
-                     val shootInterval: Long,
-                     val shootRadius: Double)
+case class ShootingConfig(speed: Double,
+                          shootInterval: Long,
+                          shootRadius: Double)
 
-class AssistanceConfig(val power: Double,
-                       val maxBonusPower: Double) {
+case class AssistanceConfig(power: Double,
+                            maxBonusPower: Double) {
   val buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
 }
 
-class UnitsConfig(val house: Stat,
-                  val tower: Stat,
-                  val church: Stat) {
+case class UnitsConfig(house: Stat,
+                       tower: Stat,
+                       church: Stat) {
 
-  def apply(prototype: BuildingPrototypeDTO): Stat = apply(prototype.getType)
+  def apply(prototype: BuildingPrototype): Stat = apply(prototype.buildingType)
 
   def apply(buildingType: BuildingType): Stat =
     buildingType match {
@@ -74,23 +74,23 @@ class UnitsConfig(val house: Stat,
     }
 }
 
-class BuildingConfig(val regeneration: Double,
-                     val startPopulation: Int,
-                     val maxPopulation: Int,
-                     val fortification: Double,
-                     val shotPower: Option[Double])
+case class BuildingConfig(regeneration: Double,
+                          startCount: Int,
+                          maxCount: Double,
+                          fortification: Double,
+                          shotPower: Option[Double])
 
-class BuildingsConfig(val house1: BuildingConfig,
-                      val house2: BuildingConfig,
-                      val house3: BuildingConfig,
-                      val tower1: BuildingConfig,
-                      val tower2: BuildingConfig,
-                      val tower3: BuildingConfig,
-                      val church1: BuildingConfig,
-                      val church2: BuildingConfig,
-                      val church3: BuildingConfig) {
+case class BuildingsConfig(house1: BuildingConfig,
+                           house2: BuildingConfig,
+                           house3: BuildingConfig,
+                           tower1: BuildingConfig,
+                           tower2: BuildingConfig,
+                           tower3: BuildingConfig,
+                           church1: BuildingConfig,
+                           church2: BuildingConfig,
+                           church3: BuildingConfig) {
 
-  def apply(prototype: BuildingPrototypeDTO): BuildingConfig = apply(prototype.getType, prototype.getLevel)
+  def apply(prototype: BuildingPrototype): BuildingConfig = apply(prototype.buildingType, prototype.buildingLevel)
 
   def apply(buildingType: BuildingType, buildingLevel: BuildingLevel): BuildingConfig =
     buildingType match {
@@ -115,233 +115,72 @@ class BuildingsConfig(val house1: BuildingConfig,
     }
 }
 
-class GameConfig(val constants: Constants,
-                 buildings: BuildingsConfig,
-                 units: UnitsConfig,
-                 fireball: FireballConfig,
-                 volcano: VolcanoConfig,
-                 tornado: TornadoConfig,
-                 strengthening: StrengtheningConfig,
-                 shooting: ShootingConfig,
-                 assistance: AssistanceConfig) {
+case class GameConfig(constants: Constants,
+                      buildings: BuildingsConfig,
+                      units: UnitsConfig,
+                      fireball: FireballConfig,
+                      volcano: VolcanoConfig,
+                      tornado: TornadoConfig,
+                      strengthening: StrengtheningConfig,
+                      shooting: ShootingConfig,
+                      assistance: AssistanceConfig) {
 
-  def getStartPopulation(prototype: BuildingPrototypeDTO) =
-    buildings(prototype).startPopulation
+  def startCount(prototype: BuildingPrototype) =
+    buildings(prototype).startCount
 
-  private def maxPopulation(b: Building) =
-    buildings(b.prototype).maxPopulation
+  def maxCount(b: Building) =
+    buildings(b.buildingPrototype).maxCount
 
-  def fireballSplashRadius(player: PlayerState) = fireball.radius
+  def strengtheningDuration(churchesProportion: Double) = {
+    val bonus = (strengthening.maxBonusDuration * churchesProportion).toLong
+    strengthening.duration + bonus
+  }
 
-  def fireballFlyDuration = fireball.flyDuration
+  def strengtheningToStat(churchesProportion: Double) =
+    strengthening.stat(churchesProportion)
 
-  def volcanoDuration(player: PlayerState) = volcano.duration
+  def assistanceCount(b: Building, churchesProportion: Double) = {
+    val bonus = assistance.maxBonusPower * churchesProportion
+    buildings(b.buildingPrototype).maxCount * (assistance.power + bonus)
+  }
 
-  def volcanoRadius(player: PlayerState) = volcano.radius
+  /**
+   * Сколько юнитов будет в здании после входа в него дружественного отряда
+   */
+  def countAfterFriendlyUnitEnter(b: Building, unitCount: Double) =
+    Math.min(maxCount(b), b.count + unitCount)
 
-  def tornadoRadius(player: PlayerState) = tornado.radius
+  /**
+   * Сколько юнитов будет в здании после входа в него вражеского отряда
+   * Вторым параметром возвращает захвачено здание или нет
+   */
+  def countAfterEnemyUnitEnter(b: Building, unit: GameUnit, buildingStat: Stat, unitStat: Stat) = {
+    val attackPower = unitStat.attack
+    val defencePower = buildingStat.defence * buildings(b.buildingPrototype).fortification
 
-  def tornadoDuration(player: PlayerState) = tornado.duration
+    val leftInBuilding = b.count * defencePower - unit.count * attackPower
 
-  def tornadoSpeed = tornado.speed
+    val capture = leftInBuilding < 0
 
-  def strengtheningDuration(player: PlayerState) =
-    churchesToStrengtheningDuration(player)
+    val newCount = if (capture)
+      -leftInBuilding / attackPower
+    else
+      leftInBuilding / defencePower
 
-  def bulletSpeed = shooting.speed
+    val resultCount = Math.min(maxCount(b), newCount)
 
-  def shootingInterval = shooting.shootInterval
+    (resultCount, capture)
+  }
 
-  def shootRadius = shooting.shootRadius
-
-  def assistanceBuildingPrototype = assistance.buildingPrototype
-
-  def assistanceCount(b: Building, player: PlayerState) =
-    churchesToAssistanceCount(b, player)
+  def bulletPowerVsUnit(building: Building): Double =
+    buildings(building.buildingPrototype).shotPower.get
 
   /**
    * Награда★ за выигранный бой (1ое место)
    */
   val winReward = 2
 
-  /**
-   * Сколько юнитов будет в здании после регенерации
-   */
-  def populationAfterRegen(b: Building, deltaTime: Long): Double = {
-    val add = buildings(b.prototype).regeneration * deltaTime
-    Math.min(maxPopulation(b), b.population + add)
-  }
-
-  /**
-   * Сколько юнитов выйдут из здания
-   */
-  def unitsToExit(buildingPopulation: Double): Int =
-    Math.floor(buildingPopulation * constants.unitToExitFactor).toInt
-
-  /**
-   * Сколько юнитов останется в зданиии, после выхода из него отряда
-   */
-  def buildingAfterUnitToExit(buildingPopulation: Double): Double =
-    buildingPopulation - unitsToExit(buildingPopulation)
-
-  /**
-   * Сколько юнитов будет в здании после входа в него дружественного отряда
-   */
-  def populationAfterFriendlyUnitEnter(b: Building, unitCount: Double) =
-    Math.min(maxPopulation(b), b.population + unitCount)
-
-  /**
-   * Сколько юнитов будет в здании после входа в него вражеского отряда
-   * Вторым параметром возвращает захвачено здание или нет
-   */
-  def buildingAfterEnemyUnitEnter(b: Building, unit: GameUnit, buildingPlayer: Option[PlayerState], unitPlayer: PlayerState) = {
-    val attackPower = unitAttack(unit.buildingPrototype, Some(unitPlayer), unit.strengthened)
-    val defencePower = unitDefence(b.prototype, buildingPlayer, b.strengthened) * fortification(b.prototype, buildingPlayer, b.strengthened)
-
-    val leftInBuilding = b.population * defencePower - unit.count * attackPower
-
-    val capture = leftInBuilding < 0
-
-    val newPopulation = if (capture)
-      -leftInBuilding / attackPower
-    else
-      leftInBuilding / defencePower
-
-    val resultPopulation = Math.min(maxPopulation(b), newPopulation)
-
-    (resultPopulation, capture)
-  }
-
-  def unitCountAfterBulletHit(u: GameUnit,
-                              b: Building,
-                              unitPlayer: PlayerState,
-                              bulletPlayer: Option[PlayerState]) = {
-    val damage = shotPower(b.prototype, bulletPlayer) / unitDefence(u.buildingPrototype, Some(unitPlayer), u.strengthened)
-    Math.max(0, u.count - damage)
-  }
-
-  def unitCountAfterFireballHit(u: GameUnit,
-                                fireballPlayer: PlayerState,
-                                unitPlayer: PlayerState) = {
-    val damage = fireballPowerVsUnit(fireballPlayer) / unitDefence(u.buildingPrototype, Some(unitPlayer), u.strengthened)
-    Math.max(0, u.count - damage)
-  }
-
-  def unitCountAfterVolcanoHit(u: GameUnit,
-                               volcanoPlayer: PlayerState,
-                               unitPlayer: PlayerState) = {
-    val damage = volcanoPowerVsUnit(volcanoPlayer) / unitDefence(u.buildingPrototype, Some(unitPlayer), u.strengthened)
-    Math.max(0, u.count - damage)
-  }
-
-  def unitCountAfterTornadoHit(u: GameUnit,
-                               tornadoPlayer: PlayerState,
-                               unitPlayer: PlayerState) = {
-    val damage = tornadoPowerVsUnit(tornadoPlayer) / unitDefence(u.buildingPrototype, Some(unitPlayer), u.strengthened)
-    Math.max(0, u.count - damage)
-  }
-
-  def buildingPopulationAfterFireballHit(b: Building,
-                                         fireballPlayer: PlayerState,
-                                         buildingPlayer: Option[PlayerState]) = {
-    val damage = fireballPowerVsBuilding(fireballPlayer) / unitDefence(b.prototype, buildingPlayer, b.strengthened)
-    Math.max(0, b.population - damage)
-  }
-
-  def buildingPopulationAfterVolcanoHit(b: Building,
-                                        volcanoPlayer: PlayerState,
-                                        buildingPlayer: Option[PlayerState]) = {
-    val damage = volcanoPowerVsBuilding(volcanoPlayer) / unitDefence(b.prototype, buildingPlayer, b.strengthened)
-    Math.max(0, b.population - damage)
-  }
-
-  def buildingPopulationAfterTornadoHit(b: Building,
-                                        tornadoPlayer: PlayerState,
-                                        buildingPlayer: Option[PlayerState]) = {
-    val damage = tornadoPowerVsBuilding(tornadoPlayer) / unitDefence(b.prototype, buildingPlayer, b.strengthened)
-    Math.max(0, b.population - damage)
-  }
-
-  // stats
-
-  private def shotPower(prototype: BuildingPrototypeDTO, playerState: Option[PlayerState]) =
-    buildings(prototype).shotPower.get
-
-  private def fireballPowerVsBuilding(playerState: PlayerState) = {
-    val bonus = fireball.maxPowerBonus * playerState.churchesProportion
-    fireball.damageVsBuilding + bonus
-  }
-
-  private def volcanoPowerVsBuilding(playerState: PlayerState) = {
-    val bonus = volcano.maxPowerBonus * playerState.churchesProportion
-    volcano.damageVsBuilding + bonus
-  }
-
-  private def tornadoPowerVsBuilding(playerState: PlayerState) = {
-    val bonus = tornado.maxPowerBonus * playerState.churchesProportion
-    tornado.damageVsBuilding + bonus
-  }
-
-  private def fireballPowerVsUnit(playerState: PlayerState) = {
-    val bonus = fireball.maxPowerBonus * playerState.churchesProportion
-    fireball.damageVsUnit + bonus
-  }
-
-  private def volcanoPowerVsUnit(playerState: PlayerState) = {
-    val bonus = volcano.maxPowerBonus * playerState.churchesProportion
-    volcano.damageVsUnit + bonus
-  }
-
-  private def tornadoPowerVsUnit(playerState: PlayerState) = {
-    val bonus = tornado.maxPowerBonus * playerState.churchesProportion
-    tornado.damageVsUnit + bonus
-  }
-
-  def unitSpeed(prototype: BuildingPrototypeDTO, player: PlayerState, strengthened: Boolean) =
-    aggregatedStats(prototype, Some(player), strengthened).speed
-
-  private def unitAttack(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
-    aggregatedStats(prototype, player, strengthened).attack
-
-  private def unitDefence(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
-    aggregatedStats(prototype, player, strengthened).defence
-
-  private def fortification(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
-    buildings(prototype).fortification
-
-  private def aggregatedStats(prototype: BuildingPrototypeDTO, player: Option[PlayerState], strengthened: Boolean) =
-    units(prototype) * playerStateToStat(player) * strengtheningToStat(strengthened, player)
-
-  private def playerStateToStat(player: Option[PlayerState]) =
-    if (player.isDefined) player.get.stat else Stat.unit
-
-  private def strengtheningToStat(strengthened: Boolean, playerState: Option[PlayerState]) =
-    if (strengthened)
-      strengthening.stat(playerState.get.churchesProportion)
-    else
-      Stat.unit
-
-  private def churchesToAssistanceCount(b: Building, playerState: PlayerState) = {
-    val bonus = assistance.maxBonusPower * playerState.churchesProportion
-    buildings(b.prototype).maxPopulation * (assistance.power + bonus)
-  }
-
-  private def churchesToStrengtheningDuration(playerState: PlayerState) = {
-    val bonus = strengthening.maxBonusDuration * playerState.churchesProportion
-    strengthening.duration + bonus
-  }
-
-  def tutorConfig = new GameConfig(
-    constants,
-    buildings,
-    units,
-    fireball,
-    volcano,
-    tornado,
-    strengthening.tutorConfig,
-    shooting,
-    assistance
-  )
+  def tutorConfig = this
 }
 
 object GameConfig {

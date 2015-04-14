@@ -8,53 +8,44 @@
 
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
-import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
-import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO, MoveDTO}
-
-import scala.collection.JavaConverters._
+import ru.rknrl.dto.{MoveDTO, PlayerId}
 
 object Moving {
+  /**
+   * Сколько юнитов выйдут из здания
+   */
+  def unitsToExit(buildingPopulation: Double): Int =
+    Math.floor(buildingPopulation * 0.5).toInt
 
-  case class ExitUnit(playerId: PlayerIdDTO, fromBuildingId: BuildingIdDTO, toBuildingId: BuildingIdDTO)
+  def moveActionToExitUnit(move: Move, unitIdIterator: UnitIdIterator, time: Long) = {
+    val distance = move.fromBuilding.pos.distance(move.toBuilding.pos)
+    val speed = move.fromBuilding.stat.speed
 
-  case class EnterUnit(unit: GameUnit)
+    new GameUnit(
+      id = unitIdIterator.next,
+      fromBuilding = move.fromBuilding,
+      toBuilding = move.toBuilding,
+      count = unitsToExit(move.fromBuilding.count),
+      startTime = time,
+      duration = (distance / speed).toLong
+    )
+  }
 
-  def `moveActions→exitUnits`(moveActions: Map[PlayerIdDTO, MoveDTO], buildings: Buildings, config: GameConfig) =
-    for ((playerId, moveDto) ← moveActions;
-         fromBuildingsDto = moveDto.getFromBuildingsList.asScala.toList;
-         fromBuildingDto ← fromBuildingsDto;
-         fromBuildingId = BuildingId(fromBuildingDto.getId);
-         fromBuilding = buildings(fromBuildingId)
-         if config.unitsToExit(fromBuilding.floorPopulation) >= 1;
-         toBuildingId = BuildingId(moveDto.getToBuilding.getId)
-         if fromBuildingId != toBuildingId
-         if fromBuilding.owner.get == playerId
-    ) yield
-    ExitUnit(playerId, fromBuildingId, toBuildingId)
+  case class Move(playerId: PlayerId, fromBuilding: Building, toBuilding: Building)
 
+  def convert(moveActions: Map[PlayerId, MoveDTO], buildings: Iterable[Building]) =
+    for ((playerId, move) ← moveActions;
+         fromBuildingId ← move.fromBuildings)
+      yield Move(
+        playerId,
+        fromBuilding = buildings.find(_.id == fromBuildingId).get,
+        toBuilding = buildings.find(_.id == move.toBuilding).get
+      )
 
-  def `exitUnit→units`(exitUnits: Iterable[ExitUnit], buildings: Buildings, config: GameConfig, unitIdIterator: UnitIdIterator, playerStates: PlayerStates, time: Long) =
-    for (exitUnit ← exitUnits) yield {
-      val fromBuilding = buildings(exitUnit.fromBuildingId)
-      val toBuilding = buildings(exitUnit.toBuildingId)
-
-      val count = config.unitsToExit(fromBuilding.floorPopulation)
-
-      val unitId = unitIdIterator.next
-
-      val starPos = fromBuilding.pos
-      val endPos = toBuilding.pos
-
-      val buildingPrototype = fromBuilding.prototype
-      val playerState = playerStates(fromBuilding.owner.get)
-      val speed = config.unitSpeed(buildingPrototype, playerState, fromBuilding.strengthened)
-
-      new GameUnit(unitId, buildingPrototype, count, starPos, endPos, time, speed, exitUnit.toBuildingId, exitUnit.playerId, fromBuilding.strengthened)
-    }
-
-  def `units→enterUnit`(units: Iterable[GameUnit], time: Long) =
-    for (unit ← units if unit.pos(time) == unit.endPos) yield EnterUnit(unit)
+  def moveActionsToExitUnits(moveActions: Map[PlayerId, MoveDTO], buildings: Iterable[Building], unitIdIterator: UnitIdIterator, time: Long) =
+    convert(moveActions, buildings)
+      .filter(m ⇒ m.fromBuilding.id != m.toBuilding.id)
+      .filter(m ⇒ m.fromBuilding.owner.isDefined && m.fromBuilding.owner.get.id == m.playerId)
+      .filter(m ⇒ m.fromBuilding.count >= 2)
+      .map(moveActionToExitUnit(_, unitIdIterator, time))
 }

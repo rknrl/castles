@@ -1,0 +1,208 @@
+package ru.rknrl.dto;
+
+option java_outer_classname = "CommonDTO";
+
+option optimize_for = SPEED;
+
+message NodeLocator {
+    required string host = 1;
+    required int32 port = 2;
+}
+
+enum AccountType {
+    DEV = 1;
+    VKONTAKTE = 2;
+    ODNOKLASSNIKI = 3;
+    MOIMIR = 4;
+    FOTOSTRANA = 5;
+    FACEBOOK = 6;
+    DEVICE_ID = 7;
+}
+
+enum PlatformType {
+    CANVAS = 1;
+    IOS = 2;
+    ANDROID = 3;
+}
+
+enum DeviceType {
+    PC = 1;
+    PHONE = 2;
+    TABLET = 3;
+}
+
+enum ProductId {
+    STARS = 1;
+}
+
+enum StatAction {
+    AUTHENTICATED = 1; // Успешная авторизация (первый запрос к серверу)
+    NOT_AUTHENTICATED = 2; // Сервер отказал в авторизации
+    FIRST_AUTHENTICATED = 3; // Первая авторизация игрока (был создан новый аккаунт)
+
+    START_TUTOR = 4;
+
+    TUTOR_GAME_SPLASH = 5;
+    TUTOR_SELF_BUILDINGS = 6;
+    TUTOR_ENEMY_BUILDINGS = 7;
+    TUTOR_NO_OWNER_BUILDINGS = 8;
+    TUTOR_ARROW = 9;
+    TUTOR_ARROWS = 10;
+    TUTOR_FIREBALL = 11;
+    TUTOR_VOLCANO = 12;
+    TUTOR_TORNADO = 13;
+    TUTOR_ASSISTANCE = 14;
+    TUTOR_STRENGTHENING = 15;
+    TUTOR_BIG_TOWER = 16;
+    TUTOR_WIN_CHALLENGE = 17;
+    TUTOR_2_WIN = 18; // Игрок выиграл тутор на 2-ух› игроков
+    TUTOR_2_LOSE = 19; // Игрок проиграл тутор на 2-ух игроков
+    TUTOR_4_WIN = 20; // Игрок выиграл тутор на 4-ех игроков
+    TUTOR_4_LOSE = 21; // Игрок проиграл тутор на 4-ех игроков
+
+    TUTOR_NAVIGATE = 22;
+    TUTOR_EMPTY_SLOT_CLICK = 23;
+    TUTOR_SLOT_CLICK = 24;
+    TUTOR_ITEM_CLICK = 25;
+    TUTOR_SKILL_CLICK = 26;
+
+    BUY_FIREBALL = 30;
+    BUY_STRENGTHENING = 31;
+    BUY_VOLCANO = 32;
+    BUY_TORNADO = 33;
+    BUY_ASSISTANCE = 34;
+
+    BUY_HOUSE1 = 35;
+    BUY_HOUSE2 = 36;
+    BUY_HOUSE3 = 37;
+
+    BUY_TOWER1 = 38;
+    BUY_TOWER2 = 39;
+    BUY_TOWER3 = 40;
+
+    BUY_CHURCH1 = 41;
+    BUY_CHURCH2 = 42;
+    BUY_CHURCH3 = 43;
+
+    REMOVE_BUILDING = 44;
+
+    BUY_ATTACK1 = 45;
+    BUY_ATTACK2 = 46;
+    BUY_ATTACK3 = 47;
+
+    BUY_DEFENCE1 = 48;
+    BUY_DEFENCE2 = 49;
+    BUY_DEFENCE3 = 50;
+
+    BUY_SPEED1 = 51;
+    BUY_SPEED2 = 52;
+    BUY_SPEED3 = 53;
+
+    WIN_2_BOTS = 54; // Игрок выиграл бота, в игре на 2-ух игроков, не тутор
+    LOSE_2_BOTS = 55; // Игрок проиграл боту, в игре на 2-ух игроков, не тутор
+    WIN_4_BOTS = 56; // Игрок выиграл ботов, в игре на 4-ех игроков, не тутор
+    LOSE_4_BOTS = 57; // Игрок проиграл ботам, в игре на 4-ех игроков, не тутор
+
+    START_GAME_2_WITH_BOTS = 58; // Создана игра на 2-ух игроков, реальный игрок с ботом, не тутор
+    START_GAME_2_WITH_PLAYERS = 59; // Создана игра на 2-ух игроков, два реальных игрока
+    START_GAME_4_WITH_BOTS = 60; // Создана игра на 4-ех игроков, реальный игрок с тремя ботами, не тутор
+    START_GAME_4_WITH_PLAYERS = 61; // Создана игра на 4-ех игроков, не меньше двух реальных игроков
+}
+
+message StatDTO {
+    required StatAction action = 1;
+}
+
+message AccountId {
+    required AccountType accountType = 1;
+    required string id = 2;
+}
+
+message UserInfoDTO {
+    required AccountId accountId = 1;
+    optional string firstName = 2;
+    optional string lastName = 3;
+    optional string photo96 = 4; // for phones
+    optional string photo256 = 5; // for tablet and canvas
+}
+
+enum BuildingType {
+    HOUSE = 1;
+    TOWER = 2;
+    CHURCH = 3;
+}
+
+enum BuildingLevel {
+    LEVEL_1 = 1;
+    LEVEL_2 = 2;
+    LEVEL_3 = 3;
+}
+
+enum SkillType {
+    ATTACK = 1;
+    DEFENCE = 2;
+    SPEED = 3;
+}
+
+enum SkillLevel {
+    SKILL_LEVEL_0 = 0;
+    SKILL_LEVEL_1 = 1;
+    SKILL_LEVEL_2 = 2;
+    SKILL_LEVEL_3 = 3;
+}
+
+enum ItemType {
+    FIREBALL = 1;
+    STRENGTHENING = 2;
+    VOLCANO = 3;
+    TORNADO = 4;
+    ASSISTANCE = 5;
+}
+
+message BuildingPrototype {
+    required BuildingType buildingType = 1;
+    required BuildingLevel buildingLevel = 2;
+}
+
+message TutorStateDTO {
+    optional bool slot = 1;
+    optional bool emptySlot = 2;
+    optional bool navigate = 3;
+    optional bool magicItem = 4;
+    optional bool skills = 5;
+}
+
+enum SlotId {
+    SLOT_1 = 1;
+    SLOT_2 = 2;
+    SLOT_3 = 3;
+    SLOT_4 = 4;
+    SLOT_5 = 5;
+}
+
+enum Slot1Pos {
+    SLOT_1_X = -1;
+    SLOT_1_Y = -1;
+}
+
+enum Slot2Pos {
+    SLOT_2_X = 1;
+    SLOT_2_Y = -1;
+}
+
+enum Slot3Pos {
+    SLOT_3_X = -2;
+    SLOT_3_Y = 0;
+}
+
+enum Slot4Pos {
+    SLOT_4_X = 0;
+    SLOT_4_Y = 0;
+}
+
+enum Slot5Pos {
+    SLOT_5_X = 2;
+    SLOT_5_Y = 0;
+}
+
+

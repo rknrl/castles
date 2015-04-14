@@ -17,7 +17,7 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.utils.createTextField;
 
 public class UnitView extends Sprite {
@@ -25,7 +25,7 @@ public class UnitView extends Sprite {
 
     private var textField:TextField;
 
-    public function UnitView(buildingType:BuildingType, buildingLevel:BuildingLevel, ownerId:PlayerIdDTO, count:int, stengthened:Boolean) {
+    public function UnitView(buildingType:BuildingType, buildingLevel:BuildingLevel, ownerId:PlayerId, count:int, stengthened:Boolean) {
         const shadow:Shadow = new Shadow();
         shadow.width = 16;
         shadow.height = 2;

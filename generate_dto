@@ -5,20 +5,11 @@
 project="/Users/tolyayanot/dev/rknrl/castles"
 rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 
-proto_dir="${project}/proto"
-java_out="${project}/server/src/main/java/"
+proto_dir="${project}/server/src/main/protobuf"
 as3_out="${project}/client/client-base/src/main/flex/"
 
-rm -rf ${java_out}/ru/rknrl/dto/*
-
-protoc \
---java_out=${java_out} \
---proto_path=${proto_dir} \
-${proto_dir}/auth.proto \
-${proto_dir}/common.proto \
-${proto_dir}/account.proto \
-${proto_dir}/game.proto \
-${proto_dir}/admin.proto
+java -Xmx512M -XX:MaxPermSize=256M -jar ~/Library/Caches/IntelliJIdea14/sbtexe/sbt-launch-0.13.0.jar clean
+java -Xmx512M -XX:MaxPermSize=256M -jar ~/Library/Caches/IntelliJIdea14/sbtexe/sbt-launch-0.13.0.jar protobuf:protobufScalaGenerate
 
 rm -rf ${as3_out}/ru/rknrl/dto/*
 

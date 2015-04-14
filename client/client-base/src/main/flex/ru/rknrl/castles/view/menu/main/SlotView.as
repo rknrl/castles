@@ -66,11 +66,11 @@ public class SlotView extends Animated {
         }
 
         if (value.hasBuildingPrototype) {
-            building = Fla.createBuilding(value.buildingPrototype.type, value.buildingPrototype.level);
+            building = Fla.createBuilding(value.buildingPrototype.buildingType, value.buildingPrototype.buildingLevel);
             building.transform.colorTransform = Colors.transform(Colors.slot(id));
             buildingLayer.addChild(building);
         }
-        shadow.scaleX = shadow.scaleY = value.hasBuildingPrototype ? Fla.buildingLevelToScale(value.buildingPrototype.level) : Fla.buildingLevelToScale(BuildingLevel.LEVEL_1);
+        shadow.scaleX = shadow.scaleY = value.hasBuildingPrototype ? Fla.buildingLevelToScale(value.buildingPrototype.buildingLevel) : Fla.buildingLevelToScale(BuildingLevel.LEVEL_1);
 
         bounce();
     }

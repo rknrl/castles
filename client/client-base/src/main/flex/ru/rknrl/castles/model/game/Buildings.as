@@ -8,11 +8,11 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 
 public class Buildings {
     private static const mouseAreaRadius:Number = CellSize.SIZE.id() * 2 / 3;
@@ -23,7 +23,7 @@ public class Buildings {
         this.buildings = buildings;
     }
 
-    public function byId(id:BuildingIdDTO):Building {
+    public function byId(id:BuildingId):Building {
         for each(var building:Building in buildings) {
             if (building.id.id == id.id) return building;
         }
@@ -45,58 +45,58 @@ public class Buildings {
         return result;
     }
 
-    public function selfInXy(selfId:PlayerIdDTO, pos:Point):Building {
+    public function selfInXy(selfId:PlayerId, pos:Point):Building {
         const building:Building = inXy(pos);
         return building && building.owner.equalsId(selfId) ? building : null;
     }
 
     // tutorial:
 
-    private function byPlayerId(id:PlayerIdDTO):Vector.<BuildingIdDTO> {
-        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    private function byPlayerId(id:PlayerId):Vector.<BuildingId> {
+        const result:Vector.<BuildingId> = new <BuildingId>[];
         for each(var building:Building in buildings) {
             if (building.owner.equalsId(id)) result.push(building.id);
         }
         return result;
     }
 
-    public function notPlayerId(id:PlayerIdDTO):Vector.<BuildingIdDTO> {
-        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    public function notPlayerId(id:PlayerId):Vector.<BuildingId> {
+        const result:Vector.<BuildingId> = new <BuildingId>[];
         for each(var building:Building in buildings) {
             if (!building.owner.equalsId(id)) result.push(building.id);
         }
         return result;
     }
 
-    public function notOwned():Vector.<BuildingIdDTO> {
-        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    public function notOwned():Vector.<BuildingId> {
+        const result:Vector.<BuildingId> = new <BuildingId>[];
         for each(var building:Building in buildings) {
             if (!building.owner.hasOwner) result.push(building.id);
         }
         return result;
     }
 
-    public function owned():Vector.<BuildingIdDTO> {
-        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    public function owned():Vector.<BuildingId> {
+        const result:Vector.<BuildingId> = new <BuildingId>[];
         for each(var building:Building in buildings) {
             if (building.owner.hasOwner) result.push(building.id);
         }
         return result;
     }
 
-    public function getBuildingIds(selfId:PlayerIdDTO):Vector.<BuildingIdDTO> {
+    public function getBuildingIds(selfId:PlayerId):Vector.<BuildingId> {
         return byPlayerId(selfId);
     }
 
-    public function getBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
+    public function getBuildingId(selfId:PlayerId):BuildingId {
         return getBuildingIds(selfId)[0];
     }
 
-    public function getEnemyBuildingId(selfId:PlayerIdDTO):BuildingIdDTO {
+    public function getEnemyBuildingId(selfId:PlayerId):BuildingId {
         return notPlayerId(selfId)[0];
     }
 
-    public function myTower(ownerId:PlayerIdDTO):BuildingIdDTO {
+    public function myTower(ownerId:PlayerId):BuildingId {
         for each(var building:Building in buildings) {
             if (building.owner.equalsId(ownerId) && building.buildingType == BuildingType.TOWER)
                 return building.id;
@@ -104,7 +104,7 @@ public class Buildings {
         return null;
     }
 
-    public function bigTower(ownerId:PlayerIdDTO):BuildingIdDTO {
+    public function bigTower(ownerId:PlayerId):BuildingId {
         for each(var building:Building in buildings) {
             if (!building.owner.equalsId(ownerId) && building.buildingType == BuildingType.TOWER && building.buildingLevel == BuildingLevel.LEVEL_2)
                 return building.id;

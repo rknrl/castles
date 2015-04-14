@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.rmi.C2B.UpdateStatistics
-import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.CommonDTO.{AccountIdDTO, TutorStateDTO, UserInfoDTO}
+import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO, UserInfoDTO}
 import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 class DbConfiguration(username: String,
@@ -39,33 +38,33 @@ object Database {
   case object GetTop
 
   /** Ответом будет AccountDeleted */
-  case class DeleteAccount(accountId: AccountIdDTO)
+  case class DeleteAccount(accountId: AccountId)
 
-  case class AccountDeleted(accountId: AccountIdDTO)
+  case class AccountDeleted(accountId: AccountId)
 
   /** Ответом будет AccountStateResponse или AccountNoExists */
-  case class GetAccountState(accountId: AccountIdDTO)
+  case class GetAccountState(accountId: AccountId)
 
-  case class AccountStateResponse(accountId: AccountIdDTO, state: AccountStateDTO)
+  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO)
 
   case object AccountNoExists
 
   /** Ответом будет TutorStateResponse */
-  case class GetTutorState(accountId: AccountIdDTO)
+  case class GetTutorState(accountId: AccountId)
 
-  case class TutorStateResponse(accountId: AccountIdDTO, tutorState: TutorStateDTO)
-
-  /** Ответом будет AccountStateResponse */
-  case class Insert(accountId: AccountIdDTO, accountState: AccountStateDTO, userInfo: UserInfoDTO, tutorState: TutorStateDTO)
+  case class TutorStateResponse(accountId: AccountId, tutorState: TutorStateDTO)
 
   /** Ответом будет AccountStateResponse */
-  case class UpdateAccountState(accountId: AccountIdDTO, accountState: AccountStateDTO)
+  case class Insert(accountId: AccountId, accountState: AccountStateDTO, userInfo: UserInfoDTO, tutorState: TutorStateDTO)
+
+  /** Ответом будет AccountStateResponse */
+  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO)
 
   /** Без ответа */
-  case class UpdateTutorState(accountId: AccountIdDTO, tutorState: TutorStateDTO)
+  case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO)
 
   /** Без ответа */
-  case class UpdateUserInfo(accountId: AccountIdDTO, userInfo: UserInfoDTO)
+  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
 
 }
 
@@ -81,7 +80,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
 
   def `rowData→topItem`(rowData: RowData) = {
     val idByteArray = rowData("id").asInstanceOf[Array[Byte]]
-    val id = AccountIdDTO.parseFrom(idByteArray)
+    val id = AccountId.parseFrom(idByteArray)
 
     val rating = rowData("rating").asInstanceOf[Double]
 
@@ -122,7 +121,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
     case Insert(accountId, accountState, userInfo, tutorState) ⇒
       val ref = sender()
 
-      pool.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.getRating, accountState.toByteArray, userInfo.toByteArray)).map(
+      pool.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.rating, accountState.toByteArray, userInfo.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             pool.sendPreparedStatement("INSERT INTO tutor_state (id,state) VALUES (?,?);", Seq(accountId.toByteArray, tutorState.toByteArray)).map(
@@ -138,7 +137,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
 
     case UpdateAccountState(accountId, accountState) ⇒
       val ref = sender()
-      pool.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.getRating, accountState.toByteArray, accountId.toByteArray)).map(
+      pool.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.rating, accountState.toByteArray, accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             ref ! AccountStateResponse(accountId, accountState)
@@ -207,7 +206,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
       )
 
     case UpdateStatistics(dto) ⇒
-      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(dto.getAction.getNumber)).map(
+      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(dto.action.id)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1) {
             // ok

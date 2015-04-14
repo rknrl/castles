@@ -8,9 +8,16 @@
 
 package ru.rknrl.castles.game.state
 
-class Stat(val attack: Double,
-           val defence: Double,
-           val speed: Double) {
+import ru.rknrl.Assertion
+
+case class Stat(attack: Double,
+                defence: Double,
+                speed: Double) {
+
+  Assertion.check(attack > 0, attack)
+  Assertion.check(defence > 0, defence)
+  Assertion.check(speed > 0, speed)
+
   def *(that: Stat) =
     new Stat(
       attack * that.attack,

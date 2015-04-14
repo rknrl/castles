@@ -16,7 +16,7 @@ import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupLandscape;
 import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 
 public class LayoutLandscape extends Layout {
     public static const iPadWidth:int = 1024;
@@ -91,7 +91,7 @@ public class LayoutLandscape extends Layout {
         return 4;
     }
 
-    override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
+    override public function gameAvatarPos(playerId:PlayerId, areaH:int, areaV:int):Point {
         const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
         const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
 
@@ -115,13 +115,13 @@ public class LayoutLandscape extends Layout {
         throw new Error("invalid avatar playerId " + playerId.id);
     }
 
-    override public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
+    override public function gameAvatarBitmapPos(playerId:PlayerId):Point {
         return new Point(0, 0);
     }
 
     private static const gameAvatarTextGap:Number = 8;
 
-    override public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
+    override public function gameAvatarTextPos(playerId:PlayerId, width:Number, height:Number):Point {
         return new Point(-width / 2, notScaledGameAvatarSize / 2 + gameAvatarTextGap)
     }
 

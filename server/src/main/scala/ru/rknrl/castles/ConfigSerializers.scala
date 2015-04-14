@@ -10,8 +10,8 @@ package ru.rknrl.castles
 
 import net.liftweb.json.CustomSerializer
 import net.liftweb.json.JsonAST._
-import ru.rknrl.castles.account.AccountConfig.{BuildingPrices, SkillUpgradePrices}
-import ru.rknrl.dto.CommonDTO.BuildingLevel
+import ru.rknrl.castles.account.{SkillUpgradePrices, BuildingPrices}
+import ru.rknrl.dto.BuildingLevel
 
 class BuildingPricesSerializer extends CustomSerializer[BuildingPrices](format ⇒ ( {
   case JObject(

@@ -11,7 +11,7 @@ import flash.system.Security;
 
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.platforms.SocialMock;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 
@@ -27,9 +27,9 @@ public class MainWebStandalone extends MainWebBase {
         Security.allowDomain("*");
 
         const accountType:AccountType = AccountType.DEV;
-        const accountId:AccountIdDTO = new AccountIdDTO();
+        const accountId:AccountId = new AccountId();
         accountId.id = "1";
-        accountId.type = accountType;
+        accountId.accountType = accountType;
 
         const social:ISocial = new SocialMock(accountId.id);
 

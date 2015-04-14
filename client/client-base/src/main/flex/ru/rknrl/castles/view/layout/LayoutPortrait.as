@@ -16,7 +16,7 @@ import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupPortrait;
 import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.utils.createTextField;
 
 public class LayoutPortrait extends Layout {
@@ -77,7 +77,7 @@ public class LayoutPortrait extends Layout {
         return 32;
     }
 
-    override public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
+    override public function gameAvatarBitmapPos(playerId:PlayerId):Point {
         switch (playerId.id) {
             case 0:
                 return new Point(0, 0);
@@ -90,7 +90,7 @@ public class LayoutPortrait extends Layout {
         throw new Error("invalid avatar playerId " + playerId.id);
     }
 
-    override public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
+    override public function gameAvatarTextPos(playerId:PlayerId, width:Number, height:Number):Point {
         const gap:Number = 4;
         const y:Number = -height / 2;
         switch (playerId.id) {
@@ -109,7 +109,7 @@ public class LayoutPortrait extends Layout {
         return 2;
     }
 
-    override public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
+    override public function gameAvatarPos(playerId:PlayerId, areaH:int, areaV:int):Point {
         const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
         const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
 

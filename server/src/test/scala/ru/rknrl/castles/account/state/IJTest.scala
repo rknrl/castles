@@ -8,10 +8,11 @@
 
 package ru.rknrl.castles.account.state
 
-import org.scalatest.{FreeSpec, Matchers}
-import ru.rknrl.castles.game.points.Point
+import org.scalatest.{Matchers, WordSpec}
+import ru.rknrl.castles.account.IJ
+import ru.rknrl.castles.game.state.Point
 
-class IJTest extends FreeSpec with Matchers {
+class IJTest extends WordSpec with Matchers {
   "centerXY" in {
     IJ(0, 0).centerXY shouldEqual Point(19.5, 19.5)
     IJ(11, 2).centerXY shouldEqual Point(448.5, 97.5)

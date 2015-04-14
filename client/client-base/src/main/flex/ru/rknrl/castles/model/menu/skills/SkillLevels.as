@@ -41,7 +41,7 @@ public class SkillLevels {
 
     public function getLevel(skillType:SkillType):SkillLevel {
         for each(var level:SkillLevelDTO in skills) {
-            if (level.type == skillType) return level.level;
+            if (level.skillType == skillType) return level.level;
         }
         throw new Error("can't found skill level " + skillType);
     }

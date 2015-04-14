@@ -1,0 +1,146 @@
+package ru.rknrl.dto;
+
+option java_outer_classname = "GameDTO";
+
+option optimize_for = SPEED;
+
+import "common.proto";
+
+enum CellSize {
+    SIZE = 39;
+}
+
+message BuildingId {
+    required int32 id = 1;
+}
+
+message UnitId {
+    required int32 id = 1;
+}
+
+message PlayerId {
+    required int32 id = 1;
+}
+
+message PlayerDTO {
+    required PlayerId id = 1;
+    required UserInfoDTO info = 2;
+}
+
+message PointDTO {
+    required float x = 1;
+    required float y = 2;
+}
+
+// server -> client
+
+message GameStateDTO {
+    required int32 width = 1;
+    required int32 height = 2;
+    repeated PlayerDTO players = 3;
+    repeated SlotsPosDTO slots = 4;
+    required PlayerId selfId = 5;
+    repeated BuildingDTO buildings = 6;
+    repeated UnitDTO units = 7;
+    repeated FireballDTO fireballs = 8;
+    repeated TornadoDTO tornadoes = 9;
+    repeated VolcanoDTO volcanoes = 10;
+    repeated BulletDTO bullets = 11;
+    required ItemsStateDTO itemsState = 12;
+    repeated GameOverDTO gameOvers = 13;
+}
+
+enum SlotsOrientation {
+    TOP_LEFT = 1;
+    TOP_RIGHT = 2;
+    BOTTOM_LEFT = 3;
+    BOTTOM_RIGHT = 4;
+}
+
+message SlotsPosDTO {
+    required PlayerId playerId = 1;
+    required PointDTO pos = 2;
+    required SlotsOrientation orientation = 3;
+}
+
+message BuildingDTO {
+    required BuildingId id = 1;
+    required BuildingPrototype building = 2;
+    required PointDTO pos = 3;
+    required int32 population = 4;
+    optional PlayerId owner = 5;
+    required bool strengthened = 6;
+}
+
+message BuildingUpdateDTO {
+    required BuildingId id = 1;
+    required int32 population = 2;
+    optional PlayerId owner = 3;
+    required bool strengthened = 4;
+}
+
+message UnitDTO {
+    required UnitId id = 1;
+    required BuildingType buildingType = 2;
+    required int32 count = 3;
+    required PointDTO pos = 4;
+    required int32 duration = 5;
+    required BuildingId targetBuildingId = 6;
+    required PlayerId owner = 7;
+    required bool strengthened = 8;
+}
+
+message UnitUpdateDTO {
+    required UnitId id = 1;
+    required int32 count = 4;
+}
+
+message FireballDTO {
+    required PointDTO pos = 1;
+    required int32 millisTillSplash = 2;
+}
+
+message VolcanoDTO {
+    required PointDTO pos = 1;
+    required int32 millisTillEnd = 2;
+}
+
+message TornadoDTO {
+    repeated PointDTO points = 1;
+    required int32 millisFromStart = 3;
+    required int32 millisTillEnd = 4;
+}
+
+message BulletDTO {
+    required BuildingId buildingId = 1;
+    required UnitId unitId = 2;
+    required int32 duration = 3;
+}
+
+message GameOverDTO {
+    required PlayerId playerId = 1;
+    required int32 place = 3;
+    required int32 reward = 4;
+}
+
+message ItemsStateDTO {
+    repeated ItemStateDTO items = 1;
+}
+
+message ItemStateDTO {
+    required ItemType itemType = 1;
+    required int32 count = 2;
+    required int32 millisTillCooldownEnd = 3;
+    required int32 cooldownDuration = 4; // todo можно не посылать каждый раз
+}
+
+// client -> server
+
+message MoveDTO {
+    repeated BuildingId fromBuildings = 1;
+    required BuildingId toBuilding = 2;
+}
+
+message CastTornadoDTO {
+    repeated PointDTO points = 1;
+}

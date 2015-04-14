@@ -108,10 +108,10 @@ public class MenuController {
     private function onSlotClick(event:SlotClickEvent):void {
         const slot:SlotDTO = model.slots.getSlot(event.slotId);
         if (slot.hasBuildingPrototype) {
-            const canUpgrade:Boolean = slot.buildingPrototype.level != BuildingLevel.LEVEL_3;
+            const canUpgrade:Boolean = slot.buildingPrototype.buildingLevel != BuildingLevel.LEVEL_3;
             const canRemove:Boolean = model.slots.buildingsCount > 1;
             if (canUpgrade) {
-                const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
+                const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.buildingLevel);
                 const upgradePrice:int = model.buildingPrices.getPrice(nextLevel);
             }
             if (canUpgrade || canRemove) {
@@ -121,7 +121,7 @@ public class MenuController {
                     server.updateStatistics(DtoMock.stat(StatAction.TUTOR_SLOT_CLICK));
                 }
 
-                view.openUpgradePopup(event.slotId, slot.buildingPrototype.type, canUpgrade, canRemove, upgradePrice);
+                view.openUpgradePopup(event.slotId, slot.buildingPrototype.buildingType, canUpgrade, canRemove, upgradePrice);
             }
 
         } else {
@@ -152,7 +152,7 @@ public class MenuController {
     private function onUpgradeBuilding(event:UpgradeBuildingEvent):void {
         const slot:SlotDTO = model.slots.getSlot(event.slotId);
         if (!slot.hasBuildingPrototype) throw new Error();
-        const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.level);
+        const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.buildingLevel);
         const price:int = model.buildingPrices.getPrice(nextLevel);
 
         if (model.gold < price) {

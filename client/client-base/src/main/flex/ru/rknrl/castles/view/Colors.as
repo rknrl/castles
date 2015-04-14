@@ -13,7 +13,7 @@ import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 
@@ -185,11 +185,11 @@ public class Colors {
         red
     ];
 
-    public static function playerColor(playerId:PlayerIdDTO):uint {
+    public static function playerColor(playerId:PlayerId):uint {
         return playerColors[playerId.id];
     }
 
-    public static function playerTransform(playerId:PlayerIdDTO):ColorTransform {
+    public static function playerTransform(playerId:PlayerId):ColorTransform {
         return transform(playerColor(playerId));
     }
 
@@ -197,7 +197,7 @@ public class Colors {
         return owner.hasOwner ? playerTransform(owner.ownerId) : transform(noOwnerColor);
     }
 
-    public static function groundBitmapDataById(playerId:PlayerIdDTO):BitmapData {
+    public static function groundBitmapDataById(playerId:PlayerId):BitmapData {
         return lightBitmapData(playerColor(playerId));
     }
 

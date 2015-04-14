@@ -9,14 +9,14 @@
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 
 public class Building {
-    private var _id:BuildingIdDTO;
+    private var _id:BuildingId;
 
-    public function get id():BuildingIdDTO {
+    public function get id():BuildingId {
         return _id;
     }
 
@@ -62,7 +62,7 @@ public class Building {
         _strengthened = strengthened;
     }
 
-    public function Building(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, pos:Point, owner:BuildingOwner, population:int, strengthened:Boolean) {
+    public function Building(id:BuildingId, buildingType:BuildingType, buildingLevel:BuildingLevel, pos:Point, owner:BuildingOwner, population:int, strengthened:Boolean) {
         _id = id;
         _buildingType = buildingType;
         _buildingLevel = buildingLevel;
@@ -75,8 +75,8 @@ public class Building {
     public static function fromDto(b:BuildingDTO):Building {
         return new Building(
                 b.id,
-                b.building.type,
-                b.building.level,
+                b.building.buildingType,
+                b.building.buildingLevel,
                 Point.fromDto(b.pos),
                 new BuildingOwner(b.hasOwner, b.owner),
                 b.population,

@@ -36,7 +36,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.menu.factory.MobileFactory;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
@@ -197,9 +197,9 @@ public class MainMobileBase extends Sprite {
     }
 
     private function start(accountType:AccountType, id:String, accessToken:String):void {
-        const accountId:AccountIdDTO = new AccountIdDTO();
+        const accountId:AccountId = new AccountId();
         accountId.id = id;
-        accountId.type = accountType;
+        accountId.accountType = accountType;
 
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = accessToken;
@@ -207,7 +207,7 @@ public class MainMobileBase extends Sprite {
         authenticationSecret.accessToken = accessToken;
 
         Log.info("accountId=" + accountId.id);
-        Log.info("accountType=" + accountId.type.name());
+        Log.info("accountType=" + accountId.accountType.name());
         Log.info("authenticationSecret=" + authenticationSecret.body);
         Log.info("authenticationParams=" + authenticationSecret.params);
         Log.info("authenticationAccessToken=" + authenticationSecret.accessToken);

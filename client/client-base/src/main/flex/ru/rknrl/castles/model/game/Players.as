@@ -8,19 +8,19 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 
 public class Players {
     private var players:Vector.<PlayerDTO>;
 
-    public function Players(players:Vector.<PlayerDTO>, selfId:PlayerIdDTO) {
+    public function Players(players:Vector.<PlayerDTO>, selfId:PlayerId) {
         this.players = players;
         this._selfId = selfId;
     }
 
-    private var _selfId:PlayerIdDTO;
+    private var _selfId:PlayerId;
 
-    public function get selfId():PlayerIdDTO {
+    public function get selfId():PlayerId {
         return _selfId;
     }
 
@@ -28,7 +28,7 @@ public class Players {
         return players.length == 4;
     }
 
-    public function getPlayer(playerId:PlayerIdDTO):PlayerDTO {
+    public function getPlayer(playerId:PlayerId):PlayerDTO {
         for each(var player:PlayerDTO in players) {
             if (player.id.id == playerId.id) return player;
         }
@@ -39,7 +39,7 @@ public class Players {
         return getPlayer(_selfId);
     }
 
-    public function getEnemiesPlayers(playerId:PlayerIdDTO):Vector.<PlayerDTO> {
+    public function getEnemiesPlayers(playerId:PlayerId):Vector.<PlayerDTO> {
         const result:Vector.<PlayerDTO> = new <PlayerDTO>[];
         for each(var player:PlayerDTO in players) {
             if (player.id.id != playerId.id) result.push(player);
@@ -51,8 +51,8 @@ public class Players {
         return players;
     }
 
-    public static function playersToIds(players:Vector.<PlayerDTO>):Vector.<PlayerIdDTO> {
-        const result:Vector.<PlayerIdDTO> = new <PlayerIdDTO>[];
+    public static function playersToIds(players:Vector.<PlayerDTO>):Vector.<PlayerId> {
+        const result:Vector.<PlayerId> = new <PlayerId>[];
         for each(var player:PlayerDTO in players) result.push(player.id);
         return result;
     }

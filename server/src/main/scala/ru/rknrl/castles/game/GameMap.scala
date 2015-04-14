@@ -11,12 +11,10 @@ package ru.rknrl.castles.game
 import java.io.File
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.state.{BuildingPrototype, IJ}
-import ru.rknrl.castles.game.GameMap
+import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.GameMap.random
-import ru.rknrl.castles.game.state.buildings.Building
-import ru.rknrl.castles.game.state.{BuildingIdIterator, GameArea}
-import ru.rknrl.dto.CommonDTO.{BuildingLevel, BuildingType}
+import ru.rknrl.castles.game.state.{Building, BuildingIdIterator}
+import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
 
 import scala.io.Source
 
@@ -29,19 +27,21 @@ class GameMap(val cells: Iterable[MapCell]) {
 
   private def topLeftBuildings(iterator: BuildingIdIterator, config: GameConfig) =
     for (cell ← cells) yield {
-      val buildingType = cell.buildingType.getOrElse(random(BuildingType.values()))
-      val buildingLevel = cell.buildingLevel.getOrElse(random(BuildingLevel.values()))
+      val buildingType = cell.buildingType.getOrElse(random(BuildingType.values))
+      val buildingLevel = cell.buildingLevel.getOrElse(random(BuildingLevel.values))
       val prototype = BuildingPrototype(buildingType, buildingLevel)
 
+      val stat = config.units(prototype)
+
       new Building(
-        iterator.next,
-        prototype,
-        IJ(cell.i, cell.j).centerXY,
-        config.getStartPopulation(prototype),
+        id = iterator.next,
+        buildingPrototype = prototype,
+        pos = IJ(cell.i, cell.j).centerXY,
+        count = config.startCount(prototype),
         owner = None,
-        strengthened = false,
-        strengtheningStartTime = 0,
-        lastShootTime = 0
+        strengthening = None,
+        lastShootTime = 0,
+        buildingStat = stat
       )
     }
 
@@ -80,7 +80,16 @@ class GameMap(val cells: Iterable[MapCell]) {
           case 3 ⇒ gameArea.mirrorH(gameArea.mirrorV(b.pos))
         }
 
-        new Building(buildingIdIterator.next, b.prototype, pos, b.population, b.owner, b.strengthened, b.strengtheningStartTime, b.lastShootTime)
+        new Building(
+          id = buildingIdIterator.next,
+          buildingPrototype = b.buildingPrototype,
+          pos = pos,
+          count = b.count,
+          owner = b.owner,
+          strengthening = b.strengthening,
+          lastShootTime = b.lastShootTime,
+          buildingStat = b.buildingStat
+        )
       }
   }
 }
@@ -97,7 +106,7 @@ class GameMaps(val big: Array[GameMap],
 }
 
 object GameMap {
-  def random[T](list: Array[T]): T =
+  def random[T](list: Seq[T]): T =
     list((Math.random() * list.length).toInt)
 
   private def toBuildingType(s: String) =

@@ -222,7 +222,7 @@ public class ViewReport extends Sprite {
         view.addGame();
         const buildings:Vector.<BuildingDTO> = layout is LayoutPortrait ? DtoMock.buildingsPortrait() : DtoMock.buildingsLandscape();
         for each(var b:BuildingDTO in  buildings) {
-            gameView.area.addBuilding(b.id, b.building.type, b.building.level, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
+            gameView.area.addBuilding(b.id, b.building.buildingType, b.building.buildingLevel, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
         }
         const slotsPos:Vector.<SlotsPosDTO> = layout is LayoutPortrait ? DtoMock.slotsPosPortrait() : DtoMock.slotsPosLandscape();
         for each(var s:SlotsPosDTO in slotsPos) {

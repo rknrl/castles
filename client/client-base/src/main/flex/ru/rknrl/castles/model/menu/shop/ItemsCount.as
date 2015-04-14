@@ -19,7 +19,7 @@ public class ItemsCount {
 
     public function getCount(itemType:ItemType):int {
         for each(var item:ItemDTO in _itemsDto) {
-            if (item.type == itemType) return item.count;
+            if (item.itemType == itemType) return item.count;
         }
         throw new Error("can't find item " + itemType);
     }

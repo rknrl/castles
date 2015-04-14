@@ -17,7 +17,7 @@ import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
 import ru.rknrl.castles.view.game.area.units.BloodView;
 import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.castles.view.game.area.volcanoes.VolcanoesView;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
@@ -116,29 +116,29 @@ public class GameArea extends Sprite {
         addChild(_tornadoPath = new TornadoPathView());
     }
 
-    public function addBuilding(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {
+    public function addBuilding(id:BuildingId, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {
         _ground.updateGroundColor(pos, owner);
         buildings.addBuilding(id, buildingType, buildingLevel, owner, count, strengthened, pos);
     }
 
-    public function setBuildingCount(id:BuildingIdDTO, count:int):void {
+    public function setBuildingCount(id:BuildingId, count:int):void {
         buildings.setBuildingCount(id, count);
     }
 
-    public function setBuildingDust(id:BuildingIdDTO, visible:Boolean):void {
+    public function setBuildingDust(id:BuildingId, visible:Boolean):void {
         buildings.setBuildingsDust(id, visible);
     }
 
-    public function setBuildingOwner(id:BuildingIdDTO, owner:BuildingOwner):void {
+    public function setBuildingOwner(id:BuildingId, owner:BuildingOwner):void {
         buildings.setBuildingOwner(id, owner);
         _ground.updateGroundColor(buildings.byId(id).pos, owner);
     }
 
-    public function setBuildingStrengthened(id:BuildingIdDTO, strengthened:Boolean):void {
+    public function setBuildingStrengthened(id:BuildingId, strengthened:Boolean):void {
         buildings.setBuildingStrengthened(id, strengthened);
     }
 
-    public function tutorBlur(buildingIds:Vector.<BuildingIdDTO>):void {
+    public function tutorBlur(buildingIds:Vector.<BuildingId>):void {
         buildings.tutorBlur(buildingIds);
     }
 

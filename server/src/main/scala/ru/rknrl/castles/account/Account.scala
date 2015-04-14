@@ -12,23 +12,18 @@ import akka.actor.ActorRef
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
-import ru.rknrl.castles.account.state.{AccountState, Skills}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.Statistics.updateStatistics
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game
 import ru.rknrl.castles.game.state.Stat
-import ru.rknrl.castles.payments.BugType
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
-import ru.rknrl.dto.AuthDTO._
-import ru.rknrl.dto.CommonDTO._
-import ru.rknrl.{EscalateStrategyActor, Logged, SilentLog}
-
-import scala.collection.JavaConverters._
+import ru.rknrl.dto._
+import ru.rknrl.{BugType, EscalateStrategyActor, Logged, SilentLog}
 
 object Account {
 
@@ -54,36 +49,36 @@ class Account(matchmaking: ActorRef,
   // auth
 
   var client: ActorRef = null
-  var accountId: AccountIdDTO = null
+  var accountId: AccountId = null
   var deviceType: DeviceType = null
   var platformType: PlatformType = null
   var userInfo: UserInfoDTO = null
   var state: AccountState = null
 
   def checkSecret(authenticate: AuthenticateDTO) =
-    authenticate.getUserInfo.getAccountId.getType match {
+    authenticate.userInfo.accountId.accountType match {
       case AccountType.DEV ⇒
         config.isDev
       case AccountType.VKONTAKTE ⇒
-        if (authenticate.getSecret.hasAccessToken)
+        if (authenticate.secret.accessToken.isDefined)
           true // todo: check access token
         else
-          SocialAuth.checkSecretVk(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.vk.get)
+          SocialAuth.checkSecretVk(authenticate.secret.body, authenticate.userInfo.accountId.id, config.social.vk.get)
 
       case AccountType.ODNOKLASSNIKI ⇒
-        if (authenticate.getSecret.hasAccessToken)
+        if (authenticate.secret.accessToken.isDefined)
           true // todo: check access token
         else
-          SocialAuth.checkSecretOk(authenticate.getSecret.getBody, authenticate.getSecret.getParams, authenticate.getUserInfo.getAccountId.getId, config.social.ok.get)
+          SocialAuth.checkSecretOk(authenticate.secret.body, authenticate.secret.getParams, authenticate.userInfo.accountId.id, config.social.ok.get)
 
       case AccountType.MOIMIR ⇒
-        if (authenticate.getSecret.hasAccessToken)
+        if (authenticate.secret.accessToken.isDefined)
           true // todo: check access token
         else
-          SocialAuth.checkSecretMm(authenticate.getSecret.getBody, authenticate.getSecret.getParams, config.social.mm.get)
+          SocialAuth.checkSecretMm(authenticate.secret.body, authenticate.secret.getParams, config.social.mm.get)
 
       case AccountType.FACEBOOK ⇒
-        SocialAuth.checkSecretFb(authenticate.getSecret.getBody, authenticate.getUserInfo.getAccountId.getId, config.social.fb.get)
+        SocialAuth.checkSecretFb(authenticate.secret.body, authenticate.userInfo.accountId.id, config.social.fb.get)
 
       case AccountType.DEVICE_ID ⇒
         true
@@ -97,10 +92,10 @@ class Account(matchmaking: ActorRef,
     case Authenticate(authenticate) ⇒
       if (checkSecret(authenticate)) {
         client = sender
-        accountId = authenticate.getUserInfo.getAccountId
-        deviceType = authenticate.getDeviceType
-        platformType = authenticate.getPlatformType
-        userInfo = authenticate.getUserInfo
+        accountId = authenticate.userInfo.accountId
+        deviceType = authenticate.deviceType
+        platformType = authenticate.platformType
+        userInfo = authenticate.userInfo
         database ! Database.GetAccountState(accountId)
         database ! updateStatistics(StatAction.AUTHENTICATED)
       } else {
@@ -110,8 +105,7 @@ class Account(matchmaking: ActorRef,
       }
 
     case AccountNoExists ⇒
-      val initTutorState = TutorStateDTO.newBuilder.build
-      database ! Insert(accountId, AccountState.initAccount(config.account).dto, userInfo, initTutorState)
+      database ! Insert(accountId, config.account.initAccount.dto, userInfo, TutorStateDTO())
       database ! updateStatistics(StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(id, dto) ⇒
@@ -143,40 +137,37 @@ class Account(matchmaking: ActorRef,
       }
   })
 
-  def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO], tutorState: TutorStateDTO) = {
-    val builder = AuthenticatedDTO.newBuilder
-      .setAccountState(state.dto)
-      .setConfig(config.account.dto)
-      .setTop(TopDTO.newBuilder.addAllUsers(top.asJava).build)
-      .setTutor(tutorState)
-      .addAllProducts(config.productsDto(platformType, accountId.getType).asJava)
-      .setSearchOpponents(searchOpponents)
-
-    if (gameAddress.isDefined) builder.setGame(gameAddress.get)
-
-    Authenticated(builder.build)
-  }
+  def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO], tutorState: TutorStateDTO) =
+    Authenticated(AuthenticatedDTO(
+      accountState = state.dto,
+      config = config.account.dto,
+      top = TopDTO(top.toSeq),
+      products = config.productsDto(platformType, accountId.accountType),
+      tutor = tutorState,
+      searchOpponents = searchOpponents,
+      game = gameAddress
+    ))
 
   def account: Receive = persistent.orElse(logged({
     case BuyBuilding(dto) ⇒
-      updateState(state.buyBuilding(dto.getId, dto.getBuildingType, config.account))
-      database ! updateStatistics(Statistics.buyBuilding(dto.getBuildingType, BuildingLevel.LEVEL_1))
+      updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
+      database ! updateStatistics(Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1))
 
     case UpgradeBuilding(dto) ⇒
-      updateState(state.upgradeBuilding(dto.getId, config.account))
-      database ! updateStatistics(Statistics.buyBuilding(state.slots(dto.getId).getBuildingPrototype))
+      updateState(state.upgradeBuilding(dto.id, config.account))
+      database ! updateStatistics(Statistics.buyBuilding(state.slots(dto.id).get))
 
     case RemoveBuilding(dto) ⇒
-      updateState(state.removeBuilding(dto.getId))
+      updateState(state.removeBuilding(dto.id))
       database ! updateStatistics(StatAction.REMOVE_BUILDING)
 
     case UpgradeSkill(dto) ⇒
-      updateState(state.upgradeSkill(dto.getType, config.account))
-      database ! updateStatistics(Statistics.buySkill(dto.getType, state.skills(dto.getType)))
+      updateState(state.upgradeSkill(dto.`type`, config.account))
+      database ! updateStatistics(Statistics.buySkill(dto.`type`, state.skills(dto.`type`)))
 
     case BuyItem(dto) ⇒
-      updateState(state.buyItem(dto.getType, config.account))
-      database ! updateStatistics(Statistics.buyItem(dto.getType))
+      updateState(state.buyItem(dto.`type`, config.account))
+      database ! updateStatistics(Statistics.buyItem(dto.`type`))
 
     case EnterGame ⇒
       placeGameOrder(isTutor = false)
@@ -214,7 +205,7 @@ class Account(matchmaking: ActorRef,
         state = state.addItem(itemType, -count)
 
       database ! UpdateAccountState(accountId, state.dto)
-      client ! TopUpdated(TopDTO.newBuilder.addAllUsers(top.asJava).build)
+      client ! TopUpdated(TopDTO(top.toSeq))
       context become account
 
   }).orElse(persistent)
@@ -241,7 +232,7 @@ class Account(matchmaking: ActorRef,
   })
 
   def placeGameOrder(isTutor: Boolean) = {
-    val realStat = Skills.stat(config.account, state.skills)
+    val realStat = config.account.skillsToStat(state.skills)
     val stat = if (isTutor)
       new Stat(
         attack = realStat.attack * 3,
@@ -258,10 +249,7 @@ class Account(matchmaking: ActorRef,
     context become inGame(game)
   }
 
-  def gameAddress = NodeLocator.newBuilder
-    .setHost(config.host)
-    .setPort(config.gamePort)
-    .build
+  def gameAddress = NodeLocator(config.host, config.gamePort)
 
   override def postStop() = {
     matchmaking ! Offline(accountId)

@@ -8,21 +8,21 @@
 
 package ru.rknrl.castles.model {
 import ru.rknrl.dto.AccountConfigDTO;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticatedDTO;
 import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingPriceDTO;
-import ru.rknrl.dto.BuildingPrototypeDTO;
+import ru.rknrl.dto.BuildingPrototype;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.dto.PointDTO;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.SkillLevel;
@@ -66,14 +66,14 @@ public class DtoMock {
         return dto;
     }
 
-    public static function buildingPrototype(buildingType:BuildingType, level:BuildingLevel):BuildingPrototypeDTO {
-        const dto:BuildingPrototypeDTO = new BuildingPrototypeDTO();
-        dto.type = buildingType;
-        dto.level = level;
+    public static function buildingPrototype(buildingType:BuildingType, level:BuildingLevel):BuildingPrototype {
+        const dto:BuildingPrototype = new BuildingPrototype();
+        dto.buildingType = buildingType;
+        dto.buildingLevel = level;
         return dto;
     }
 
-    public static function slot(slotId:SlotId, buildingPrototype:BuildingPrototypeDTO):SlotDTO {
+    public static function slot(slotId:SlotId, buildingPrototype:BuildingPrototype):SlotDTO {
         const dto:SlotDTO = new SlotDTO();
         dto.id = slotId;
         dto.buildingPrototype = buildingPrototype;
@@ -92,7 +92,7 @@ public class DtoMock {
 
     public static function skillLevel(skillType:SkillType, level:SkillLevel):SkillLevelDTO {
         const dto:SkillLevelDTO = new SkillLevelDTO();
-        dto.type = skillType;
+        dto.skillType = skillType;
         dto.level = level;
         return dto;
     }
@@ -107,7 +107,7 @@ public class DtoMock {
 
     public static function item(itemType:ItemType, count:int):ItemDTO {
         const dto:ItemDTO = new ItemDTO();
-        dto.type = itemType;
+        dto.itemType = itemType;
         dto.count = count;
         return dto;
     }
@@ -161,10 +161,10 @@ public class DtoMock {
         return dto;
     }
 
-    public static function accountId(type:AccountType, id:String):AccountIdDTO {
-        const dto:AccountIdDTO = new AccountIdDTO();
+    public static function accountId(type:AccountType, id:String):AccountId {
+        const dto:AccountId = new AccountId();
         dto.id = id;
-        dto.type = type;
+        dto.accountType = type;
         return dto;
     }
 
@@ -222,14 +222,14 @@ public class DtoMock {
 
     public static function findSkillLevel(dto:Vector.<SkillLevelDTO>, skillType:SkillType):SkillLevelDTO {
         for each(var skillLevel:SkillLevelDTO in dto) {
-            if (skillLevel.type == skillType) return skillLevel;
+            if (skillLevel.skillType == skillType) return skillLevel;
         }
         throw new Error("can't find skill level " + skillType)
     }
 
     public static function findItem(dto:Vector.<ItemDTO>, itemType:ItemType):ItemDTO {
         for each(var item:ItemDTO in dto) {
-            if (item.type == itemType) return item;
+            if (item.itemType == itemType) return item;
         }
         throw new Error("can't find item " + itemType)
     }
@@ -243,7 +243,7 @@ public class DtoMock {
 
     private static function player(id:int, name:String, photoUrl:String):PlayerDTO {
         const dto:PlayerDTO = new PlayerDTO();
-        dto.id = new PlayerIdDTO();
+        dto.id = new PlayerId();
         dto.id.id = id;
         dto.info = userInfo(name, null, photoUrl);
         return dto;
@@ -288,8 +288,8 @@ public class DtoMock {
         ];
     }
 
-    public static function playerId(id:int):PlayerIdDTO {
-        const dto:PlayerIdDTO = new PlayerIdDTO();
+    public static function playerId(id:int):PlayerId {
+        const dto:PlayerId = new PlayerId();
         dto.id = id;
         return dto;
     }
@@ -318,8 +318,8 @@ public class DtoMock {
 
     private static var buildingIdIterator:int = 0;
 
-    public static function buildingId(id:int):BuildingIdDTO {
-        const dto:BuildingIdDTO = new BuildingIdDTO();
+    public static function buildingId(id:int):BuildingId {
+        const dto:BuildingId = new BuildingId();
         dto.id = id;
         return dto;
     }

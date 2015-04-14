@@ -59,9 +59,9 @@
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
-    <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module" module-name="asocial-base" exported="" />
     <orderEntry type="module" module-name="asocial-web" exported="" />
     <orderEntry type="module" module-name="aslog" exported="" />
+    <orderEntry type="module" module-name="dto-core-client" exported="" />
   </component>
 </module>

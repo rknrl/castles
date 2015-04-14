@@ -26,7 +26,7 @@ public class Tornadoes {
 
     public function add(dto:TornadoDTO):void {
         const time:int = getTimer();
-        const tornado:Tornado = new Tornado(tornadoIterator++, time, dto.millisFromStart, dto.millisTillEnd, Points.fromDto(dto.points), dto.speed);
+        const tornado:Tornado = new Tornado(tornadoIterator++, time, dto.millisFromStart, dto.millisTillEnd, Points.fromDto(dto.points));
         tornadoes.push(tornado);
         view.addTornado(tornado.id, tornado.pos(time))
     }

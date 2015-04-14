@@ -9,11 +9,7 @@
 package ru.rknrl.castles.rmi
 
 import ru.rknrl.core.rmi.Msg
-import ru.rknrl.dto.AccountDTO.{BuyBuildingDTO, BuyItemDTO, RemoveBuildingDTO, UpgradeBuildingDTO, UpgradeSkillDTO}
-import ru.rknrl.dto.AdminDTO._
-import ru.rknrl.dto.AuthDTO.AuthenticateDTO
-import ru.rknrl.dto.CommonDTO.{StatDTO, StatAction, AccountIdDTO, TutorStateDTO}
-import ru.rknrl.dto.GameDTO._
+import ru.rknrl.dto._
 
 object C2B {
 
@@ -39,7 +35,7 @@ object C2B {
 
   case class SetSlot(dto: AdminSetSlotDTO) extends Msg(75)
 
-  case class DeleteAccount(accountId: AccountIdDTO) extends Msg(76)
+  case class DeleteAccount(accountId: AccountId) extends Msg(76)
 
   // account 80 - 89
 
@@ -73,12 +69,12 @@ object C2B {
 
   case class CastFireball(point: PointDTO) extends GameMsg(101)
 
-  case class CastStrengthening(buildingId: BuildingIdDTO) extends GameMsg(102)
+  case class CastStrengthening(buildingId: BuildingId) extends GameMsg(102)
 
   case class CastVolcano(point: PointDTO) extends GameMsg(103)
 
-  case class CastTornado(cast: CastTorandoDTO) extends GameMsg(104)
+  case class CastTornado(cast: CastTornadoDTO) extends GameMsg(104)
 
-  case class CastAssistance(buildingId: BuildingIdDTO) extends GameMsg(105)
+  case class CastAssistance(buildingId: BuildingId) extends GameMsg(105)
 
 }

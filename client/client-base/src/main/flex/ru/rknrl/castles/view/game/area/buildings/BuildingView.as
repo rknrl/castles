@@ -19,7 +19,7 @@ import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.utils.dust.FireDust;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 
@@ -36,7 +36,7 @@ public class BuildingView extends Sprite {
     private var dust:FireDust;
     private var scale:Number;
 
-    public function BuildingView(id:BuildingIdDTO, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
+    public function BuildingView(id:BuildingId, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point) {
         _id = id;
         _pos = pos;
 
@@ -59,9 +59,9 @@ public class BuildingView extends Sprite {
         this.strengthened = strengthened;
     }
 
-    private var _id:BuildingIdDTO;
+    private var _id:BuildingId;
 
-    public function get id():BuildingIdDTO {
+    public function get id():BuildingId {
         return _id;
     }
 

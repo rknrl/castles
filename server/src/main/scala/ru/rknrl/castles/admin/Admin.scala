@@ -12,16 +12,14 @@ import akka.actor.ActorRef
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
-import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.AccountDTO.AccountStateDTO
-import ru.rknrl.dto.AdminDTO.AdminAccountStateDTO
-import ru.rknrl.dto.CommonDTO.AccountIdDTO
+import ru.rknrl.dto.{AccountId, AccountStateDTO, AdminAccountStateDTO}
 import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 import scala.concurrent.Await
@@ -45,7 +43,7 @@ class Admin(database: ActorRef,
   def auth: Receive = logged({
     /** from Client */
     case AuthenticateAsAdmin(authenticate) ⇒
-      if (authenticate.getLogin == login && authenticate.getPassword == password) {
+      if (authenticate.login == login && authenticate.password == password) {
         client = sender
         client ! AuthenticatedAsAdmin
         context become admin
@@ -64,7 +62,7 @@ class Admin(database: ActorRef,
     case AccountNoExists ⇒
 
     case C2B.GetAccountState(dto) ⇒
-      database ! Database.GetAccountState(dto.getAccountId)
+      database ! Database.GetAccountState(dto.accountId)
 
     case C2B.DeleteAccount(accountId) ⇒
       database ! Database.DeleteAccount(accountId)
@@ -79,38 +77,34 @@ class Admin(database: ActorRef,
       client ! msg
 
     case AddGold(dto) ⇒
-      getState(dto.getAccountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.getAmount))
+      getState(dto.accountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.amount))
       )
 
     case AddItem(dto) ⇒
-      getState(dto.getAccountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.getItemType, dto.getAmount))
+      getState(dto.accountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.itemType, dto.amount))
       )
 
     case SetSkill(dto) ⇒
-      getState(dto.getAccountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.getSkilType, dto.getSkillLevel))
+      getState(dto.accountId,
+        (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.skilType, dto.skillLevel))
       )
 
     case SetSlot(dto) ⇒
-      getState(dto.getAccountId,
+      getState(dto.accountId,
         (accountId, accountState) ⇒
-          if (dto.getSlot.hasBuildingPrototype)
-            update(accountId, accountState.setBuilding(dto.getSlot.getId, dto.getSlot.getBuildingPrototype))
+          if (dto.slot.buildingPrototype.isDefined)
+            update(accountId, accountState.setBuilding(dto.slot.id, dto.slot.buildingPrototype.get))
           else
-            update(accountId, accountState.removeBuilding(dto.getSlot.getId))
+            update(accountId, accountState.removeBuilding(dto.slot.id))
       )
   })
 
-  def sendToClient(accountId: AccountIdDTO, accountState: AccountStateDTO) =
-    client ! B2C.AccountState(
-      AdminAccountStateDTO.newBuilder
-        .setAccountId(accountId)
-        .setAccountState(accountState)
-        .build)
+  def sendToClient(accountId: AccountId, accountState: AccountStateDTO) =
+    client ! B2C.AccountState(AdminAccountStateDTO(accountId, accountState))
 
-  def getState(accountId: AccountIdDTO, f: (AccountIdDTO, AccountState) ⇒ Unit) = {
+  def getState(accountId: AccountId, f: (AccountId, AccountState) ⇒ Unit) = {
     val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
@@ -123,7 +117,7 @@ class Admin(database: ActorRef,
     }
   }
 
-  def update(accountId: AccountIdDTO, newAccountState: AccountState): Unit = {
+  def update(accountId: AccountId, newAccountState: AccountState): Unit = {
     val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto), 5 seconds)
     val result = Await.result(future, 5 seconds)
 

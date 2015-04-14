@@ -9,31 +9,43 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.points.Point
-import ru.rknrl.castles.game.state.buildings.{BuildingId, Buildings}
-import ru.rknrl.castles.game.state.players.{PlayerId, PlayerStates}
-import ru.rknrl.castles.game.state.units.GameUnit
-import ru.rknrl.dto.GameDTO.{BuildingIdDTO, PlayerIdDTO}
+import ru.rknrl.dto.{BuildingId, PlayerId}
 
 object Assistance {
-  def `casts→units`(casts: Map[PlayerIdDTO, BuildingIdDTO],
-                    buildings: Buildings,
-                    config: GameConfig,
-                    playerStates: PlayerStates,
-                    unitIdIterator: UnitIdIterator,
-                    assistancePositions: Map[PlayerIdDTO, Point],
-                    time: Long) =
-    for ((playerId, buildingId) ← casts) yield {
-      val building = buildings(buildingId)
+  def castToUnit(cast: (Player, BuildingId),
+                 buildings: Iterable[Building],
+                 config: GameConfig,
+                 churchesProportion: ChurchesProportion,
+                 unitIdIterator: UnitIdIterator,
+                 assistancePositions: Map[PlayerId, Point],
+                 time: Long) = {
 
-      // Assertion.check(building.owner.get == playerId)
-      // здание может быть захвачено противником до каста, в этом случае все равно отправляем отряд
+    val player = cast._1
+    val buildingId = cast._2
+    val toBuilding = buildings.find(_.id == buildingId).get
+    val prototype = config.assistance.buildingPrototype
 
-      val startPos = assistancePositions(playerId)
-      val endPos = building.pos
-      val prototype = config.assistanceBuildingPrototype
-      val speed = config.unitSpeed(prototype, playerStates(playerId), strengthened = false)
-      val count = config.assistanceCount(building, playerStates(playerId))
-      new GameUnit(unitIdIterator.next, prototype, count, startPos, endPos, time, speed, buildingId, playerId, false)
-    }
+    val fromBuilding = new Building(
+      id = new BuildingId(-1),
+      buildingPrototype = prototype,
+      pos = assistancePositions(player.id),
+      owner = Some(player),
+      count = 0,
+      buildingStat = config.units(prototype),
+      strengthening = None,
+      lastShootTime = 0
+    )
+
+    val distance = fromBuilding.pos.distance(toBuilding.pos)
+    val speed = fromBuilding.stat.speed
+
+    new GameUnit(
+      id = unitIdIterator.next,
+      fromBuilding = fromBuilding,
+      toBuilding = toBuilding,
+      count = config.assistanceCount(toBuilding, churchesProportion(player.id)),
+      startTime = time,
+      duration = (distance / speed).toLong
+    )
+  }
 }

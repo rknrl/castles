@@ -11,9 +11,6 @@
             <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc">
               <dependency linkage="Merged" />
             </entry>
@@ -21,6 +18,9 @@
               <dependency linkage="Merged" />
             </entry>
             <entry module-name="aslog" build-configuration-name="aslog">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -53,7 +53,6 @@
     <orderEntry type="library" exported="" name="Maven: org.flexunit:flexunit:swc:as3:4.1.0" level="project" />
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="rmi-core-client" exported="" />
-    <orderEntry type="module" module-name="dto-core-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc" />
@@ -66,5 +65,6 @@
     </orderEntry>
     <orderEntry type="module" module-name="asocial-base" exported="" />
     <orderEntry type="module" module-name="aslog" exported="" />
+    <orderEntry type="module" module-name="dto-core-client" exported="" />
   </component>
 </module>

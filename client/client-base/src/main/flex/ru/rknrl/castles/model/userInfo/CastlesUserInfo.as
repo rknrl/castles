@@ -10,7 +10,7 @@ package ru.rknrl.castles.model.userInfo {
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.asocial.userInfo.UserInfoAvatarUrl;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.UserInfoDTO;
 
@@ -34,15 +34,15 @@ public class CastlesUserInfo extends UserInfo {
     }
 
     public static function fromDto(dto:UserInfoDTO):CastlesUserInfo {
-        return new CastlesUserInfo(dto.accountId.id, dto.accountId.type, dto.firstName, dto.lastName, dto.photo96, dto.photo256);
+        return new CastlesUserInfo(dto.accountId.id, dto.accountId.accountType, dto.firstName, dto.lastName, dto.photo96, dto.photo256);
     }
 
     public static function userInfoDto(userInfo:UserInfo, accountType:AccountType):UserInfoDTO {
         const dto:UserInfoDTO = new UserInfoDTO();
 
-        dto.accountId = new AccountIdDTO();
+        dto.accountId = new AccountId();
         dto.accountId.id = userInfo.uid;
-        dto.accountId.type = accountType;
+        dto.accountId.accountType = accountType;
 
         const firstName:String = userInfo.firstName;
         if (firstName) dto.firstName = firstName;

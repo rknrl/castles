@@ -22,25 +22,25 @@
 
     <fx:Script><![CDATA[
         import ru.rknrl.castles.events.SetSlotEvent;
-        import ru.rknrl.dto.BuildingPrototypeDTO;
+        import ru.rknrl.dto.BuildingPrototype;
         import ru.rknrl.dto.SlotDTO;
         import ru.rknrl.dto.SlotId;
 
         private var slotId:SlotId;
 
-        public function init(slotId:SlotId, buildingPrototype:BuildingPrototypeDTO): void {
+        public function init(slotId:SlotId, buildingPrototype:BuildingPrototype): void {
             this.slotId = slotId;
             nameLabel.text = slotId.name();
-            buildingLabel.text = buildingPrototype ? buildingPrototype.type.name() + " " + buildingPrototype.level.name() : "None";
+            buildingLabel.text = buildingPrototype ? buildingPrototype.buildingType.name() + " " + buildingPrototype.buildingLevel.name() : "None";
         }
 
         private function onClick(event:MouseEvent):void {
             const dto:SlotDTO = new SlotDTO();
             dto.id = slotId;
             if (typeComboBox.selectedItem != Utils.NO_BUILDING) {
-                dto.buildingPrototype = new BuildingPrototypeDTO();
-                dto.buildingPrototype.type = typeComboBox.selectedItem;
-                dto.buildingPrototype.level = levelComboBox.selectedItem;
+                dto.buildingPrototype = new BuildingPrototype();
+                dto.buildingPrototype.buildingType = typeComboBox.selectedItem;
+                dto.buildingPrototype.buildingLevel = levelComboBox.selectedItem;
             }
 
             dispatchEvent(new SetSlotEvent(dto));

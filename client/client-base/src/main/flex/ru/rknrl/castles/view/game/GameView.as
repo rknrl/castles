@@ -26,8 +26,8 @@ import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.dto.BuildingIdDTO;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.BuildingId;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {
@@ -181,19 +181,19 @@ public class GameView extends Sprite {
         addChild(gameOverScreen = new GameOverScreen(winners, losers, win, reward, _layout, locale, loadImageManager))
     }
 
-    private function getAvatarById(playerId:PlayerIdDTO):GameAvatar {
+    private function getAvatarById(playerId:PlayerId):GameAvatar {
         for each(var avatar:GameAvatar in avatars) {
             if (avatar.playerId.id == playerId.id) return avatar;
         }
         throw new Error("can't find avatar " + playerId.id);
     }
 
-    public function setDeadAvatar(playerId:PlayerIdDTO):void {
+    public function setDeadAvatar(playerId:PlayerId):void {
         getAvatarById(playerId).dead = true;
     }
 
-    public function tutorBlur(playerIds:Vector.<PlayerIdDTO>, buildingIds:Vector.<BuildingIdDTO>):void {
-        for each(var playerId:PlayerIdDTO in playerIds)
+    public function tutorBlur(playerIds:Vector.<PlayerId>, buildingIds:Vector.<BuildingId>):void {
+        for each(var playerId:PlayerId in playerIds)
             getAvatarById(playerId).tutorBlur = true;
         area.tutorBlur(buildingIds);
     }

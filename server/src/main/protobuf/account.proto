@@ -1,0 +1,72 @@
+package ru.rknrl.dto;
+
+option java_outer_classname = "AccountDTO";
+
+option optimize_for = SPEED;
+
+import "common.proto";
+
+message AccountStateDTO {
+    repeated SlotDTO slots = 1;
+    repeated SkillLevelDTO skills = 2;
+    repeated ItemDTO items = 3;
+    required int32 gold = 4;
+    required double rating = 5;
+    required int32 gamesCount = 6;
+}
+
+message SlotDTO {
+    required SlotId id = 1;
+    optional BuildingPrototype buildingPrototype = 2;
+}
+
+message SkillLevelDTO {
+    required SkillType skillType = 1;
+    required SkillLevel level = 2;
+}
+
+message ItemDTO {
+    required ItemType itemType = 1;
+    required int32 count = 2;
+}
+
+// config
+
+message AccountConfigDTO {
+    repeated BuildingPriceDTO buildings = 1;
+    repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
+    required int32 itemPrice = 3;
+}
+
+message SkillUpgradePriceDTO {
+    required int32 totalLevel = 1;
+    required int32 price = 2;
+}
+
+message BuildingPriceDTO {
+    required BuildingLevel level = 1;
+    required int32 price = 2;
+}
+
+// client->server actions
+
+message BuyBuildingDTO {
+    required SlotId id = 1;
+    required BuildingType buildingType = 2;
+}
+
+message UpgradeBuildingDTO {
+    required SlotId id = 1;
+}
+
+message RemoveBuildingDTO {
+    required SlotId id = 1;
+}
+
+message UpgradeSkillDTO {
+    required SkillType type = 1;
+}
+
+message BuyItemDTO {
+    required ItemType type = 1;
+}

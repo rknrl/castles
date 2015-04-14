@@ -12,11 +12,11 @@
     </s:HGroup>
 
     <fx:Script><![CDATA[
-        import ru.rknrl.dto.AccountIdDTO;
+        import ru.rknrl.dto.AccountId;
 
-        public function init(accountId:AccountIdDTO): void {
+        public function init(accountId:AccountId): void {
             idLabel.text = accountId.id;
-            typeLabel.text = accountId.type.name();
+            typeLabel.text = accountId.accountType.name();
         }
         ]]></fx:Script>
 </s:VGroup>

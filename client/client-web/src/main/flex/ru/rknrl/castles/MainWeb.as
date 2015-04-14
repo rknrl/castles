@@ -13,7 +13,7 @@ import ru.rknrl.asocial.platforms.Facebook;
 import ru.rknrl.asocial.platforms.MoiMir;
 import ru.rknrl.asocial.platforms.Odnoklassniki;
 import ru.rknrl.asocial.platforms.Vkontakte;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.print;
@@ -32,9 +32,9 @@ public class MainWeb extends MainWebBase {
         const accountType:AccountType = getAccountType(flashVars.rknrlAccountType);
         const social:ISocialWeb = createSocial(accountType, flashVars);
 
-        const accountId:AccountIdDTO = new AccountIdDTO();
+        const accountId:AccountId = new AccountId();
         accountId.id = social.flashVars.uid;
-        accountId.type = accountType;
+        accountId.accountType = accountType;
 
         const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
         authenticationSecret.body = social.flashVars.authenticationSecret;

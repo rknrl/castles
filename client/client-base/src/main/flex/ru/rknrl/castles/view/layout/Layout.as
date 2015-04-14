@@ -14,7 +14,7 @@ import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.utils.OverrideMe;
 
@@ -192,15 +192,15 @@ public class Layout {
         throw OverrideMe;
     }
 
-    public function gameAvatarPos(playerId:PlayerIdDTO, areaH:int, areaV:int):Point {
+    public function gameAvatarPos(playerId:PlayerId, areaH:int, areaV:int):Point {
         throw OverrideMe()
     }
 
-    public function gameAvatarBitmapPos(playerId:PlayerIdDTO):Point {
+    public function gameAvatarBitmapPos(playerId:PlayerId):Point {
         throw OverrideMe()
     }
 
-    public function gameAvatarTextPos(playerId:PlayerIdDTO, width:Number, height:Number):Point {
+    public function gameAvatarTextPos(playerId:PlayerId, width:Number, height:Number):Point {
         throw OverrideMe()
     }
 

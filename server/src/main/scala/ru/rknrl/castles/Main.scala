@@ -12,12 +12,12 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
-import ru.rknrl.PolicyServer
+import ru.rknrl.{Bugs, PolicyServer}
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
 import ru.rknrl.castles.game.GameMaps
-import ru.rknrl.castles.payments.{Bugs, HttpServer}
+import ru.rknrl.castles.payments.HttpServer
 import spray.can.Http
 
 import scala.concurrent.Await

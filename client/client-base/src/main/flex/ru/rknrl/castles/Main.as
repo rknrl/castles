@@ -29,7 +29,7 @@ import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.dto.AccountIdDTO;
+import ru.rknrl.dto.AccountId;
 import ru.rknrl.dto.AuthenticateDTO;
 import ru.rknrl.dto.AuthenticationSecretDTO;
 import ru.rknrl.dto.DeviceType;
@@ -47,7 +47,7 @@ public class Main extends Sprite {
     private var gamePort:int;
     private var policyPort:int;
 
-    private var accountId:AccountIdDTO;
+    private var accountId:AccountId;
     private var secret:AuthenticationSecretDTO;
     private var deviceType:DeviceType;
     private var platformType:PlatformType;
@@ -67,7 +67,7 @@ public class Main extends Sprite {
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountIdDTO, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, myUserInfo:UserInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountId, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, myUserInfo:UserInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -158,7 +158,7 @@ public class Main extends Sprite {
     private function onConnect(event:Event):void {
         Log.info("onConnect");
         const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.type);
+        authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.accountType);
         authenticate.secret = secret;
         authenticate.deviceType = deviceType;
         authenticate.platformType = platformType;

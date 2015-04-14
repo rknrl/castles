@@ -9,66 +9,59 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.state.IJ
-import ru.rknrl.castles.game.points.Point
-import ru.rknrl.castles.game.state.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.account.IJ
+import ru.rknrl.castles.game.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.state.Assistance.castToUnit
+import ru.rknrl.castles.game.state.Building._
+import ru.rknrl.castles.game.state.Bullets._
+import ru.rknrl.castles.game.state.ChurchesProportion._
+import ru.rknrl.castles.game.state.Fireballs._
+import ru.rknrl.castles.game.state.GameItems._
 import ru.rknrl.castles.game.state.Moving._
-import ru.rknrl.castles.game.state.buildings.{Building, BuildingId, Buildings}
-import ru.rknrl.castles.game.state.bullets.Bullets._
-import ru.rknrl.castles.game.state.fireballs.Fireballs._
-import ru.rknrl.castles.game.state.players._
-import ru.rknrl.castles.game.state.tornadoes.Tornadoes._
-import ru.rknrl.castles.game.state.units.GameUnits.{getUpdateMessages, _}
-import ru.rknrl.castles.game.state.units.{GameUnits, UnitId}
-import ru.rknrl.castles.game.state.volcanoes.Volcanoes._
-import ru.rknrl.castles.game.{GameConfig, GameMap}
+import ru.rknrl.castles.game.state.Strengthening._
+import ru.rknrl.castles.game.state.Tornadoes._
+import ru.rknrl.castles.game.state.Volcanoes._
+import ru.rknrl.castles.game.{GameArea, GameConfig, GameMap}
+import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.core.rmi.Msg
-import ru.rknrl.dto.CommonDTO.ItemType
-import ru.rknrl.dto.GameDTO._
+import ru.rknrl.dto.ItemType._
+import ru.rknrl.dto._
 import ru.rknrl.utils.IdIterator
-
-import scala.collection.JavaConverters._
-
-class BuildingIdIterator extends IdIterator {
-  def next = BuildingId(nextInt)
-}
-
-class UnitIdIterator extends IdIterator {
-  def next = UnitId(nextInt)
-}
 
 object GameState {
 
   def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
     for (player ← players;
-         (slotId, slot) ← player.slots
-         if slot.hasBuildingPrototype)
+         (slotId, buildingPrototype) ← player.slots
+         if buildingPrototype.isDefined)
       yield {
-        val ij = playersSlotsPositions(player.id.getId)(slotId)
+        val ij = playersSlotsPositions(player.id.id)(slotId)
         val xy = ij.centerXY
 
-        val prototype = slot.getBuildingPrototype
+        val stat = config.units(buildingPrototype.get) * player.stat
+
+        val prototype = buildingPrototype.get
         new Building(
-          buildingIdIterator.next,
-          prototype,
-          xy,
-          population = config.getStartPopulation(prototype),
-          owner = Some(player.id),
-          strengthened = false,
-          strengtheningStartTime = 0,
-          lastShootTime = 0)
+          id = buildingIdIterator.next,
+          buildingPrototype = prototype,
+          pos = xy,
+          count = config.startCount(prototype),
+          owner = Some(player),
+          strengthening = None,
+          lastShootTime = 0,
+          buildingStat = stat)
       }
 
   def slotsPosDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, SlotsOrientation]) =
     for (player ← players)
       yield {
-        val id = player.id.getId
+        val id = player.id.id
         val pos = positions(id)
-        SlotsPosDTO.newBuilder
-          .setPlayerId(player.id)
-          .setPos(pos.centerXY.dto)
-          .setOrientation(orientations(id))
-          .build
+        SlotsPosDTO(
+          player.id,
+          pos.centerXY.dto,
+          orientations(id)
+        )
       }
 
   def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig, gameMap: GameMap) = {
@@ -91,177 +84,187 @@ object GameState {
 
     val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
 
-    val playerStates = for (player ← players) yield player.id → new PlayerState(player.stat, 0)
-
     new GameState(
-      time,
-      gameArea.width,
-      gameArea.height,
-      players.map(p ⇒ p.id → p).toMap,
-      new Buildings(buildings.map(b ⇒ b.id → b).toMap),
-      new GameUnits(List.empty),
-      new Fireballs(List.empty),
-      new Volcanoes(List.empty),
-      new Tornadoes(List.empty),
-      new Bullets(List.empty),
-      new GameItems(players.map(p ⇒ p.id → GameItems.init(p.id, p.items)).toMap),
-      new UnitIdIterator,
-      slotsPos,
-      new PlayerStates(playerStates.toMap),
-      gameArea.assistancePositions,
-      config
+      time = time,
+      width = gameArea.width,
+      height = gameArea.height,
+      players = players.map(p ⇒ p.id → p).toMap,
+      buildings = buildings,
+      units = List.empty,
+      fireballs = List.empty,
+      tornadoes = List.empty,
+      volcanoes = List.empty,
+      bullets = List.empty,
+      items = new GameItems(players.map(p ⇒ p.id → GameItems.init(p.items)).toMap),
+      unitIdIterator = new UnitIdIterator,
+      slotsPos = slotsPos,
+      assistancePositions = gameArea.assistancePositions,
+      config = config
     )
   }
 }
 
-class GameState(val time: Long,
-                val width: Int,
+class BuildingIdIterator extends IdIterator {
+  def next = BuildingId(nextInt)
+}
+
+class UnitIdIterator extends IdIterator {
+  def next = UnitId(nextInt)
+}
+
+class GameState(val width: Int,
                 val height: Int,
-                val players: Map[PlayerIdDTO, Player],
-                val buildings: Buildings,
-                val units: GameUnits,
-                val fireballs: Fireballs,
-                val volcanoes: Volcanoes,
-                val tornadoes: Tornadoes,
-                val bullets: Bullets,
-                val gameItems: GameItems,
-                val unitIdIterator: UnitIdIterator,
                 val slotsPos: Iterable[SlotsPosDTO],
-                val playerStates: PlayerStates,
-                val assistancePositions: Map[PlayerIdDTO, Point],
-                val config: GameConfig) {
+                val time: Long,
+                val players: Map[PlayerId, Player],
+                val buildings: Seq[Building],
+                val units: Seq[GameUnit],
+                val fireballs: Iterable[Fireball],
+                val volcanoes: Iterable[Volcano],
+                val tornadoes: Iterable[Tornado],
+                val bullets: Iterable[Bullet],
+                val items: GameItems,
+                val config: GameConfig,
+                val unitIdIterator: UnitIdIterator,
+                val assistancePositions: Map[PlayerId, Point]) {
 
   def update(newTime: Long,
-             moveActions: Map[PlayerIdDTO, MoveDTO],
-             newFireballCasts: Map[PlayerIdDTO, PointDTO],
-             newStrengtheningCasts: Map[PlayerIdDTO, BuildingIdDTO],
-             newVolcanoCasts: Map[PlayerIdDTO, PointDTO],
-             newTornadoCasts: Map[PlayerIdDTO, CastTorandoDTO],
-             newAssistanceCasts: Map[PlayerIdDTO, BuildingIdDTO]) = {
+             moveActions: Map[PlayerId, MoveDTO],
+             fireballCasts: Map[PlayerId, PointDTO],
+             volcanoCasts: Map[PlayerId, PointDTO],
+             tornadoCasts: Map[PlayerId, CastTornadoDTO],
+             strengtheningCasts: Map[PlayerId, BuildingId],
+             assistanceCasts: Map[PlayerId, BuildingId]) = {
 
     val deltaTime = newTime - time
 
-    val fireballCasts = gameItems.checkCasts(newFireballCasts, ItemType.FIREBALL, config, time)
-    val strengtheningCasts = gameItems.checkCasts(newStrengtheningCasts, ItemType.STRENGTHENING, config, time)
-    val tornadoCasts = gameItems.checkCasts(newTornadoCasts, ItemType.TORNADO, config, time)
-    val volcanoCasts = gameItems.checkCasts(newVolcanoCasts, ItemType.VOLCANO, config, time)
-    val assistanceCasts = gameItems.checkCasts(newAssistanceCasts, ItemType.ASSISTANCE, config, time)
+    val churchesProportion = getChurchesProportion(buildings, players, config)
 
-    val exitUnits = `moveActions→exitUnits`(moveActions, buildings, config)
-    val assistanceUnits = Assistance.`casts→units`(assistanceCasts, buildings, config, playerStates, unitIdIterator, assistancePositions, time)
-    val exitedUnits = `exitUnit→units`(exitUnits, buildings, config, unitIdIterator, playerStates, time)
-    val createdUnits = assistanceUnits ++ exitedUnits
-    val addUnitMessages = `units→addMessages`(createdUnits, time)
-    val enterUnits = `units→enterUnit`(units.units, time)
-    val killUnitMessages = units.`killed→killMessages`
+    val validFireballCasts = items.checkCasts(fireballCasts, FIREBALL, config, newTime)
+    val createdFireballs = validFireballCasts.map(castToFireball(_, newTime, churchesProportion, config))
 
-    val createdFireballs = `casts→fireballs`(fireballCasts, config, time)
-    val createdVolcanoes = `casts→volcanoes`(volcanoCasts, time, config, playerStates)
-    val createdTornadoes = `casts→tornadoes`(tornadoCasts, time, config, playerStates)
+    val validVolcanoCasts = items.checkCasts(volcanoCasts, VOLCANO, config, newTime)
+    val createdVolcanoes = validVolcanoCasts.map(castToVolcano(_, newTime, churchesProportion, config))
 
-    val addFireballMessages = `fireballs→addMessages`(createdFireballs, time)
-    val addVolcanoMessages = `volcanoes→addMessages`(createdVolcanoes, time)
-    val addTornadoMessages = `tornadoes→addMessages`(createdTornadoes, time)
+    val validTornadoCasts = items.checkCasts(tornadoCasts, TORNADO, config, newTime)
+    val createdTornadoes = validTornadoCasts.map(castToTornado(_, newTime, churchesProportion, config))
 
-    val newGameItems = gameItems
-      .applyCasts(fireballCasts, ItemType.FIREBALL, time)
-      .applyCasts(strengtheningCasts, ItemType.STRENGTHENING, time)
-      .applyCasts(tornadoCasts, ItemType.TORNADO, time)
-      .applyCasts(volcanoCasts, ItemType.VOLCANO, time)
-      .applyCasts(assistanceCasts, ItemType.ASSISTANCE, time)
+    val validStrengtheningCasts = items.checkCasts(strengtheningCasts, STRENGTHENING, config, newTime)
+      .filter { case (playerId, buildingId) ⇒
+      val owner = buildings.find(_.id == buildingId).get.owner
+      owner.isDefined && owner.get.id == playerId
+    }
+    val strengthenings = validStrengtheningCasts.map(castToStrengthening(_, newTime, churchesProportion, config))
 
-    val updateItemsStatesMessages = GameItems.getUpdateItemsStatesMessages(gameItems, newGameItems, config, time)
+    val validAssistanceCasts = items.checkCasts(assistanceCasts, ASSISTANCE, config, newTime)
+      .map { case (playerId, buildingId) ⇒ players(playerId) → buildingId }
+      .filter { case (player, buildingId) ⇒ buildings.find(_.id == buildingId).get.owner == Some(player) }
 
-    val finishedFireballs = fireballs.getFinished(time)
+    val assistanceUnits = validAssistanceCasts.map(castToUnit(_, buildings, config, churchesProportion, unitIdIterator, assistancePositions, newTime))
 
-    val finishedBullets = bullets.getFinished(time)
+    val exitUnits = moveActionsToExitUnits(moveActions, buildings, unitIdIterator, newTime)
+    val createdUnits = exitUnits ++ assistanceUnits
+    val enterUnits = units.filter(_.isFinish(newTime))
 
-    val newUnits = units
-      .add(createdUnits)
-      .applyFireballs(finishedFireballs, playerStates, config, time)
-      .applyVolcanoes(volcanoes.list, playerStates, config, time)
-      .applyTornadoes(tornadoes.list, playerStates, config, time)
-      .applyBullets(finishedBullets, playerStates, config, time)
-      .applyEnterUnits(enterUnits)
-      .applyKillMessages(killUnitMessages)
+    val createdBullets = createBullets(canShoot(buildings, newTime, config), units, newTime, config)
 
-    val updateUnitMessages = getUpdateMessages(units.units, newUnits.units, time)
+    val finishedFireballs = fireballs.filter(_.isFinish(newTime))
+    val damagers = finishedFireballs ++ volcanoes ++ tornadoes
 
-    val createdBullets = createBullets(buildings, newUnits, time, config)
-    val addBulletsMessages = `bullets→addMessage`(createdBullets, time)
+    val finishedBullets = bullets.filter(_.isFinish(newTime))
 
     val newBuildings = buildings
-      .updatePopulation(deltaTime, config)
-      .applyStrengtheningCasts(strengtheningCasts, time)
-      .cleanupStrengthening(time, config, playerStates)
-      .applyExitUnits(exitUnits, config)
-      .applyEnterUnits(enterUnits, config, playerStates)
-      .applyShots(time, createdBullets)
-      .applyFireballs(finishedFireballs, playerStates, config)
-      .applyVolcanoes(volcanoes.list, playerStates, config)
-      .applyTornadoes(tornadoes.list, playerStates, config, time)
+      .map(_.regenerate(deltaTime, config))
+      .map(_.applyExitUnits(exitUnits))
+      .map(_.applyEnterUnits(enterUnits, config))
+      .map(_.applyStrengthening(strengthenings))
+      .map(_.cleanupStrengthening(newTime))
+      .map(_.applyDamagers(damagers, newTime))
+      .map(_.applyShots(newTime, createdBullets))
 
-    val updateBuildingMessages = Buildings.getUpdateMessages(buildings.map, newBuildings.map)
+    val unitsAfterDamage = (units ++ createdUnits)
+      .filterNot(_.isFinish(newTime))
+      .map(_.applyDamagers(damagers, newTime))
+      .map(_.applyBullets(finishedBullets))
 
-    val newFireballs = fireballs
-      .add(createdFireballs)
-      .cleanup(time)
+    val killedUnits = unitsAfterDamage.filter(_.count == 0)
 
-    val newVolcanoes = volcanoes
-      .add(createdVolcanoes)
-      .cleanup(time)
+    val newUnits = unitsAfterDamage.filterNot(_.count == 0)
 
-    val newTornadoes = tornadoes
-      .add(createdTornadoes)
-      .cleanup(time)
+    val newFireballs = (fireballs ++ createdFireballs)
+      .filterNot(_.isFinish(newTime))
 
-    val newBullets = bullets
-      .add(createdBullets)
-      .cleanup(time)
+    val newVolcanoes = (volcanoes ++ createdVolcanoes)
+      .filterNot(_.isFinish(newTime))
 
-    val newPlayerStates = playerStates.updateChurchesProportion(buildings.map)
+    val newTornadoes = (tornadoes ++ createdTornadoes)
+      .filterNot(_.isFinish(newTime))
+
+    val newBullets = (bullets ++ createdBullets)
+      .filterNot(_.isFinish(newTime))
+
+    val newItems = items
+      .applyCasts(validFireballCasts, FIREBALL, time)
+      .applyCasts(validStrengtheningCasts, STRENGTHENING, time)
+      .applyCasts(validTornadoCasts, TORNADO, time)
+      .applyCasts(validVolcanoCasts, VOLCANO, time)
+      .applyCasts(validAssistanceCasts.map { case (player, cast) ⇒ player.id → cast }, ASSISTANCE, time)
 
     val newGameState = new GameState(
-      newTime,
-      width,
-      height,
-      players,
-      newBuildings,
-      newUnits,
-      newFireballs,
-      newVolcanoes,
-      newTornadoes,
-      newBullets,
-      newGameItems,
-      unitIdIterator,
-      slotsPos,
-      newPlayerStates,
-      assistancePositions,
-      config
+      width = width,
+      height = height,
+      slotsPos = slotsPos,
+      time = newTime,
+      players = players,
+      buildings = newBuildings,
+      units = newUnits,
+      fireballs = newFireballs,
+      volcanoes = newVolcanoes,
+      tornadoes = newTornadoes,
+      bullets = newBullets,
+      items = newItems,
+      config = config,
+      unitIdIterator = unitIdIterator,
+      assistancePositions = assistancePositions
     )
 
-    val messages: Iterable[Msg] = addUnitMessages ++ updateUnitMessages ++ killUnitMessages ++
-      updateBuildingMessages ++
-      addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages
+    val addUnitMessages = createdUnits.map(u ⇒ AddUnit(u.dto(newTime)))
+    val addFireballMessages = createdFireballs.map(f ⇒ AddFireball(f.dto(newTime)))
+    val addVolcanoMessages = createdVolcanoes.map(v ⇒ AddVolcano(v.dto(newTime)))
+    val addTornadoMessages = createdTornadoes.map(t ⇒ AddTornado(t.dto(newTime)))
+    val addBulletsMessages = createdBullets.map(b ⇒ AddBullet(b.dto(newTime)))
+
+    val updateUnitMessages = GameUnit.getUpdateMessages(units, newUnits)
+    val updateBuildingMessages = Building.getUpdateMessages(buildings, newBuildings)
+
+    val killUnitMessages = killedUnits.map(u ⇒ KillUnit(u.id))
+
+    val messages: Iterable[Msg] = addUnitMessages ++ addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages ++
+      updateBuildingMessages ++ updateUnitMessages ++ killUnitMessages
+
+    val updateItemsStatesMessages = getUpdateItemsStatesMessages(items, newItems, config, newTime)
 
     val personalMessages = updateItemsStatesMessages
 
     (newGameState, messages, personalMessages)
   }
 
-  def isPlayerLose(playerId: PlayerIdDTO) =
-    !buildings.map.exists { case (buildingId, building) ⇒ building.owner == Some(playerId) }
+  def isPlayerLose(playerId: PlayerId) =
+    !buildings.exists(b ⇒ b.owner.isDefined && b.owner.get.id == playerId)
 
-  def dtoBuilder(id: PlayerIdDTO) =
-    GameStateDTO.newBuilder
-      .setWidth(width)
-      .setHeight(height)
-      .setSelfId(id)
-      .addAllSlots(slotsPos.asJava)
-      .addAllBuildings(buildings.dto.asJava)
-      .addAllUnits(units.dto(time).asJava)
-      .addAllVolcanoes(volcanoes.dto(time).asJava)
-      .addAllTornadoes(tornadoes.dto(time).asJava)
-      .addAllBullets(bullets.dto(time).asJava)
-      .setItemsState(gameItems.dto(id, time, config))
+  def dto(id: PlayerId, players: Seq[PlayerDTO], gameOvers: Seq[GameOverDTO]) =
+    GameStateDTO(
+      width = width,
+      height = height,
+      selfId = id,
+      slots = slotsPos.toSeq,
+      buildings = buildings.map(_.dto),
+      units = units.map(_.dto(time)),
+      volcanoes = volcanoes.map(_.dto(time)).toSeq,
+      tornadoes = tornadoes.map(_.dto(time)).toSeq,
+      bullets = bullets.map(_.dto(time)).toSeq,
+      itemsState = items.dto(id, time, config),
+      players = players,
+      gameOvers = gameOvers
+    )
 }

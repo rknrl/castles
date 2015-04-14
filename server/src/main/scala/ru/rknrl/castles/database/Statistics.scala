@@ -9,10 +9,10 @@
 package ru.rknrl.castles.database
 
 import ru.rknrl.castles.rmi.C2B.UpdateStatistics
-import ru.rknrl.dto.CommonDTO._
+import ru.rknrl.dto._
 
 object Statistics {
-  def updateStatistics(action: StatAction) = UpdateStatistics(StatDTO.newBuilder.setAction(action).build)
+  def updateStatistics(action: StatAction) = UpdateStatistics(StatDTO(action))
 
   def buyItem(itemType: ItemType) =
     itemType match {
@@ -23,8 +23,8 @@ object Statistics {
       case ItemType.ASSISTANCE ⇒ StatAction.BUY_ASSISTANCE
     }
 
-  def buyBuilding(prototype: BuildingPrototypeDTO): StatAction =
-    buyBuilding(prototype.getType, prototype.getLevel)
+  def buyBuilding(prototype: BuildingPrototype): StatAction =
+    buyBuilding(prototype.buildingType, prototype.buildingLevel)
 
   def buyBuilding(buildingType: BuildingType, buildingLevel: BuildingLevel): StatAction =
     buildingType match {

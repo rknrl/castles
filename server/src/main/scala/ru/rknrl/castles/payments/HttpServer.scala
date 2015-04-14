@@ -13,12 +13,12 @@ import java.net.URLDecoder
 import akka.actor.ActorRef
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
-import ru.rknrl.StoppingStrategyActor
+import ru.rknrl.Bugs.Bug
+import ru.rknrl.{BugType, StoppingStrategyActor}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking.AdminSetAccountState
-import ru.rknrl.castles.account.state.AccountState
+import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
-import ru.rknrl.castles.payments.Bugs.Bug
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import spray.http.MediaTypes._
@@ -123,11 +123,11 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
 
                 result match {
                   case msg@AccountStateResponse(_, newAccountStateDto) ⇒
-                    if (newAccountStateDto.getGold == newState.gold) {
+                    if (newAccountStateDto.gold == newState.gold) {
                       matchmaking ! AdminSetAccountState(accountId, newAccountStateDto)
                       complete(httpResponse)
                     } else {
-                      log.info("invalid gold=" + newAccountStateDto.getGold + ", but expected " + newState.gold)
+                      log.info("invalid gold=" + newAccountStateDto.gold + ", but expected " + newState.gold)
                       complete(callback.databaseError)
                     }
                   case invalid ⇒

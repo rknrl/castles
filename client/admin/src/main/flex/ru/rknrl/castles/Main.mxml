@@ -117,7 +117,7 @@
         import ru.rknrl.castles.events.AddMagicItemEvent;
         import ru.rknrl.castles.events.SetSkillEvent;
         import ru.rknrl.castles.events.SetSlotEvent;
-        import ru.rknrl.dto.AccountIdDTO;
+        import ru.rknrl.dto.AccountId;
         import ru.rknrl.dto.AccountStateDTO;
         import ru.rknrl.dto.AdminAddGoldDTO;
         import ru.rknrl.dto.AdminAddItemDTO;
@@ -193,13 +193,13 @@
             stateHolder.removeAllElements();
 
             const dto:AdminGetAccountStateDTO = new AdminGetAccountStateDTO();
-            dto.accountId = new AccountIdDTO();
+            dto.accountId = new AccountId();
             dto.accountId.id = accountIdInput.text;
-            dto.accountId.type = accountTypeComboBox.selectedItem;
+            dto.accountId.accountType = accountTypeComboBox.selectedItem;
             server.getAccountState(dto);
         }
 
-        private var currentAccountId:AccountIdDTO;
+        private var currentAccountId:AccountId;
 
         public function onAccountState(e:AccountStateEvent):void {
             stateHolder.removeAllElements();
@@ -230,7 +230,7 @@
 
             for each(var skill:SkillLevelDTO in state.skills) {
                 const skillRow:SkillRow = new SkillRow();
-                skillRow.init(skill.type, skill.level);
+                skillRow.init(skill.skillType, skill.level);
                 stateHolder.addElement(skillRow);
             }
 
@@ -238,7 +238,7 @@
 
             for each(var item:ItemDTO in state.items) {
                 const magicItemRow:MagicItemRow = new MagicItemRow();
-                magicItemRow.init(item.type, item.count);
+                magicItemRow.init(item.itemType, item.count);
                 stateHolder.addElement(magicItemRow);
             }
         }

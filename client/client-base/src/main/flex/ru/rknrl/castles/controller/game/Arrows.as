@@ -14,7 +14,7 @@ import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
-import ru.rknrl.dto.BuildingIdDTO;
+import ru.rknrl.dto.BuildingId;
 
 public class Arrows {
     private var view:ArrowsView;
@@ -31,10 +31,10 @@ public class Arrows {
 
     private var fromBuildingIdToArrow:Dictionary = new Dictionary();
 
-    public function getFromBuildingsIds():Vector.<BuildingIdDTO> {
-        const result:Vector.<BuildingIdDTO> = new <BuildingIdDTO>[];
+    public function getFromBuildingsIds():Vector.<BuildingId> {
+        const result:Vector.<BuildingId> = new <BuildingId>[];
         for (var id:* in fromBuildingIdToArrow) {
-            const buildingId:BuildingIdDTO = id;
+            const buildingId:BuildingId = id;
             result.push(buildingId);
         }
         return result;
@@ -45,15 +45,15 @@ public class Arrows {
         addArrow(fromBuilding);
     }
 
-    private function getArrow(fromBuildingId:BuildingIdDTO):ArrowView {
+    private function getArrow(fromBuildingId:BuildingId):ArrowView {
         for (var id:* in fromBuildingIdToArrow) {
-            const buildingId:BuildingIdDTO = id;
+            const buildingId:BuildingId = id;
             if (buildingId.id == fromBuildingId.id) return fromBuildingIdToArrow[id];
         }
         return null;
     }
 
-    public function hasArrow(fromBuildingId:BuildingIdDTO):Boolean {
+    public function hasArrow(fromBuildingId:BuildingId):Boolean {
         return getArrow(fromBuildingId);
     }
 
@@ -62,7 +62,7 @@ public class Arrows {
             fromBuildingIdToArrow[fromBuilding.id] = view.addArrow(fromBuilding.pos);
     }
 
-    public function removeArrow(fromBuildingId:BuildingIdDTO):void {
+    public function removeArrow(fromBuildingId:BuildingId):void {
         view.removeArrow(getArrow(fromBuildingId));
     }
 

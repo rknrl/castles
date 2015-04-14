@@ -8,38 +8,38 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.dto.PlayerIdDTO;
-import ru.rknrl.dto.UnitIdDTO;
+import ru.rknrl.dto.PlayerId;
+import ru.rknrl.dto.UnitId;
 
 public class Unit {
     private var startPos:Point;
     private var endPos:Point;
     private var startTime:int;
-    private var speed:Number;
+    private var duration:int;
 
-    public function Unit(id:UnitIdDTO, owner:PlayerIdDTO, startPos:Point, endPos:Point, startTime:int, speed:Number, count:int) {
+    public function Unit(id:UnitId, owner:PlayerId, startPos:Point, endPos:Point, startTime:int, duration:int, count:int) {
         _id = id;
         _owner = owner;
-        this.endPos = endPos;
-        update(startTime, startPos, speed, count);
-    }
-
-    public function update(startTime:int, startPos:Point, speed:Number, count:int):void {
-        this.startTime = startTime;
         this.startPos = startPos;
-        this.speed = speed;
-        this._count = count;
+        this.endPos = endPos;
+        this.startTime = startTime;
+        this.duration = duration;
+        setCount(count);
     }
 
-    private var _id:UnitIdDTO;
+    public function setCount(count:int):void {
+        _count = count;
+    }
 
-    public function get id():UnitIdDTO {
+    private var _id:UnitId;
+
+    public function get id():UnitId {
         return _id;
     }
 
-    private var _owner:PlayerIdDTO;
+    private var _owner:PlayerId;
 
-    public function get owner():PlayerIdDTO {
+    public function get owner():PlayerId {
         return _owner;
     }
 
@@ -47,10 +47,6 @@ public class Unit {
 
     public function get count():int {
         return _count;
-    }
-
-    private function get duration():int {
-        return startPos.distance(endPos) / speed;
     }
 
     public function pos(time:int):Point {

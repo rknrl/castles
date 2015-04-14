@@ -21,7 +21,7 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.UnitDTO;
-import ru.rknrl.dto.UnitIdDTO;
+import ru.rknrl.dto.UnitId;
 
 public class GameSplash extends TutorControllerBase {
     public static const GAME_SPLASH_COMPLETE:String = "gameSplashComplete";
@@ -106,20 +106,20 @@ public class GameSplash extends TutorControllerBase {
                 view.mouseEnabled = false;
 
                 const dto:UnitDTO = new UnitDTO();
-                dto.id = new UnitIdDTO();
+                dto.id = new UnitId();
                 dto.id.id = 0;
-                dto.type = BuildingType.TOWER;
+                dto.buildingType = BuildingType.TOWER;
                 dto.count = 4;
                 dto.pos = DtoMock.point(view.tower1.x, view.tower1.y);
                 dto.owner = DtoMock.playerId(0);
-                dto.speed = 0.04;
+                dto.duration = 2000;
                 dto.strengthened = false;
 
                 const startPos:Point = view.tower1Pos;
                 const endPos:Point = view.tower2Pos;
 
-                unit = new Unit(dto.id, dto.owner, startPos, endPos, getTimer(), dto.speed, dto.count);
-                view.units.addUnit(dto.id, dto.type, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, endPos);
+                unit = new Unit(dto.id, dto.owner, startPos, endPos, getTimer(), dto.duration, dto.count);
+                view.units.addUnit(dto.id, dto.buildingType, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, endPos);
                 view.tower1.count = 4;
             } else {
                 view.tutor.visible = true;

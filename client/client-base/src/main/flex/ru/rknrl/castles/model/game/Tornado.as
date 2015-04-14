@@ -15,15 +15,13 @@ public class Tornado {
     private var millisFromStart:int;
     private var millisTillEnd:int;
     private var points:Points;
-    private var speed:Number;
 
-    public function Tornado(id:int, startTime:int, millisFromStart:int, millisTillEnd:int, points:Points, speed:Number) {
+    public function Tornado(id:int, startTime:int, millisFromStart:int, millisTillEnd:int, points:Points) {
         _id = id;
         this.startTime = startTime;
         this.millisFromStart = millisFromStart;
         this.millisTillEnd = millisTillEnd;
         this.points = points;
-        this.speed = speed;
     }
 
     private var _id:int;
@@ -34,7 +32,7 @@ public class Tornado {
 
     public function pos(time:int):Point {
         const duration:int = time - startTime + millisFromStart;
-        const distance:Number = duration * speed;
+        const distance:Number = duration // todo * speed;
         return points.getPos(distance)
     }
 

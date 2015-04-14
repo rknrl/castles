@@ -11,8 +11,8 @@ package ru.rknrl
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import org.slf4j.Logger
-import ru.rknrl.castles.payments.BugType.BugType
-import ru.rknrl.castles.payments.Bugs.Bug
+import ru.rknrl.BugType.BugType
+import ru.rknrl.Bugs.Bug
 
 trait Log {
   def info(s: String)
@@ -24,7 +24,7 @@ class SilentLog extends Log {
 
   def info(s: String) = {
     builder append s + "\n"
-    println(s)
+  //  println(s)
   }
 
   def result = builder.result

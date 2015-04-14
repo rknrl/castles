@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu.main {
-import ru.rknrl.dto.BuildingPrototypeDTO;
+import ru.rknrl.dto.BuildingPrototype;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
 
@@ -42,8 +42,8 @@ public class Slots {
         return !a.hasBuildingPrototype && !b.hasBuildingPrototype || equalsPrototype(a.buildingPrototype, b.buildingPrototype);
     }
 
-    private static function equalsPrototype(a:BuildingPrototypeDTO, b:BuildingPrototypeDTO):Boolean {
-        return a.type == b.type && a.level == b.level;
+    private static function equalsPrototype(a:BuildingPrototype, b:BuildingPrototype):Boolean {
+        return a.buildingType == b.buildingType && a.buildingLevel == b.buildingLevel;
     }
 
     public function getEmptySlot():SlotId {

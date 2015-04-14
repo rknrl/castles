@@ -8,12 +8,12 @@
 
 package ru.rknrl
 
-import ru.rknrl.dto.CommonDTO.StatAction
+import ru.rknrl.dto.StatAction
 
 object CreateStatTable {
   def main(args: Array[String]) {
     println("TRUNCATE stat;")
     for (action ← StatAction.values)
-      println("INSERT INTO stat (action,count) VALUES (" + action.getNumber + ",0);")
+      println("INSERT INTO stat (action,count) VALUES (" + action.id + ",0);")
   }
 }

@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles.model.userInfo {
 import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.PlayerIdDTO;
+import ru.rknrl.dto.PlayerId;
 
 public class PlayerInfo {
-    private var _playerId:PlayerIdDTO;
+    private var _playerId:PlayerId;
 
-    public function get playerId():PlayerIdDTO {
+    public function get playerId():PlayerId {
         return _playerId;
     }
 
@@ -23,7 +23,7 @@ public class PlayerInfo {
         return _info;
     }
 
-    public function PlayerInfo(playerId:PlayerIdDTO, info:CastlesUserInfo) {
+    public function PlayerInfo(playerId:PlayerId, info:CastlesUserInfo) {
         _playerId = playerId;
         _info = info;
     }

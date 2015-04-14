@@ -12,10 +12,7 @@ import akka.actor.ActorRef
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.CommonDTO.{AccountIdDTO, BuildingLevel, BuildingType, StatAction}
-import ru.rknrl.dto.GameDTO.MoveDTO
-
-import scala.collection.JavaConverters._
+import ru.rknrl.dto._
 
 object BotMode extends Enumeration {
   type BotMode = Value
@@ -27,7 +24,7 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) extends Bot(accountId, config, bugs) {
+class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Bot(accountId, config, bugs) {
 
   var mode = NONE
 
@@ -36,7 +33,7 @@ class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) exte
       mode = GAME
 
     case StatAction.TUTOR_ARROWS ⇒
-      if (playerId.get.getId == 3) mode = SEND_UNITS_TO_ONE_BUILDING
+      if (playerId.get.id == 3) mode = SEND_UNITS_TO_ONE_BUILDING
   })
 
   override def receive = tutorBotReceive.orElse(super.receive)
@@ -51,10 +48,10 @@ class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) exte
           lastTime = time
 
           sender ! Move(
-            MoveDTO.newBuilder
-              .addAllFromBuildings(getMyBuildings.map(_.id).asJava)
-              .setToBuilding(towers.last.id)
-              .build
+            MoveDTO(
+              getMyBuildings.map(_.id),
+              towers.last.id
+            )
           )
         }
       case GAME ⇒
@@ -63,7 +60,7 @@ class TutorBot(accountId: AccountIdDTO, config: GameConfig, bugs: ActorRef) exte
     }
 
     def towers = buildings
-      .filter(b ⇒ b.prototype.getType == BuildingType.TOWER &&
-      b.prototype.getLevel == BuildingLevel.LEVEL_2)
+      .filter(b ⇒ b.buildingPrototype.buildingType == BuildingType.TOWER &&
+      b.buildingPrototype.buildingLevel == BuildingLevel.LEVEL_2)
   }
 }
