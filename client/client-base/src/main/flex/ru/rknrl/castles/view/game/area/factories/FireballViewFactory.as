@@ -6,16 +6,15 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.view.game.area {
-import ru.rknrl.castles.model.points.Point;
+package ru.rknrl.castles.view.game.area.factories {
+import flash.display.DisplayObject;
+import flash.display.Sprite;
 
-public class BulletsView extends MovableView {
-    public function BulletsView():void {
-        super("bullet");
-    }
+import ru.rknrl.core.GameObjectViewFactory;
 
-    public function addBullet(id:int, pos:Point):void {
-        add(id, pos, new BulletMC());
+public class FireballViewFactory implements GameObjectViewFactory {
+    public function create(time: int):DisplayObject {
+        return new FireballMC();
     }
 }
 }

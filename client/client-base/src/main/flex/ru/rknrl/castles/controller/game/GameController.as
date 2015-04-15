@@ -13,21 +13,23 @@ import flash.utils.getTimer;
 
 import ru.rknrl.Log;
 import ru.rknrl.castles.model.events.GameMouseEvent;
+import ru.rknrl.castles.model.events.GameTutorEvents;
 import ru.rknrl.castles.model.events.GameViewEvents;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
 import ru.rknrl.castles.model.game.GameMagicItems;
-import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
-import ru.rknrl.castles.model.game.Tornado;
 import ru.rknrl.castles.model.game.Unit;
-import ru.rknrl.castles.model.game.Volcano;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.GameView;
+import ru.rknrl.core.GameObjectsController;
+import ru.rknrl.core.Movable;
+import ru.rknrl.core.Static;
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.dto.BuildingDTO;
 import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingUpdateDTO;
@@ -64,11 +66,11 @@ public class GameController extends EventDispatcher {
     private var server:Server;
     private var selfId:PlayerId;
 
-    private var bullets:Bullets;
-    private var fireballs:Fireballs;
-    private var tornadoes:Tornadoes;
-    private var volcanoes:Volcanoes;
-    private var units:Units;
+    private var bullets:GameObjectsController;
+    private var fireballs:FireballsControllers;
+    private var tornadoes:GameObjectsController;
+    private var volcanoes:VolcanoesController;
+    private var units:UnitsController;
     private var arrows:Arrows;
     private var tornadoPath:TornadoPath;
     private var magicItems:MagicItems;
@@ -89,11 +91,11 @@ public class GameController extends EventDispatcher {
         selfId = gameState.selfId;
         players = new Players(gameState.players, selfId);
 
-        bullets = new Bullets(view.area.bullets);
-        fireballs = new Fireballs(view.area.fireballs, view.area.explosions, gameState.width, gameState.height);
-        tornadoes = new Tornadoes(view.area.tornadoes);
-        volcanoes = new Volcanoes(view.area.volcanoes);
-        units = new Units(view.area.units, view.area.blood);
+        bullets = new GameObjectsController(view.area.bullets);
+        fireballs = new FireballsControllers(view.area.fireballs, view.area.explosions, view.area.explosionsFactory);
+        tornadoes = new GameObjectsController(view.area.tornadoes);
+        volcanoes = new VolcanoesController(view.area.volcanoes);
+        units = new UnitsController(view.area.units, view.area.blood);
         arrows = new Arrows(view.area.arrows);
         tornadoPath = new TornadoPath(view.area.tornadoPath);
         magicItems = new MagicItems(view.magicItems);
@@ -192,7 +194,7 @@ public class GameController extends EventDispatcher {
         tornadoes.update(time);
         bullets.update(time);
 
-        updateDustByVolcanoes();
+        updateDustByVolcanoes(time);
         addKillsByTornadoes(time);
 
         for each(var itemType:ItemType in ItemType.values) {
@@ -200,14 +202,14 @@ public class GameController extends EventDispatcher {
         }
     }
 
-    private function updateDustByVolcanoes():void {
+    private function updateDustByVolcanoes(time:int):void {
         for each(b in buildings.buildings) {
             view.area.setBuildingDust(b.id, false);
         }
 
         const volcanoDamageRadius:int = 48;
-        for each(var volcano:Volcano in volcanoes.volcanoes) {
-            const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos, volcanoDamageRadius);
+        for (var volcano:Static in volcanoes.objectToView) {
+            const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos(time), volcanoDamageRadius);
             for each(var b:Building in inRadius) {
                 view.area.setBuildingDust(b.id, true);
             }
@@ -222,7 +224,7 @@ public class GameController extends EventDispatcher {
 
             const tornadoDamageRadius:int = 48;
             const damagedBuildings:Vector.<Building> = new <Building>[];
-            for each(var tornado:Tornado in tornadoes.tornadoes) {
+            for (var tornado:Movable in tornadoes.objectToView) {
                 const inRadius:Vector.<Building> = buildings.inRadius(tornado.pos(time), tornadoDamageRadius);
                 for each(var b:Building in inRadius) {
                     if (damagedBuildings.indexOf(b) == -1) damagedBuildings.push(b);
@@ -240,15 +242,15 @@ public class GameController extends EventDispatcher {
 
     private function addUnit(dto:UnitDTO):void {
         const endPos:Point = buildings.byId(dto.targetBuildingId).pos;
-        units.add(endPos, dto);
+        units.addUnit(getTimer(), endPos, dto);
     }
 
     private function onUpdateUnit(e:UpdateUnitEvent):void {
-        units.updateUnit(e.unitUpdate);
+        units.updateUnit(getTimer(), e.unitUpdate);
     }
 
     private function onKillUnit(e:KillUnitEvent):void {
-        units.kill(e.killedId);
+        units.kill(getTimer(), e.killedId);
     }
 
     private function onAddFireball(e:AddFireballEvent):void {
@@ -256,7 +258,20 @@ public class GameController extends EventDispatcher {
     }
 
     private function addFireball(dto:FireballDTO):void {
-        fireballs.add(dto);
+        const time:int = getTimer();
+
+        const fromLeft:Boolean = dto.pos.x > view.area.width / 2;
+        const fromTop:Boolean = dto.pos.y > view.area.height / 2;
+        const dx:Number = fromLeft ? dto.pos.x : view.area.width - dto.pos.x;
+        const dy:Number = fromTop ? dto.pos.y : view.area.height - dto.pos.y;
+        const d:Number = Math.max(dx, dy);
+
+        const startPos:Point = new Point(fromLeft ? dto.pos.x - d : dto.pos.x + d, fromTop ? dto.pos.y - d : dto.pos.y + d);
+        const endPos:Point = new Point(dto.pos.x, dto.pos.y);
+        const points:Points = Points.two(startPos, endPos);
+
+        const fireball:Movable = new Movable(points, time, dto.millisTillSplash);
+        fireballs.add(time, fireball, view.area.fireballsFactory.create(time));
     }
 
     private function onAddVolcano(e:AddVolcanoEvent):void {
@@ -264,7 +279,9 @@ public class GameController extends EventDispatcher {
     }
 
     private function addVolcano(dto:VolcanoDTO):void {
-        volcanoes.add(dto);
+        const time:int = getTimer();
+        const volcano:Static = new Static(Point.fromDto(dto.pos), time, dto.millisTillEnd);
+        volcanoes.add(getTimer(), volcano, view.area.volcanoesFactory.create(time));
     }
 
     private function onAddTornado(e:AddTornadoEvent):void {
@@ -272,7 +289,12 @@ public class GameController extends EventDispatcher {
     }
 
     private function addTornado(dto:TornadoDTO):void {
-        tornadoes.add(dto);
+        const time:int = getTimer();
+        const startTime:int = time - dto.millisFromStart;
+        const duration:int = dto.millisFromStart + dto.millisTillEnd;
+        const points:Points = Points.fromDto(dto.points);
+        const tornado:Movable = new Movable(points, startTime, duration);
+        tornadoes.add(time, tornado, view.area.tornadoesFactory.create(time));
     }
 
     private function onAddBullet(e:AddBulletEvent):void {
@@ -285,7 +307,9 @@ public class GameController extends EventDispatcher {
             const time:int = getTimer();
             const startPos:Point = buildings.byId(dto.buildingId).pos;
             const endPos:Point = unit.pos(time + dto.duration);
-            bullets.add(time, startPos, endPos, dto.duration);
+            const points:Points = Points.two(startPos, endPos);
+            const bullet:Movable = new Movable(points, time, dto.duration);
+            bullets.add(time, bullet, view.area.bulletsFactory.create(time));
         }
     }
 
@@ -396,7 +420,7 @@ public class GameController extends EventDispatcher {
             if (tornadoPath.drawing) {
                 if (tornadoPath.points.length >= 2 && checkTornadoPoints(tornadoPath.points)) {
                     const gameState:CastTornadoDTO = new CastTornadoDTO();
-                    gameState.points = Point.pointsToDto(tornadoPath.points);
+                    gameState.points = Points.pointsToDto(tornadoPath.points);
                     server.castTornado(gameState);
                     magicItems.useItem();
                     dispatchEvent(new Event(GameTutorEvents.casted(ItemType.TORNADO)));

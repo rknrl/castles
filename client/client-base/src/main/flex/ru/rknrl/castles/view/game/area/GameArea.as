@@ -11,12 +11,16 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.getSlotPos;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingsView;
+import ru.rknrl.castles.view.game.area.factories.BulletViewFactory;
+import ru.rknrl.castles.view.game.area.factories.ExplosionViewFactory;
+import ru.rknrl.castles.view.game.area.factories.FireballViewFactory;
+import ru.rknrl.castles.view.game.area.factories.TornadoViewFactory;
+import ru.rknrl.castles.view.game.area.factories.VolcanoViewFactory;
 import ru.rknrl.castles.view.game.area.units.BloodView;
-import ru.rknrl.castles.view.game.area.units.UnitsView;
-import ru.rknrl.castles.view.game.area.volcanoes.VolcanoesView;
+import ru.rknrl.core.GameObjectViewFactory;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
@@ -26,8 +30,6 @@ import ru.rknrl.dto.SlotsOrientation;
 import ru.rknrl.dto.SlotsPosDTO;
 
 public class GameArea extends Sprite {
-    private var buildings:BuildingsView;
-
     private var _h:int;
 
     public function get h():int {
@@ -46,74 +48,37 @@ public class GameArea extends Sprite {
         return _ground;
     }
 
-    private var _blood:BloodView;
+    private const buildings:BuildingsView = new BuildingsView();
+    public const blood:BloodView = new BloodView();
+    public const arrows:ArrowsView = new ArrowsView();
+    public const units:Sprite = new Sprite();
+    public const volcanoes:Sprite = new Sprite();
+    public const tornadoes:Sprite = new Sprite();
+    public const bullets:Sprite = new Sprite();
+    public const fireballs:Sprite = new Sprite();
+    public const explosions:ExplosionsView = new ExplosionsView();
+    public const tornadoPath:TornadoPathView = new TornadoPathView();
 
-    public function get blood():BloodView {
-        return _blood;
-    }
-
-    private var _volcanoes:VolcanoesView;
-
-    public function get volcanoes():VolcanoesView {
-        return _volcanoes;
-    }
-
-    private var _arrows:ArrowsView;
-
-    public function get arrows():ArrowsView {
-        return _arrows;
-    }
-
-    private var _units:UnitsView;
-
-    public function get units():UnitsView {
-        return _units;
-    }
-
-    private var _tornadoes:TornadoesView;
-
-    public function get tornadoes():TornadoesView {
-        return _tornadoes;
-    }
-
-    private var _bullets:BulletsView;
-
-    public function get bullets():BulletsView {
-        return _bullets;
-    }
-
-    private var _fireballs:FireballsView;
-
-    public function get fireballs():FireballsView {
-        return _fireballs;
-    }
-
-    private var _explosions:ExplosionsView;
-
-    public function get explosions():ExplosionsView {
-        return _explosions;
-    }
-
-    private var _tornadoPath:TornadoPathView;
-
-    public function get tornadoPath():TornadoPathView {
-        return _tornadoPath;
-    }
+    public const bulletsFactory:GameObjectViewFactory = new BulletViewFactory();
+    public const explosionsFactory:GameObjectViewFactory = new ExplosionViewFactory();
+    public const fireballsFactory:GameObjectViewFactory = new FireballViewFactory();
+    public const tornadoesFactory:GameObjectViewFactory = new TornadoViewFactory();
+    public const volcanoesFactory:GameObjectViewFactory = new VolcanoViewFactory();
 
     public function GameArea(h:int, v:int) {
         _h = h;
         _v = v;
         addChild(_ground = new Ground(h, v));
-        addChild(_blood = new BloodView());
-        addChild(_volcanoes = new VolcanoesView());
-        addChild(_arrows = new ArrowsView());
-        addChild(_units = new UnitsView());
-        addChild(buildings = new BuildingsView());
-        addChild(_tornadoes = new TornadoesView());
-        addChild(_bullets = new BulletsView());
-        addChild(_fireballs = new FireballsView());
-        addChild(_explosions = new ExplosionsView());
-        addChild(_tornadoPath = new TornadoPathView());
+        addChild(blood);
+        addChild(volcanoes);
+        addChild(arrows);
+        addChild(units);
+        addChild(buildings);
+        addChild(tornadoes);
+        addChild(bullets);
+        addChild(fireballs);
+        addChild(explosions);
+        addChild(tornadoPath);
     }
 
     public function addBuilding(id:BuildingId, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {

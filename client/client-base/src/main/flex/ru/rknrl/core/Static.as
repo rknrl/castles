@@ -6,19 +6,19 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.model.game {
-import ru.rknrl.castles.model.points.Point;
+package ru.rknrl.core {
+import ru.rknrl.core.points.Point;
 
-public class Bullet extends Movable {
-    private var _id:int;
+public class Static extends Periodic implements GameObject {
+    private var point:Point;
 
-    public function get id():int {
-        return _id;
+    public function Static(point:Point, startTime:int, duration:int) {
+        this.point = point;
+        super(startTime, duration);
     }
 
-    public function Bullet(id:int, startPos:Point, endPos:Point, startTime:int, duration:int) {
-        _id = id;
-        super(startPos, endPos, startTime, duration);
+    public function pos(time:int):Point {
+        return point;
     }
 }
 }

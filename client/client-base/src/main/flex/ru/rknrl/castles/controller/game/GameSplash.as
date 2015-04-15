@@ -15,9 +15,11 @@ import flash.utils.setTimeout;
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Unit;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameSplashView;
+import ru.rknrl.castles.view.game.area.units.UnitView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.UnitDTO;
@@ -29,6 +31,7 @@ public class GameSplash extends TutorControllerBase {
 
     private var view:GameSplashView;
     private var unit:Unit;
+    private var unitView:UnitView;
 
     public function GameSplash(view:GameSplashView) {
         super(view.tutor);
@@ -69,9 +72,10 @@ public class GameSplash extends TutorControllerBase {
         view.arrows.orientArrows(mousePos);
 
         if (unit) {
-            view.units.setPos(unit.id.id, unit.pos(time));
+            unitView.x = unit.pos(time).x;
+            unitView.y = unit.pos(time).y;
             if (unit.needRemove(time)) {
-                view.units.remove(unit.id.id);
+                view.units.removeChild(unitView);
                 unit = null;
                 view.tower2.owner = new BuildingOwner(true, DtoMock.playerId(0));
                 view.tower2.count = 1;
@@ -112,14 +116,16 @@ public class GameSplash extends TutorControllerBase {
                 dto.count = 4;
                 dto.pos = DtoMock.point(view.tower1.x, view.tower1.y);
                 dto.owner = DtoMock.playerId(0);
-                dto.duration = 2000;
+                dto.duration = 4000;
                 dto.strengthened = false;
 
                 const startPos:Point = view.tower1Pos;
                 const endPos:Point = view.tower2Pos;
+                const points:Points = Points.two(startPos, endPos);
 
-                unit = new Unit(dto.id, dto.owner, startPos, endPos, getTimer(), dto.duration, dto.count);
-                view.units.addUnit(dto.id, dto.buildingType, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened, endPos);
+                unit = new Unit(dto.owner, points, getTimer(), dto.duration, dto.count);
+                unitView = new UnitView(dto.buildingType, BuildingLevel.LEVEL_1, dto.owner, dto.count, dto.strengthened);
+                view.units.addChild(unitView);
                 view.tower1.count = 4;
             } else {
                 view.tutor.visible = true;

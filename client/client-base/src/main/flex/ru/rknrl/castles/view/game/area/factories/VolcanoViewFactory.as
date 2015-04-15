@@ -6,16 +6,15 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.view.game.area {
-import ru.rknrl.castles.model.points.Point;
+package ru.rknrl.castles.view.game.area.factories {
+import flash.display.DisplayObject;
 
-public class FireballsView extends MovableView {
-    public function FireballsView():void {
-        super("fireball");
-    }
+import ru.rknrl.castles.view.game.area.VolcanoView;
+import ru.rknrl.core.GameObjectViewFactory;
 
-    public function addFireball(id:int, pos:Point):void {
-        add(id, pos, new FireballMC());
+public class VolcanoViewFactory implements GameObjectViewFactory {
+    public function create(time:int):DisplayObject {
+        return new VolcanoView();
     }
 }
 }

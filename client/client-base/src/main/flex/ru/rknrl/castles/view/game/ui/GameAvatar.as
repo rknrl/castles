@@ -10,7 +10,7 @@ package ru.rknrl.castles.view.game.ui {
 import flash.display.Sprite;
 import flash.text.TextField;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;

@@ -6,27 +6,31 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.model.game {
+package ru.rknrl.core {
 public class Periodic {
     private var _startTime:int;
 
-    protected function get startTime():int {
+    public function get startTime():int {
         return _startTime;
     }
 
-    private var _millisTillEnd:int;
+    private var _duration:int;
 
-    protected function get millisTillEnd():int {
-        return _millisTillEnd;
+    public function get duration():int {
+        return _duration;
     }
 
-    public function Periodic(startTime:int, millisTillEnd:int) {
+    public function Periodic(startTime:int, duration:int) {
         _startTime = startTime;
-        _millisTillEnd = millisTillEnd;
+        _duration = duration;
     }
 
     public function needRemove(time:int):Boolean {
-        return time > _startTime + _millisTillEnd;
+        return time - _startTime >= _duration;
+    }
+
+    public function progress(time:int):Number {
+        return (time - _startTime) / _duration
     }
 }
 }

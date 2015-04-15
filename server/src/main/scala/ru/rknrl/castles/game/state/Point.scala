@@ -18,8 +18,8 @@ class Point(val x: Double, val y: Double) {
   }
 
   def lerp(that: Point, progress: Double) = {
-    val x = Math.max(0, Math.min(1, progress))
-    new Point(this.x + (that.x - this.x) * x, this.y + (that.y - this.y) * x)
+    val p = Math.max(0, Math.min(1, progress))
+    new Point(this.x + (that.x - this.x) * p, this.y + (that.y - this.y) * p)
   }
 
   override def equals(obj: scala.Any): Boolean =

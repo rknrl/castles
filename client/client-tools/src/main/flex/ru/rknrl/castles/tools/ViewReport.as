@@ -20,7 +20,7 @@ import flash.utils.Dictionary;
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;

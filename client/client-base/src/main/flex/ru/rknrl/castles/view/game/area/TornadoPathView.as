@@ -11,7 +11,7 @@ import flash.display.CapsStyle;
 import flash.display.LineScaleMode;
 import flash.display.Sprite;
 
-import ru.rknrl.castles.model.points.Points;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.castles.view.utils.DashLine;
 
 public class TornadoPathView extends Sprite {

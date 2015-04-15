@@ -9,7 +9,7 @@
 package ru.rknrl.castles.controller.game {
 import flash.events.EventDispatcher;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;

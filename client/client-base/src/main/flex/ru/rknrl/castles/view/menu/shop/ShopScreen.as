@@ -13,7 +13,7 @@ import flash.events.MouseEvent;
 
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;

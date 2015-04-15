@@ -12,7 +12,7 @@ import flash.display.Sprite;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.dto.CellSize;
 

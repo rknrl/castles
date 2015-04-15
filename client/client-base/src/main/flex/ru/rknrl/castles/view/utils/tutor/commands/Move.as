@@ -12,8 +12,8 @@ import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.model.points.Points;
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.easers.interpolate;
@@ -38,7 +38,7 @@ public class Move extends EventDispatcher implements ITutorCommand {
     public function enterFrame():void {
         const time:int = getTimer();
         const progress:Number = interpolate(0, 1, time, startTime, duration, easer);
-        const pos:Point = points.getPos(points.totalDistance * progress);
+        const pos:Point = points.pos(progress);
         target.x = pos.x;
         target.y = pos.y;
         if (progress == 1) dispatchEvent(new Event(Event.COMPLETE));

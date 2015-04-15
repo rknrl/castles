@@ -6,20 +6,14 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.view.game.area {
+package ru.rknrl.castles.view.game.area.factories {
 import flash.display.DisplayObject;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.GameObjectViewFactory;
 
-public class MovableView extends PeriodicView {
-    public function MovableView(name:String) {
-        super(name);
-    }
-
-    public function setPos(id:int, pos:Point):void {
-        const displayObject:DisplayObject = byId(id);
-        displayObject.x = pos.x;
-        displayObject.y = pos.y;
+public class TornadoViewFactory implements GameObjectViewFactory {
+    public function create(time: int):DisplayObject {
+        return new TornadoMC();
     }
 }
 }

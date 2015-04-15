@@ -15,7 +15,7 @@ public class Players {
 
     public function Players(players:Vector.<PlayerDTO>, selfId:PlayerId) {
         this.players = players;
-        this._selfId = selfId;
+        _selfId = selfId;
     }
 
     private var _selfId:PlayerId;

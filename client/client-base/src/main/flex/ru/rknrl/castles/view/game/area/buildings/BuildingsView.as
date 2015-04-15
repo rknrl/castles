@@ -11,7 +11,7 @@ import flash.display.Sprite;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;

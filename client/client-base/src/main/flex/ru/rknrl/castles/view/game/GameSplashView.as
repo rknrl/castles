@@ -12,17 +12,16 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.game.area.buildings.BuildingView;
-import ru.rknrl.castles.view.game.area.units.UnitsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.loading.LoadingScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;
 
@@ -57,9 +56,9 @@ public class GameSplashView extends Sprite {
         return _arrows;
     }
 
-    private var _units:UnitsView;
+    private var _units:Sprite;
 
-    public function get units():UnitsView {
+    public function get units():Sprite {
         return _units;
     }
 
@@ -72,7 +71,7 @@ public class GameSplashView extends Sprite {
         addChild(area = new Sprite());
 
         area.addChild(mouseHolder = new Bitmap(Colors.transparent));
-        area.addChild(_units = new UnitsView());
+        area.addChild(_units = new Sprite());
         area.addChild(_tower1 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(true, DtoMock.playerId(0)), 8, false, new Point(0, 0)));
         area.addChild(_tower2 = new BuildingView(DtoMock.buildingId(0), BuildingType.TOWER, BuildingLevel.LEVEL_3, new BuildingOwner(false), 3, false, new Point(0, 0)));
 

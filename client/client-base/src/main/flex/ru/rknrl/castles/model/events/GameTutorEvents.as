@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.model.game {
+package ru.rknrl.castles.model.events {
 import ru.rknrl.dto.ItemType;
 
 public class GameTutorEvents {

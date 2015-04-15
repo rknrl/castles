@@ -9,7 +9,7 @@
 package ru.rknrl.castles.view.game.area.arrows {
 import flash.display.Sprite;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 
 public class ArrowsView extends Sprite {
     private const arrows:Vector.<ArrowView> = new <ArrowView>[];

@@ -10,8 +10,8 @@ package ru.rknrl.castles.view.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.castles.model.points.Point;
-import ru.rknrl.castles.model.points.Points;
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.game.area.TornadoPathView;

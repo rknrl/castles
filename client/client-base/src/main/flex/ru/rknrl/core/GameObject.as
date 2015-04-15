@@ -6,16 +6,16 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.view.game.area {
-import ru.rknrl.castles.model.points.Point;
+package ru.rknrl.core {
+import ru.rknrl.core.points.Point;
 
-public class TornadoesView extends MovableView {
-    public function TornadoesView():void {
-        super("tornado");
-    }
+public interface GameObject {
+    function get startTime():int
 
-    public function addTornado(id:int, pos:Point):void {
-        add(id, pos, new TornadoMC());
-    }
+    function get duration():int
+
+    function needRemove(time:int):Boolean
+
+    function pos(time:int):Point
 }
 }

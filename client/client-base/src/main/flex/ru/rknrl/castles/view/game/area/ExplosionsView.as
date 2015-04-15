@@ -7,32 +7,26 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.game.area {
+import flash.display.DisplayObject;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.events.GameViewEvents;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.utils.dust.Dust;
 import ru.rknrl.castles.view.utils.dust.DustShape;
 
-public class ExplosionsView extends PeriodicView {
+public class ExplosionsView extends Sprite {
     private var dusts:Vector.<Dust> = new <Dust>[];
 
     public function ExplosionsView() {
-        super("explosion");
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
-    public function addExplosion(id:int, pos:Point):void {
-        const dust:Dust = new Dust(getTimer());
-        dust.x = pos.x;
-        dust.y = pos.y;
-        addChild(dust);
+    override public function addChild(dust:DisplayObject):DisplayObject {
         dusts.push(dust);
-
-        add(id, pos, new ExplosionMC());
-
         dispatchEvent(new Event(GameViewEvents.SHAKE, true));
+        return super.addChild(dust);
     }
 
     private var lastTime:int;

@@ -6,19 +6,15 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.model.game {
-public class Explosion extends Periodic {
-    private static const duration:int = 500;
+package ru.rknrl.castles.view.game.area.factories {
+import flash.display.DisplayObject;
+import flash.display.Sprite;
 
-    private var _id:int;
+import ru.rknrl.core.GameObjectViewFactory;
 
-    public function get id():int {
-        return _id;
-    }
-
-    public function Explosion(id:int, startTime:int) {
-        _id = id;
-        super(startTime, duration);
+public class BulletViewFactory implements GameObjectViewFactory {
+    public function create(time: int):DisplayObject {
+        return new BulletMC();
     }
 }
 }

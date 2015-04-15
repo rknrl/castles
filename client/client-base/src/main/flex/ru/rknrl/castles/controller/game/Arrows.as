@@ -11,7 +11,7 @@ package ru.rknrl.castles.controller.game {
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.Building;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.game.area.arrows.ArrowView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.dto.BuildingId;

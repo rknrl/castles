@@ -17,7 +17,7 @@ import flash.utils.getTimer;
 
 import ru.rknrl.castles.model.events.GameMouseEvent;
 import ru.rknrl.castles.model.events.GameViewEvents;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.area.GameArea;
 import ru.rknrl.castles.view.game.gameOver.GameOverScreen;

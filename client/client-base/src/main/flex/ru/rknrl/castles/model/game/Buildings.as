@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.game {
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.BuildingId;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuildingType;

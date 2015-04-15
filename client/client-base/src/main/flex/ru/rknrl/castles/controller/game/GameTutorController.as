@@ -11,15 +11,15 @@ package ru.rknrl.castles.controller.game {
 import flash.events.EventDispatcher;
 
 import ru.rknrl.castles.model.DtoMock;
+import ru.rknrl.castles.model.events.GameTutorEvents;
 import ru.rknrl.castles.model.game.Buildings;
-import ru.rknrl.castles.model.game.GameTutorEvents;
 import ru.rknrl.castles.model.game.Players;
-import ru.rknrl.castles.model.points.Point;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.utils.tutor.commands.Exec;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForClick;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForEvent;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;

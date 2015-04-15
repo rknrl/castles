@@ -6,22 +6,20 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.model.game {
-import ru.rknrl.castles.model.points.Point;
+package ru.rknrl.core {
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 
-public class Movable extends Periodic {
-    private var startPos:Point;
-    private var endPos:Point;
+public class Movable extends Periodic implements GameObject {
+    private var points:Points;
 
-    public function Movable(startPos:Point, endPos:Point, startTime:int, duration:int) {
-        this.startPos = startPos;
-        this.endPos = endPos;
+    public function Movable(points:Points, startTime:int, duration:int) {
+        this.points = points;
         super(startTime, duration);
     }
 
     public function pos(time:int):Point {
-        const progress:Number = (time - startTime) / millisTillEnd;
-        return startPos.lerp(endPos, progress);
+        return points.pos(progress(time));
     }
 }
 }

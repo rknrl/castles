@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model {
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.Slot1Pos;
 import ru.rknrl.dto.Slot2Pos;
 import ru.rknrl.dto.Slot3Pos;

@@ -12,7 +12,7 @@ import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.utils.Align;
 import ru.rknrl.utils.createTextField;

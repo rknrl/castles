@@ -9,7 +9,7 @@
 package ru.rknrl.castles.view.game {
 import flash.events.Event;
 
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.castles.view.layout.Layout;

@@ -13,7 +13,7 @@ import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.events.SlotClickEvent;
 import ru.rknrl.castles.model.menu.main.Slots;
-import ru.rknrl.castles.model.points.Point;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.dto.SlotDTO;
 import ru.rknrl.dto.SlotId;
