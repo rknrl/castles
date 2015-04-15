@@ -187,9 +187,9 @@ class GameState(val width: Int,
       .map(_.applyDamagers(damagers, newTime))
       .map(_.applyBullets(finishedBullets))
 
-    val killedUnits = unitsAfterDamage.filter(_.count == 0)
+    val killedUnits = unitsAfterDamage.filter(_.floorCount == 0)
 
-    val newUnits = unitsAfterDamage.filterNot(_.count == 0)
+    val newUnits = unitsAfterDamage.filterNot(_.floorCount == 0)
 
     val newFireballs = (fireballs ++ createdFireballs)
       .filterNot(_.isFinish(newTime))

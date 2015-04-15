@@ -986,7 +986,7 @@ class GameStateTest extends WordSpec with Matchers {
       toBuilding = buildingMock(pos = Point(4, 2)),
       startTime = 1,
       duration = 10,
-      count = 77
+      count = 0
     )
     val u1 = unitMock(
       id = UnitId(1),
@@ -994,7 +994,7 @@ class GameStateTest extends WordSpec with Matchers {
       toBuilding = buildingMock(pos = Point(2, 4)),
       startTime = 1,
       duration = 10,
-      count = 55
+      count = 0.7
     )
     val u2 = unitMock(
       id = UnitId(2),
@@ -1006,19 +1006,10 @@ class GameStateTest extends WordSpec with Matchers {
     )
     val units = List(u0, u1, u2)
 
-    val damagerConfig = damagerConfigMock(
-      powerVsUnit = 999,
-      radius = 1
-    )
-
-    val fireball1 = fireballMock(pos = Point(2, 2), startTime = 1, duration = 1, damagerConfig = damagerConfig)
-    val fireball2 = fireballMock(pos = Point(4, 2), startTime = 1, duration = 1, damagerConfig = damagerConfig)
-
     val gameState = gameStateMock(
       time = 1,
       players = players,
-      units = units,
-      fireballs = List(fireball1, fireball2)
+      units = units
     )
 
     val (newGameState, messages, _) = updateGameState(gameState, newTime = 2)

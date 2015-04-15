@@ -34,11 +34,17 @@ object Bullets {
   def heads[T](xs: Iterable[Iterable[T]]): Iterable[T] =
     xs.filter(_.size > 0).map(_.head)
 
-  def canCreateBullet(b: Building, u: GameUnit, time: Long, config: GameConfig) = {
-    val distance = b.pos.distance(u.pos(time))
-    val duration = (distance / config.shooting.speed).toLong
-    distance < config.shooting.shootRadius && !u.isFinish(time + duration)
-  }
+  def canCreateBullet(b: Building, u: GameUnit, time: Long, config: GameConfig) =
+    if (b.owner.isDefined && b.owner.get.id == u.owner.id)
+      false
+    else {
+      val distance = b.pos.distance(u.pos(time))
+      if (distance > 0) {
+        val duration = (distance / config.shooting.speed).toLong
+        distance < config.shooting.shootRadius && !u.isFinish(time + duration)
+      }
+      else false
+    }
 
   def createBullet(b: Building, u: GameUnit, time: Long, config: GameConfig) = {
     val duration = b.pos.distance(u.pos(time)) / config.shooting.speed

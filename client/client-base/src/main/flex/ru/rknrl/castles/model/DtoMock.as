@@ -37,6 +37,7 @@ import ru.rknrl.dto.StatAction;
 import ru.rknrl.dto.StatDTO;
 import ru.rknrl.dto.TopDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
+import ru.rknrl.dto.UnitId;
 import ru.rknrl.dto.UserInfoDTO;
 
 public class DtoMock {
@@ -48,8 +49,8 @@ public class DtoMock {
         "mock_avatars/5.png"
     ];
 
-    public static function stat(action: StatAction):StatDTO {
-        const dto: StatDTO = new StatDTO();
+    public static function stat(action:StatAction):StatDTO {
+        const dto:StatDTO = new StatDTO();
         dto.action = action;
         return dto;
     }
@@ -195,7 +196,7 @@ public class DtoMock {
     }
 
     public static function top():TopDTO {
-        const dto: TopDTO = new TopDTO();
+        const dto:TopDTO = new TopDTO();
         dto.users = topUsers();
         return dto;
     }
@@ -448,6 +449,12 @@ public class DtoMock {
             building(BuildingType.HOUSE, BuildingLevel.LEVEL_3, -1, 1, 2),
             building(BuildingType.CHURCH, BuildingLevel.LEVEL_3, -1, 0, 0)
         ];
+    }
+
+    public static function unitId(id:int):UnitId {
+        const dto:UnitId = new UnitId();
+        dto.id = id;
+        return dto;
     }
 }
 }
