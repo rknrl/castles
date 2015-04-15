@@ -6,16 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.core {
-import ru.rknrl.core.points.Point;
+package ru.rknrl.core.kit {
+import org.flexunit.asserts.assertEquals;
 
-public interface GameObject {
-    function get startTime():int
-
-    function get duration():int
-
-    function isFinish(time:int):Boolean
-
-    function pos(time:int):Point
+public function assertVectors(a:Vector.<*>, b:Vector.<*>):void {
+    assertEquals(a.length, b.length);
+    for (var i:int = 0; i < a.length; i++)
+        assertEquals(a[i], b[i])
 }
 }

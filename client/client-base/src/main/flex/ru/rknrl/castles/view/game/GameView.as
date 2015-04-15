@@ -195,13 +195,13 @@ public class GameView extends Sprite {
     public function tutorBlur(playerIds:Vector.<PlayerId>, buildingIds:Vector.<BuildingId>):void {
         for each(var playerId:PlayerId in playerIds)
             getAvatarById(playerId).tutorBlur = true;
-        area.tutorBlur(buildingIds);
+        area.buildings.tutorBlur(buildingIds);
     }
 
     public function tutorUnblur():void {
         for each(var avatar:GameAvatar in avatars)
             avatar.tutorBlur = false;
-        area.tutorUnblur();
+        area.buildings.tutorUnblur();
     }
 }
 }

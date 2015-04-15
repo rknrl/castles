@@ -22,6 +22,7 @@ public class GameObjectsController {
     }
 
     public function add(time:int, object:GameObject, view:DisplayObject):void {
+        if (objectToView[object]) throw new Error("add but already exists " + object);
         objectToView[object] = view;
         layer.addChild(view);
         updateObject(time, object);
@@ -29,8 +30,10 @@ public class GameObjectsController {
 
     public function remove(time:int, object:GameObject):void {
         const view:DisplayObject = objectToView[object];
-        layer.removeChild(view);
-        delete objectToView[object];
+        if (view) {
+            layer.removeChild(view);
+            delete objectToView[object];
+        }
     }
 
     protected function updateObject(time:int, object:GameObject):void {
@@ -43,7 +46,7 @@ public class GameObjectsController {
     public function update(time:int):void {
         const toRemove:Vector.<GameObject> = new <GameObject>[];
         for (var object:GameObject in objectToView)
-            if (object.needRemove(time))
+            if (object.isFinish(time))
                 toRemove.push(object);
             else
                 updateObject(time, object);

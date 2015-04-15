@@ -42,13 +42,8 @@ public class GameArea extends Sprite {
         return _v;
     }
 
-    private var _ground:Ground;
-
-    public function get ground():Ground {
-        return _ground;
-    }
-
-    private const buildings:BuildingsView = new BuildingsView();
+    private var ground:Ground;
+    public const buildings:BuildingsView = new BuildingsView();
     public const blood:BloodView = new BloodView();
     public const arrows:ArrowsView = new ArrowsView();
     public const units:Sprite = new Sprite();
@@ -68,7 +63,7 @@ public class GameArea extends Sprite {
     public function GameArea(h:int, v:int) {
         _h = h;
         _v = v;
-        addChild(_ground = new Ground(h, v));
+        addChild(ground = new Ground(h, v));
         addChild(blood);
         addChild(volcanoes);
         addChild(arrows);
@@ -82,33 +77,13 @@ public class GameArea extends Sprite {
     }
 
     public function addBuilding(id:BuildingId, buildingType:BuildingType, buildingLevel:BuildingLevel, owner:BuildingOwner, count:int, strengthened:Boolean, pos:Point):void {
-        _ground.updateGroundColor(pos, owner);
+        ground.updateGroundColor(pos, owner);
         buildings.addBuilding(id, buildingType, buildingLevel, owner, count, strengthened, pos);
-    }
-
-    public function setBuildingCount(id:BuildingId, count:int):void {
-        buildings.setBuildingCount(id, count);
-    }
-
-    public function setBuildingDust(id:BuildingId, visible:Boolean):void {
-        buildings.setBuildingsDust(id, visible);
     }
 
     public function setBuildingOwner(id:BuildingId, owner:BuildingOwner):void {
         buildings.setBuildingOwner(id, owner);
-        _ground.updateGroundColor(buildings.byId(id).pos, owner);
-    }
-
-    public function setBuildingStrengthened(id:BuildingId, strengthened:Boolean):void {
-        buildings.setBuildingStrengthened(id, strengthened);
-    }
-
-    public function tutorBlur(buildingIds:Vector.<BuildingId>):void {
-        buildings.tutorBlur(buildingIds);
-    }
-
-    public function tutorUnblur():void {
-        buildings.tutorUnblur();
+        ground.updateGroundColor(buildings.byId(id).pos, owner);
     }
 
     public function addSlots(dto:SlotsPosDTO):void {
@@ -120,7 +95,7 @@ public class GameArea extends Sprite {
             const isMirrorV:Boolean = orientation == SlotsOrientation.TOP_LEFT || orientation == SlotsOrientation.TOP_RIGHT;
             const x:Number = isMirrorH ? dto.pos.x - pos.x * cellSize : dto.pos.x + pos.x * cellSize;
             const y:Number = isMirrorV ? dto.pos.y - pos.y * cellSize : dto.pos.y + pos.y * cellSize;
-            _ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
+            ground.updateGroundColor(new Point(x, y), new BuildingOwner(true, dto.playerId));
         }
     }
 }

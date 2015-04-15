@@ -23,8 +23,8 @@ class PeriodObjectTest extends WordSpec with Matchers {
 
   "millisFromStart" in {
     val p = Period(startTime = 1, duration = 10)
-    p.millisFromsStart(1) shouldBe 0
-    p.millisFromsStart(3) shouldBe 2
+    p.millisFromStart(1) shouldBe 0
+    p.millisFromStart(3) shouldBe 2
   }
 
   "millisTillEnd" in {

@@ -44,32 +44,23 @@ class PointsTest extends WordSpec with Matchers {
     )
   }
 
-  "distances" in {
-    val points = Points(
+  def testPoints =
+    Points(
       Point(0, 0),
       Point(3, 4), // distance 5
       Point(5, 4) // distance 2
     )
 
-    points.distances shouldBe Vector(0.0, 5.0, 7.0)
+  "distances" in {
+    testPoints.distances shouldBe Vector(0.0, 5.0, 7.0)
   }
 
   "totalDistance" in {
-    val points = Points(
-      Point(0, 0),
-      Point(3, 4), // distance 5
-      Point(5, 4) // distance 2
-    )
-
-    points.totalDistance shouldBe 7.0
+    testPoints.totalDistance shouldBe 7.0
   }
 
   "getIndex" in {
-    val points = Points(
-      Point(0, 0),
-      Point(3, 4), // distance 5
-      Point(5, 4) // distance 2
-    )
+    val points = testPoints
 
     points.getIndex(0) shouldBe 0
     points.getIndex(2) shouldBe 0
@@ -79,11 +70,7 @@ class PointsTest extends WordSpec with Matchers {
   }
 
   "pos" in {
-    val points = Points(
-      Point(0, 0),
-      Point(3, 4), // distance 5
-      Point(5, 4) // distance 2
-    )
+    val points = testPoints
     // totalDistance = 7
 
     checkPoint(points.pos(-1), Point(0, 0))
@@ -102,7 +89,7 @@ class PointsTest extends WordSpec with Matchers {
     checkPoint(points.pos(0.8), Point(3, 4).lerp(Point(5, 4), 0.6 / 2))
 
     checkPoint(points.pos(1), Point(5, 4))
-    checkPoint(points.pos(1), Point(5, 4))
+    checkPoint(points.pos(2), Point(5, 4))
   }
 
   "same points" in {

@@ -204,14 +204,14 @@ public class GameController extends EventDispatcher {
 
     private function updateDustByVolcanoes(time:int):void {
         for each(b in buildings.buildings) {
-            view.area.setBuildingDust(b.id, false);
+            view.area.buildings.setBuildingsDust(b.id, false);
         }
 
         const volcanoDamageRadius:int = 48;
         for (var volcano:Static in volcanoes.objectToView) {
             const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos(time), volcanoDamageRadius);
             for each(var b:Building in inRadius) {
-                view.area.setBuildingDust(b.id, true);
+                view.area.buildings.setBuildingsDust(b.id, true);
             }
         }
     }
@@ -328,9 +328,9 @@ public class GameController extends EventDispatcher {
 
         building.update(newOwner, dto.population, dto.strengthened);
 
-        view.area.setBuildingCount(dto.id, dto.population);
+        view.area.buildings.setBuildingCount(dto.id, dto.population);
         view.area.setBuildingOwner(dto.id, newOwner);
-        view.area.setBuildingStrengthened(dto.id, dto.strengthened);
+        view.area.buildings.setBuildingStrengthened(dto.id, dto.strengthened);
 
         // Если ты вел стрелку из домика, а его захватили - убираем стрелку
         if (arrows.hasArrow(building.id) && (wasOwned && !willOwned)) {

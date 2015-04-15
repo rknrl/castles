@@ -11,21 +11,30 @@ package ru.rknrl.core.points {
 import ru.rknrl.dto.PointDTO;
 
 public class Points {
-    private var points:Vector.<Point>;
-    private var distances:Vector.<Number>;
+    private var _points:Vector.<Point>;
+
+    public function get points():Vector.<Point> {
+        return _points;
+    }
+
+    private var _distances:Vector.<Number>;
+
+    public function get distances():Vector.<Number> {
+        return _distances;
+    }
 
     public function Points(points:Vector.<Point>) {
-        if (points.length < 2) throw new Error("points.length < 2");
-        this.points = points;
-        distances = getDistances();
-        _totalDistance = distances[distances.length - 1];
+        if (points.length < 2) throw new Error("_points.length < 2");
+        _points = points;
+        _distances = getDistances();
+        _totalDistance = _distances[_distances.length - 1];
     }
 
     private function getDistances():Vector.<Number> {
         var d:Number = 0;
         const ds:Vector.<Number> = new <Number>[0];
-        for (var i:int = 1; i < points.length; i++) {
-            d += points[i - 1].distance(points[i]);
+        for (var i:int = 1; i < _points.length; i++) {
+            d += _points[i - 1].distance(_points[i]);
             ds.push(d);
         }
         return ds
@@ -37,9 +46,9 @@ public class Points {
         return _totalDistance;
     }
 
-    private function getIndex(distance:Number):int {
+    public function getIndex(distance:Number):int {
         var i:int = 0;
-        while (i < points.length - 1 && distances[i + 1] < distance) i++;
+        while (i < _points.length - 1 && _distances[i + 1] < distance) i++;
         return i;
     }
 
@@ -48,18 +57,18 @@ public class Points {
         const distance:Number = _totalDistance * x;
         const i1:int = getIndex(distance);
         const i2:int = i1 + 1;
-        const p1:Point = points[i1];
-        const p2:Point = points[i2];
+        const p1:Point = _points[i1];
+        const p2:Point = _points[i2];
         if (p1.equals(p2))
             return p1;
         else {
-            const lerp:Number = (distance - distances[i1]) / p1.distance(p2);
+            const lerp:Number = (distance - _distances[i1]) / p1.distance(p2);
             return p1.lerp(p2, lerp)
         }
     }
 
     public function dto():Vector.<PointDTO> {
-        return pointsToDto(points);
+        return pointsToDto(_points);
     }
 
     public static function pointsToDto(points:Vector.<Point>):Vector.<PointDTO> {

@@ -74,7 +74,7 @@ public class GameSplash extends TutorControllerBase {
         if (unit) {
             unitView.x = unit.pos(time).x;
             unitView.y = unit.pos(time).y;
-            if (unit.needRemove(time)) {
+            if (unit.isFinish(time)) {
                 view.units.removeChild(unitView);
                 unit = null;
                 view.tower2.owner = new BuildingOwner(true, DtoMock.playerId(0));

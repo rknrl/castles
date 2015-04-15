@@ -16,15 +16,15 @@ trait Periodic {
 
   Assertion.check(duration > 0, duration)
 
-  def isFinish(time: Long) =
-    time - startTime >= duration
-
-  def millisFromsStart(time: Long) =
+  def millisFromStart(time: Long) =
     (time - startTime).toInt
 
   def millisTillEnd(time: Long) =
-    (duration - (time - startTime)).toInt
+    (duration - millisFromStart(time)).toInt
+
+  def isFinish(time: Long) =
+    millisFromStart(time) >= duration
 
   def progress(time: Long) =
-    millisFromsStart(time).toDouble / duration
+    millisFromStart(time).toDouble / duration
 }

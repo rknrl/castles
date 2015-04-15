@@ -14,14 +14,14 @@ import ru.rknrl.dto.PointDTO
 class PointTest extends WordSpec with Matchers {
   "equals" in {
     Point(1.1, 2.2) shouldBe Point(1.1, 2.2)
-    Point(0, 4) shouldBe Point(0, 4)
+    Point(0, 4) should not be Point(1, 4)
   }
 
   "dto" in {
     Point(1.1, 2.2).dto shouldBe PointDTO(1.1f, 2.2f)
   }
 
-  "form dto" in {
+  "from dto" in {
     Point(PointDTO(1.1f, 2.2f)) shouldBe Point(1.1f, 2.2f)
   }
 
