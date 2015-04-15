@@ -6,18 +6,15 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.core {
-import ru.rknrl.core.points.Point;
+package ru.rknrl.castles.controller.game {
+import flash.display.DisplayObject;
+import flash.display.Sprite;
 
-public interface GameObject {
-    function get startTime():int
+import ru.rknrl.core.GameObjectViewFactory;
 
-    function get duration():int
-
-    function progress(time: int): Number
-
-    function isFinish(time:int):Boolean
-
-    function pos(time:int):Point
+public class SpriteFactory implements GameObjectViewFactory {
+    public function create(time:int):DisplayObject {
+        return new Sprite();
+    }
 }
 }

@@ -14,13 +14,13 @@ import ru.rknrl.core.GameObjectViewFactory;
 import ru.rknrl.core.GameObjectsController;
 import ru.rknrl.core.Static;
 
-public class FireballsControllers extends GameObjectsController {
-    private static const explosionDuration:int = 500;
+public class FireballsController extends GameObjectsController {
+    public static const explosionDuration:int = 5000;
 
     private var explosions:GameObjectsController;
     private var explosionsFactory:GameObjectViewFactory;
 
-    public function FireballsControllers(fireballsLayer:Sprite,
+    public function FireballsController(fireballsLayer:Sprite,
                                          explosionsLayer:Sprite, explosionsFactory:GameObjectViewFactory) {
         this.explosionsFactory = explosionsFactory;
         explosions = new GameObjectsController(explosionsLayer);

@@ -67,7 +67,7 @@ public class GameController extends EventDispatcher {
     private var selfId:PlayerId;
 
     private var bullets:GameObjectsController;
-    private var fireballs:FireballsControllers;
+    private var fireballs:FireballsController;
     private var tornadoes:GameObjectsController;
     private var volcanoes:VolcanoesController;
     private var units:UnitsController;
@@ -92,7 +92,7 @@ public class GameController extends EventDispatcher {
         players = new Players(gameState.players, selfId);
 
         bullets = new GameObjectsController(view.area.bullets);
-        fireballs = new FireballsControllers(view.area.fireballs, view.area.explosions, view.area.explosionsFactory);
+        fireballs = new FireballsController(view.area.fireballs, view.area.explosions, view.area.explosionsFactory);
         tornadoes = new GameObjectsController(view.area.tornadoes);
         volcanoes = new VolcanoesController(view.area.volcanoes);
         units = new UnitsController(view.area.units, view.area.blood);

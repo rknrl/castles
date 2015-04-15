@@ -24,10 +24,10 @@ public class VolcanoesController extends GameObjectsController {
         view.radius = getRadius(time, object);
     }
 
-    private static const radiuses:Vector.<Number> = new <Number>[20, 30, 40];
+    public static const radiuses:Vector.<Number> = new <Number>[20, 30, 40];
 
-    private static function getRadius(time:int, object:GameObject):Number {
-        const progress:Number = (time - object.startTime) / object.duration;
+    public static function getRadius(time:int, object:GameObject):Number {
+        const progress:Number = object.progress(time);
         const index:int = Math.min(radiuses.length * progress, radiuses.length - 1);
         return radiuses[index];
     }

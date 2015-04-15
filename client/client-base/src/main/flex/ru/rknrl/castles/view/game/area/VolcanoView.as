@@ -23,6 +23,10 @@ public class VolcanoView extends Sprite {
 
     private var _radius:Number;
 
+    public function get radius():Number {
+        return _radius;
+    }
+
     public function set radius(value:Number):void {
         if (_radius != value) dispatchEvent(new Event(GameViewEvents.SHAKE, true));
         _radius = value;
