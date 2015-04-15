@@ -45,11 +45,13 @@ public class GameObjectsController {
 
     public function update(time:int):void {
         const toRemove:Vector.<GameObject> = new <GameObject>[];
-        for (var object:GameObject in objectToView)
-            if (object.isFinish(time))
+        for (var object:GameObject in objectToView) {
+            if (object.isFinish(time)) {
                 toRemove.push(object);
-            else
+            } else {
                 updateObject(time, object);
+            }
+        }
 
         for each(object in toRemove) remove(time, object)
     }
