@@ -6,13 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.core {
+package ru.rknrl.core.points {
 
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 
-import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.PointDTO;
 
 public class PointTest {
