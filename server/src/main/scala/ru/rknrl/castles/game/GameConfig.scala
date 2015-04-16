@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game
 
+import ru.rknrl.Assertion
 import ru.rknrl.castles.game.state.{Building, GameUnit}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2, LEVEL_3}
@@ -18,6 +19,11 @@ case class DamagerConfig(powerVsUnit: Double,
                          powerVsBuilding: Double,
                          maxPowerBonus: Double,
                          radius: Double) {
+
+  Assertion.check(powerVsUnit >= 0, powerVsUnit)
+  Assertion.check(powerVsBuilding >= 0, powerVsBuilding)
+  Assertion.check(maxPowerBonus >= 0, maxPowerBonus)
+  Assertion.check(radius > 0, radius)
 
   def bonused(churchesProportion: Double) =
     new DamagerConfig(
@@ -77,9 +83,15 @@ case class UnitsConfig(house: Stat,
 
 case class BuildingConfig(regeneration: Double,
                           startCount: Int,
-                          maxCount: Double,
+                          maxCount: Int,
                           fortification: Double,
-                          shotPower: Option[Double])
+                          shotPower: Option[Double]) {
+  Assertion.check(regeneration >= 0, regeneration)
+  Assertion.check(startCount >= 0, startCount)
+  Assertion.check(maxCount > 0, maxCount)
+  Assertion.check(fortification >= 0, fortification)
+  if (shotPower.isDefined) Assertion.check(shotPower.get > 0, shotPower.get)
+}
 
 case class BuildingsConfig(house1: BuildingConfig,
                            house2: BuildingConfig,

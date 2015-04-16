@@ -39,10 +39,9 @@ object ChurchesProportion {
 
   def getChurchesProportion(buildings: Iterable[Building], players: Map[PlayerId, Player], config: GameConfig) = {
     val total = totalChurchesPopulation(buildings, config)
-    var newStates = Map.empty[PlayerId, Double]
-    for ((playerId, _) ← players) {
+    val newStates = for ((playerId, _) ← players) yield {
       val proportion = if (total == 0) 0 else playerChurchesPopulation(buildings, playerId) / total
-      newStates = newStates.updated(playerId, proportion)
+      playerId → proportion
     }
     new ChurchesProportion(newStates)
   }

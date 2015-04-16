@@ -85,7 +85,7 @@ class BuildingTest extends WordSpec with Matchers {
   "regeneration & maxCount" in {
     val config = gameConfigMock(
       buildings = buildingsConfigMock(
-        house1 = buildingConfigMock(regeneration = 3.2, maxCount = 7.7)
+        house1 = buildingConfigMock(regeneration = 3.2, maxCount = 7)
       )
     )
 
@@ -96,7 +96,7 @@ class BuildingTest extends WordSpec with Matchers {
 
     checkBuilding(
       a.regenerate(999, config),
-      a.copy(newCount = 7.7)
+      a.copy(newCount = 7)
     )
   }
 

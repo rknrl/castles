@@ -218,7 +218,7 @@ object Mocks extends Matchers {
 
   def buildingConfigMock(regeneration: Double = 1.0,
                          startCount: Int = 10,
-                         maxCount: Double = 99,
+                         maxCount: Int = 99,
                          fortification: Double = 1.2,
                          shotPower: Option[Double] = None) =
     new BuildingConfig(
