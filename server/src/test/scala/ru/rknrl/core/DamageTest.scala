@@ -16,6 +16,36 @@ import ru.rknrl.core.points.Point
 class DamageTest extends WordSpec with Matchers {
 
   "DamagerConfig.bonused" should {
+    "negative powerVsUnit" in {
+      a[Exception] shouldBe thrownBy {
+        damagerConfigMock(powerVsUnit = -1)
+      }
+      damagerConfigMock(powerVsUnit = 0) // ok
+    }
+
+    "negative powerVsBuilding" in {
+      a[Exception] shouldBe thrownBy {
+        damagerConfigMock(powerVsBuilding = -1)
+      }
+      damagerConfigMock(powerVsBuilding = 0) // ok
+    }
+
+    "negative maxPowerBonus" in {
+      a[Exception] shouldBe thrownBy {
+        damagerConfigMock(maxPowerBonus = -1)
+      }
+      damagerConfigMock(maxPowerBonus = 0) // ok
+    }
+
+    "non-positive radius" in {
+      a[Exception] shouldBe thrownBy {
+        damagerConfigMock(radius = -1)
+      }
+      a[Exception] shouldBe thrownBy {
+        damagerConfigMock(radius = 0)
+      }
+    }
+
     "Увеличивает powerVsUnit и powerVsBuilding на нужное значение" +
       "не меняет остальные параметры" in {
 
@@ -81,6 +111,13 @@ class DamageTest extends WordSpec with Matchers {
 
       val newDamaged = Damage.applyDamage(damagedMock(count = 10), List(999))
       newDamaged.count shouldBe 0
+
+    }
+
+    "нулевые дамаги" in {
+
+      val newDamaged = Damage.applyDamage(damagedMock(count = 10), List(0, 0, 0))
+      newDamaged.count shouldBe 10
 
     }
   }
