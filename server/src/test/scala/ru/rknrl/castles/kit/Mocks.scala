@@ -12,6 +12,8 @@ import org.scalatest.Matchers
 import ru.rknrl.castles.account.AccountState.{Items, Slots}
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state._
+import ru.rknrl.core.{Stat, Damaged, Damager}
+import ru.rknrl.core.points.{Points, Point}
 import ru.rknrl.core.social.{ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto.BuildingType.HOUSE

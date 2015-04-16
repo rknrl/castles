@@ -6,9 +6,10 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game.state
+package ru.rknrl.core
 
 import org.scalatest.{Matchers, WordSpec}
+import ru.rknrl.core.points.{Point, Points}
 
 class MovableTest extends WordSpec with Matchers {
 

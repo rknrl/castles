@@ -10,7 +10,7 @@ package ru.rknrl.castles.game
 
 import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.GameArea.{PlayerIdToSlotsPositions, SlotsPositions}
-import ru.rknrl.castles.game.state.Point
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 
 object GameArea {

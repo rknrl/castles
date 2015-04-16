@@ -6,11 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game.state
+package ru.rknrl.core
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.game.DamagerConfig
 import ru.rknrl.castles.kit.Mocks._
+import ru.rknrl.core.points.Point
 
 class DamageTest extends WordSpec with Matchers {
 

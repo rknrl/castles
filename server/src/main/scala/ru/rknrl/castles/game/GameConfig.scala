@@ -8,7 +8,8 @@
 
 package ru.rknrl.castles.game
 
-import ru.rknrl.castles.game.state.{Building, GameUnit, Stat}
+import ru.rknrl.castles.game.state.{Building, GameUnit}
+import ru.rknrl.core.Stat
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2, LEVEL_3}
 import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
 import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}

@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game.state
+package ru.rknrl.core.points
 
 import ru.rknrl.dto.PointDTO
 

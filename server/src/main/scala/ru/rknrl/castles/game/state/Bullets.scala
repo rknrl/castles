@@ -9,6 +9,7 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.core.Periodic
 import ru.rknrl.dto.BulletDTO
 
 case class Bullet(building: Building,

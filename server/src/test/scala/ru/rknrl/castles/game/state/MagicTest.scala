@@ -14,6 +14,7 @@ import ru.rknrl.castles.game.state.Strengthening.castToStrengthening
 import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
+import ru.rknrl.core.Stat
 import ru.rknrl.dto.{BuildingId, CastTornadoDTO, PlayerId, PointDTO}
 
 // todo powerBonus работает не правильно

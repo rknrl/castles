@@ -16,10 +16,10 @@ import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.Statistics.updateStatistics
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game
-import ru.rknrl.castles.game.state.Stat
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
+import ru.rknrl.core.Stat
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto._

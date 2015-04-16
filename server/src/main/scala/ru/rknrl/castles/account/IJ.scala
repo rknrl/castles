@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.account
 
-import ru.rknrl.castles.game.state.Point
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto.CellSize
 
 case class IJ(i: Int, j: Int) {

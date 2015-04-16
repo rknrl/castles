@@ -9,6 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.{DamagerConfig, GameConfig}
+import ru.rknrl.core.{Stat, Damager, Periodic}
+import ru.rknrl.core.points.{Points, Point}
 import ru.rknrl.dto._
 
 case class Fireball(playerId: PlayerId,

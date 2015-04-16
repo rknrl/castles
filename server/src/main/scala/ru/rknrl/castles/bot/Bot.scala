@@ -12,10 +12,11 @@ import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.MatchMaking.ConnectToGame
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.{Building, GameState, Player, Point}
+import ru.rknrl.castles.game.state.{Building, GameState, Player}
 import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 import ru.rknrl.{BugType, Logged, SilentLog}
 

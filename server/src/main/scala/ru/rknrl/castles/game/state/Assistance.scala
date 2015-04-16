@@ -9,6 +9,7 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto.{BuildingId, PlayerId}
 
 object Assistance {

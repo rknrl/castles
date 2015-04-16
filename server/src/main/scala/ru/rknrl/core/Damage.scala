@@ -6,9 +6,11 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game.state
+package ru.rknrl.core
 
 import ru.rknrl.castles.game.{DamagerConfig, GameConfig}
+import ru.rknrl.core.Stat
+import ru.rknrl.core.points.Point
 
 trait Damager {
   def pos(time: Long): Point

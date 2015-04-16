@@ -23,6 +23,7 @@ import ru.rknrl.castles.game.state.Tornadoes._
 import ru.rknrl.castles.game.state.Volcanoes._
 import ru.rknrl.castles.game.{GameArea, GameConfig, GameMap}
 import ru.rknrl.castles.rmi.B2C._
+import ru.rknrl.core.points.Point
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto._

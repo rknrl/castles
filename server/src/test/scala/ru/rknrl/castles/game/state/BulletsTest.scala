@@ -11,6 +11,7 @@ package ru.rknrl.castles.game.state
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.kit.Mocks._
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto.BuildingLevel.LEVEL_3
 import ru.rknrl.dto.{PlayerId, BuildingPrototype}
 import ru.rknrl.dto.BuildingType.TOWER

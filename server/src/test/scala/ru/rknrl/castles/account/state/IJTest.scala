@@ -10,7 +10,7 @@ package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.account.IJ
-import ru.rknrl.castles.game.state.Point
+import ru.rknrl.core.points.Point
 
 class IJTest extends WordSpec with Matchers {
   "centerXY" in {

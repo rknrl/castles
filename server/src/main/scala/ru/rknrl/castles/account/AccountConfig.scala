@@ -10,7 +10,7 @@ package ru.rknrl.castles.account
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountState.{Items, Slots, Skills}
-import ru.rknrl.castles.game.state.Stat
+import ru.rknrl.core.Stat
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
 import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_0

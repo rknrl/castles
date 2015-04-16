@@ -11,6 +11,8 @@ package ru.rknrl.castles.game.state
 import ru.rknrl.Assertion
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.rmi.B2C.UpdateBuilding
+import ru.rknrl.core.{Stat, Damage, Damaged, Damager}
+import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 
 class Building(val id: BuildingId,

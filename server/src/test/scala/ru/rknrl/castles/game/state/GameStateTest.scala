@@ -20,6 +20,7 @@ import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.rmi.B2C._
+import ru.rknrl.core.points.{Points, Point}
 import ru.rknrl.dto.BuildingLevel._
 import ru.rknrl.dto.BuildingType._
 import ru.rknrl.dto.ItemType._
