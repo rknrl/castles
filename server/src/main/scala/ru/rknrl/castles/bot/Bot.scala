@@ -52,7 +52,6 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
     case ConnectToGame(gameRef) ⇒
       game = Some(gameRef)
       gameRef ! Join(accountId, self)
-      gameRef ! C2B.JoinGame
 
     case JoinedGame(gameState) ⇒
       playerId = Some(gameState.selfId)

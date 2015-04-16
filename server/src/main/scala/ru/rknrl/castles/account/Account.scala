@@ -15,7 +15,7 @@ import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.Statistics.updateStatistics
 import ru.rknrl.castles.database.{Database, Statistics}
-import ru.rknrl.castles.game.Game
+import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -122,7 +122,7 @@ class Account(matchmaking: ActorRef,
     case InGameResponse(game, searchOpponents, top) ⇒
       if (game.isDefined) {
         client ! authenticated(searchOpponents = false, Some(gameAddress), top, tutorState)
-        connectToGame(game.get)
+        context become inGame(game.get)
       } else if (searchOpponents) {
         client ! authenticated(searchOpponents = true, None, top, tutorState)
         context become enterGame
@@ -183,11 +183,15 @@ class Account(matchmaking: ActorRef,
     /** Matchmaking говорит к какой игре коннектится */
     case ConnectToGame(game) ⇒
       client ! EnteredGame(gameAddress)
-      connectToGame(game)
+      context become inGame(game)
   }))
 
   def inGame(game: ActorRef): Receive = logged({
-    case msg: GameMsg ⇒ game forward msg
+    case msg: GameMsg ⇒
+      msg match {
+        case C2B.JoinGame ⇒ game ! Join(accountId, sender)
+        case _ ⇒ game forward msg
+      }
 
     case msg: UpdateStatistics ⇒
       game forward msg
@@ -242,11 +246,6 @@ class Account(matchmaking: ActorRef,
     else
       realStat
     matchmaking ! GameOrder(accountId, deviceType, userInfo, state.slots, stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor)
-  }
-
-  def connectToGame(game: ActorRef) = {
-    game ! Game.Join(accountId, client)
-    context become inGame(game)
   }
 
   def gameAddress = NodeLocator(config.host, config.gamePort)

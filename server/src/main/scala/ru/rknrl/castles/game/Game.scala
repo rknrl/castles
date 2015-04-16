@@ -11,7 +11,7 @@ package ru.rknrl.castles.game
 import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.{Join, PersonalMessage}
-import ru.rknrl.castles.game.state.{Player, GameState}
+import ru.rknrl.castles.game.state.{GameState, Player}
 import ru.rknrl.castles.rmi.B2C.GameOver
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -185,7 +185,7 @@ class Game(players: Map[PlayerId, Player],
       fireballCasts = fireballCasts,
       strengtheningCasts = strengtheningCasts,
       volcanoCasts = volcanoCasts,
-      tornadoCasts =  tornadoCasts,
+      tornadoCasts = tornadoCasts,
       assistanceCasts = assistanceCasts
     )
 
@@ -202,8 +202,10 @@ class Game(players: Map[PlayerId, Player],
   })
 
   def receive = logged({
-    /** Аккаунт присоединяется к игре и сообщает о рефах куда слать игровые сообщения
-      * Добавляем/Обнавляем рефы в мапах
+    /** Игрок присоединяется к игре
+      * Добавляем/Обновляем рефы в мапах
+      * Кладем его в мапу online
+      * и отправляем стартовое сообщение JoinedGame
       */
     case Join(accountId, client) ⇒
       val playerId = `accountId→playerId`(accountId)
@@ -212,24 +214,18 @@ class Game(players: Map[PlayerId, Player],
       `playerId→client` = `playerId→client` + (playerId → client)
       `client→playerId` = `client→playerId` + (client → playerId)
 
+      online = online + playerId
+
+      client ! B2C.JoinedGame(
+        gameState.dto(playerId, playersDto.toSeq, gameOverDto.toSeq)
+      )
+
     /** Аккаунт говорит, что потеряли связь с игроком
       * Убираем из его мапы online
       */
     case Offline(accountId) ⇒
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
-
-    /** Игрок входит в бой
-      * Кладем его в мапу online
-      * и отправляем стартовое сообщение JoinGameMsg
-      */
-    case C2B.JoinGame ⇒
-      val playerId = `client→playerId`(sender)
-      online = online + playerId
-
-      sender ! B2C.JoinedGame(
-        gameState.dto(playerId, playersDto.toSeq, gameOverDto.toSeq)
-      )
 
     /** Игрок сдается */
     case Surrender ⇒
