@@ -94,9 +94,9 @@ public class GameSplash extends TutorControllerBase {
     private var down:Boolean;
 
     private function onMouseDown(event:MouseEvent):void {
-        view.tutor.visible = false;
         if (mousePos.distance(view.tower1Pos) < buildingRadius) {
             down = true;
+            view.tutor.visible = false;
             view.arrows.addArrow(view.tower1Pos);
         }
     }
