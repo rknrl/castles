@@ -25,13 +25,13 @@ class GameUnit(val id: UnitId,
 
   val points = Points(fromBuilding.pos, toBuilding.pos)
 
-  def buildingPrototype = fromBuilding.buildingPrototype
+  val buildingPrototype = fromBuilding.buildingPrototype
 
-  def owner = fromBuilding.owner.get
+  val owner = fromBuilding.owner.get
 
-  def stat = fromBuilding.stat
+  val stat = fromBuilding.stat
 
-  def strengthened = fromBuilding.strengthening.isDefined
+  val strengthened = fromBuilding.strengthening.isDefined
 
   def setCount(newCount: Double) = copy(newCount = newCount)
 
@@ -65,7 +65,7 @@ class GameUnit(val id: UnitId,
       buildingType = buildingPrototype.buildingType,
       count = floorCount,
       pos = pos(time).dto,
-      duration = duration.toInt,
+      duration = millisTillEnd(time),
       targetBuildingId = toBuilding.id,
       owner = owner.id,
       strengthened = strengthened

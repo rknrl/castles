@@ -49,7 +49,7 @@ public class TornadoPath {
                 lastTime = time;
                 if (points.length >= 2) {
                     const p:Points = new Points(points);
-                    view.drawPath(p, p.totalDistance);
+                    view.drawPath(p, 1);
                 }
             }
         }

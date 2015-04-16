@@ -38,19 +38,19 @@ class BulletsTest extends WordSpec with Matchers {
     )
 
     val u0 = unitMock(
-      fromBuilding = buildingMock(pos = Point(2, 4)),
+      fromBuilding = buildingMock(pos = Point(2, 4), owner = Some(playerMock(PlayerId(0)))),
       toBuilding = b,
       startTime = 0,
       duration = 10
     )
     val u1 = unitMock(
-      fromBuilding = buildingMock(pos = Point(2, 4)),
+      fromBuilding = buildingMock(pos = Point(2, 4), owner = Some(playerMock(PlayerId(0)))),
       toBuilding = b,
       startTime = 0,
       duration = 10
     )
     val u2 = unitMock(
-      fromBuilding = buildingMock(pos = Point(3, 2)),
+      fromBuilding = buildingMock(pos = Point(3, 2), owner = Some(playerMock(PlayerId(0)))),
       toBuilding = b,
       startTime = 0,
       duration = 7
@@ -104,6 +104,13 @@ class BulletsTest extends WordSpec with Matchers {
       duration = 10
     )
 
+    val u5 = unitMock(
+      fromBuilding = buildingMock(pos = Point(2.01, 2.01), owner = Some(playerMock(PlayerId(0)))),
+      toBuilding = b,
+      startTime = 0,
+      duration = 10
+    )
+
     val config = gameConfigMock(
       shooting = shootingConfigMock(
         shootRadius = 1.1,
@@ -117,6 +124,7 @@ class BulletsTest extends WordSpec with Matchers {
 
     canCreateBullet(b, u3, time = 5, config) shouldBe false // because same owner
     canCreateBullet(b, u4, time = 5, config) shouldBe false // because same positions, distance == 0
+    canCreateBullet(b, u5, time = 5, config) shouldBe false // because bullet duration == 0
   }
 
   "createBullet" in {
@@ -127,7 +135,8 @@ class BulletsTest extends WordSpec with Matchers {
 
     val u = unitMock(
       fromBuilding = buildingMock(
-        pos = Point(2, 2)
+        pos = Point(2, 2),
+        owner = Some(playerMock(PlayerId(0)))
       ),
       toBuilding = buildingMock(
         pos = Point(1, 1)

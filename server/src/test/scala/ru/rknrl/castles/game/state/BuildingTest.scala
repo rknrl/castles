@@ -162,17 +162,17 @@ class BuildingTest extends WordSpec with Matchers {
 
       val exits = List(
         unitMock(
-          fromBuilding = buildingMock(id = BuildingId(7)),
+          fromBuilding = buildingMock(id = BuildingId(7), owner = Some(playerMock(PlayerId(0)))),
           toBuilding = buildingMock(id = BuildingId(2)),
           count = 5
         ),
         unitMock(
-          fromBuilding = buildingMock(id = BuildingId(1)),
+          fromBuilding = buildingMock(id = BuildingId(1), owner = Some(playerMock(PlayerId(0)))),
           toBuilding = buildingMock(id = BuildingId(2)),
           count = 33
         ),
         unitMock(
-          fromBuilding = buildingMock(id = BuildingId(7)),
+          fromBuilding = buildingMock(id = BuildingId(7), owner = Some(playerMock(PlayerId(0)))),
           toBuilding = buildingMock(id = BuildingId(2)),
           count = 2
         )

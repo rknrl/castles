@@ -89,7 +89,7 @@ class MatchMaking(interval: FiniteDuration,
     * Если в игре случается ошибка, посылаем всем не вышедшим игрокам LeaveGame и стопаем актор игры
     */
   override def supervisorStrategy = OneForOneStrategy() {
-    case _: Exception ⇒
+    case e: Exception ⇒
       if (gameRefToGameInfo.contains(sender)) {
         val gameInfo = gameRefToGameInfo(sender)
         for (order ← gameInfo.orders;
@@ -99,6 +99,8 @@ class MatchMaking(interval: FiniteDuration,
         }
         onGameOver(sender)
       }
+
+      if(config.isDev) throw new Error(e)
 
       Stop
   }

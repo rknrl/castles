@@ -10,8 +10,6 @@ package ru.rknrl.castles.view.game {
 import flash.events.Event;
 import flash.utils.getTimer;
 
-import ru.rknrl.core.points.Point;
-import ru.rknrl.core.points.Points;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.game.area.TornadoPathView;
@@ -23,6 +21,8 @@ import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.tutor.TutorialView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
+import ru.rknrl.core.points.Point;
+import ru.rknrl.core.points.Points;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
@@ -120,7 +120,7 @@ public class GameTutorialView extends TutorialView {
         _arrows.orientArrows(new Point((cursor.x - _areaPos.x) / layout.scale, (cursor.y - _areaPos.y) / layout.scale));
         if (tornado) {
             const progress:Number = interpolate(0, 1, getTimer(), tornadoStartTime, 500, easer);
-            tornadoPath.drawPath(tornadoPoints, tornadoPoints.totalDistance * progress);
+            tornadoPath.drawPath(tornadoPoints, progress);
         }
     }
 

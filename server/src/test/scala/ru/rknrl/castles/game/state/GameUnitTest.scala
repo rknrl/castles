@@ -11,9 +11,10 @@ package ru.rknrl.castles.game.state
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.UnitId
+import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_3}
+import ru.rknrl.dto.BuildingType.{HOUSE, TOWER}
+import ru.rknrl.dto._
 
-// todo: dto, updateDto
 class GameUnitTest extends WordSpec with Matchers {
 
   "negative count" in {
@@ -22,6 +23,12 @@ class GameUnitTest extends WordSpec with Matchers {
     }
 
     unitMock(count = 0) // ok
+  }
+
+  "no owner source building" in {
+    a[Exception] shouldBe thrownBy {
+      unitMock(fromBuilding = buildingMock(owner = None))
+    }
   }
 
   "copy equals" in {
@@ -49,7 +56,8 @@ class GameUnitTest extends WordSpec with Matchers {
         count = 14,
         fromBuilding = buildingMock(
           pos = Point(2, 2),
-          buildingStat = statMock(defence = 1.3)
+          buildingStat = statMock(defence = 1.3),
+          owner = Some(playerMock(PlayerId(0)))
         ),
         toBuilding = buildingMock(pos = Point(2, 2))
       )
@@ -78,7 +86,8 @@ class GameUnitTest extends WordSpec with Matchers {
         id = UnitId(1),
         count = 13,
         fromBuilding = buildingMock(
-          buildingStat = statMock(defence = 1.3)
+          buildingStat = statMock(defence = 1.3),
+          owner = Some(playerMock(PlayerId(0)))
         )
       )
 
@@ -125,5 +134,39 @@ class GameUnitTest extends WordSpec with Matchers {
 
   }
 
+  "dto" should {
+    val u = new GameUnit(
+      id = UnitId(7),
+      startTime = 1,
+      duration = 10,
+      fromBuilding = buildingMock(
+        id = BuildingId(2),
+        buildingPrototype = BuildingPrototype(TOWER, LEVEL_3),
+        pos = Point(1, 1),
+        owner = Some(playerMock(PlayerId(3))),
+        strengthening = Some(strengtheningMock())
+      ),
+      toBuilding = buildingMock(
+        id = BuildingId(2),
+        buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+        pos = Point(2, 2)
+      ),
+      count = 33.3
+    )
+    val dto = u.dto(2)
+    dto.id shouldBe UnitId(7)
+    dto.buildingType shouldBe TOWER
+    dto.count shouldBe 33
+    dto.pos shouldBe PointDTO(1.1f, 1.1f)
+    dto.duration shouldBe 9
+    dto.owner shouldBe PlayerId(3)
+    dto.strengthened shouldBe true
+  }
 
+  "updateDto" in {
+    val u = unitMock(id = UnitId(7), count = 77.7)
+    val dto = u.updateDto
+    dto.id shouldBe UnitId(7)
+    dto.count shouldBe 77
+  }
 }

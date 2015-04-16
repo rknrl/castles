@@ -191,7 +191,7 @@ object Mocks extends Matchers {
   def unitMock(id: UnitId = UnitId(0),
                startTime: Long = 0,
                duration: Long = 1000,
-               fromBuilding: Building = buildingMock(pos = Point(0, 0)),
+               fromBuilding: Building = buildingMock(pos = Point(0, 0), owner = Some(playerMock(PlayerId(0)))),
                toBuilding: Building = buildingMock(pos = Point(1, 1)),
                count: Double = 10.1) =
     new GameUnit(

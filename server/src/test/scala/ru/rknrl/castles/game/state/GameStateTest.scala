@@ -9,7 +9,6 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.game.state.Fireballs.castToFireball
@@ -20,7 +19,7 @@ import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.rmi.B2C._
-import ru.rknrl.core.points.{Points, Point}
+import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.dto.BuildingLevel._
 import ru.rknrl.dto.BuildingType._
 import ru.rknrl.dto.ItemType._
@@ -551,19 +550,22 @@ class GameStateTest extends WordSpec with Matchers {
       id = BuildingId(0),
       pos = Point(2, 2),
       count = 90,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player0)
     )
     val b1 = buildingMock(
       id = BuildingId(1),
       pos = Point(4, 2),
       count = 99,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player1)
     )
     val b2 = buildingMock(
       id = BuildingId(2),
       pos = Point(2, 4),
       count = 89,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player2)
     )
     val buildings = List(b0, b1, b2)
 
@@ -716,19 +718,22 @@ class GameStateTest extends WordSpec with Matchers {
       id = BuildingId(0),
       pos = Point(2, 2),
       count = 90,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player0)
     )
     val b1 = buildingMock(
       id = BuildingId(1),
       pos = Point(4, 2),
       count = 99,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player1)
     )
     val b2 = buildingMock(
       id = BuildingId(2),
       pos = Point(2, 4),
       count = 89,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player2)
     )
     val buildings = List(b0, b1, b2)
 
@@ -883,19 +888,22 @@ class GameStateTest extends WordSpec with Matchers {
       id = BuildingId(0),
       pos = Point(2, 2),
       count = 90,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player0)
     )
     val b1 = buildingMock(
       id = BuildingId(1),
       pos = Point(4, 2),
       count = 99,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player1)
     )
     val b2 = buildingMock(
       id = BuildingId(2),
       pos = Point(2, 4),
       count = 89,
-      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1)
+      buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
+      owner = Some(player2)
     )
     val buildings = List(b0, b1, b2)
 
@@ -983,7 +991,7 @@ class GameStateTest extends WordSpec with Matchers {
 
     val u0 = unitMock(
       id = UnitId(0),
-      fromBuilding = buildingMock(pos = Point(2, 2)),
+      fromBuilding = buildingMock(pos = Point(2, 2), owner = Some(player0)),
       toBuilding = buildingMock(pos = Point(4, 2)),
       startTime = 1,
       duration = 10,
@@ -991,7 +999,7 @@ class GameStateTest extends WordSpec with Matchers {
     )
     val u1 = unitMock(
       id = UnitId(1),
-      fromBuilding = buildingMock(pos = Point(4, 2)),
+      fromBuilding = buildingMock(pos = Point(4, 2), owner = Some(player1)),
       toBuilding = buildingMock(pos = Point(2, 4)),
       startTime = 1,
       duration = 10,
@@ -999,7 +1007,7 @@ class GameStateTest extends WordSpec with Matchers {
     )
     val u2 = unitMock(
       id = UnitId(2),
-      fromBuilding = buildingMock(pos = Point(2, 4)),
+      fromBuilding = buildingMock(pos = Point(2, 4), owner = Some(player2)),
       toBuilding = buildingMock(pos = Point(2, 2)),
       startTime = 1,
       duration = 10,

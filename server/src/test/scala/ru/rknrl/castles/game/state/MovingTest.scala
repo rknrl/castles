@@ -22,7 +22,11 @@ class MovingTest extends WordSpec with Matchers {
   }
 
   "moveActionToExitUnit" in {
-    val from = buildingMock(pos = Point(0, 0), buildingStat = Stat(1, 1, 0.2))
+    val from = buildingMock(
+      pos = Point(0, 0),
+      buildingStat = Stat(1, 1, 0.2),
+      owner = Some(playerMock(PlayerId(0)))
+    )
     val to = buildingMock(pos = Point(2, 0))
     val move = Move(
       playerId = PlayerId(0),

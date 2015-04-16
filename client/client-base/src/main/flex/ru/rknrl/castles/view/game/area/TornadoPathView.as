@@ -15,11 +15,11 @@ import ru.rknrl.core.points.Points;
 import ru.rknrl.castles.view.utils.DashLine;
 
 public class TornadoPathView extends Sprite {
-    public function drawPath(points:Points, distance:Number):void {
+    public function drawPath(points:Points, progress:Number):void {
         graphics.clear();
         graphics.lineStyle(5, 0xffffff, 1, false, LineScaleMode.NORMAL, CapsStyle.NONE);
 
-        DashLine.drawPath(graphics, points, distance);
+        DashLine.drawPath(graphics, points, progress);
     }
 
     public function clear():void {

@@ -40,11 +40,11 @@ object Bullets {
       false
     else {
       val distance = b.pos.distance(u.pos(time))
-      if (distance > 0) {
-        val duration = (distance / config.shooting.speed).toLong
+      val duration = (distance / config.shooting.speed).toLong
+      if (duration > 0)
         distance < config.shooting.shootRadius && !u.isFinish(time + duration)
-      }
-      else false
+      else
+        false
     }
 
   def createBullet(b: Building, u: GameUnit, time: Long, config: GameConfig) = {
