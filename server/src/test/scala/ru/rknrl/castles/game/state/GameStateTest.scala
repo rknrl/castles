@@ -886,21 +886,21 @@ class GameStateTest extends WordSpec with Matchers {
 
     val b0 = buildingMock(
       id = BuildingId(0),
-      pos = Point(2, 2),
+      pos = Point(1, 1),
       count = 90,
       buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
       owner = Some(player0)
     )
     val b1 = buildingMock(
       id = BuildingId(1),
-      pos = Point(4, 2),
+      pos = Point(2, 1),
       count = 99,
       buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
       owner = Some(player1)
     )
     val b2 = buildingMock(
       id = BuildingId(2),
-      pos = Point(2, 4),
+      pos = Point(1, 2),
       count = 89,
       buildingPrototype = BuildingPrototype(HOUSE, LEVEL_1),
       owner = Some(player2)
@@ -911,7 +911,7 @@ class GameStateTest extends WordSpec with Matchers {
       id = UnitId(0),
       fromBuilding = b0,
       toBuilding = b1,
-      startTime = 1,
+      startTime = 6,
       duration = 10,
       count = 77
     )
@@ -919,7 +919,7 @@ class GameStateTest extends WordSpec with Matchers {
       id = UnitId(1),
       fromBuilding = b1,
       toBuilding = b2,
-      startTime = 1,
+      startTime = 6,
       duration = 10,
       count = 55
     )
@@ -927,7 +927,7 @@ class GameStateTest extends WordSpec with Matchers {
       id = UnitId(2),
       fromBuilding = b2,
       toBuilding = b0,
-      startTime = 1,
+      startTime = 6,
       duration = 10,
       count = 66
     )
@@ -936,14 +936,14 @@ class GameStateTest extends WordSpec with Matchers {
     val damagerConfig = damagerConfigMock(
       powerVsUnit = 40,
       powerVsBuilding = 40,
-      radius = 1
+      radius = 0.01
     )
 
-    val tornado1 = tornadoMock(points = Points(Point(0, 0), Point(2, 2)), startTime = 1, duration = 1, damagerConfig = damagerConfig)
-    val tornado2 = tornadoMock(points = Points(Point(0, 0), Point(4, 2)), startTime = 1, duration = 1, damagerConfig = damagerConfig)
+    val tornado1 = tornadoMock(points = Points(Point(0, 0), Point(2, 2)), startTime = 1, duration = 10, damagerConfig = damagerConfig)
+    val tornado2 = tornadoMock(points = Points(Point(0, 0), Point(4, 2)), startTime = 1, duration = 10, damagerConfig = damagerConfig)
 
     val gameState = gameStateMock(
-      time = 1,
+      time = 6,
       players = players,
       buildings = buildings,
       units = units,
@@ -951,19 +951,22 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 2)
+    val (newGameState, messages, _) = updateGameState(gameState, newTime = 6)
 
     checkBuildings(
       newGameState.buildings,
       List(
-        b0.applyDamagers(List(tornado1), time = 2),
-        b1.applyDamagers(List(tornado2), time = 2),
+        b0.applyDamagers(List(tornado1), time = 6),
+        b1.applyDamagers(List(tornado2), time = 6),
         b2
       )
     )
 
-    val newU0 = u0.applyDamagers(List(tornado1), time = 2)
-    val newU1 = u1.applyDamagers(List(tornado2), time = 2)
+    val newU0 = u0.applyDamagers(List(tornado1), time = 6)
+    newU0.count should be < u0.count
+
+    val newU1 = u1.applyDamagers(List(tornado2), time = 6)
+    newU1.count should be < u1.count
 
     checkUnits(
       newGameState.units,

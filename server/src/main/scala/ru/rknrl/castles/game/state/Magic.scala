@@ -63,7 +63,7 @@ case class Tornado(playerId: PlayerId,
                    duration: Long,
                    damagerConfig: DamagerConfig) extends Periodic with Damager {
 
-  def pos(time: Long) = points.pos(millisFromStart(time))
+  def pos(time: Long) = points.pos(progress(time))
 
   def dto(time: Long) =
     TornadoDTO(
