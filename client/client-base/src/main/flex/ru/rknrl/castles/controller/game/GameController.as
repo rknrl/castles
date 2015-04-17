@@ -208,7 +208,8 @@ public class GameController extends EventDispatcher {
         }
 
         const volcanoDamageRadius:int = 48;
-        for (var volcano:Static in volcanoes.objectToView) {
+        for (var key:* in volcanoes.objectToView) {
+            const volcano:Static = key;
             const inRadius:Vector.<Building> = buildings.inRadius(volcano.pos(time), volcanoDamageRadius);
             for each(var b:Building in inRadius) {
                 view.area.buildings.setBuildingsDust(b.id, true);
@@ -224,7 +225,8 @@ public class GameController extends EventDispatcher {
 
             const tornadoDamageRadius:int = 48;
             const damagedBuildings:Vector.<Building> = new <Building>[];
-            for (var tornado:Movable in tornadoes.objectToView) {
+            for (var key:* in tornadoes.objectToView) {
+                const tornado:Movable = key;
                 const inRadius:Vector.<Building> = buildings.inRadius(tornado.pos(time), tornadoDamageRadius);
                 for each(var b:Building in inRadius) {
                     if (damagedBuildings.indexOf(b) == -1) damagedBuildings.push(b);
