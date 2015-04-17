@@ -28,7 +28,7 @@ object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
-    println(s"ver: 30 march 2015 1:09")
+    println(s"ver: 17 apr 2015 17:34")
     configPaths.foreach(path ⇒ println(s"configPath='$path'"))
 
     val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
