@@ -100,7 +100,7 @@ class MatchMaking(interval: FiniteDuration,
         onGameOver(sender)
       }
 
-      if(config.isDev) throw new Error(e)
+      if (config.isDev) throw new Error(e)
 
       Stop
   }
@@ -417,7 +417,9 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def insert(list: List[TopItem], item: TopItem) =
-    (top.filter(_.accountId != item.accountId) :+ item).sortBy(_.rating).take(5)
+    (top.filter(_.accountId != item.accountId) :+ item)
+      .sortBy(_.rating)(Ordering.Double.reverse)
+      .take(5)
 
   def topDto =
     for (i ← 0 until top.size)
