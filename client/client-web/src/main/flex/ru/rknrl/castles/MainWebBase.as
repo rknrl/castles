@@ -36,7 +36,6 @@ public class MainWebBase extends Sprite {
     private var accountId:AccountId;
     private var authenticationSecret:AuthenticationSecretDTO;
     private var social:ISocial;
-    private var bugsLogUrl:String;
 
     private var myUserInfo:UserInfo;
     private var main:Main;
@@ -49,8 +48,8 @@ public class MainWebBase extends Sprite {
         this.accountId = accountId;
         this.authenticationSecret = authenticationSecret;
         this.social = social;
-        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
-        Log.info("bugsLogUrl=" + bugsLogUrl);
+        Log.url = "http://" + host + ":" + httpPort + "/bug";
+        Log.info("bugsLogUrl=" + Log.url);
 
         loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
@@ -102,7 +101,6 @@ public class MainWebBase extends Sprite {
             const error:Error = event.error as Error;
             const stackTrace:String = error ? error.getStackTrace() : "";
             Log.error(event.error, stackTrace);
-            Log.send(bugsLogUrl);
             if (main) main.addErrorScreen();
         }
     }
