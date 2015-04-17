@@ -69,7 +69,6 @@ public class MainMobileBase extends Sprite {
     private var gamePort:int;
     private var policyPort:int;
     private var httpPort:int;
-    private var bugsLogUrl:String;
     private var deviceType:DeviceType;
     private var platformType:PlatformType;
 
@@ -87,8 +86,8 @@ public class MainMobileBase extends Sprite {
         this.policyPort = policyPort;
         this.httpPort = httpPort;
 
-        this.bugsLogUrl = "http://" + host + ":" + httpPort + "/bug";
-        Log.info("bugsLogUrl=" + bugsLogUrl);
+        Log.url = "http://" + host + ":" + httpPort + "/bug";
+        Log.info("bugsLogUrl=" + Log.url);
 
         loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 
@@ -227,7 +226,6 @@ public class MainMobileBase extends Sprite {
             const error:Error = event.error as Error;
             const stackTrace:String = error ? error.getStackTrace() : "";
             Log.error(event.error, stackTrace);
-            Log.send(bugsLogUrl);
             if (main) main.addErrorScreen();
         }
     }
