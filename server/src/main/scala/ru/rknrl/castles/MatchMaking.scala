@@ -331,7 +331,7 @@ class MatchMaking(interval: FiniteDuration,
 
     /** Scheduler говорит, что пора пробовать создавать игры из заявок */
     case TryCreateGames ⇒
-      tryCreateGames(gameOrders).map(registerGame)
+      tryCreateGames(gameOrders).foreach(registerGame)
   })
 
   def getSA(big: Boolean, place: Int) =

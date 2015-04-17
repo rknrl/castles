@@ -1,0 +1,3 @@
+disable scala inspections:
+advanced language feature
+empty-paren method accesses as parameterless
