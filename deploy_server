@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# build server via maven
+# build server via sbt
 
 sbt assembly &&
 

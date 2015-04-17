@@ -1,5 +1,7 @@
 #!/bin/sh
 
+SWF_NAME="game1.swf"
+
 # build client-web.swf via ant
 
 ant -buildfile build-web.xml castles-web-swf &&
@@ -10,20 +12,30 @@ rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/* &&
 
 # copy client-web.swf to out folder
 
-cp ~/dev/rknrl/castles/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/game.swf &&
+cp ~/dev/rknrl/castles/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/${SWF_NAME} &&
 
 # copy html files to out folder
 
 cp -a ~/dev/rknrl/castles/client/client-web/src/main/www/. ~/dev/rknrl/castles-deploy/castles-client/www &&
 
-# replace 127.0.0.1 by castles.rknrl.ru in vk.html, ok.html, mm.html
+# www folder
 
 cd ~/dev/rknrl/castles-deploy/castles-client/www &&
-sed -i.bak 's/127\.0\.0\.1/castles\.rknrl\.ru/g' *.html &&
 
-# replace http port 8080 by 80 in vk.html, ok.html, mm.html
+# replace 127.0.0.1 by castles.rknrl.ru in html files
 
-sed -i.bak 's/8080/80/g' *.html &&
+sed -i.bak "s/127\.0\.0\.1/castles\.rknrl\.ru/g" *.html &&
+
+# replace http port 8080 by 80 in html files
+
+sed -i.bak "s/8080/80/g" *.html &&
+
+# replace game.swf by ${SWF_NAME} in html files
+
+sed -i.bak "s/game.swf/${SWF_NAME}/g" *.html &&
+
+# delete sed *.bak files
+
 rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/*.bak &&
 
 # commit changes
@@ -35,5 +47,4 @@ git push
 
 #ssh castles@rknrl.ru
 #cd /var/castles-client/
-#sudo -E git pull
-#sudo service nginx restart
+#sudo -E git pull && sudo service nginx restart
