@@ -180,7 +180,7 @@ public class GameController extends EventDispatcher {
         } else {
             if (arrows.drawing) {
                 const building:Building = buildings.selfInXy(selfId, event.mousePos);
-                if (building) arrows.addArrow(building);
+                if (building) arrows.addArrow(building.id.id, building.pos);
 
                 arrows.mouseMove(event.mousePos);
             }
@@ -335,8 +335,8 @@ public class GameController extends EventDispatcher {
         view.area.buildings.setBuildingStrengthened(dto.id, dto.strengthened);
 
         // Если ты вел стрелку из домика, а его захватили - убираем стрелку
-        if (arrows.hasArrow(building.id) && (wasOwned && !willOwned)) {
-            arrows.removeArrow(building.id)
+        if (arrows.hasArrow(building.id.id) && (wasOwned && !willOwned)) {
+            arrows.removeArrow(building.id.id)
         }
     }
 
@@ -408,7 +408,7 @@ public class GameController extends EventDispatcher {
             }
         } else {
             const building:Building = buildings.selfInXy(selfId, event.mousePos);
-            if (building) arrows.startDraw(building);
+            if (building) arrows.startDraw(building.id.id, building.pos);
         }
     }
 

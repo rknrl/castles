@@ -10,17 +10,17 @@ package ru.rknrl.castles.controller.game {
 
 import flash.utils.Dictionary;
 
-import ru.rknrl.castles.model.game.Building;
-import ru.rknrl.core.points.Point;
+import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.view.game.area.arrows.ArrowView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.dto.BuildingId;
 
 public class Arrows {
-    private var view:ArrowsView;
+    private var layer:ArrowsView;
 
-    public function Arrows(view:ArrowsView) {
-        this.view = view;
+    public function Arrows(layer:ArrowsView) {
+        this.layer = layer;
     }
 
     private var _drawing:Boolean;
@@ -29,51 +29,46 @@ public class Arrows {
         return _drawing;
     }
 
-    private var fromBuildingIdToArrow:Dictionary = new Dictionary();
+    private var fromBuildingIdToView:Dictionary = new Dictionary();
 
     public function getFromBuildingsIds():Vector.<BuildingId> {
         const result:Vector.<BuildingId> = new <BuildingId>[];
-        for (var id:* in fromBuildingIdToArrow) {
-            const buildingId:BuildingId = id;
-            result.push(buildingId);
+        for (var key:* in fromBuildingIdToView) {
+            const id:int = key;
+            result.push(DtoMock.buildingId(id));
         }
         return result;
     }
 
-    public function startDraw(fromBuilding:Building):void {
+    public function startDraw(fromBuildingId:int, fromPos:Point):void {
         _drawing = true;
-        addArrow(fromBuilding);
+        addArrow(fromBuildingId, fromPos);
     }
 
-    private function getArrow(fromBuildingId:BuildingId):ArrowView {
-        for (var id:* in fromBuildingIdToArrow) {
-            const buildingId:BuildingId = id;
-            if (buildingId.id == fromBuildingId.id) return fromBuildingIdToArrow[id];
+    public function hasArrow(fromBuildingId:int):Boolean {
+        return fromBuildingIdToView[fromBuildingId];
+    }
+
+    public function addArrow(fromBuildingId:int, fromPos:Point):void {
+        if (!fromBuildingIdToView[fromBuildingId]) {
+            fromBuildingIdToView[fromBuildingId] = layer.addArrow(fromPos);
         }
-        return null;
     }
 
-    public function hasArrow(fromBuildingId:BuildingId):Boolean {
-        return getArrow(fromBuildingId);
-    }
-
-    public function addArrow(fromBuilding:Building):void {
-        if (!hasArrow(fromBuilding.id))
-            fromBuildingIdToArrow[fromBuilding.id] = view.addArrow(fromBuilding.pos);
-    }
-
-    public function removeArrow(fromBuildingId:BuildingId):void {
-        view.removeArrow(getArrow(fromBuildingId));
+    public function removeArrow(fromBuildingId:int):void {
+        const view:ArrowView = fromBuildingIdToView[fromBuildingId];
+        layer.removeArrow(view);
+        delete fromBuildingIdToView[fromBuildingId];
     }
 
     public function mouseMove(mousePos:Point):void {
-        view.orientArrows(mousePos);
+        layer.orientArrows(mousePos);
     }
 
     public function endDraw():void {
         _drawing = false;
-        fromBuildingIdToArrow = new Dictionary();
-        view.removeArrows();
+        fromBuildingIdToView = new Dictionary();
+        layer.removeArrows();
     }
 }
 }
