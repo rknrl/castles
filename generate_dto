@@ -8,8 +8,8 @@ rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 proto_dir="${project}/server/src/main/protobuf"
 as3_out="${project}/client/client-base/src/main/flex/"
 
-java -Xmx512M -XX:MaxPermSize=256M -jar ~/Library/Caches/IntelliJIdea14/sbtexe/sbt-launch-0.13.0.jar clean
-java -Xmx512M -XX:MaxPermSize=256M -jar ~/Library/Caches/IntelliJIdea14/sbtexe/sbt-launch-0.13.0.jar protobuf:protobufScalaGenerate
+sbt clean
+sbt protobuf:protobufScalaGenerate
 
 rm -rf ${as3_out}/ru/rknrl/dto/*
 
