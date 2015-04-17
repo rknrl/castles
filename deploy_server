@@ -2,7 +2,7 @@
 
 # build server via maven
 
-mvn clean install &&
+sbt assembly &&
 
 # clear out folder
 
@@ -18,7 +18,7 @@ cp -a server/src/main/resources/maps/. ~/dev/rknrl/castles-deploy/castles-server
 
 # copy server jar to out folder
 
-cp server/target/server-1.0-SNAPSHOT-allinone.jar ~/dev/rknrl/castles-deploy/castles-server/server.jar &&
+cp server/target/scala-2.11/castles.jar ~/dev/rknrl/castles-deploy/castles-server/server.jar &&
 
 # print diff
 
