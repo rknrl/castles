@@ -137,8 +137,6 @@ class MatchMaking(interval: FiniteDuration,
 
   context.system.scheduler.schedule(0 seconds, interval, self, TryCreateGames)
 
-  context.system.scheduler.schedule(0 seconds, 1 minute, self, RegisterHealth)
-
   /** Создать игры из имеющихся заявок */
   def tryCreateGames(gameOrders: List[GameOrder]) = {
     val (smallGameOrders, bigGameOrders) = gameOrders.span(_.deviceType == DeviceType.PHONE)
