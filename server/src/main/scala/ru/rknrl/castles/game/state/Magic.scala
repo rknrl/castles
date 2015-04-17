@@ -9,8 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.{DamagerConfig, GameConfig}
-import ru.rknrl.core.{Stat, Damager, Periodic}
-import ru.rknrl.core.points.{Points, Point}
+import ru.rknrl.core.points.{Point, Points}
+import ru.rknrl.core.{Damager, Periodic, Stat}
 import ru.rknrl.dto._
 
 case class Fireball(playerId: PlayerId,
@@ -77,7 +77,7 @@ object Tornadoes {
   def castToTornado(cast: (PlayerId, CastTornadoDTO), time: Long, churchesProportion: ChurchesProportion, config: GameConfig) =
     new Tornado(
       playerId = cast._1,
-      points = Points.fromDto(cast._2.points),
+      points = Points.fromDto(cast._2.points).toDistance(config.tornado.duration * config.tornado.speed),
       startTime = time,
       duration = config.tornado.duration,
       damagerConfig = config.tornado.damage.bonused(churchesProportion(cast._1))

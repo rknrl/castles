@@ -96,4 +96,65 @@ class PointsTest extends WordSpec with Matchers {
     val points = Points(Point(0, 0), Point(0, 0))
     points.pos(0.5) shouldBe Point(0, 0)
   }
+
+  "cut" should {
+    "two points" in {
+      val points = Points(Point(0, 0), Point(1, 1))
+      val cut = points.cut(0.5).points
+      cut.size shouldBe 2
+      checkPoint(cut(0), Point(0, 0))
+      checkPoint(cut(1), Point(0.5, 0.5))
+    }
+    "two same points" in {
+      val points = Points(Point(2, 1), Point(2, 1))
+      val cut = points.cut(0.5).points
+      cut.size shouldBe 2
+      checkPoint(cut(0), Point(2, 1))
+      checkPoint(cut(1), Point(2, 1))
+    }
+
+    "cut" in {
+      val points = Points(Point(0, 0), Point(0, 1), Point(1, 1))
+      val cut = points.cut(0.6).points
+      cut.size shouldBe 2
+      checkPoint(cut(0), Point(0, 0))
+      checkPoint(cut(1), Point(0.2, 1))
+    }
+
+    "cut2" in {
+      val points = Points(Point(-1, -1), Point(-1, 0), Point(0, 0), Point(0, 1), Point(1, 1))
+      val cut = points.cut(0.8).points
+      cut.size shouldBe 4
+      checkPoint(cut(0), Point(-1, -1))
+      checkPoint(cut(1), Point(-1, 0))
+      checkPoint(cut(2), Point(0, 0))
+      checkPoint(cut(3), Point(0.2, 1))
+    }
+  }
+
+  "prolong" should {
+    "two points" in {
+      val points = Points(Point(0, 0), Point(0, 1))
+      val cut = points.prolong(1.5).points
+      cut.size shouldBe 3
+      checkPoint(cut(0), Point(0, 0))
+      checkPoint(cut(1), Point(0, 1))
+      checkPoint(cut(2), Point(0, 2.5))
+    }
+    "prolong" in {
+      val points = Points(Point(-1, -2), Point(0, 0), Point(0, 1))
+      val cut = points.prolong(1.5).points
+      cut.size shouldBe 4
+      checkPoint(cut(0), Point(-1, -2))
+      checkPoint(cut(1), Point(0, 0))
+      checkPoint(cut(2), Point(0, 1))
+      checkPoint(cut(3), Point(0, 2.5))
+    }
+  }
+
+  "toDistance" should {
+    val points = Points(Point(0, 0), Point(0, 2))
+    points.toDistance(1) shouldBe Points(Point(0, 0), Point(0, 1))
+    points.toDistance(4) shouldBe Points(Point(0, 0), Point(0, 2), Point(0, 4))
+  }
 }

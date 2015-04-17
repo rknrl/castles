@@ -100,9 +100,8 @@ class MagicTest extends WordSpec with Matchers {
 
   "castToTornado" in {
     val dto = CastTornadoDTO(Seq(
-      PointDTO(10.1f, 20.2f),
-      PointDTO(30.1f, 40.2f),
-      PointDTO(50.1f, 60.2f)
+      PointDTO(1f, 2f),
+      PointDTO(1f, 4f)
     ))
 
     val tornado = castToTornado(
@@ -117,8 +116,8 @@ class MagicTest extends WordSpec with Matchers {
 
       config = gameConfigMock(
         tornado = tornadoConfigMock(
-          duration = 3210,
-          speed = 0.033,
+          duration = 100,
+          speed = 0.5,
           damage = damagerConfigMock(
             powerVsUnit = 50,
             powerVsBuilding = 20,
@@ -134,14 +133,14 @@ class MagicTest extends WordSpec with Matchers {
 
     tornado.playerId shouldBe PlayerId(2)
     tornado.points.points should have size 3
-    tornado.points.points(0).x shouldBe (10.1 +- 0.001)
-    tornado.points.points(0).y shouldBe (20.2 +- 0.001)
-    tornado.points.points(1).x shouldBe (30.1 +- 0.001)
-    tornado.points.points(1).y shouldBe (40.2 +- 0.001)
-    tornado.points.points(2).x shouldBe (50.1 +- 0.001)
-    tornado.points.points(2).y shouldBe (60.2 +- 0.001)
+    tornado.points.points(0).x shouldBe (1.0 +- 0.001)
+    tornado.points.points(0).y shouldBe (2.0 +- 0.001)
+    tornado.points.points(1).x shouldBe (1.0 +- 0.001)
+    tornado.points.points(1).y shouldBe (4.0 +- 0.001)
+    tornado.points.points(2).x shouldBe (1.0 +- 0.001)
+    tornado.points.points(2).y shouldBe (52.0 +- 0.001)
     tornado.startTime shouldBe 123
-    tornado.duration shouldBe 3210
+    tornado.duration shouldBe 100
     tornado.damagerConfig.powerVsUnit shouldBe (50.4 +- 0.01)
     tornado.damagerConfig.powerVsBuilding shouldBe (20.4 +- 0.01)
     tornado.damagerConfig.maxPowerBonus shouldBe 0.8
