@@ -15,8 +15,7 @@ import com.github.mauricio.async.db.{Configuration, RowData}
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
-import ru.rknrl.castles.rmi.C2B.UpdateStatistics
-import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO, UserInfoDTO}
+import ru.rknrl.dto._
 import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
 class DbConfiguration(username: String,
@@ -205,8 +204,8 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
         }
       )
 
-    case UpdateStatistics(dto) ⇒
-      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(dto.action.id)).map(
+    case statAction: StatAction ⇒
+      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(statAction.id)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1) {
             // ok

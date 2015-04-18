@@ -8,12 +8,9 @@
 
 package ru.rknrl.castles.database
 
-import ru.rknrl.castles.rmi.C2B.UpdateStatistics
 import ru.rknrl.dto._
 
 object Statistics {
-  def updateStatistics(action: StatAction) = UpdateStatistics(StatDTO(action))
-
   def buyItem(itemType: ItemType) =
     itemType match {
       case ItemType.FIREBALL ⇒ StatAction.BUY_FIREBALL

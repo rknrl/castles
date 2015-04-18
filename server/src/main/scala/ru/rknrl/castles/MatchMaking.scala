@@ -16,7 +16,6 @@ import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.AccountState.{Items, Slots}
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Statistics.updateStatistics
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.rmi.B2C.ServerHealth
@@ -178,7 +177,7 @@ class MatchMaking(interval: FiniteDuration,
       val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
       val bot = context.actorOf(Props(botClass, accountId, config.game, bugs), accountId.id)
       val botStat = if (isTutor) tutorBotStat else order.stat
-      val botOrder = new GameOrder(accountId, order.deviceType, botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
+      val botOrder = new GameOrder(accountId, order.deviceType, config.botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
@@ -188,34 +187,6 @@ class MatchMaking(interval: FiniteDuration,
 
   def botItems(playerItems: Items) =
     playerItems.mapValues(count ⇒ count * 2)
-
-  def botUserInfo(accountId: AccountId, number: Int) =
-    number match {
-      case 0 ⇒
-        UserInfoDTO(
-          accountId,
-          Some("Sasha"),
-          Some("Serova"),
-          Some("http://" + config.staticHost + "/avatars/Sasha96.png"),
-          Some("http://" + config.staticHost + "/avatars/Sasha256.png")
-        )
-      case 1 ⇒
-        UserInfoDTO(
-          accountId,
-          Some("Napoleon"),
-          Some("1769"),
-          Some("http://" + config.staticHost + "/avatars/Napoleon96.png"),
-          Some("http://" + config.staticHost + "/avatars/Napoleon256.png")
-        )
-      case 2 ⇒
-        UserInfoDTO(
-          accountId,
-          Some("Виктория"),
-          Some("Викторовна"),
-          Some("http://" + config.staticHost + "/avatars/Babka96.png"),
-          Some("http://" + config.staticHost + "/avatars/Babka256.png")
-        )
-    }
 
   val gameIdIterator = new GameIdIterator
 
@@ -237,14 +208,14 @@ class MatchMaking(interval: FiniteDuration,
     if (!isTutor) {
       if (orders.count(_.isBot) == orders.size - 1) {
         if (orders.size == 4)
-          database ! updateStatistics(StatAction.START_GAME_4_WITH_BOTS)
+          database ! StatAction.START_GAME_4_WITH_BOTS
         else
-          database ! updateStatistics(StatAction.START_GAME_2_WITH_BOTS)
+          database ! StatAction.START_GAME_2_WITH_BOTS
       } else {
         if (orders.size == 4)
-          database ! updateStatistics(StatAction.START_GAME_4_WITH_PLAYERS)
+          database ! StatAction.START_GAME_4_WITH_PLAYERS
         else
-          database ! updateStatistics(StatAction.START_GAME_2_WITH_PLAYERS)
+          database ! StatAction.START_GAME_2_WITH_PLAYERS
       }
     }
 
@@ -334,26 +305,6 @@ class MatchMaking(interval: FiniteDuration,
       tryCreateGames(gameOrders).foreach(registerGame)
   })
 
-  def getSA(big: Boolean, place: Int) =
-    if (big)
-      place match {
-        case 1 ⇒ 1.0
-        case 2 ⇒ 0.5
-        case 3 ⇒ 0.25
-        case 4 ⇒ 0.0
-      }
-    else
-    if (place == 1) 1.0 else 0.0
-
-  /** http://en.wikipedia.org/wiki/Elo_rating_system */
-  def getNewRating(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {
-    val eA: Double = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400))
-
-    val k: Double = if (ratingA > 2400) 10 else if (gamesCountA <= 30) 30 else 15
-
-    ratingA + k * (sA - eA)
-  }
-
   def placeGameOrder(gameOrder: GameOrder, accountRef: ActorRef) = {
     Assertion.check(accountIdToGameInfo.get(gameOrder.accountId).isEmpty)
     accountIdToAccountRef = accountIdToAccountRef.updated(gameOrder.accountId, accountRef)
@@ -379,38 +330,40 @@ class MatchMaking(interval: FiniteDuration,
 
     val averageEnemyRating = orders.filter(_ != order).map(_.rating).sum / (orders.size - 1)
 
-    val sA = getSA(gameInfo.big, place)
-    val newRating = getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
+    val sA = ELO.getSA(gameInfo.big, place)
+    val newRating = ELO.getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
 
     top = insert(top, TopItem(accountId, newRating, userInfo))
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, topDto) // todo - если он ушел в оффлайн, ничо не сохранится
 
-    val gameWithBots = orders.count(_.isBot) == orders.size - 1
-    if (gameWithBots && !order.isBot) {
-      if (orders.size == 4) {
-        if (place == 1) {
-          if (gameInfo.isTutor)
-            database ! updateStatistics(StatAction.TUTOR_4_WIN)
-          else
-            database ! updateStatistics(StatAction.WIN_4_BOTS)
-        } else {
-          if (gameInfo.isTutor)
-            database ! updateStatistics(StatAction.TUTOR_4_LOSE)
-          else
-            database ! updateStatistics(StatAction.LOSE_4_BOTS)
-        }
-      } else if (orders.size == 2) {
-        if (place == 1) {
-          if (gameInfo.isTutor)
-            database ! updateStatistics(StatAction.TUTOR_2_WIN)
-          else
-            database ! updateStatistics(StatAction.WIN_2_BOTS)
-        } else {
-          if (gameInfo.isTutor)
-            database ! updateStatistics(StatAction.TUTOR_2_LOSE)
-          else
-            database ! updateStatistics(StatAction.LOSE_2_BOTS)
+    if (!order.isBot) {
+      val gameWithBots = orders.count(_.isBot) == orders.size - 1
+      if (gameWithBots) {
+        if (orders.size == 4) {
+          if (place == 1) {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_4_WIN
+            else
+              database ! StatAction.WIN_4_BOTS
+          } else {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_4_LOSE
+            else
+              database ! StatAction.LOSE_4_BOTS
+          }
+        } else if (orders.size == 2) {
+          if (place == 1) {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_2_WIN
+            else
+              database ! StatAction.WIN_2_BOTS
+          } else {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_2_LOSE
+            else
+              database ! StatAction.LOSE_2_BOTS
+          }
         }
       }
     }

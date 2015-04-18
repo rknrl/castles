@@ -270,8 +270,8 @@ class Game(players: Map[PlayerId, Player],
     case CastAssistance(buildingIdDto) ⇒
       if (senderCanPlay) assistanceCasts = assistanceCasts + (senderPlayerId → buildingIdDto)
 
-    case C2B.UpdateStatistics(dto) ⇒
-      sendToBots(dto.action)
+    case statAction: StatAction ⇒
+      sendToBots(statAction)
   })
 
   def addLoser(playerId: PlayerId, place: Int) {

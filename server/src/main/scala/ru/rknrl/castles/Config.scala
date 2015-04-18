@@ -13,7 +13,7 @@ import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.core.social.{Product, SocialConfigs}
-import ru.rknrl.dto.{AccountType, PlatformType, ProductDTO}
+import ru.rknrl.dto._
 
 class Config(val host: String,
              val staticHost: String,
@@ -85,4 +85,32 @@ class Config(val host: String,
         price = productInfo.price,
         currency = productInfo.currency
       )
+
+  def botUserInfo(accountId: AccountId, number: Int) =
+    number match {
+      case 0 ⇒
+        UserInfoDTO(
+          accountId,
+          Some("Sasha"),
+          Some("Serova"),
+          Some("http://" + staticHost + "/avatars/Sasha96.png"),
+          Some("http://" + staticHost + "/avatars/Sasha256.png")
+        )
+      case 1 ⇒
+        UserInfoDTO(
+          accountId,
+          Some("Napoleon"),
+          Some("1769"),
+          Some("http://" + staticHost + "/avatars/Napoleon96.png"),
+          Some("http://" + staticHost + "/avatars/Napoleon256.png")
+        )
+      case 2 ⇒
+        UserInfoDTO(
+          accountId,
+          Some("Виктория"),
+          Some("Викторовна"),
+          Some("http://" + staticHost + "/avatars/Babka96.png"),
+          Some("http://" + staticHost + "/avatars/Babka256.png")
+        )
+    }
 }
