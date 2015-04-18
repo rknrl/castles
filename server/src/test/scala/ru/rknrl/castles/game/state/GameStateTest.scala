@@ -293,13 +293,13 @@ class GameStateTest extends WordSpec with Matchers {
     )
 
     val items = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         ASSISTANCE → gameItemStateMock(ASSISTANCE, count = 1)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         ASSISTANCE → gameItemStateMock(ASSISTANCE, count = 2)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         ASSISTANCE → gameItemStateMock(ASSISTANCE, count = 2)
       ))
     ))
@@ -395,13 +395,13 @@ class GameStateTest extends WordSpec with Matchers {
     val buildings = List(b0, b1, b2)
 
     val items = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         STRENGTHENING → gameItemStateMock(STRENGTHENING, count = 1)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         STRENGTHENING → gameItemStateMock(STRENGTHENING, count = 2)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         STRENGTHENING → gameItemStateMock(STRENGTHENING, count = 2)
       ))
     ))
@@ -484,13 +484,13 @@ class GameStateTest extends WordSpec with Matchers {
     ))
 
     val items = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 1)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 2)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 2)
       ))
     ))
@@ -652,13 +652,13 @@ class GameStateTest extends WordSpec with Matchers {
     ))
 
     val items = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         VOLCANO → gameItemStateMock(VOLCANO, count = 1)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         VOLCANO → gameItemStateMock(VOLCANO, count = 2)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         VOLCANO → gameItemStateMock(VOLCANO, count = 2)
       ))
     ))
@@ -821,13 +821,13 @@ class GameStateTest extends WordSpec with Matchers {
     ))
 
     val items = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         TORNADO → gameItemStateMock(TORNADO, count = 1)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         TORNADO → gameItemStateMock(TORNADO, count = 2)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         TORNADO → gameItemStateMock(TORNADO, count = 2)
       ))
     ))
@@ -1121,13 +1121,13 @@ class GameStateTest extends WordSpec with Matchers {
 
   def testItems(itemType: ItemType) =
     new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         itemType → gameItemStateMock(itemType, count = 1, lastUseTime = 0)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         itemType → gameItemStateMock(itemType, count = 1, lastUseTime = 10)
       )),
-      PlayerId(2) → new GameItemsState(Map(
+      PlayerId(2) → new ItemStates(Map(
         itemType → gameItemStateMock(itemType, count = 0, lastUseTime = 0)
       ))
     ))

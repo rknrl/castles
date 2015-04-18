@@ -41,5 +41,9 @@ public class Periodic {
     public function progress(time:int):Number {
         return millisFromStart(time) / _duration
     }
+
+    public function progressInRange(time:int):Number {
+        return Math.max(0, Math.min(1, progress(time)));
+    }
 }
 }

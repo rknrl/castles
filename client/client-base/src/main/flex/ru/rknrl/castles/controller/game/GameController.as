@@ -19,7 +19,7 @@ import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.game.Buildings;
-import ru.rknrl.castles.model.game.GameMagicItems;
+import ru.rknrl.castles.model.game.ItemStates;
 import ru.rknrl.castles.model.game.Players;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
@@ -38,8 +38,8 @@ import ru.rknrl.dto.CastTornadoDTO;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
+import ru.rknrl.dto.ItemStatesDTO;
 import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.ItemsStateDTO;
 import ru.rknrl.dto.MoveDTO;
 import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerId;
@@ -100,7 +100,7 @@ public class GameController extends EventDispatcher {
         tornadoPath = new TornadoPath(view.area.tornadoPath);
         magicItems = new MagicItems(view.magicItems);
 
-        updateItemStates(gameState.itemsState);
+        updateItemStates(gameState.itemStates);
 
         for each(var slotsPos:SlotsPosDTO in gameState.slots) view.area.addSlots(slotsPos);
 
@@ -198,7 +198,7 @@ public class GameController extends EventDispatcher {
         addKillsByTornadoes(time);
 
         for each(var itemType:ItemType in ItemType.values) {
-            view.magicItems.setItemCooldown(itemType, magicItemStates.cooldownProgress(itemType, time))
+            view.magicItems.setItemCooldown(itemType, magicItemStates.get(itemType).cooldown.progressInRange(time))
         }
     }
 
@@ -342,24 +342,24 @@ public class GameController extends EventDispatcher {
 
     // magic items
 
-    private var magicItemStates:GameMagicItems;
+    private var magicItemStates:ItemStates;
 
     private function onUpdateItemStates(e:UpdateItemStatesEvent):void {
         updateItemStates(e.states);
     }
 
-    private function updateItemStates(dto:ItemsStateDTO):void {
-        magicItemStates = new GameMagicItems(dto);
+    private function updateItemStates(dto:ItemStatesDTO):void {
+        magicItemStates = new ItemStates(dto, getTimer());
 
         for each(var itemType:ItemType in ItemType.values) {
-            view.magicItems.setItemCount(itemType, magicItemStates.count(itemType))
+            view.magicItems.setItemCount(itemType, magicItemStates.get(itemType).count)
         }
         view.magicItems.lock = false;
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {
         const itemType:ItemType = event.itemType;
-        if (magicItemStates.canUse(itemType, getTimer())) {
+        if (magicItemStates.get(itemType).canUse(getTimer())) {
             if (magicItems.selected == itemType) {
                 magicItems.selected = null;
             } else {

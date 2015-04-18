@@ -16,17 +16,20 @@ import ru.rknrl.castles.rmi.B2C.UpdateItemStates
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto.PlayerId
 
-class GameItemsTest extends WordSpec with Matchers {
+class ItemStatesTest extends WordSpec with Matchers {
   "getUpdateItemsStatesMessages" in {
+    // У player0 различается count у фаербола и lastUseTime у вулкана
+    // у player1 предметы не различаются
+
     val a = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 1, lastUseTime = 0),
         VOLCANO → gameItemStateMock(VOLCANO, count = 1, lastUseTime = 0),
         TORNADO → gameItemStateMock(TORNADO, count = 1, lastUseTime = 0),
         STRENGTHENING → gameItemStateMock(STRENGTHENING, count = 1, lastUseTime = 0),
         ASSISTANCE → gameItemStateMock(ASSISTANCE, count = 1, lastUseTime = 0)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 1, lastUseTime = 0),
         VOLCANO → gameItemStateMock(VOLCANO, count = 1, lastUseTime = 0),
         TORNADO → gameItemStateMock(TORNADO, count = 10, lastUseTime = 0),
@@ -35,14 +38,14 @@ class GameItemsTest extends WordSpec with Matchers {
       ))
     ))
     val b = new GameItems(Map(
-      PlayerId(0) → new GameItemsState(Map(
+      PlayerId(0) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 0, lastUseTime = 0),
         VOLCANO → gameItemStateMock(VOLCANO, count = 1, lastUseTime = 10),
         TORNADO → gameItemStateMock(TORNADO, count = 1, lastUseTime = 0),
         STRENGTHENING → gameItemStateMock(STRENGTHENING, count = 1, lastUseTime = 0),
         ASSISTANCE → gameItemStateMock(ASSISTANCE, count = 1, lastUseTime = 0)
       )),
-      PlayerId(1) → new GameItemsState(Map(
+      PlayerId(1) → new ItemStates(Map(
         FIREBALL → gameItemStateMock(FIREBALL, count = 1, lastUseTime = 0),
         VOLCANO → gameItemStateMock(VOLCANO, count = 1, lastUseTime = 0),
         TORNADO → gameItemStateMock(TORNADO, count = 10, lastUseTime = 0),

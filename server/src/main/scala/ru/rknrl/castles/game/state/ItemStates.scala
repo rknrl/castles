@@ -13,42 +13,34 @@ import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.rmi.B2C.UpdateItemStates
-import ru.rknrl.dto.{ItemStateDTO, ItemType, ItemsStateDTO, PlayerId}
+import ru.rknrl.dto._
 
-class GameItemState(val itemType: ItemType,
-                    val count: Int,
-                    val lastUseTime: Long,
-                    val useCount: Int) {
+case class ItemState(itemType: ItemType,
+                     count: Int,
+                     lastUseTime: Long,
+                     useCount: Int) {
   Assertion.check(count >= 0)
 
-  def use(time: Long) = new GameItemState(itemType, count - 1, lastUseTime = time, useCount + 1)
-
-  def differentWith(state: GameItemState) =
-    lastUseTime != state.lastUseTime || count != state.count
+  def use(time: Long) = new ItemState(itemType, count - 1, lastUseTime = time, useCount + 1)
 
   def dto(time: Long, config: GameConfig) = {
-    val millisTillCooldownEnd: Long = Math.max(0, config.constants.itemCooldown - (time - lastUseTime))
+    val duration = config.constants.itemCooldown
+    val millisFromStart = Math.min(duration, time - lastUseTime)
+
     ItemStateDTO(
       itemType = itemType,
       count = count,
-      millisTillCooldownEnd = millisTillCooldownEnd.toInt,
-      cooldownDuration = config.constants.itemCooldown.toInt
+      millisFromStart = millisFromStart.toInt,
+      cooldownDuration = duration.toInt
     )
   }
 }
 
-class GameItemsState(val items: Map[ItemType, GameItemState]) {
+class ItemStates(val items: Map[ItemType, ItemState]) {
 
   def use(itemType: ItemType, time: Long) = {
     val newItem = items(itemType).use(time)
-    new GameItemsState(items = items.updated(itemType, newItem))
-  }
-
-  def differentWith(oldState: GameItemsState): Boolean = {
-    for ((itemType, state) ← items)
-      if (state differentWith oldState.items(itemType)) return true
-
-    false
+    new ItemStates(items = items.updated(itemType, newItem))
   }
 
   def usedItems =
@@ -60,25 +52,30 @@ class GameItemsState(val items: Map[ItemType, GameItemState]) {
       yield state.dto(time, config)
 
   def dto(time: Long, config: GameConfig) =
-    ItemsStateDTO(itemsDto(time, config).toSeq)
+    ItemStatesDTO(itemsDto(time, config).toSeq)
+
+  override def equals(obj: scala.Any): Boolean = obj match {
+    case that: ItemStates ⇒ this.items == that.items
+    case _ ⇒ false
+  }
 }
 
 object GameItems {
   private def initMap(items: Items) =
     for ((itemType, count) ← items)
-      yield itemType → new GameItemState(itemType, count, lastUseTime = 0, useCount = 0)
+      yield itemType → new ItemState(itemType, count, lastUseTime = 0, useCount = 0)
 
   def init(items: Items) =
-    new GameItemsState(initMap(items))
+    new ItemStates(initMap(items))
 
   def getUpdateItemsStatesMessages(oldItems: GameItems, item: GameItems, config: GameConfig, time: Long) =
     for ((playerId, state) ← item.states;
          oldState = oldItems.states(playerId)
-         if state differentWith oldState
+         if state != oldState
     ) yield PersonalMessage(playerId, UpdateItemStates(state.dto(time, config)))
 }
 
-class GameItems(val states: Map[PlayerId, GameItemsState]) {
+class GameItems(val states: Map[PlayerId, ItemStates]) {
   def applyCasts(casts: Map[PlayerId, _], itemType: ItemType, time: Long) =
     new GameItems(
       for ((playerId, state) ← states)

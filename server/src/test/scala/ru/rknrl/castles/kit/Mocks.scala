@@ -80,7 +80,7 @@ object Mocks extends Matchers {
                         count: Int = 1,
                         lastUseTime: Long = 0,
                         useCount: Int = 0) =
-    new GameItemState(
+    new ItemState(
       itemType = itemType,
       count = count,
       lastUseTime = lastUseTime,

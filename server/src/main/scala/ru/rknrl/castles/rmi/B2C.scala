@@ -43,7 +43,7 @@ object B2C {
 
   case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(40)
 
-  case class UpdateItemStates(states: ItemsStateDTO) extends Msg(41)
+  case class UpdateItemStates(states: ItemStatesDTO) extends Msg(41)
 
   case class AddUnit(unit: UnitDTO) extends Msg(42)
 

@@ -46,7 +46,7 @@ message GameStateDTO {
     repeated TornadoDTO tornadoes = 9;
     repeated VolcanoDTO volcanoes = 10;
     repeated BulletDTO bullets = 11;
-    required ItemsStateDTO itemsState = 12;
+    required ItemStatesDTO itemStates = 12;
     repeated GameOverDTO gameOvers = 13;
 }
 
@@ -123,14 +123,14 @@ message GameOverDTO {
     required int32 reward = 4;
 }
 
-message ItemsStateDTO {
+message ItemStatesDTO {
     repeated ItemStateDTO items = 1;
 }
 
 message ItemStateDTO {
     required ItemType itemType = 1;
     required int32 count = 2;
-    required int32 millisTillCooldownEnd = 3;
+    required int32 millisFromStart = 3;
     required int32 cooldownDuration = 4; // todo можно не посылать каждый раз
 }
 

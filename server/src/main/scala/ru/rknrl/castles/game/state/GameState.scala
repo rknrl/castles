@@ -264,7 +264,7 @@ class GameState(val width: Int,
       volcanoes = volcanoes.map(_.dto(time)).toSeq,
       tornadoes = tornadoes.map(_.dto(time)).toSeq,
       bullets = bullets.map(_.dto(time)).toSeq,
-      itemsState = items.dto(id, time, config),
+      itemStates = items.dto(id, time, config),
       players = players,
       gameOvers = gameOvers
     )

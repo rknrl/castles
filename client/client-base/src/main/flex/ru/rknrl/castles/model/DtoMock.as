@@ -20,6 +20,8 @@ import ru.rknrl.dto.BuildingPrototype;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.ItemDTO;
+import ru.rknrl.dto.ItemStateDTO;
+import ru.rknrl.dto.ItemStatesDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.PlayerDTO;
 import ru.rknrl.dto.PlayerId;
@@ -454,6 +456,21 @@ public class DtoMock {
     public static function unitId(id:int):UnitId {
         const dto:UnitId = new UnitId();
         dto.id = id;
+        return dto;
+    }
+
+    public static function itemState(itemType:ItemType, count:int, cooldownDuration:int, millisFromStart:int):ItemStateDTO {
+        const dto:ItemStateDTO = new ItemStateDTO();
+        dto.itemType = itemType;
+        dto.count = count;
+        dto.cooldownDuration = cooldownDuration;
+        dto.millisFromStart = millisFromStart;
+        return dto;
+    }
+
+    public static function itemStates(states:Vector.<ItemStateDTO>):ItemStatesDTO {
+        const dto:ItemStatesDTO = new ItemStatesDTO();
+        dto.items = states;
         return dto;
     }
 }

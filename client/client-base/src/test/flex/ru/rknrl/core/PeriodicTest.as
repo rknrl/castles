@@ -50,6 +50,20 @@ public class PeriodicTest {
         assertEquals(0, p.progress(1));
         assertEquals(0.5, p.progress(6));
         assertEquals(1, p.progress(11));
+
+        assertEquals(-0.1, p.progress(0));
+        assertEquals(11, p.progress(111));
+    }
+
+    [Test("progressInRange")]
+    public function t7():void {
+        const p:Periodic = new Periodic(1, 10);
+        assertEquals(0, p.progressInRange(1));
+        assertEquals(0.5, p.progressInRange(6));
+        assertEquals(1, p.progressInRange(11));
+
+        assertEquals(0, p.progressInRange(0));
+        assertEquals(1, p.progressInRange(111));
     }
 }
 }
