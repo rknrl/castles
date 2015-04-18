@@ -380,8 +380,8 @@ public class GameController extends EventDispatcher {
             view.tutor.clear();
             view.y = 0; // todo
             view.removeEventListener(GameViewEvents.SURRENDER, onSurrender);
-            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[players.getSelfPlayer()] : players.getEnemiesPlayers(selfId);
-            const losers:Vector.<PlayerDTO> = dto.place == 1 ? players.getEnemiesPlayers(selfId) : new <PlayerDTO>[players.getSelfPlayer()];
+            const winners:Vector.<PlayerDTO> = dto.place == 1 ? new <PlayerDTO>[players.getSelfPlayer()] : players.getEnemiesPlayers();
+            const losers:Vector.<PlayerDTO> = dto.place == 1 ? players.getEnemiesPlayers() : new <PlayerDTO>[players.getSelfPlayer()];
             view.openGameOverScreen(PlayerInfo.fromDtoVector(winners), PlayerInfo.fromDtoVector(losers), dto.place == 1, dto.reward);
         } else {
             view.setDeadAvatar(dto.playerId);

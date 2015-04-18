@@ -250,42 +250,42 @@ public class DtoMock {
         return dto;
     }
 
-    public static const playerInfo1:PlayerDTO = player(0, "Толя Янот", "mock_avatars/1.png");
-    public static const playerInfo2:PlayerDTO = player(1, "Sasha Serova", "mock_avatars/2.png");
-    private static const playerInfo3:PlayerDTO = player(2, "Napoleon1769", "mock_avatars/3.png");
-    private static const playerInfo4:PlayerDTO = player(3, "Виктория Викторовна", "mock_avatars/4.png");
+    public static const playerInfo0:PlayerDTO = player(0, "Толя Янот", "mock_avatars/1.png");
+    public static const playerInfo1:PlayerDTO = player(1, "Sasha Serova", "mock_avatars/2.png");
+    public static const playerInfo2:PlayerDTO = player(2, "Napoleon1769", "mock_avatars/3.png");
+    public static const playerInfo3:PlayerDTO = player(3, "Виктория Викторовна", "mock_avatars/4.png");
 
     public static function playerInfosPortrait():Vector.<PlayerDTO> {
         return new <PlayerDTO>[
-            playerInfo1,
-            playerInfo2
+            playerInfo0,
+            playerInfo1
         ];
     }
 
     public static function playerInfosLandscape():Vector.<PlayerDTO> {
         return new <PlayerDTO>[
+            playerInfo0,
             playerInfo1,
             playerInfo2,
-            playerInfo3,
-            playerInfo4
+            playerInfo3
         ];
     }
 
     public static function winner():PlayerDTO {
-        return playerInfo1;
+        return playerInfo0;
     }
 
     public static function losersPortrait():Vector.<PlayerDTO> {
         return new <PlayerDTO>[
-            playerInfo2
+            playerInfo1
         ];
     }
 
     public static function losersLandscape():Vector.<PlayerDTO> {
         return new <PlayerDTO>[
+            playerInfo1,
             playerInfo2,
-            playerInfo3,
-            playerInfo4
+            playerInfo3
         ];
     }
 

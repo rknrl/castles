@@ -187,7 +187,7 @@ public class GameTutorController extends TutorControllerBase {
     }
 
     private function _highlightSelfBuildings():void {
-        view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers(players.selfId)), buildings.notPlayerId(players.selfId));
+        view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers()), buildings.notPlayerId(players.selfId));
     }
 
     private function _highlightNoOwnerBuildings():void {
@@ -197,9 +197,9 @@ public class GameTutorController extends TutorControllerBase {
     private var enemyIndex:int;
 
     private function _highlightNextEnemyBuildings():void {
-        const player:PlayerDTO = players.getEnemiesPlayers(players.selfId)[enemyIndex];
+        const player:PlayerDTO = players.getEnemiesPlayers()[enemyIndex];
         view.tutorUnblur();
-        view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers(player.id)), buildings.notPlayerId(player.id));
+        view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers()), buildings.notPlayerId(player.id));
         enemyIndex++;
         if (enemyIndex == 3) enemyIndex = 0;
     }
