@@ -37,15 +37,6 @@ public class Slots {
         throw new Error("can't find slot by id " + slotId);
     }
 
-    public static function equals(a:SlotDTO, b:SlotDTO):Boolean {
-        if (a.hasBuildingPrototype != b.hasBuildingPrototype) return false;
-        return !a.hasBuildingPrototype && !b.hasBuildingPrototype || equalsPrototype(a.buildingPrototype, b.buildingPrototype);
-    }
-
-    private static function equalsPrototype(a:BuildingPrototype, b:BuildingPrototype):Boolean {
-        return a.buildingType == b.buildingType && a.buildingLevel == b.buildingLevel;
-    }
-
     public function getEmptySlot():SlotId {
         for each(var slot:SlotDTO in dto) {
             if (!slot.hasBuildingPrototype) return slot.id
@@ -58,6 +49,15 @@ public class Slots {
             if (slot.hasBuildingPrototype) return slot.id
         }
         throw new Error("no buildings in start location");
+    }
+
+    public static function equals(a:SlotDTO, b:SlotDTO):Boolean {
+        if (a.hasBuildingPrototype != b.hasBuildingPrototype) return false;
+        return !a.hasBuildingPrototype && !b.hasBuildingPrototype || equalsPrototype(a.buildingPrototype, b.buildingPrototype);
+    }
+
+    public static function equalsPrototype(a:BuildingPrototype, b:BuildingPrototype):Boolean {
+        return a.buildingType == b.buildingType && a.buildingLevel == b.buildingLevel;
     }
 }
 }
