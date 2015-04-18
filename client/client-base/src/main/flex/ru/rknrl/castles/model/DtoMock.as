@@ -187,13 +187,19 @@ public class DtoMock {
         return dto;
     }
 
+    public static const topUser1: TopUserInfoDTO = topUserInfo(1, "1", "mock_avatars/1.png");
+    public static const topUser2: TopUserInfoDTO = topUserInfo(2, "2", "mock_avatars/2.png");
+    public static const topUser3: TopUserInfoDTO = topUserInfo(3, "3", "mock_avatars/3.png");
+    public static const topUser4: TopUserInfoDTO = topUserInfo(4, "4", "mock_avatars/4.png");
+    public static const topUser5: TopUserInfoDTO = topUserInfo(5, "5", "mock_avatars/5.png");
+
     public static function topUsers():Vector.<TopUserInfoDTO> {
         const dto:Vector.<TopUserInfoDTO> = new <TopUserInfoDTO>[];
-        dto.push(topUserInfo(1, "1", "mock_avatars/1.png"));
-        dto.push(topUserInfo(2, "2", "mock_avatars/2.png"));
-        dto.push(topUserInfo(3, "3", "mock_avatars/3.png"));
-        dto.push(topUserInfo(4, "4", "mock_avatars/4.png"));
-        dto.push(topUserInfo(5, "5", "mock_avatars/5.png"));
+        dto.push(topUser1);
+        dto.push(topUser2);
+        dto.push(topUser3);
+        dto.push(topUser4);
+        dto.push(topUser5);
         return dto;
     }
 
