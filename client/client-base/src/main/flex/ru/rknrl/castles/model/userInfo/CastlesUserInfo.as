@@ -15,9 +15,6 @@ import ru.rknrl.dto.AccountType;
 import ru.rknrl.dto.UserInfoDTO;
 
 public class CastlesUserInfo extends UserInfo {
-    private var _accountType:AccountType;
-    private var _photo96:String;
-    private var _photo256:String;
 
     public function CastlesUserInfo(uid:String, accountType:AccountType, firstName:String, lastName:String, photo96:String, photo256:String) {
         super({}, uid, firstName, lastName, Sex.UNDEFINED);
@@ -25,6 +22,15 @@ public class CastlesUserInfo extends UserInfo {
         _photo96 = photo96;
         _photo256 = photo256;
     }
+
+    private var _accountType:AccountType;
+
+    public function get accountType():AccountType {
+        return _accountType;
+    }
+
+    private var _photo96:String;
+    private var _photo256:String;
 
     override protected function getAvatarUrls():Vector.<UserInfoAvatarUrl> {
         const urls:Vector.<UserInfoAvatarUrl> = new <UserInfoAvatarUrl>[];
