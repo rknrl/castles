@@ -72,15 +72,15 @@ public class Building {
         _strengthened = strengthened;
     }
 
-    public static function fromDto(b:BuildingDTO):Building {
+    public static function fromDto(dto:BuildingDTO):Building {
         return new Building(
-                b.id,
-                b.building.buildingType,
-                b.building.buildingLevel,
-                Point.fromDto(b.pos),
-                new BuildingOwner(b.hasOwner, b.owner),
-                b.population,
-                b.strengthened
+                dto.id,
+                dto.building.buildingType,
+                dto.building.buildingLevel,
+                Point.fromDto(dto.pos),
+                new BuildingOwner(dto.hasOwner, dto.owner),
+                dto.population,
+                dto.strengthened
         );
     }
 }

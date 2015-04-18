@@ -30,19 +30,17 @@ public class Buildings {
         throw new Error("can't find building " + id);
     }
 
-    public function inXy(pos:Point):Building {
-        for each(var building:Building in buildings) {
-            if (building.pos.distance(pos) < mouseAreaRadius) return building;
-        }
-        return null;
-    }
-
     public function inRadius(pos:Point, radius:Number):Vector.<Building> {
         const result:Vector.<Building> = new <Building>[];
         for each(var building:Building in buildings) {
             if (building.pos.distance(pos) < radius) result.push(building);
         }
         return result;
+    }
+
+    public function inXy(pos:Point):Building {
+        const nearest:Vector.<Building> = inRadius(pos, mouseAreaRadius);
+        return nearest.length > 0 ? nearest[0] : null;
     }
 
     public function selfInXy(selfId:PlayerId, pos:Point):Building {
@@ -52,26 +50,10 @@ public class Buildings {
 
     // tutorial:
 
-    private function byPlayerId(id:PlayerId):Vector.<BuildingId> {
-        const result:Vector.<BuildingId> = new <BuildingId>[];
-        for each(var building:Building in buildings) {
-            if (building.owner.equalsId(id)) result.push(building.id);
-        }
-        return result;
-    }
-
     public function notPlayerId(id:PlayerId):Vector.<BuildingId> {
         const result:Vector.<BuildingId> = new <BuildingId>[];
         for each(var building:Building in buildings) {
             if (!building.owner.equalsId(id)) result.push(building.id);
-        }
-        return result;
-    }
-
-    public function notOwned():Vector.<BuildingId> {
-        const result:Vector.<BuildingId> = new <BuildingId>[];
-        for each(var building:Building in buildings) {
-            if (!building.owner.hasOwner) result.push(building.id);
         }
         return result;
     }
@@ -82,18 +64,6 @@ public class Buildings {
             if (building.owner.hasOwner) result.push(building.id);
         }
         return result;
-    }
-
-    public function getBuildingIds(selfId:PlayerId):Vector.<BuildingId> {
-        return byPlayerId(selfId);
-    }
-
-    public function getBuildingId(selfId:PlayerId):BuildingId {
-        return getBuildingIds(selfId)[0];
-    }
-
-    public function getEnemyBuildingId(selfId:PlayerId):BuildingId {
-        return notPlayerId(selfId)[0];
     }
 
     public function myTower(ownerId:PlayerId):BuildingId {
