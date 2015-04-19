@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.rmi
 
+import ru.rknrl.castles.rmi.C2B.GameMsg
 import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto._
 
@@ -41,24 +42,24 @@ object B2C {
 
   // game 40-59
 
-  case class UpdateBuilding(building: BuildingUpdateDTO) extends Msg(40)
+  case class UpdateBuilding(building: BuildingUpdateDTO) extends GameMsg(40)
 
-  case class UpdateItemStates(states: ItemStatesDTO) extends Msg(41)
+  case class UpdateItemStates(states: ItemStatesDTO) extends GameMsg(41)
 
-  case class AddUnit(unit: UnitDTO) extends Msg(42)
+  case class AddUnit(unit: UnitDTO) extends GameMsg(42)
 
-  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends Msg(43)
+  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends GameMsg(43)
 
-  case class KillUnit(killedId: UnitId) extends Msg(44)
+  case class KillUnit(killedId: UnitId) extends GameMsg(44)
 
-  case class AddFireball(fireball: FireballDTO) extends Msg(45)
+  case class AddFireball(fireball: FireballDTO) extends GameMsg(45)
 
-  case class AddVolcano(volcano: VolcanoDTO) extends Msg(46)
+  case class AddVolcano(volcano: VolcanoDTO) extends GameMsg(46)
 
-  case class AddTornado(tornado: TornadoDTO) extends Msg(47)
+  case class AddTornado(tornado: TornadoDTO) extends GameMsg(47)
 
-  case class AddBullet(bullet: BulletDTO) extends Msg(48)
+  case class AddBullet(bullet: BulletDTO) extends GameMsg(48)
 
-  case class GameOver(gameOver: GameOverDTO) extends Msg(49)
+  case class GameOver(gameOver: GameOverDTO) extends GameMsg(49)
 
 }

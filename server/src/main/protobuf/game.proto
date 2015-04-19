@@ -50,6 +50,19 @@ message GameStateDTO {
     repeated GameOverDTO gameOvers = 13;
 }
 
+message GameStateUpdateDTO {
+    repeated BuildingUpdateDTO buildingUpdates = 1;
+    repeated UnitDTO newUnits = 2;
+    repeated UnitUpdateDTO unitUpdates = 3;
+    repeated UnitId killUnits = 4;
+    repeated FireballDTO newFireballs = 5;
+    repeated TornadoDTO newTornadoes = 6;
+    repeated VolcanoDTO newVolcanoes = 7;
+    repeated BulletDTO newBullets = 8;
+    repeated ItemStatesDTO itemStatesUpdates = 9;
+    repeated GameOverDTO newGameOvers = 10;
+}
+
 enum SlotsOrientation {
     TOP_LEFT = 1;
     TOP_RIGHT = 2;
@@ -124,7 +137,8 @@ message GameOverDTO {
 }
 
 message ItemStatesDTO {
-    repeated ItemStateDTO items = 1;
+    required PlayerId playerId = 1;
+    repeated ItemStateDTO items = 2;
 }
 
 message ItemStateDTO {

@@ -10,7 +10,6 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountState.Items
-import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.rmi.B2C.UpdateItemStates
 import ru.rknrl.dto._
@@ -51,8 +50,11 @@ class ItemStates(val items: Map[ItemType, ItemState]) {
     for ((itemType, state) ← items)
       yield state.dto(time, config)
 
-  def dto(time: Long, config: GameConfig) =
-    ItemStatesDTO(itemsDto(time, config).toSeq)
+  def dto(playerId: PlayerId, time: Long, config: GameConfig) =
+    ItemStatesDTO(
+      playerId = playerId,
+      items = itemsDto(time, config).toSeq
+    )
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case that: ItemStates ⇒ this.items == that.items
@@ -72,7 +74,7 @@ object GameItems {
     for ((playerId, state) ← item.states;
          oldState = oldItems.states(playerId)
          if state != oldState
-    ) yield PersonalMessage(playerId, UpdateItemStates(state.dto(time, config)))
+    ) yield UpdateItemStates(state.dto(playerId, time, config))
 }
 
 class GameItems(val states: Map[PlayerId, ItemStates]) {
@@ -93,7 +95,7 @@ class GameItems(val states: Map[PlayerId, ItemStates]) {
   def checkCasts[T](casts: Map[PlayerId, T], itemType: ItemType, config: GameConfig, time: Long) =
     casts.filter { case (playerId, _) ⇒ canCast(playerId, itemType, config, time) }
 
-  def dto(playerId: PlayerId, time: Long, config: GameConfig) = states(playerId).dto(time, config)
+  def dto(playerId: PlayerId, time: Long, config: GameConfig) = states(playerId).dto(playerId, time, config)
 
   override def equals(obj: scala.Any): Boolean =
     obj match {

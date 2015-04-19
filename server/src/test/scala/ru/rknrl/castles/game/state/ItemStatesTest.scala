@@ -9,7 +9,6 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.castles.game.Game.PersonalMessage
 import ru.rknrl.castles.game.state.GameItems.getUpdateItemsStatesMessages
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.rmi.B2C.UpdateItemStates
@@ -56,10 +55,10 @@ class ItemStatesTest extends WordSpec with Matchers {
 
     val config = gameConfigMock()
 
-    val personalMessages = getUpdateItemsStatesMessages(a, b, config, time = 10)
+    val messages = getUpdateItemsStatesMessages(a, b, config, time = 10)
 
-    personalMessages shouldBe List(
-      PersonalMessage(PlayerId(0), UpdateItemStates(b.states(PlayerId(0)).dto(time = 10, config = config)))
+    messages shouldBe List(
+      UpdateItemStates(b.states(PlayerId(0)).dto(playerId = PlayerId(0), time = 10, config = config))
     )
 
   }

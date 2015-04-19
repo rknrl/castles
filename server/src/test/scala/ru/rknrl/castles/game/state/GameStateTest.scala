@@ -47,16 +47,14 @@ class GameStateTest extends WordSpec with Matchers {
 
   "no changes" in {
     val gameState = gameStateMock(time = 1)
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 1)
+    val newGameState = updateGameState(gameState, newTime = 1)
     checkGameState(newGameState, gameState)
-    messages.size shouldBe 0
   }
 
   "time" in {
     val gameState = gameStateMock(time = 1)
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 2)
+    val newGameState = updateGameState(gameState, newTime = 2)
     newGameState.time shouldBe 2
-    messages.size shouldBe 0
   }
 
   "buildings regeneration" in {
@@ -80,7 +78,7 @@ class GameStateTest extends WordSpec with Matchers {
 
     val buildings = List(a, b)
     val gameState = gameStateMock(time = 1, buildings = buildings, config = config)
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 3)
+    val newGameState = updateGameState(gameState, newTime = 3)
 
     val newA = a.regenerate(2, config)
     val newB = b.regenerate(2, config)
@@ -91,11 +89,6 @@ class GameStateTest extends WordSpec with Matchers {
         newA,
         newB
       )
-    )
-
-    messages shouldBe List(
-      UpdateBuilding(newA.updateDto),
-      UpdateBuilding(newB.updateDto)
     )
   }
 
@@ -148,7 +141,7 @@ class GameStateTest extends WordSpec with Matchers {
       PlayerId(1) → MoveDTO(List(BuildingId(2)), BuildingId(1))
     )
 
-    val (newGameState, messages, _) = updateGameState(
+    val newGameState = updateGameState(
       gameState,
       newTime = 3,
       moveActions = moveActions
@@ -165,10 +158,6 @@ class GameStateTest extends WordSpec with Matchers {
       newGameState.buildings,
       gameState.buildings.map(_.applyExitUnits(exitUnits))
     )
-
-    messages should contain(AddUnit(exitUnits(0).dto(newGameState.time)))
-    messages should contain(AddUnit(exitUnits(1).dto(newGameState.time)))
-
   }
 
   "enterUnits" in {
@@ -241,7 +230,7 @@ class GameStateTest extends WordSpec with Matchers {
       )
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 99)
+    val newGameState = updateGameState(gameState, newTime = 99)
     newGameState.units.size shouldBe 0
     checkBuildings(
       newGameState.buildings,
@@ -313,7 +302,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, personalMessages) = updateGameState(
+    val newGameState = updateGameState(
       gameState,
       newTime = 1,
       assistanceCasts = casts
@@ -322,8 +311,6 @@ class GameStateTest extends WordSpec with Matchers {
     newGameState.items.states(PlayerId(0)).items(ASSISTANCE).count shouldBe 0
     newGameState.items.states(PlayerId(1)).items(ASSISTANCE).count shouldBe 1
     newGameState.items.states(PlayerId(2)).items(ASSISTANCE).count shouldBe 2
-
-    personalMessages shouldBe getUpdateItemsStatesMessages(gameState.items, newGameState.items, config, newGameState.time)
 
     val churchesProportion = new ChurchesProportion(Map(
       PlayerId(0) → 0.0,
@@ -420,7 +407,7 @@ class GameStateTest extends WordSpec with Matchers {
 
     val casts = Map(cast1, cast2, cast3)
 
-    val (newGameState, _, personalMessages) = updateGameState(
+    val newGameState = updateGameState(
       gameState,
       newTime = 2,
       strengtheningCasts = casts
@@ -429,8 +416,6 @@ class GameStateTest extends WordSpec with Matchers {
     newGameState.items.states(PlayerId(0)).items(STRENGTHENING).count shouldBe 0
     newGameState.items.states(PlayerId(1)).items(STRENGTHENING).count shouldBe 1
     newGameState.items.states(PlayerId(2)).items(STRENGTHENING).count shouldBe 2
-
-    personalMessages shouldBe getUpdateItemsStatesMessages(gameState.items, newGameState.items, config, newGameState.time)
 
     val churchesProportion = new ChurchesProportion(Map(
       PlayerId(0) → 0,
@@ -457,7 +442,7 @@ class GameStateTest extends WordSpec with Matchers {
       )
     )
     checkBuildings(
-      updateGameState(newGameState, newTime = 99999)._1.buildings,
+      updateGameState(newGameState, newTime = 99999).buildings,
       List(
         b0.copy(newStrengthening = None),
         b1,
@@ -505,13 +490,11 @@ class GameStateTest extends WordSpec with Matchers {
       items = items
     )
 
-    val (newGameState, messages, personalMessages) = updateGameState(gameState, newTime = 2, fireballCasts = casts)
+    val newGameState = updateGameState(gameState, newTime = 2, fireballCasts = casts)
 
     newGameState.items.states(PlayerId(0)).items(FIREBALL).count shouldBe 0
     newGameState.items.states(PlayerId(1)).items(FIREBALL).count shouldBe 1
     newGameState.items.states(PlayerId(2)).items(FIREBALL).count shouldBe 2
-
-    personalMessages shouldBe getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time)
 
     val fireball1 = castToFireball(cast1, newGameState.time, churchesProportion, gameState.config)
     val fireball2 = castToFireball(cast2, newGameState.time, churchesProportion, gameState.config)
@@ -521,12 +504,7 @@ class GameStateTest extends WordSpec with Matchers {
       fireball2
     )
 
-    messages shouldBe List(
-      AddFireball(fireball1.dto(newGameState.time)),
-      AddFireball(fireball2.dto(newGameState.time))
-    )
-
-    updateGameState(newGameState, newTime = 99999)._1.fireballs.size shouldBe 0
+    updateGameState(newGameState, newTime = 99999).fireballs.size shouldBe 0
   }
 
   "fireball damage buildings & units" in {
@@ -613,7 +591,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 2)
+    val newGameState = updateGameState(gameState, newTime = 2)
 
     checkBuildings(
       newGameState.buildings,
@@ -673,7 +651,7 @@ class GameStateTest extends WordSpec with Matchers {
       items = items
     )
 
-    val (newGameState, messages, personalMessages) = updateGameState(gameState, newTime = 2, volcanoCasts = casts)
+    val newGameState = updateGameState(gameState, newTime = 2, volcanoCasts = casts)
 
     newGameState.items.states(PlayerId(0)).items(VOLCANO).count shouldBe 0
     newGameState.items.states(PlayerId(1)).items(VOLCANO).count shouldBe 1
@@ -682,19 +660,12 @@ class GameStateTest extends WordSpec with Matchers {
     val volcano1 = castToVolcano(cast1, newGameState.time, churchesProportion, gameState.config)
     val volcano2 = castToVolcano(cast2, newGameState.time, churchesProportion, gameState.config)
 
-    personalMessages shouldBe getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time)
-
     newGameState.volcanoes shouldBe List(
       volcano1,
       volcano2
     )
 
-    messages shouldBe List(
-      AddVolcano(volcano1.dto(newGameState.time)),
-      AddVolcano(volcano2.dto(newGameState.time))
-    )
-
-    updateGameState(newGameState, newTime = 99999)._1.fireballs.size shouldBe 0
+    updateGameState(newGameState, newTime = 99999).fireballs.size shouldBe 0
   }
 
   "volcano damage buildings & units" in {
@@ -781,7 +752,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 2)
+    val newGameState = updateGameState(gameState, newTime = 2)
 
     checkBuildings(
       newGameState.buildings,
@@ -843,13 +814,11 @@ class GameStateTest extends WordSpec with Matchers {
       items = items
     )
 
-    val (newGameState, messages, personalMessages) = updateGameState(gameState, newTime = 2, tornadoCasts = casts)
+    val newGameState = updateGameState(gameState, newTime = 2, tornadoCasts = casts)
 
     newGameState.items.states(PlayerId(0)).items(TORNADO).count shouldBe 0
     newGameState.items.states(PlayerId(1)).items(TORNADO).count shouldBe 1
     newGameState.items.states(PlayerId(2)).items(TORNADO).count shouldBe 2
-
-    personalMessages shouldBe getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time)
 
     val tornado1 = castToTornado(cast1, newGameState.time, churchesProportion, gameState.config)
     val tornado2 = castToTornado(cast2, newGameState.time, churchesProportion, gameState.config)
@@ -859,12 +828,7 @@ class GameStateTest extends WordSpec with Matchers {
       tornado2
     )
 
-    messages shouldBe List(
-      AddTornado(tornado1.dto(newGameState.time)),
-      AddTornado(tornado2.dto(newGameState.time))
-    )
-
-    updateGameState(newGameState, newTime = 99999)._1.fireballs.size shouldBe 0
+    updateGameState(newGameState, newTime = 99999).fireballs.size shouldBe 0
   }
 
   "tornado damage buildings & units" in {
@@ -951,7 +915,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 6)
+    val newGameState = updateGameState(gameState, newTime = 6)
 
     checkBuildings(
       newGameState.buildings,
@@ -976,9 +940,6 @@ class GameStateTest extends WordSpec with Matchers {
         u2
       )
     )
-
-    messages should contain(UpdateUnit(newU0.updateDto))
-    messages should contain(UpdateUnit(newU1.updateDto))
   }
 
   "units kills" in {
@@ -1024,18 +985,13 @@ class GameStateTest extends WordSpec with Matchers {
       units = units
     )
 
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 2)
+    val newGameState = updateGameState(gameState, newTime = 2)
 
     checkUnits(
       newGameState.units,
       List(
         u2
       )
-    )
-
-    messages shouldBe List(
-      KillUnit(UnitId(0)),
-      KillUnit(UnitId(1))
     )
   }
 
@@ -1095,7 +1051,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, messages, _) = updateGameState(gameState, newTime = 5)
+    val newGameState = updateGameState(gameState, newTime = 5)
 
 
     val expectedBullets = createBullets(List(b), List(u0, u1, u2), time = 5, config)
@@ -1107,14 +1063,10 @@ class GameStateTest extends WordSpec with Matchers {
       List(b.applyShots(time = 5, expectedBullets))
     )
 
-    updateGameState(newGameState, newTime = 9)._1.bullets shouldBe empty
-
-    messages shouldBe List(
-      AddBullet(expectedBullets.head.dto(newGameState.time))
-    )
+    updateGameState(newGameState, newTime = 9).bullets shouldBe empty
 
     checkUnits(
-      updateGameState(newGameState, newTime = 9)._1.units,
+      updateGameState(newGameState, newTime = 9).units,
       List(u0.applyBullets(expectedBullets), u1)
     )
   }
@@ -1167,7 +1119,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 100, fireballCasts = Map(cast0, cast1, cast2))
+    val newGameState = updateGameState(gameState, newTime = 100, fireballCasts = Map(cast0, cast1, cast2))
     newGameState.fireballs shouldBe List(
       castToFireball(cast0, time = 100, emptyChurchesProportion, config)
     )
@@ -1201,7 +1153,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 100, volcanoCasts = Map(cast0, cast1, cast2))
+    val newGameState = updateGameState(gameState, newTime = 100, volcanoCasts = Map(cast0, cast1, cast2))
     newGameState.volcanoes shouldBe List(
       castToVolcano(cast0, time = 100, emptyChurchesProportion, config)
     )
@@ -1235,7 +1187,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 100, tornadoCasts = Map(cast0, cast1, cast2))
+    val newGameState = updateGameState(gameState, newTime = 100, tornadoCasts = Map(cast0, cast1, cast2))
     newGameState.tornadoes shouldBe List(
       castToTornado(cast0, time = 100, emptyChurchesProportion, config)
     )
@@ -1282,7 +1234,7 @@ class GameStateTest extends WordSpec with Matchers {
       assistancePositions = assistancePositions
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 100, assistanceCasts = Map(cast0, cast1, cast2))
+    val newGameState = updateGameState(gameState, newTime = 100, assistanceCasts = Map(cast0, cast1, cast2))
     checkUnits(
       newGameState.units,
       List(castToUnit(
@@ -1336,7 +1288,7 @@ class GameStateTest extends WordSpec with Matchers {
       config = config
     )
 
-    val (newGameState, _, _) = updateGameState(gameState, newTime = 100, strengtheningCasts = Map(cast0, cast1, cast2))
+    val newGameState = updateGameState(gameState, newTime = 100, strengtheningCasts = Map(cast0, cast1, cast2))
 
     val expectedStrengthenings = List(
       castToStrengthening(cast0, time = 100, emptyChurchesProportion, config)

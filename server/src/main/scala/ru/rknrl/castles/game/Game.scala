@@ -10,8 +10,8 @@ package ru.rknrl.castles.game
 
 import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
-import ru.rknrl.castles.game.Game.{Join, PersonalMessage}
-import ru.rknrl.castles.game.state.{GameState, Player}
+import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
+import ru.rknrl.castles.game.state.{GameState, GameStateDiff, Player}
 import ru.rknrl.castles.rmi.B2C.GameOver
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -25,7 +25,7 @@ object Game {
 
   case class Join(accountId: AccountId, client: ActorRef)
 
-  case class PersonalMessage(playerId: PlayerId, msg: Msg)
+  case object UpdateGameState
 
 }
 
@@ -113,10 +113,6 @@ class Game(players: Map[PlayerId, Player],
   def allLeaved =
     playerStates.count { case (playerId, playerState) ⇒ !players(playerId).isBot && playerState != PlayerState.LEAVED } == 0
 
-  def playersDto =
-    for ((id, player) ← players)
-      yield PlayerDTO(id, player.userInfo)
-
   def placeToReward(place: Int) =
     if (place == 1) config.winReward else 0
 
@@ -132,8 +128,6 @@ class Game(players: Map[PlayerId, Player],
   val sendFps = 30
   val sendInterval = 1000 / sendFps
 
-  case object UpdateGameState
-
   import context.dispatcher
 
   val scheduler = context.system.scheduler.schedule(0 seconds, sendInterval milliseconds, self, UpdateGameState)
@@ -142,12 +136,10 @@ class Game(players: Map[PlayerId, Player],
     (online contains playerId) &&
       (playerStates(playerId) != PlayerState.LEAVED)
 
-  def sendToPlayers(messages: Iterable[Msg], personalMessages: Iterable[PersonalMessage]): Unit =
+  def sendToPlayers(messages: Iterable[Msg]): Unit =
     for ((playerId, client) ← `playerId→client`
-         if canSendMessage(playerId) && !players(playerId).isBot) {
-      val all = messages ++ personalMessages.filter(_.playerId == playerId).map(_.msg)
-      client ! all
-    }
+         if canSendMessage(playerId) && !players(playerId).isBot)
+      client ! messages
 
   def sendToBots(msg: Any) =
     for ((playerId, ref) ← `playerId→client`
@@ -179,7 +171,7 @@ class Game(players: Map[PlayerId, Player],
   def updateGameState = {
     val time = System.currentTimeMillis()
 
-    val (newGameState, messages, personalMessages) = gameState.update(
+    val newGameState = gameState.update(
       newTime = time,
       moveActions = moveActions,
       fireballCasts = fireballCasts,
@@ -191,7 +183,7 @@ class Game(players: Map[PlayerId, Player],
 
     clearMaps()
 
-    (newGameState, messages, personalMessages)
+    newGameState
   }
 
   val log = new SilentLog
@@ -217,7 +209,7 @@ class Game(players: Map[PlayerId, Player],
       online = online + playerId
 
       client ! B2C.JoinedGame(
-        gameState.dto(playerId, playersDto.toSeq, gameOverDto.toSeq)
+        gameState.dto(playerId, gameOverDto.toSeq)
       )
 
     /** Аккаунт говорит, что потеряли связь с игроком
@@ -241,10 +233,11 @@ class Game(players: Map[PlayerId, Player],
 
     /** Scheduler говорит, что пора обновить game state и отправить игрокам */
     case UpdateGameState ⇒
-      val (newGameState, messages, personalMessages) = updateGameState
+      val newGameState = updateGameState
+      val messages = GameStateDiff.diff(gameState, newGameState)
       gameState = newGameState
 
-      sendToPlayers(messages, personalMessages)
+      sendToPlayers(messages)
       sendToBots(gameState)
 
       val newLosers = getNewLosers
@@ -279,7 +272,7 @@ class Game(players: Map[PlayerId, Player],
 
     val dto = getLoseDto(playerId, place)
     gameOvers = gameOvers + (playerId → place)
-    sendToPlayers(List(GameOver(dto)), List.empty)
+    sendToPlayers(List(GameOver(dto)))
 
     // Если в бою остался один игрок - объявляем его победителем
 
@@ -289,7 +282,7 @@ class Game(players: Map[PlayerId, Player],
       playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
       gameOvers = gameOvers + (winnerId.get → 1)
-      sendToPlayers(List(GameOver(winDto)), List.empty)
+      sendToPlayers(List(GameOver(winDto)))
       scheduler.cancel()
     }
   }

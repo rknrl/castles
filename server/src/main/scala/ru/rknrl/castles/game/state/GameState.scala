@@ -188,8 +188,6 @@ class GameState(val width: Int,
       .map(_.applyDamagers(damagers, newTime))
       .map(_.applyBullets(finishedBullets))
 
-    val killedUnits = unitsAfterDamage.filter(_.floorCount == 0)
-
     val newUnits = unitsAfterDamage.filterNot(_.floorCount == 0)
 
     val newFireballs = (fireballs ++ createdFireballs)
@@ -211,7 +209,7 @@ class GameState(val width: Int,
       .applyCasts(validVolcanoCasts, VOLCANO, time)
       .applyCasts(validAssistanceCasts.map { case (player, cast) ⇒ player.id → cast }, ASSISTANCE, time)
 
-    val newGameState = new GameState(
+    new GameState(
       width = width,
       height = height,
       slotsPos = slotsPos,
@@ -228,32 +226,16 @@ class GameState(val width: Int,
       unitIdIterator = unitIdIterator,
       assistancePositions = assistancePositions
     )
-
-    val addUnitMessages = createdUnits.map(u ⇒ AddUnit(u.dto(newTime)))
-    val addFireballMessages = createdFireballs.map(f ⇒ AddFireball(f.dto(newTime)))
-    val addVolcanoMessages = createdVolcanoes.map(v ⇒ AddVolcano(v.dto(newTime)))
-    val addTornadoMessages = createdTornadoes.map(t ⇒ AddTornado(t.dto(newTime)))
-    val addBulletsMessages = createdBullets.map(b ⇒ AddBullet(b.dto(newTime)))
-
-    val updateUnitMessages = GameUnit.getUpdateMessages(units, newUnits)
-    val updateBuildingMessages = Building.getUpdateMessages(buildings, newBuildings)
-
-    val killUnitMessages = killedUnits.map(u ⇒ KillUnit(u.id))
-
-    val messages: Iterable[Msg] = addUnitMessages ++ addFireballMessages ++ addVolcanoMessages ++ addTornadoMessages ++ addBulletsMessages ++
-      updateBuildingMessages ++ updateUnitMessages ++ killUnitMessages
-
-    val updateItemsStatesMessages = getUpdateItemsStatesMessages(items, newItems, config, newTime)
-
-    val personalMessages = updateItemsStatesMessages
-
-    (newGameState, messages, personalMessages)
   }
 
   def isPlayerLose(playerId: PlayerId) =
     !buildings.exists(b ⇒ b.owner.isDefined && b.owner.get.id == playerId)
 
-  def dto(id: PlayerId, players: Seq[PlayerDTO], gameOvers: Seq[GameOverDTO]) =
+  def playersDto =
+    for ((id, player) ← players)
+      yield PlayerDTO(id, player.userInfo)
+
+  def dto(id: PlayerId, gameOvers: Seq[GameOverDTO]) =
     GameStateDTO(
       width = width,
       height = height,
@@ -265,7 +247,7 @@ class GameState(val width: Int,
       tornadoes = tornadoes.map(_.dto(time)).toSeq,
       bullets = bullets.map(_.dto(time)).toSeq,
       itemStates = items.dto(id, time, config),
-      players = players,
+      players = playersDto.toSeq,
       gameOvers = gameOvers
     )
 }

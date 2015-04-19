@@ -349,12 +349,14 @@ public class GameController extends EventDispatcher {
     }
 
     private function updateItemStates(dto:ItemStatesDTO):void {
-        magicItemStates = new ItemStates(dto, getTimer());
+        if(dto.playerId.id == selfId.id) {
+            magicItemStates = new ItemStates(dto, getTimer());
 
-        for each(var itemType:ItemType in ItemType.values) {
-            view.magicItems.setItemCount(itemType, magicItemStates.get(itemType).count)
+            for each(var itemType:ItemType in ItemType.values) {
+                view.magicItems.setItemCount(itemType, magicItemStates.get(itemType).count)
+            }
+            view.magicItems.lock = false;
         }
-        view.magicItems.lock = false;
     }
 
     private function onMagicItemClick(event:MagicItemClickEvent):void {
