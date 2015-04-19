@@ -11,13 +11,11 @@ package ru.rknrl.castles.game.state
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.game.state.Fireballs.castToFireball
-import ru.rknrl.castles.game.state.GameItems._
-import ru.rknrl.castles.game.state.GameStateDiff.diff
+import ru.rknrl.castles.game.state.GameStateDiff._
 import ru.rknrl.castles.game.state.Moving.moveActionsToExitUnits
 import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.dto.BuildingLevel._
 import ru.rknrl.dto.BuildingType._
@@ -44,16 +42,28 @@ class GameStateDiffTest extends WordSpec with Matchers {
       assistanceCasts = assistanceCasts
     )
 
+  def checkEmpty(gameStateUpdate: GameStateUpdateDTO) = {
+    gameStateUpdate.buildingUpdates shouldBe empty
+    gameStateUpdate.newUnits shouldBe empty
+    gameStateUpdate.unitUpdates shouldBe empty
+    gameStateUpdate.killUnits shouldBe empty
+    gameStateUpdate.newFireballs shouldBe empty
+    gameStateUpdate.newVolcanoes shouldBe empty
+    gameStateUpdate.newBullets shouldBe empty
+    gameStateUpdate.itemStatesUpdates shouldBe empty
+    gameStateUpdate.newGameOvers shouldBe empty
+  }
+
   "no changes" in {
     val gameState = gameStateMock(time = 1)
-    val messages = diff(gameState, updateGameState(gameState, newTime = 1))
-    messages.size shouldBe 0
+    val gameStateUpdate = diff(gameState, updateGameState(gameState, newTime = 1))
+    checkEmpty(gameStateUpdate)
   }
 
   "time" in {
     val gameState = gameStateMock(time = 1)
-    val messages = diff(gameState, updateGameState(gameState, newTime = 2))
-    messages.size shouldBe 0
+    val gameStateUpdate = diff(gameState, updateGameState(gameState, newTime = 2))
+    checkEmpty(gameStateUpdate)
   }
 
   "buildings regeneration" in {
@@ -77,14 +87,14 @@ class GameStateDiffTest extends WordSpec with Matchers {
 
     val buildings = List(a, b)
     val gameState = gameStateMock(time = 1, buildings = buildings, config = config)
-    val messages = diff(gameState, updateGameState(gameState, newTime = 3))
+    val gameStateUpdate = diff(gameState, updateGameState(gameState, newTime = 3))
 
     val newA = a.regenerate(2, config)
     val newB = b.regenerate(2, config)
 
-    messages shouldBe List(
-      UpdateBuilding(newA.updateDto),
-      UpdateBuilding(newB.updateDto)
+    gameStateUpdate.buildingUpdates shouldBe List(
+      newA.updateDto,
+      newB.updateDto
     )
   }
 
@@ -143,13 +153,14 @@ class GameStateDiffTest extends WordSpec with Matchers {
       moveActions = moveActions
     )
 
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
     val exitUnits = moveActionsToExitUnits(moveActions, buildings, new UnitIdIterator, time = 3).toSeq
 
-    messages should contain(AddUnit(exitUnits(0).dto(newGameState.time)))
-    messages should contain(AddUnit(exitUnits(1).dto(newGameState.time)))
-
+    gameStateUpdate.newUnits shouldBe List(
+      exitUnits(0).dto(newGameState.time),
+      exitUnits(1).dto(newGameState.time)
+    )
   }
 
   "assistance" in {
@@ -222,11 +233,9 @@ class GameStateDiffTest extends WordSpec with Matchers {
       assistanceCasts = casts
     )
 
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
-    getUpdateItemsStatesMessages(gameState.items, newGameState.items, config, newGameState.time).foreach(
-      msg ⇒ messages should contain(msg)
-    )
+    gameStateUpdate.itemStatesUpdates shouldBe getItemStatesUpdates(gameState.items, newGameState.items, config, newGameState.time)
   }
 
   "cast & cleanup strengthening" in {
@@ -298,11 +307,9 @@ class GameStateDiffTest extends WordSpec with Matchers {
       strengtheningCasts = casts
     )
 
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
-    getUpdateItemsStatesMessages(gameState.items, newGameState.items, config, newGameState.time).foreach(
-      msg ⇒ messages should contain(msg)
-    )
+    gameStateUpdate.itemStatesUpdates shouldBe getItemStatesUpdates(gameState.items, newGameState.items, config, newGameState.time)
   }
 
   "fireballs cast & cleanup" in {
@@ -345,17 +352,17 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 2, fireballCasts = casts)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
-    getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time).foreach(
-      msg ⇒ messages should contain(msg)
-    )
+    gameStateUpdate.itemStatesUpdates shouldBe getItemStatesUpdates(gameState.items, newGameState.items, gameState.config, newGameState.time)
 
     val fireball1 = castToFireball(cast1, newGameState.time, churchesProportion, gameState.config)
     val fireball2 = castToFireball(cast2, newGameState.time, churchesProportion, gameState.config)
 
-    messages should contain(AddFireball(fireball1.dto(newGameState.time)))
-    messages should contain(AddFireball(fireball2.dto(newGameState.time)))
+    gameStateUpdate.newFireballs shouldBe List(
+      fireball1.dto(newGameState.time),
+      fireball2.dto(newGameState.time)
+    )
   }
 
   "volcano cast & cleanup" in {
@@ -398,17 +405,17 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 2, volcanoCasts = casts)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
     val volcano1 = castToVolcano(cast1, newGameState.time, churchesProportion, gameState.config)
     val volcano2 = castToVolcano(cast2, newGameState.time, churchesProportion, gameState.config)
 
-    getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time).foreach(
-      msg ⇒ messages should contain(msg)
-    )
+    gameStateUpdate.itemStatesUpdates shouldBe getItemStatesUpdates(gameState.items, newGameState.items, gameState.config, newGameState.time)
 
-    messages should contain(AddVolcano(volcano1.dto(newGameState.time)))
-    messages should contain(AddVolcano(volcano2.dto(newGameState.time)))
+    gameStateUpdate.newVolcanoes shouldBe List(
+      volcano1.dto(newGameState.time),
+      volcano2.dto(newGameState.time)
+    )
   }
 
   "tornado cast & cleanup" in {
@@ -452,17 +459,17 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 2, tornadoCasts = casts)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
-    getUpdateItemsStatesMessages(gameState.items, newGameState.items, gameState.config, newGameState.time).foreach(
-      msg ⇒ messages should contain(msg)
-    )
+    gameStateUpdate.itemStatesUpdates shouldBe getItemStatesUpdates(gameState.items, newGameState.items, gameState.config, newGameState.time)
 
     val tornado1 = castToTornado(cast1, newGameState.time, churchesProportion, gameState.config)
     val tornado2 = castToTornado(cast2, newGameState.time, churchesProportion, gameState.config)
 
-    messages should contain(AddTornado(tornado1.dto(newGameState.time)))
-    messages should contain(AddTornado(tornado2.dto(newGameState.time)))
+    gameStateUpdate.newTornadoes shouldBe List(
+      tornado1.dto(newGameState.time),
+      tornado2.dto(newGameState.time)
+    )
   }
 
   "tornado damage buildings & units" in {
@@ -550,7 +557,7 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 6)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
     val newU0 = u0.applyDamagers(List(tornado1), time = 6)
     newU0.count should be < u0.count
@@ -558,8 +565,10 @@ class GameStateDiffTest extends WordSpec with Matchers {
     val newU1 = u1.applyDamagers(List(tornado2), time = 6)
     newU1.count should be < u1.count
 
-    messages should contain(UpdateUnit(newU0.updateDto))
-    messages should contain(UpdateUnit(newU1.updateDto))
+    gameStateUpdate.unitUpdates shouldBe List(
+      newU0.updateDto,
+      newU1.updateDto
+    )
   }
 
   "units kills" in {
@@ -606,11 +615,11 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 2)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
-    messages shouldBe List(
-      KillUnit(UnitId(0)),
-      KillUnit(UnitId(1))
+    gameStateUpdate.killUnits shouldBe List(
+      UnitId(0),
+      UnitId(1)
     )
   }
 
@@ -671,12 +680,12 @@ class GameStateDiffTest extends WordSpec with Matchers {
     )
 
     val newGameState = updateGameState(gameState, newTime = 5)
-    val messages = diff(gameState, newGameState)
+    val gameStateUpdate = diff(gameState, newGameState)
 
     val expectedBullets = createBullets(List(b), List(u0, u1, u2), time = 5, config)
 
-    messages shouldBe List(
-      AddBullet(expectedBullets.head.dto(newGameState.time))
+    gameStateUpdate.newBullets shouldBe List(
+      expectedBullets.head.dto(newGameState.time)
     )
   }
 

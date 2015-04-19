@@ -109,7 +109,7 @@ class GameUnitTest extends WordSpec with Matchers {
     }
   }
 
-  "getUpdateMessages" should {
+  "getUnitUpdates" should {
     "Возвращает апдейт мессадж" +
       "если юнит был и в старом и в новом списке" +
       "и они различаются по differentWith" in {
@@ -125,10 +125,10 @@ class GameUnitTest extends WordSpec with Matchers {
         unitMock(id = UnitId(2), count = 9)
       )
 
-      val updateMessages = GameUnit.getUpdateMessages(oldUnits, newUnits)
+      val updateMessages = GameStateDiff.getUnitUpdates(oldUnits, newUnits)
       updateMessages should have size 1
-      updateMessages.head.unitUpdate.id shouldBe UnitId(2)
-      updateMessages.head.unitUpdate.count shouldBe 9
+      updateMessages.head.id shouldBe UnitId(2)
+      updateMessages.head.count shouldBe 9
 
     }
 

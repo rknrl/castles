@@ -12,7 +12,7 @@ import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff, Player}
-import ru.rknrl.castles.rmi.B2C.GameOver
+import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, GameOver}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
@@ -136,10 +136,10 @@ class Game(players: Map[PlayerId, Player],
     (online contains playerId) &&
       (playerStates(playerId) != PlayerState.LEAVED)
 
-  def sendToPlayers(messages: Iterable[Msg]): Unit =
+  def sendToPlayers(msg: Msg): Unit =
     for ((playerId, client) ← `playerId→client`
          if canSendMessage(playerId) && !players(playerId).isBot)
-      client ! messages
+      client ! msg
 
   def sendToBots(msg: Any) =
     for ((playerId, ref) ← `playerId→client`
@@ -150,7 +150,7 @@ class Game(players: Map[PlayerId, Player],
 
   def senderCanPlay = playerStates(senderPlayerId) == PlayerState.GAME
 
-  var gameState = GameState.init(System.currentTimeMillis(), players.values.toList, big, isTutor, config, gameMap)
+  var gameState = GameStateInit.init(System.currentTimeMillis(), players.values.toList, big, isTutor, config, gameMap)
 
   var moveActions = Map.empty[PlayerId, MoveDTO]
   var fireballCasts = Map.empty[PlayerId, PointDTO]
@@ -234,10 +234,10 @@ class Game(players: Map[PlayerId, Player],
     /** Scheduler говорит, что пора обновить game state и отправить игрокам */
     case UpdateGameState ⇒
       val newGameState = updateGameState
-      val messages = GameStateDiff.diff(gameState, newGameState)
+      val gameStateUpdate = GameStateDiff.diff(gameState, newGameState)
       gameState = newGameState
 
-      sendToPlayers(messages)
+      sendToPlayers(GameStateUpdated(gameStateUpdate))
       sendToBots(gameState)
 
       val newLosers = getNewLosers
@@ -272,7 +272,7 @@ class Game(players: Map[PlayerId, Player],
 
     val dto = getLoseDto(playerId, place)
     gameOvers = gameOvers + (playerId → place)
-    sendToPlayers(List(GameOver(dto)))
+    sendToPlayers(GameOver(dto))
 
     // Если в бою остался один игрок - объявляем его победителем
 
@@ -282,7 +282,7 @@ class Game(players: Map[PlayerId, Player],
       playerStates = playerStates.updated(winnerId.get, PlayerState.GAME_OVER)
       val winDto = getWinDto(winnerId.get)
       gameOvers = gameOvers + (winnerId.get → 1)
-      sendToPlayers(List(GameOver(winDto)))
+      sendToPlayers(GameOver(winDto))
       scheduler.cancel()
     }
   }

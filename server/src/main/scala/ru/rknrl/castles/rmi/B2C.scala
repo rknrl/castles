@@ -42,24 +42,8 @@ object B2C {
 
   // game 40-59
 
-  case class UpdateBuilding(building: BuildingUpdateDTO) extends GameMsg(40)
+  case class GameStateUpdated(gameStateUpdate: GameStateUpdateDTO) extends GameMsg(40)
 
-  case class UpdateItemStates(states: ItemStatesDTO) extends GameMsg(41)
-
-  case class AddUnit(unit: UnitDTO) extends GameMsg(42)
-
-  case class UpdateUnit(unitUpdate: UnitUpdateDTO) extends GameMsg(43)
-
-  case class KillUnit(killedId: UnitId) extends GameMsg(44)
-
-  case class AddFireball(fireball: FireballDTO) extends GameMsg(45)
-
-  case class AddVolcano(volcano: VolcanoDTO) extends GameMsg(46)
-
-  case class AddTornado(tornado: TornadoDTO) extends GameMsg(47)
-
-  case class AddBullet(bullet: BulletDTO) extends GameMsg(48)
-
-  case class GameOver(gameOver: GameOverDTO) extends GameMsg(49)
+  case class GameOver(gameOver: GameOverDTO) extends GameMsg(41)
 
 }

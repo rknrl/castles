@@ -8,102 +8,20 @@
 
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.Assertion
-import ru.rknrl.castles.account.IJ
-import ru.rknrl.castles.game.GameArea.PlayerIdToSlotsPositions
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.game.state.Building._
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.game.state.ChurchesProportion._
 import ru.rknrl.castles.game.state.Fireballs._
-import ru.rknrl.castles.game.state.GameItems._
 import ru.rknrl.castles.game.state.Moving._
 import ru.rknrl.castles.game.state.Strengthening._
 import ru.rknrl.castles.game.state.Tornadoes._
 import ru.rknrl.castles.game.state.Volcanoes._
-import ru.rknrl.castles.game.{GameArea, GameConfig, GameMap}
-import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.core.points.Point
-import ru.rknrl.core.rmi.Msg
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto._
 import ru.rknrl.utils.IdIterator
-
-object GameState {
-
-  def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
-    for (player ← players;
-         (slotId, buildingPrototype) ← player.slots
-         if buildingPrototype.isDefined)
-      yield {
-        val ij = playersSlotsPositions(player.id.id)(slotId)
-        val xy = ij.centerXY
-
-        val stat = config.units(buildingPrototype.get) * player.stat
-
-        val prototype = buildingPrototype.get
-        new Building(
-          id = buildingIdIterator.next,
-          buildingPrototype = prototype,
-          pos = xy,
-          count = config.startCount(prototype),
-          owner = Some(player),
-          strengthening = None,
-          lastShootTime = 0,
-          buildingStat = stat)
-      }
-
-  def slotsPosDto(players: List[Player], positions: Map[Int, IJ], orientations: Map[Int, SlotsOrientation]) =
-    for (player ← players)
-      yield {
-        val id = player.id.id
-        val pos = positions(id)
-        SlotsPosDTO(
-          player.id,
-          pos.centerXY.dto,
-          orientations(id)
-        )
-      }
-
-  def init(time: Long, players: List[Player], big: Boolean, isTutor: Boolean, config: GameConfig, gameMap: GameMap) = {
-    if (big)
-      Assertion.check(players.size == 4)
-    else
-      Assertion.check(players.size == 2)
-
-    val gameArea = GameArea(big)
-
-    val slotsPositions = gameArea.slotsPositions
-
-    val playersSlotsPositions = gameArea.getPlayersSlotPositions(slotsPositions)
-
-    val buildingIdIterator = new BuildingIdIterator
-
-    val playersBuildings = getPlayerBuildings(players, playersSlotsPositions, buildingIdIterator, config)
-
-    val buildings = playersBuildings ++ gameMap.buildings(gameArea, buildingIdIterator, config)
-
-    val slotsPos = slotsPosDto(players, slotsPositions, gameArea.playerIdToOrientation)
-
-    new GameState(
-      time = time,
-      width = gameArea.width,
-      height = gameArea.height,
-      players = players.map(p ⇒ p.id → p).toMap,
-      buildings = buildings,
-      units = List.empty,
-      fireballs = List.empty,
-      tornadoes = List.empty,
-      volcanoes = List.empty,
-      bullets = List.empty,
-      items = new GameItems(players.map(p ⇒ p.id → GameItems.init(p.items)).toMap),
-      unitIdIterator = new UnitIdIterator,
-      slotsPos = slotsPos,
-      assistancePositions = gameArea.assistancePositions,
-      config = config
-    )
-  }
-}
 
 class BuildingIdIterator extends IdIterator {
   def next = BuildingId(nextInt)

@@ -11,7 +11,6 @@ package ru.rknrl.castles.game.state
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.rmi.B2C.UpdateItemStates
 import ru.rknrl.dto._
 
 case class ItemState(itemType: ItemType,
@@ -69,12 +68,6 @@ object GameItems {
 
   def init(items: Items) =
     new ItemStates(initMap(items))
-
-  def getUpdateItemsStatesMessages(oldItems: GameItems, item: GameItems, config: GameConfig, time: Long) =
-    for ((playerId, state) ← item.states;
-         oldState = oldItems.states(playerId)
-         if state != oldState
-    ) yield UpdateItemStates(state.dto(playerId, time, config))
 }
 
 class GameItems(val states: Map[PlayerId, ItemStates]) {

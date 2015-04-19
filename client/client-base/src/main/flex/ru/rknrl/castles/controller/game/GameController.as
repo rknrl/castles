@@ -38,6 +38,7 @@ import ru.rknrl.dto.CastTornadoDTO;
 import ru.rknrl.dto.FireballDTO;
 import ru.rknrl.dto.GameOverDTO;
 import ru.rknrl.dto.GameStateDTO;
+import ru.rknrl.dto.GameStateUpdateDTO;
 import ru.rknrl.dto.ItemStatesDTO;
 import ru.rknrl.dto.ItemType;
 import ru.rknrl.dto.MoveDTO;
@@ -46,18 +47,12 @@ import ru.rknrl.dto.PlayerId;
 import ru.rknrl.dto.SlotsPosDTO;
 import ru.rknrl.dto.TornadoDTO;
 import ru.rknrl.dto.UnitDTO;
+import ru.rknrl.dto.UnitId;
+import ru.rknrl.dto.UnitUpdateDTO;
 import ru.rknrl.dto.VolcanoDTO;
-import ru.rknrl.rmi.AddBulletEvent;
-import ru.rknrl.rmi.AddFireballEvent;
-import ru.rknrl.rmi.AddTornadoEvent;
-import ru.rknrl.rmi.AddUnitEvent;
-import ru.rknrl.rmi.AddVolcanoEvent;
 import ru.rknrl.rmi.GameOverEvent;
-import ru.rknrl.rmi.KillUnitEvent;
+import ru.rknrl.rmi.GameStateUpdatedEvent;
 import ru.rknrl.rmi.Server;
-import ru.rknrl.rmi.UpdateBuildingEvent;
-import ru.rknrl.rmi.UpdateItemStatesEvent;
-import ru.rknrl.rmi.UpdateUnitEvent;
 
 public class GameController extends EventDispatcher {
     private var width:Number;
@@ -129,15 +124,7 @@ public class GameController extends EventDispatcher {
         view.addEventListener(GameMouseEvent.MOUSE_DOWN, onMouseDown);
         view.addEventListener(GameMouseEvent.MOUSE_UP, onMouseUp);
 
-        server.addEventListener(UpdateBuildingEvent.UPDATEBUILDING, onUpdateBuilding);
-        server.addEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
-        server.addEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
-        server.addEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
-        server.addEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
-        server.addEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
-        server.addEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
-        server.addEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
-        server.addEventListener(AddBulletEvent.ADDBULLET, onAddBullet);
+        server.addEventListener(GameStateUpdatedEvent.GAMESTATEUPDATED, onGameStateUpdated);
         server.addEventListener(GameOverEvent.GAMEOVER, onGameOver);
 
         // Человек мог играть на компе, а потом перезайти в бой на мобиле
@@ -153,15 +140,7 @@ public class GameController extends EventDispatcher {
     public function destroy():void {
         Log.info("game destroy");
 
-        server.removeEventListener(UpdateBuildingEvent.UPDATEBUILDING, onUpdateBuilding);
-        server.removeEventListener(UpdateItemStatesEvent.UPDATEITEMSTATES, onUpdateItemStates);
-        server.removeEventListener(AddUnitEvent.ADDUNIT, onAddUnit);
-        server.removeEventListener(UpdateUnitEvent.UPDATEUNIT, onUpdateUnit);
-        server.removeEventListener(KillUnitEvent.KILLUNIT, onKillUnit);
-        server.removeEventListener(AddFireballEvent.ADDFIREBALL, onAddFireball);
-        server.removeEventListener(AddVolcanoEvent.ADDVOLCANO, onAddVolcano);
-        server.removeEventListener(AddTornadoEvent.ADDTORNADO, onAddTornado);
-        server.removeEventListener(AddBulletEvent.ADDBULLET, onAddBullet);
+        server.removeEventListener(GameStateUpdatedEvent.GAMESTATEUPDATED, onGameStateUpdated);
         server.removeEventListener(GameOverEvent.GAMEOVER, onGameOver);
     }
 
@@ -238,8 +217,18 @@ public class GameController extends EventDispatcher {
         }
     }
 
-    private function onAddUnit(e:AddUnitEvent):void {
-        addUnit(e.unit);
+    public function onGameStateUpdated(e:GameStateUpdatedEvent):void {
+        const update:GameStateUpdateDTO = e.gameStateUpdate;
+        for each(var newUnit:UnitDTO in update.newUnits) addUnit(newUnit);
+        for each(var unitUpdate:UnitUpdateDTO in update.newUnits) updateUnit(unitUpdate);
+        for each(var unitId:UnitId in update.killUnits) killUnit(unitId);
+        for each(var buildingUpdate:BuildingUpdateDTO in update.buildingUpdates) updateBuilding(buildingUpdate);
+        for each(var newFireball:FireballDTO in update.newFireballs) addFireball(newFireball);
+        for each(var newVolcano:VolcanoDTO in update.newVolcanoes) addVolcano(newVolcano);
+        for each(var newTornado:TornadoDTO in update.newTornadoes) addTornado(newTornado);
+        for each(var newBullet:BulletDTO in update.newBullets) addBullet(newBullet);
+        for each(var itemStateUpdate:ItemStatesDTO in update.itemStatesUpdates) updateItemStates(itemStateUpdate);
+        for each(var newGameOver:GameOverDTO in update.newGameOvers) gameOver(newGameOver);
     }
 
     private function addUnit(dto:UnitDTO):void {
@@ -247,16 +236,12 @@ public class GameController extends EventDispatcher {
         units.addUnit(getTimer(), endPos, dto);
     }
 
-    private function onUpdateUnit(e:UpdateUnitEvent):void {
-        units.updateUnit(getTimer(), e.unitUpdate);
+    private function updateUnit(dto:UnitUpdateDTO):void {
+        units.updateUnit(getTimer(), dto);
     }
 
-    private function onKillUnit(e:KillUnitEvent):void {
-        units.kill(getTimer(), e.killedId);
-    }
-
-    private function onAddFireball(e:AddFireballEvent):void {
-        addFireball(e.fireball);
+    private function killUnit(id:UnitId):void {
+        units.kill(getTimer(), id);
     }
 
     private function addFireball(dto:FireballDTO):void {
@@ -276,18 +261,10 @@ public class GameController extends EventDispatcher {
         fireballs.add(time, fireball, view.area.fireballsFactory.create(time));
     }
 
-    private function onAddVolcano(e:AddVolcanoEvent):void {
-        addVolcano(e.volcano);
-    }
-
     private function addVolcano(dto:VolcanoDTO):void {
         const time:int = getTimer();
         const volcano:Static = new Static(Point.fromDto(dto.pos), time, dto.millisTillEnd);
         volcanoes.add(getTimer(), volcano, view.area.volcanoesFactory.create(time));
-    }
-
-    private function onAddTornado(e:AddTornadoEvent):void {
-        addTornado(e.tornado);
     }
 
     private function addTornado(dto:TornadoDTO):void {
@@ -297,10 +274,6 @@ public class GameController extends EventDispatcher {
         const points:Points = Points.fromDto(dto.points);
         const tornado:Movable = new Movable(points, startTime, duration);
         tornadoes.add(time, tornado, view.area.tornadoesFactory.create(time));
-    }
-
-    private function onAddBullet(e:AddBulletEvent):void {
-        addBullet(e.bullet);
     }
 
     private function addBullet(dto:BulletDTO):void {
@@ -317,9 +290,7 @@ public class GameController extends EventDispatcher {
 
     private var buildings:Buildings;
 
-    private function onUpdateBuilding(e:UpdateBuildingEvent):void {
-        const dto:BuildingUpdateDTO = e.building;
-
+    private function updateBuilding(dto:BuildingUpdateDTO):void {
         const building:Building = buildings.byId(dto.id);
         const newOwner:BuildingOwner = new BuildingOwner(dto.hasOwner, dto.owner);
         const wasOwned:Boolean = building.owner.equalsId(selfId);
@@ -344,12 +315,8 @@ public class GameController extends EventDispatcher {
 
     private var magicItemStates:ItemStates;
 
-    private function onUpdateItemStates(e:UpdateItemStatesEvent):void {
-        updateItemStates(e.states);
-    }
-
     private function updateItemStates(dto:ItemStatesDTO):void {
-        if(dto.playerId.id == selfId.id) {
+        if (dto.playerId.id == selfId.id) {
             magicItemStates = new ItemStates(dto, getTimer());
 
             for each(var itemType:ItemType in ItemType.values) {

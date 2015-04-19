@@ -491,13 +491,13 @@ class BuildingTest extends WordSpec with Matchers {
         buildingMock(id = BuildingId(3), count = 25, owner = Some(playerMock(PlayerId(1))))
       )
 
-      val updateMessages = Building.getUpdateMessages(oldBuildings, newBuildings).toList
+      val updateMessages = GameStateDiff.getBuildingUpdates(oldBuildings, newBuildings).toList
       updateMessages should have size 2
-      updateMessages(0).building.id shouldBe BuildingId(2)
-      updateMessages(0).building.population shouldBe 9
+      updateMessages(0).id shouldBe BuildingId(2)
+      updateMessages(0).population shouldBe 9
 
-      updateMessages(1).building.id shouldBe BuildingId(3)
-      updateMessages(1).building.owner should be(Some(PlayerId(1)))
+      updateMessages(1).id shouldBe BuildingId(3)
+      updateMessages(1).owner should be(Some(PlayerId(1)))
 
     }
   }

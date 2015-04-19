@@ -9,9 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.rmi.B2C.UpdateUnit
-import ru.rknrl.core.{Damage, Damaged, Damager, Movable}
 import ru.rknrl.core.points.Points
+import ru.rknrl.core.{Damage, Damaged, Damager, Movable}
 import ru.rknrl.dto.{UnitDTO, UnitId, UnitUpdateDTO}
 
 class GameUnit(val id: UnitId,
@@ -76,13 +75,4 @@ class GameUnit(val id: UnitId,
       id = id,
       count = floorCount
     )
-}
-
-object GameUnit {
-  def getUpdateMessages(oldUnits: Iterable[GameUnit], newUnits: Iterable[GameUnit]) =
-    for (newUnit ← newUnits;
-         oldUnit = oldUnits.find(_.id == newUnit.id)
-         if oldUnit.isDefined
-         if oldUnit.get differentWith newUnit
-    ) yield UpdateUnit(newUnit.updateDto)
 }

@@ -10,9 +10,8 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.rmi.B2C.UpdateBuilding
-import ru.rknrl.core.{Stat, Damage, Damaged, Damager}
 import ru.rknrl.core.points.Point
+import ru.rknrl.core.{Damage, Damaged, Damager, Stat}
 import ru.rknrl.dto._
 
 class Building(val id: BuildingId,
@@ -134,13 +133,6 @@ class Building(val id: BuildingId,
 }
 
 object Building {
-  def getUpdateMessages(oldBuildings: Iterable[Building], newBuildings: Iterable[Building]) =
-    for (newBuilding ← newBuildings;
-         oldBuilding = oldBuildings.find(_.id == newBuilding.id)
-         if oldBuilding.isDefined
-         if oldBuilding.get differentWith newBuilding
-    ) yield UpdateBuilding(newBuilding.updateDto)
-
   def canShoot(buildings: Iterable[Building], time: Long, config: GameConfig) =
     buildings.filter(b ⇒
       b.buildingPrototype.buildingType == BuildingType.TOWER &&
