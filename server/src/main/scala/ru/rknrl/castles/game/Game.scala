@@ -11,8 +11,8 @@ package ru.rknrl.castles.game
 import akka.actor.ActorRef
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
-import ru.rknrl.castles.game.state.{GameState, GameStateDiff, Player}
-import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, GameOver}
+import ru.rknrl.castles.game.state.{GameStateDiff, Player}
+import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.Msg
@@ -221,10 +221,8 @@ class Game(players: Map[PlayerId, Player],
 
     /** Игрок сдается */
     case Surrender ⇒
-      if (isDev) {
-        if (playerStates(senderPlayerId) == PlayerState.GAME)
-          addLoser(senderPlayerId, getPlace)
-      }
+      if (isDev && playerStates(senderPlayerId) == PlayerState.GAME)
+        addLoser(senderPlayerId, getPlace)
 
     /** Игрок окончательно выходит из боя (нажал leave в GameOverScreen) */
     case C2B.LeaveGame ⇒
@@ -243,7 +241,6 @@ class Game(players: Map[PlayerId, Player],
       val newLosers = getNewLosers
       val place = getPlace
       for (playerId ← newLosers) addLoser(playerId, place)
-
 
     case Move(moveDto) ⇒
       if (senderCanPlay) moveActions = moveActions + (senderPlayerId → moveDto)

@@ -68,5 +68,34 @@ class GameJoinTest extends GameTestSpec {
     client1.expectMsgPF(TIMEOUT) {
       case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate
     }
+
+    // Первый игрок переконнекчивается
+
+    val newClient0 = new TestProbe(system)
+
+    newClient0.send(game, Join(AccountId(VKONTAKTE, "1"), newClient0.ref))
+
+    client0.expectNoMsg()
+
+    newClient0.expectMsgPF(TIMEOUT) {
+      case JoinedGame(gameStateDto) ⇒ gameStateDto.selfId shouldBe PlayerId(0)
+    }
+
+    // Теперь сообщения приходят на новый актор, а на старый не приходит
+
+    game ! UpdateGameState(newTime = 20)
+
+    val gameStateUpdate2 = GameStateDiff.diff(newGameState, updateGameState(newGameState, newTime = 20))
+
+    client0.expectNoMsg()
+
+    newClient0.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
+    }
+
+    client1.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
+    }
+
   })
 }
