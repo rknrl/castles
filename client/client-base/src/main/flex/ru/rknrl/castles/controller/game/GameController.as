@@ -220,7 +220,7 @@ public class GameController extends EventDispatcher {
     public function onGameStateUpdated(e:GameStateUpdatedEvent):void {
         const update:GameStateUpdateDTO = e.gameStateUpdate;
         for each(var newUnit:UnitDTO in update.newUnits) addUnit(newUnit);
-        for each(var unitUpdate:UnitUpdateDTO in update.newUnits) updateUnit(unitUpdate);
+        for each(var unitUpdate:UnitUpdateDTO in update.unitUpdates) updateUnit(unitUpdate);
         for each(var unitId:UnitId in update.killUnits) killUnit(unitId);
         for each(var buildingUpdate:BuildingUpdateDTO in update.buildingUpdates) updateBuilding(buildingUpdate);
         for each(var newFireball:FireballDTO in update.newFireballs) addFireball(newFireball);
