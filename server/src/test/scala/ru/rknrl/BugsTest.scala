@@ -19,7 +19,7 @@ import scala.io.Source
 
 @Slow
 class BugsTest extends ActorsTest {
-  val root = "/Users/tolyayanot/dev/rknrl3/castles/server/src/test/resources/bugs/"
+  val root = "/Users/tolyayanot/dev/rknrl/castles/server/src/test/resources/bugs/"
   val config = new BugsConfig(
     clientDir = root + "client/",
     gameDir = root + "game/",
