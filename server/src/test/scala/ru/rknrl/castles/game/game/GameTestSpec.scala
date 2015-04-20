@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.game.game
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import org.scalatest.{Matchers, WordSpecLike}
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.game.state.{GameItems, GameState}
@@ -22,6 +22,12 @@ import ru.rknrl.dto._
 
 import scala.concurrent.duration._
 
+class FakeScheduler(game: ActorRef) extends Actor {
+  def receive = {
+    case _ ⇒
+  }
+}
+
 class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
   val TIMEOUT = 100 millis
 
@@ -29,10 +35,12 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
 
   def newGame(gameState: GameState = gameStateMock(),
               config: GameConfig = gameConfigMock(),
+              isDev: Boolean = true,
+              schedulerClass: Class[_] = classOf[FakeScheduler],
               matchmaking: ActorRef = self,
               bugs: ActorRef = self) = {
     gameIterator += 1
-    system.actorOf(Props(classOf[NewGame], gameState, config, matchmaking, bugs), "game" + gameIterator)
+    system.actorOf(Props(classOf[NewGame], gameState, config, isDev, schedulerClass, matchmaking, bugs), "game" + gameIterator)
   }
 
   def updateGameState(gameState: GameState,

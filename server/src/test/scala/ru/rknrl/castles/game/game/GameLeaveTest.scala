@@ -11,6 +11,7 @@ package ru.rknrl.castles.game.game
 import akka.testkit.TestProbe
 import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
 import ru.rknrl.castles.game.Game.Join
+import ru.rknrl.castles.game.NewGame.UpdateGameState
 import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender
@@ -124,6 +125,12 @@ class GameLeaveTest extends GameTestSpec {
     // Если еще раз отправить LeaveGame они будут игнорироваться
     client0.send(game, C2B.LeaveGame)
     client1.send(game, C2B.LeaveGame)
+    client0.expectNoMsg()
+    client1.expectNoMsg()
+    expectNoMsg()
+
+    // GameStateUpdated не приходит вышедшим клиентам
+    game ! UpdateGameState(newTime = 100)
     client0.expectNoMsg()
     client1.expectNoMsg()
     expectNoMsg()
