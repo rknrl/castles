@@ -13,6 +13,7 @@ import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
 import ru.rknrl.castles.game.init.GameMaps
+import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.{Bugs, PolicyServer}
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database

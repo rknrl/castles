@@ -19,5 +19,5 @@ class NewAccount(matchmaking: ActorRef) extends Actor {
   }
 
   override def postStop(): Unit =
-    matchmaking ! Offline(AccountId(VKONTAKTE, "1"))
+    matchmaking ! Offline(AccountId(VKONTAKTE, "1"), self) // todo client ref
 }

@@ -10,7 +10,7 @@ package ru.rknrl.castles.account
 
 import akka.actor.Props
 import ru.rknrl.castles.kit.ActorsTest
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{Offline, DuplicateAccount}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{DuplicateAccount, Offline}
 
 class AccountTest extends ActorsTest {
 
@@ -26,7 +26,7 @@ class AccountTest extends ActorsTest {
     account ! DuplicateAccount
     watch(account)
     expectMsgPF(timeout.duration) {
-      case Offline(_) ⇒ true
+      case Offline(_, _) ⇒ true
     }
     expectTerminated(account)
   })
@@ -35,7 +35,7 @@ class AccountTest extends ActorsTest {
     val account = newAccount
     system stop account
     expectMsgPF(timeout.duration) {
-      case Offline(_) ⇒ true
+      case Offline(_, _) ⇒ true
     }
   })
 

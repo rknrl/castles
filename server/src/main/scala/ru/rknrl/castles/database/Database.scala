@@ -13,8 +13,8 @@ import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.MatchMaking.TopItem
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
 import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
 
@@ -77,7 +77,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
-  def `rowData→topItem`(rowData: RowData) = {
+  def `rowData→topUser`(rowData: RowData) = {
     val idByteArray = rowData("id").asInstanceOf[Array[Byte]]
     val id = AccountId.parseFrom(idByteArray)
 
@@ -86,7 +86,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
     val userInfoByteArray = rowData("userInfo").asInstanceOf[Array[Byte]]
     val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
 
-    TopItem(id, rating, userInfo)
+    TopUser(id, rating, userInfo)
   }
 
   override def receive = logged {
@@ -95,7 +95,7 @@ class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
       pool.sendQuery("SELECT id, rating, userInfo FROM account_state ORDER BY rating DESC LIMIT 5;").map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
-            ref ! resultSet.map(`rowData→topItem`).toList
+            ref ! Top(resultSet.map(`rowData→topUser`).toList)
           case None ⇒
             log.error("Get top: get none " + queryResult)
         }

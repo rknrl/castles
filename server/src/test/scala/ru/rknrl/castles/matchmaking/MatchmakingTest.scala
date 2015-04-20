@@ -197,7 +197,7 @@ class MatchmakingTest extends ActorsTest {
 
     val accountId = AccountId(VKONTAKTE, "1")
 
-    matchmaking ! Offline(accountId)
+    matchmaking ! Offline(accountId, self)
     expectNoMsg()
   })
 
@@ -206,7 +206,7 @@ class MatchmakingTest extends ActorsTest {
     val accountId = AccountId(VKONTAKTE, "1")
     matchmaking ! Online(accountId)
     matchmaking ! GameOrder(accountId)
-    matchmaking ! Offline(accountId)
+    matchmaking ! Offline(accountId, self)
     matchmaking ! TryCreateGames
     expectNoMsg()
   })
@@ -220,9 +220,9 @@ class MatchmakingTest extends ActorsTest {
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
     }
-    matchmaking ! Offline(accountId)
+    matchmaking ! Offline(accountId, self)
     expectMsgPF(timeout.duration) {
-      case Offline(id) ⇒ id shouldBe accountId
+      case Offline(id, client) ⇒ id shouldBe accountId
     }
     expectNoMsg()
   })

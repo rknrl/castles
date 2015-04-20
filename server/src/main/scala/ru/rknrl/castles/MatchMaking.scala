@@ -19,7 +19,7 @@ import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
-import ru.rknrl.castles.matchmaking.ELO
+import ru.rknrl.castles.matchmaking.{Top, TopUser, ELO}
 import ru.rknrl.castles.rmi.B2C.ServerHealth
 import ru.rknrl.castles.rmi.C2B.GetServerHealth
 import ru.rknrl.core.Stat
@@ -76,14 +76,12 @@ object MatchMaking {
 
   case object AllPlayersLeaveGame
 
-  case class TopItem(accountId: AccountId, rating: Double, info: UserInfoDTO)
-
 }
 
 class MatchMaking(interval: FiniteDuration,
                   database: ActorRef,
                   bugs: ActorRef,
-                  var top: List[TopItem],
+                  var top: Top,
                   config: Config,
                   gameMaps: GameMaps) extends Actor {
   /** Если у бота случается ошибка - стопаем его
@@ -272,9 +270,9 @@ class MatchMaking(interval: FiniteDuration,
 
       val gameInfo = accountIdToGameInfo.get(accountId)
       if (gameInfo.isEmpty)
-        sender ! InGameResponse(None, searchOpponents = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId), topDto)
+        sender ! InGameResponse(None, searchOpponents = gameOrders.exists(gameOrder ⇒ gameOrder.accountId == accountId), top.dto)
       else
-        sender ! InGameResponse(Some(gameInfo.get.gameRef), searchOpponents = false, topDto)
+        sender ! InGameResponse(Some(gameInfo.get.gameRef), searchOpponents = false, top.dto)
 
     /** Аккаунт отсоединился */
     case Offline(accountId, client) ⇒
@@ -341,9 +339,9 @@ class MatchMaking(interval: FiniteDuration,
     val sA = ELO.getSA(gameInfo.big, place)
     val newRating = ELO.getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
 
-    top = insert(top, TopItem(accountId, newRating, userInfo))
+    top = top.insert(TopUser(accountId, newRating, userInfo))
 
-    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, topDto) // todo - если он ушел в оффлайн, ничо не сохранится
+    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, top.dto) // todo - если он ушел в оффлайн, ничо не сохранится
 
     if (!order.isBot) {
       val gameWithBots = orders.count(_.isBot) == orders.size - 1
@@ -376,18 +374,6 @@ class MatchMaking(interval: FiniteDuration,
       }
     }
   }
-
-  def insert(list: List[TopItem], item: TopItem) =
-    (top.filter(_.accountId != item.accountId) :+ item)
-      .sortBy(_.rating)(Ordering.Double.reverse)
-      .take(5)
-
-  def topDto =
-    for (i ← 0 until top.size)
-      yield TopUserInfoDTO(
-        place = i + 1,
-        info = top(i).info
-      )
 
   def onGameOver(gameRef: ActorRef) = {
     val gameInfo = gameRefToGameInfo(gameRef)

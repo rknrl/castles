@@ -18,7 +18,7 @@ object NewMatchmaking {
 
   case class Online(accountId: AccountId)
 
-  case class Offline(accountId: AccountId)
+  case class Offline(accountId: AccountId, client: ActorRef)
 
   case class GameOrder(accountId: AccountId)
 
@@ -51,7 +51,7 @@ class NewMatchmaking(gameFactory: IGameFactory) extends Actor {
 
       accountIdToAccount = accountIdToAccount + (accountId → sender)
 
-    case o@Offline(accountId) ⇒
+    case o@Offline(accountId, client) ⇒
       accountIdToAccount = accountIdToAccount - accountId
       if (accountIdToGame contains accountId)
         accountIdToGame(accountId) forward o
