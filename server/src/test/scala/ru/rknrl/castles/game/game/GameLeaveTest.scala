@@ -9,9 +9,10 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
+import ru.rknrl.castles.MatchMaking.PlayerLeaveGame
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.Game.UpdateGameState
+import ru.rknrl.castles.matchmaking.NewMatchmaking.AllPlayersLeaveGame
 import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender
@@ -120,7 +121,7 @@ class GameLeaveTest extends GameTestSpec {
 
     // Матчмайкинг получает AllPlayersLeaveGame
 
-    expectMsg(AllPlayersLeaveGame)
+    expectMsg(AllPlayersLeaveGame(game))
 
     // Если еще раз отправить LeaveGame они будут игнорироваться
     client0.send(game, C2B.LeaveGame)
@@ -136,3 +137,4 @@ class GameLeaveTest extends GameTestSpec {
     expectNoMsg()
   })
 }
+

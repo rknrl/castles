@@ -11,6 +11,10 @@ package ru.rknrl.castles
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
+import ru.rknrl.castles.MatchMaking.GameInfo
+import ru.rknrl.castles.MatchMaking.GameOrder
+import ru.rknrl.castles.MatchMaking.InGameResponse
+import ru.rknrl.castles.MatchMaking.PlayerLeaveGame
 import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.AccountState.{Items, Slots}
@@ -19,6 +23,7 @@ import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
+import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.matchmaking.{ELO, Top, TopUser}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto._
@@ -60,27 +65,11 @@ object MatchMaking {
     def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
   }
 
-  // admin -> matchmaking
-
   case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
-
-  // account -> matchmaking
-
-  case class InGame(externalAccountId: AccountId)
-
-  case class Offline(accountId: AccountId, client: ActorRef)
-
-  // matchmaking -> account
 
   case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Iterable[TopUserInfoDTO])
 
-  case class ConnectToGame(game: ActorRef)
-
-  // game -> matchmaking
-
   case class PlayerLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
-
-  case object AllPlayersLeaveGame
 
 }
 
@@ -114,7 +103,6 @@ class MatchMaking(interval: FiniteDuration,
 
   def logged(r: Receive) = new Logged(r, log, None, None, {
     case TryCreateGames ⇒ false
-    case RegisterHealth ⇒ false
     case _ ⇒ true
   })
 
@@ -125,10 +113,6 @@ class MatchMaking(interval: FiniteDuration,
   var gameRefToGameInfo = Map.empty[ActorRef, GameInfo]
 
   var accountIdToAccountRef = Map.empty[AccountId, ActorRef]
-
-  case object TryCreateGames
-
-  case object RegisterHealth
 
   import context.dispatcher
 
@@ -269,7 +253,7 @@ class MatchMaking(interval: FiniteDuration,
       onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
-    case AllPlayersLeaveGame ⇒
+    case AllPlayersLeaveGame(gameRef) ⇒
       onGameOver(sender)
       context stop sender
 

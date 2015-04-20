@@ -17,7 +17,7 @@ object TestConfig {
       |  test {
       |    # factor by which to scale timeouts during tests, e.g. to account for shared
       |    # build system load
-      |    timefactor =  1.0
+      |    timefactor =  2.0
       |
       |    # duration of EventFilter.intercept waits after the block is finished until
       |    # all required messages are received

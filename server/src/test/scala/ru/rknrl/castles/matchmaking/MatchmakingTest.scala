@@ -29,18 +29,18 @@ class MatchmakingTest extends ActorsTest {
     system.actorOf(Props(classOf[NewMatchmaking], new FakeGameFactory(self)), "matchmaking-" + matchmakingIterator)
   }
 
-  multi("Два актора отправляют PlaceGameOrder - оба получают ConnectToGame", {
+  multi("Два актора отправляют PlaceGameOrderNew - оба получают ConnectToGame", {
     val matchmaking = newMatchmaking
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
 
     val client1 = new TestProbe(system)
     client1.send(matchmaking, Online(accountId1))
-    client1.send(matchmaking, GameOrder(accountId1))
+    client1.send(matchmaking, GameOrderNew(accountId1))
 
     val client2 = new TestProbe(system)
     client2.send(matchmaking, Online(accountId2))
-    client2.send(matchmaking, GameOrder(accountId2))
+    client2.send(matchmaking, GameOrderNew(accountId2))
     client2.send(matchmaking, TryCreateGames)
 
     client1.expectMsgPF(timeout.duration) {
@@ -52,19 +52,23 @@ class MatchmakingTest extends ActorsTest {
       case ConnectToGame(gameRef) ⇒ true
     }
     client2.expectNoMsg()
+
+    matchmaking ! TryCreateGames
+    client1.expectNoMsg()
+    client2.expectNoMsg()
   })
 
-  multi("Уже находимся в игре и отправляем еще PlaceGameOrder - получаем ConnectToGame", {
+  multi("Уже находимся в игре и отправляем еще PlaceGameOrderNew - получаем ConnectToGame", {
     val matchmaking = newMatchmaking
     val accountId = AccountId(VKONTAKTE, "1")
     var game: Option[ActorRef] = None
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ gameRef shouldBe game.get
     }
@@ -78,7 +82,7 @@ class MatchmakingTest extends ActorsTest {
     var game: Option[ActorRef] = None
 
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
@@ -97,7 +101,7 @@ class MatchmakingTest extends ActorsTest {
     var game2: Option[ActorRef] = None
     val client1 = new TestProbe(system)
     client1.send(matchmaking, Online(accountId1))
-    client1.send(matchmaking, GameOrder(accountId1))
+    client1.send(matchmaking, GameOrderNew(accountId1))
     client1.send(matchmaking, TryCreateGames)
     client1.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game1 = Some(gameRef)
@@ -105,7 +109,7 @@ class MatchmakingTest extends ActorsTest {
 
     val client2 = new TestProbe(system)
     client2.send(matchmaking, Online(accountId2))
-    client2.send(matchmaking, GameOrder(accountId2))
+    client2.send(matchmaking, GameOrderNew(accountId2))
     client2.send(matchmaking, TryCreateGames)
     client2.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game2 = Some(gameRef)
@@ -114,14 +118,14 @@ class MatchmakingTest extends ActorsTest {
     client2.send(matchmaking, AllPlayersLeaveGame(game1.get))
     client2.send(matchmaking, InGame(accountId2))
     client2.expectMsgPF(timeout.duration) {
-      case InGameResponse(searchOpponents, gameRef) ⇒
-        searchOpponents shouldBe false
+      case InGameResponseNew(gameRef, searchOpponents) ⇒
         gameRef.get shouldBe game2.get
+        searchOpponents shouldBe false
     }
     client2.expectNoMsg()
   })
 
-  multi("PlayerLeaveGame", {
+  multi("PlayerLeaveGameNew", {
     val matchmaking = newMatchmaking
 
     val accountId = AccountId(VKONTAKTE, "1")
@@ -129,17 +133,17 @@ class MatchmakingTest extends ActorsTest {
     var game: Option[ActorRef] = None
 
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! PlayerLeaveGame(accountId)
+    matchmaking ! PlayerLeaveGameNew(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponse(searchOpponents, gameRef) ⇒
-        searchOpponents shouldBe false
+      case InGameResponseNew(gameRef, searchOpponents) ⇒
         gameRef shouldBe None
+        searchOpponents shouldBe false
     }
 
   })
@@ -154,13 +158,13 @@ class MatchmakingTest extends ActorsTest {
     matchmaking ! Online(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponse(false, None) ⇒ true
+      case InGameResponseNew(None, false) ⇒ true
     }
 
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponse(true, None) ⇒ true
+      case InGameResponseNew(None, true) ⇒ true
     }
 
     matchmaking ! TryCreateGames
@@ -170,13 +174,13 @@ class MatchmakingTest extends ActorsTest {
 
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponse(false, game) ⇒ true
+      case InGameResponseNew(game, false) ⇒ true
     }
 
     matchmaking ! AllPlayersLeaveGame(game.get)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponse(false, None) ⇒ true
+      case InGameResponseNew(None, false) ⇒ true
     }
 
     expectNoMsg()
@@ -205,7 +209,7 @@ class MatchmakingTest extends ActorsTest {
     val matchmaking = newMatchmaking
     val accountId = AccountId(VKONTAKTE, "1")
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! Offline(accountId, self)
     matchmaking ! TryCreateGames
     expectNoMsg()
@@ -215,7 +219,7 @@ class MatchmakingTest extends ActorsTest {
     val matchmaking = newMatchmakingWithSelfAsGameFactory
     val accountId = AccountId(VKONTAKTE, "1")
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrder(accountId)
+    matchmaking ! GameOrderNew(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
@@ -236,10 +240,10 @@ class MatchmakingTest extends ActorsTest {
     val client2 = new TestProbe(system)
 
     client1.send(matchmaking, Online(accountId))
-    client1.send(matchmaking, GameOrder(accountId))
+    client1.send(matchmaking, GameOrderNew(accountId))
 
     client2.send(matchmaking, Online(accountId))
-    client2.send(matchmaking, GameOrder(accountId))
+    client2.send(matchmaking, GameOrderNew(accountId))
 
     client1.expectMsg(DuplicateAccount)
     client1.expectNoMsg()
