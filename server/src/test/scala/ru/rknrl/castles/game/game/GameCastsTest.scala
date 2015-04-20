@@ -10,7 +10,7 @@ package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.NewGame.UpdateGameState
+import ru.rknrl.castles.game.Game.UpdateGameState
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._

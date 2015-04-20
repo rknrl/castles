@@ -54,8 +54,6 @@ case class StrengtheningConfig(factor: Double,
     val f = factor + churchesProportion * maxBonusFactor
     new Stat(attack = f, defence = f, speed = 1)
   }
-
-  def tutorConfig = new StrengtheningConfig(factor, maxBonusFactor, duration * 3, maxBonusDuration)
 }
 
 case class ShootingConfig(speed: Double,
@@ -192,8 +190,6 @@ case class GameConfig(constants: Constants,
    * Награда★ за выигранный бой (1ое место)
    */
   val winReward = 2
-
-  def tutorConfig = this
 }
 
 object GameConfig {

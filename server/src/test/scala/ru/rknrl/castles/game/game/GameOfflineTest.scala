@@ -11,7 +11,7 @@ package ru.rknrl.castles.game.game
 import akka.testkit.TestProbe
 import ru.rknrl.castles.MatchMaking.Offline
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.NewGame.UpdateGameState
+import ru.rknrl.castles.game.Game.UpdateGameState
 import ru.rknrl.castles.game.state.GameStateDiff
 import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, JoinedGame}
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}

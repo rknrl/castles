@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import org.scalatest.{Matchers, WordSpecLike}
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.game.state.{GameItems, GameState}
-import ru.rknrl.castles.game.{GameConfig, NewGame}
+import ru.rknrl.castles.game.{GameConfig, Game}
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
@@ -34,13 +34,12 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
   var gameIterator = 0
 
   def newGame(gameState: GameState = gameStateMock(),
-              config: GameConfig = gameConfigMock(),
               isDev: Boolean = true,
               schedulerClass: Class[_] = classOf[FakeScheduler],
               matchmaking: ActorRef = self,
               bugs: ActorRef = self) = {
     gameIterator += 1
-    system.actorOf(Props(classOf[NewGame], gameState, config, isDev, schedulerClass, matchmaking, bugs), "game" + gameIterator)
+    system.actorOf(Props(classOf[Game], gameState, isDev, schedulerClass, matchmaking, bugs), "game" + gameIterator)
   }
 
   def updateGameState(gameState: GameState,

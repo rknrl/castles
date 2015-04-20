@@ -17,6 +17,7 @@ import ru.rknrl.castles.account.AccountState.{Items, Slots}
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
+import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.rmi.B2C.ServerHealth
 import ru.rknrl.castles.rmi.C2B.GetServerHealth
@@ -196,14 +197,20 @@ class MatchMaking(interval: FiniteDuration,
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      playerId → new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
+      new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
     }
-
-    val gameConfig = if (isTutor) config.game.tutorConfig else config.game
 
     val gameMap = if (isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
-    val game = context.actorOf(Props(classOf[Game], players.toMap, big, isTutor, config.isDev, gameConfig, gameMap, self, bugs), gameIdIterator.next)
+    val gameState = GameStateInit.init(
+      time = System.currentTimeMillis(),
+      players = players.toList,
+      big = big,
+      isTutor = isTutor,
+      config = config.game,
+      gameMap = gameMap
+    )
+    val game = context.actorOf(Props(classOf[Game], gameState, config.isDev, classOf[GameScheduler], self, bugs), gameIdIterator.next)
 
     if (!isTutor) {
       if (orders.count(_.isBot) == orders.size - 1) {

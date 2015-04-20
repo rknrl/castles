@@ -6,17 +6,19 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game
+package ru.rknrl.castles.game.init
 
 import java.io.File
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.IJ
-import ru.rknrl.castles.game.GameMap.random
+import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.{Building, BuildingIdIterator}
 import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
 
 import scala.io.Source
+
+import GameMap._
 
 class MapCell(val i: Int,
               val j: Int,

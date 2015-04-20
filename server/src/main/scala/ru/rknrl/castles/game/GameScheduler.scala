@@ -9,7 +9,7 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.castles.game.NewGame.UpdateGameState
+import ru.rknrl.castles.game.Game.UpdateGameState
 
 import scala.concurrent.duration._
 

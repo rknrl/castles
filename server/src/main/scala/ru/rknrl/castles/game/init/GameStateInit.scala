@@ -6,11 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.game
+package ru.rknrl.castles.game.init
 
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.IJ
-import ru.rknrl.castles.game.GameArea._
+import ru.rknrl.castles.game.GameConfig
+import ru.rknrl.castles.game.init.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state._
 import ru.rknrl.dto.{SlotsOrientation, SlotsPosDTO}
 
