@@ -15,11 +15,10 @@ import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{ConnectToGame, Offline, InGame}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{ConnectToGame, InGame, InGameResponse, Offline}
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
-import ru.rknrl.core.Stat
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto._
@@ -235,18 +234,8 @@ class Account(matchmaking: ActorRef,
       client ! CloseConnection
   })
 
-  def placeGameOrder(isTutor: Boolean) = {
-    val realStat = config.account.skillsToStat(state.skills)
-    val stat = if (isTutor)
-      new Stat(
-        attack = realStat.attack * 3,
-        defence = realStat.defence * 3,
-        speed = realStat.speed
-      )
-    else
-      realStat
-    matchmaking ! GameOrder(accountId, deviceType, userInfo, state.slots, stat, state.items, state.rating, state.gamesCount, isBot = false, isTutor)
-  }
+  def placeGameOrder(isTutor: Boolean) =
+    matchmaking ! GameOrder(accountId, deviceType, userInfo, state, isBot = false)
 
   def gameAddress = NodeLocator(config.host, config.gamePort)
 

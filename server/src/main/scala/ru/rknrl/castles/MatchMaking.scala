@@ -11,13 +11,10 @@ package ru.rknrl.castles
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.MatchMaking.GameInfo
-import ru.rknrl.castles.MatchMaking.GameOrder
-import ru.rknrl.castles.MatchMaking.InGameResponse
-import ru.rknrl.castles.MatchMaking.PlayerLeaveGame
-import ru.rknrl.castles.MatchMaking._
+import ru.rknrl.castles.MatchMaking.{GameInfo, GameOrder, PlayerLeaveGame, _}
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
-import ru.rknrl.castles.account.AccountState.{Items, Slots}
+import ru.rknrl.castles.account.AccountState
+import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game._
@@ -49,13 +46,8 @@ object MatchMaking {
   case class GameOrder(accountId: AccountId,
                        deviceType: DeviceType,
                        userInfo: UserInfoDTO,
-                       slots: Slots,
-                       stat: Stat,
-                       items: Items,
-                       rating: Double,
-                       gamesCount: Int,
-                       isBot: Boolean,
-                       isTutor: Boolean)
+                       accountState: AccountState,
+                       isBot: Boolean)
 
   case class GameInfo(gameRef: ActorRef,
                       orders: Iterable[GameOrder],
@@ -66,8 +58,6 @@ object MatchMaking {
   }
 
   case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
-
-  case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Iterable[TopUserInfoDTO])
 
   case class PlayerLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
 
@@ -127,11 +117,11 @@ class MatchMaking(interval: FiniteDuration,
   }
 
   def createGames(big: Boolean, playersCount: Int, orders: List[GameOrder]) = {
-    val (tutorOrders, notTutorOrders) = orders.span(_.isTutor)
+    val (tutorOrders, notTutorOrders) = orders.span(_.accountState.gamesCount == 0)
 
     var createdGames = tutorOrders.map(order ⇒ createGameWithBot(big, playersCount, List(order), isTutor = true))
 
-    var sorted = notTutorOrders.sortBy(_.rating)(Ordering.Double.reverse)
+    var sorted = notTutorOrders.sortBy(_.accountState.rating)(Ordering.Double.reverse)
 
     while (sorted.size > playersCount) {
       createdGames = createdGames :+ createGame(big, sorted.take(playersCount), isTutor = false)
@@ -158,8 +148,16 @@ class MatchMaking(interval: FiniteDuration,
       val accountId = botIdIterator.next
       val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
       val bot = context.actorOf(Props(botClass, accountId, config.game, bugs), accountId.id)
-      val botStat = if (isTutor) tutorBotStat else order.stat
-      val botOrder = new GameOrder(accountId, order.deviceType, config.botUserInfo(accountId, i), order.slots, botStat, botItems(order.items), order.rating, order.gamesCount, isBot = true, isTutor)
+
+      val botAccountState = new AccountState(
+        slots = order.accountState.slots,
+        skills = order.accountState.skills,
+        items = botItems(order.accountState.items),
+        gold = order.accountState.gold,
+        rating = order.accountState.rating,
+        gamesCount = order.accountState.gamesCount
+      )
+      val botOrder = new GameOrder(accountId, order.deviceType, config.botUserInfo(accountId, i), botAccountState, isBot = true)
       result = result :+ botOrder
       placeGameOrder(botOrder, bot)
     }
@@ -178,7 +176,22 @@ class MatchMaking(interval: FiniteDuration,
 
     val players = for (order ← orders) yield {
       val playerId = playerIdIterator.next
-      new Player(playerId, order.accountId, order.userInfo, order.slots, order.stat, order.items, isBot = order.isBot)
+
+      val realStat = config.account.skillsToStat(order.accountState.skills)
+      val stat = if (order.isBot) {
+        if (isTutor) tutorBotStat else realStat
+      } else {
+        if (isTutor)
+          Stat(
+            attack = realStat.attack * 3,
+            defence = realStat.defence * 3,
+            speed = realStat.speed
+          )
+        else
+          realStat
+      }
+
+      new Player(playerId, order.accountId, order.userInfo, order.accountState.slots, stat, order.accountState.items, isBot = order.isBot)
     }
 
     val gameMap = if (isTutor) gameMaps.tutor(big) else gameMaps.random(big)
@@ -285,10 +298,10 @@ class MatchMaking(interval: FiniteDuration,
     val orders = gameInfo.orders
     val order = orders.find(_.accountId == accountId).get
 
-    val averageEnemyRating = orders.filter(_ != order).map(_.rating).sum / (orders.size - 1)
+    val averageEnemyRating = orders.filter(_ != order).map(_.accountState.rating).sum / (orders.size - 1)
 
     val sA = ELO.getSA(gameInfo.big, place)
-    val newRating = ELO.getNewRating(order.rating, averageEnemyRating, order.gamesCount, sA)
+    val newRating = ELO.getNewRating(order.accountState.rating, averageEnemyRating, order.accountState.gamesCount, sA)
 
     top = top.insert(TopUser(accountId, newRating, userInfo))
 

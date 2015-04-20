@@ -88,7 +88,8 @@ class Game(var gameState: GameState,
 
     case Offline(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
-      if (playerIdToClient(playerId) == client)
+      if ((playerIdToClient contains playerId) &&
+        playerIdToClient(playerId) == client)
         playerIdToClient = playerIdToClient - playerId
 
     case UpdateGameState(newTime) ⇒

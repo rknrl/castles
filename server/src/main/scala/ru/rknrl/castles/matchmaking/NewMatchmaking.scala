@@ -10,7 +10,7 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.dto.AccountId
+import ru.rknrl.dto.{AccountId, TopUserInfoDTO}
 
 object NewMatchmaking {
 
@@ -27,7 +27,7 @@ object NewMatchmaking {
 
   case class InGame(accountId: AccountId)
 
-  case class InGameResponseNew(gameRef: Option[ActorRef], searchOpponents: Boolean)
+  case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Seq[TopUserInfoDTO])
 
   case class PlayerLeaveGameNew(accountId: AccountId)
 
@@ -39,7 +39,8 @@ object NewMatchmaking {
 
 }
 
-class NewMatchmaking(gameFactory: IGameFactory) extends Actor {
+class NewMatchmaking(gamesFactory: IGamesFactory,
+                     var top: Top) extends Actor {
 
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
   var accountIdToGameOrder = Map.empty[AccountId, GameOrderNew]
@@ -58,9 +59,10 @@ class NewMatchmaking(gameFactory: IGameFactory) extends Actor {
         accountIdToGameInfo(accountId).ref forward o
 
     case InGame(accountId) ⇒
-      sender ! InGameResponseNew(
+      sender ! InGameResponse(
         gameRef = if (accountIdToGameInfo contains accountId) Some(accountIdToGameInfo(accountId).ref) else None,
-        searchOpponents = accountIdToGameOrder contains accountId
+        searchOpponents = accountIdToGameOrder contains accountId,
+        top = top.dto
       )
 
     case order@GameOrderNew(accountId) ⇒
@@ -70,7 +72,7 @@ class NewMatchmaking(gameFactory: IGameFactory) extends Actor {
         accountIdToGameOrder = accountIdToGameOrder + (accountId → order)
 
     case TryCreateGames ⇒
-      val newAccountIdToGameInfo = new GamesFactory().createGames(accountIdToGameOrder, self, gameFactory)
+      val newAccountIdToGameInfo = gamesFactory.createGames(accountIdToGameOrder, self)
       accountIdToGameOrder = Map.empty
 
       accountIdToGameInfo = accountIdToGameInfo ++ newAccountIdToGameInfo

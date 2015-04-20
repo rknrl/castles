@@ -12,21 +12,41 @@ import akka.actor._
 import akka.testkit.TestProbe
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.dto.AccountId
-import ru.rknrl.dto.AccountType.VKONTAKTE
+import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
+import ru.rknrl.dto.{AccountId, UserInfoDTO}
 
 class MatchmakingTest extends ActorsTest {
 
   var matchmakingIterator = 0
 
+  val id1 = AccountId(VKONTAKTE, "1")
+  val id2 = AccountId(FACEBOOK, "1")
+  val id3 = AccountId(ODNOKLASSNIKI, "2")
+  val id4 = AccountId(ODNOKLASSNIKI, "4")
+  val id5 = AccountId(ODNOKLASSNIKI, "5")
+
+  val info1 = UserInfoDTO(id1)
+  val info2 = UserInfoDTO(id2)
+  val info3 = UserInfoDTO(id3)
+  val info4 = UserInfoDTO(id4)
+  val info5 = UserInfoDTO(id5)
+
+  val top5 = new Top(List(
+    TopUser(id1, 1512.2, info1),
+    TopUser(id2, 1400, info2),
+    TopUser(id3, 1399, info3),
+    TopUser(id4, 1300, info4),
+    TopUser(id5, 1200, info5)
+  ))
+
   def newMatchmaking = {
     matchmakingIterator += 1
-    system.actorOf(Props(classOf[NewMatchmaking], new GameFactory), "matchmaking-" + matchmakingIterator)
+    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new GameFactory), top5), "matchmaking-" + matchmakingIterator)
   }
 
   def newMatchmakingWithSelfAsGameFactory = {
     matchmakingIterator += 1
-    system.actorOf(Props(classOf[NewMatchmaking], new FakeGameFactory(self)), "matchmaking-" + matchmakingIterator)
+    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new FakeGameFactory(self)), top5), "matchmaking-" + matchmakingIterator)
   }
 
   multi("Два актора отправляют PlaceGameOrderNew - оба получают ConnectToGame", {
@@ -117,11 +137,7 @@ class MatchmakingTest extends ActorsTest {
 
     client2.send(matchmaking, AllPlayersLeaveGame(game1.get))
     client2.send(matchmaking, InGame(accountId2))
-    client2.expectMsgPF(timeout.duration) {
-      case InGameResponseNew(gameRef, searchOpponents) ⇒
-        gameRef.get shouldBe game2.get
-        searchOpponents shouldBe false
-    }
+    client2.expectMsg(InGameResponse(gameRef = game2, searchOpponents = false, top = top5.dto))
     client2.expectNoMsg()
   })
 
@@ -140,12 +156,7 @@ class MatchmakingTest extends ActorsTest {
     }
     matchmaking ! PlayerLeaveGameNew(accountId)
     matchmaking ! InGame(accountId)
-    expectMsgPF(timeout.duration) {
-      case InGameResponseNew(gameRef, searchOpponents) ⇒
-        gameRef shouldBe None
-        searchOpponents shouldBe false
-    }
-
+    expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
   })
 
   multi("InGame", {
@@ -158,13 +169,13 @@ class MatchmakingTest extends ActorsTest {
     matchmaking ! Online(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponseNew(None, false) ⇒ true
+      case InGameResponse(None, false, top) ⇒ true
     }
 
     matchmaking ! GameOrderNew(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponseNew(None, true) ⇒ true
+      case InGameResponse(None, true, top) ⇒ true
     }
 
     matchmaking ! TryCreateGames
@@ -174,13 +185,13 @@ class MatchmakingTest extends ActorsTest {
 
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponseNew(game, false) ⇒ true
+      case InGameResponse(game, false, top) ⇒ true
     }
 
     matchmaking ! AllPlayersLeaveGame(game.get)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
-      case InGameResponseNew(None, false) ⇒ true
+      case InGameResponse(None, false, top) ⇒ true
     }
 
     expectNoMsg()
