@@ -215,7 +215,7 @@ class Game(players: Map[PlayerId, Player],
     /** Аккаунт говорит, что потеряли связь с игроком
       * Убираем из его мапы online
       */
-    case Offline(accountId) ⇒
+    case Offline(accountId, client) ⇒
       val playerId = `accountId→playerId`(accountId)
       online = online - playerId
 

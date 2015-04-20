@@ -41,9 +41,25 @@ class GameOfflineTest extends GameTestSpec {
        case JoinedGame(gameStateDto) ⇒ true
      }
 
-     // Первый игрок уходит в оффлайн
+     // Если Offline с неактульным адресом клиента - он игнорируется
 
-     game ! Offline(AccountId(VKONTAKTE, "1"))
+     game ! Offline(AccountId(VKONTAKTE, "1"), client1.ref)
+
+     // После UpdateGameState сообщения по прежнему получают оба игрока
+
+     game ! UpdateGameState(newTime = 10)
+
+     client0.expectMsgPF(TIMEOUT) {
+       case GameStateUpdated(dto) ⇒ true
+     }
+
+     client1.expectMsgPF(TIMEOUT) {
+       case GameStateUpdated(dto) ⇒ true
+     }
+
+     // Offline с актуальным адресом клиента
+
+     game ! Offline(AccountId(VKONTAKTE, "1"), client0.ref)
 
      // Теперь после UpdateGameState сообщение получает только второй игрок
 

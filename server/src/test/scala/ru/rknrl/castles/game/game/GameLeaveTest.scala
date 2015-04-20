@@ -15,7 +15,7 @@ import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, PlayerId}
+import ru.rknrl.dto.{AccountId, ItemType, PlayerId}
 
 class GameLeaveTest extends GameTestSpec {
   multi("Leave", {
@@ -41,6 +41,14 @@ class GameLeaveTest extends GameTestSpec {
     client1.expectMsgPF(TIMEOUT) {
       case JoinedGame(gameStateDto) ⇒ true
     }
+
+    // Если отправить LeaveGame раньше Surrender - они игнорируются
+
+    client0.send(game, C2B.LeaveGame)
+    client1.send(game, C2B.LeaveGame)
+    client0.expectNoMsg()
+    client1.expectNoMsg()
+    expectNoMsg()
 
     // Игроки отправляют Surrender и получают в ответ GameOver
 
@@ -76,17 +84,48 @@ class GameLeaveTest extends GameTestSpec {
         dto.place shouldBe 1
     }
 
+    // Если отправить LeaveGame с невалидного адреса - он игнорируется
+
+    val client3 = new TestProbe(system)
+    client3.send(game, C2B.LeaveGame)
+    client0.expectNoMsg()
+    client1.expectNoMsg()
+    expectNoMsg()
+
     // Игроки отправляют LeaveGame
     // Матчмайкинг получает PlayerLeaveGame
 
     client0.send(game, C2B.LeaveGame)
-    expectMsgClass(classOf[PlayerLeaveGame]) // todo check params
+    client0.expectNoMsg()
+    expectMsgPF(TIMEOUT) {
+      case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
+        accountId shouldBe AccountId(VKONTAKTE, "1")
+        place shouldBe 2
+        reward shouldBe 0
+        usedItems shouldBe ItemType.values.map(_ → 0).toMap
+        userInfo shouldBe initGameState.players(PlayerId(0)).userInfo
+    }
 
     client1.send(game, C2B.LeaveGame)
-    expectMsgClass(classOf[PlayerLeaveGame]) // todo check params
+    client1.expectNoMsg()
+    expectMsgPF(TIMEOUT) {
+      case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
+        accountId shouldBe AccountId(FACEBOOK, "1")
+        place shouldBe 1
+        reward shouldBe 2
+        usedItems shouldBe ItemType.values.map(_ → 0).toMap
+        userInfo shouldBe initGameState.players(PlayerId(1)).userInfo
+    }
 
     // Матчмайкинг получает AllPlayersLeaveGame
 
     expectMsg(AllPlayersLeaveGame)
+
+    // Если еще раз отправить LeaveGame они будут игнорироваться
+    client0.send(game, C2B.LeaveGame)
+    client1.send(game, C2B.LeaveGame)
+    client0.expectNoMsg()
+    client1.expectNoMsg()
+    expectNoMsg()
   })
 }

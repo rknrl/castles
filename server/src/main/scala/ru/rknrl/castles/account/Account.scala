@@ -250,6 +250,6 @@ class Account(matchmaking: ActorRef,
   def gameAddress = NodeLocator(config.host, config.gamePort)
 
   override def postStop() = {
-    matchmaking ! Offline(accountId)
+    matchmaking ! Offline(accountId, client)
   }
 }

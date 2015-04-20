@@ -14,12 +14,13 @@ import ru.rknrl.castles.game.NewGame.UpdateGameState
 import ru.rknrl.castles.game.state.GameItems
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
+import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
 import ru.rknrl.dto.{AccountId, BuildingId, PlayerId}
 
-class SurrenderTest extends GameTestSpec {
+class GameSurrenderTest extends GameTestSpec {
    multi("Surrender", {
 
      // Создаем игру на двух игроков
@@ -43,6 +44,14 @@ class SurrenderTest extends GameTestSpec {
      client1.expectMsgPF(TIMEOUT) {
        case JoinedGame(gameStateDto) ⇒ true
      }
+
+     // Если отправить Surrender с невалидного адреса - он игнорируется
+
+     val client3 = new TestProbe(system)
+     client3.send(game, Surrender)
+     client0.expectNoMsg()
+     client1.expectNoMsg()
+     expectNoMsg()
 
      // Первый игрок посылает Surrender
 
@@ -92,6 +101,13 @@ class SurrenderTest extends GameTestSpec {
        case GameStateUpdated(dto) ⇒ true
      }
 
+     client1.expectNoMsg()
+
+     // Если еще раз отправить Surrender - они будут игнорироваться
+
+     client0.send(game, Surrender)
+     client1.send(game, Surrender)
+     client0.expectNoMsg()
      client1.expectNoMsg()
    })
  }

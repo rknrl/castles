@@ -12,7 +12,7 @@ import akka.testkit.TestProbe
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.NewGame.UpdateGameState
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
-import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, JoinedGame}
+import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
 import ru.rknrl.dto._
@@ -172,13 +172,14 @@ class GameCastsTest extends GameTestSpec {
 
     game ! UpdateGameState(newTime = 20)
 
+    val newGameState2 = updateGameState(
+      newGameState,
+      newTime = 20
+    )
+
     val gameStateUpdate2 = GameStateDiff.diff(
       newGameState,
-
-      updateGameState(
-        newGameState,
-        newTime = 20
-      )
+      newGameState2
     )
 
     client0.expectMsgPF(TIMEOUT) {
@@ -188,6 +189,60 @@ class GameCastsTest extends GameTestSpec {
     client1.expectMsgPF(TIMEOUT) {
       case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
     }
-  }
 
+    // -------------------------------------------------------
+    // Если отправить каст с невалидного адреса - он игнорируется
+
+    val client3 = new TestProbe(system)
+    client3.send(game, cast0)
+
+    game ! UpdateGameState(newTime = 50)
+
+    val newGameState3 = updateGameState(newGameState2, newTime = 50)
+    val gameStateUpdate3 = GameStateDiff.diff(newGameState2, newGameState3)
+
+    client0.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate3
+    }
+
+    client1.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate3
+    }
+
+    // -------------------------------------------------------
+    // Если игрок проиграл или сдался - его касты игнорируются
+
+    client0.send(game, Surrender)
+
+    // Оба игрока получают GameOver в ответ
+
+    client0.expectMsgClass(classOf[GameOver])
+    client0.expectMsgClass(classOf[GameOver])
+    client1.expectMsgClass(classOf[GameOver])
+    client1.expectMsgClass(classOf[GameOver])
+
+    // Игроки делают касты
+
+    client0.send(game, cast0)
+    client1.send(game, cast1)
+
+    // Касты игнорируются
+
+    game ! UpdateGameState(newTime = 100)
+
+    val gameStateUpdate4 = GameStateDiff.diff(
+      newGameState3,
+      updateGameState(newGameState3, newTime = 100)
+    )
+
+    client0.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate4
+    }
+
+    client1.expectMsgPF(TIMEOUT) {
+      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate4
+    }
+
+
+  }
 }

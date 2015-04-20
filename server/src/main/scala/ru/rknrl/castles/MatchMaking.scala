@@ -60,7 +60,7 @@ object MatchMaking {
 
   case class InGame(externalAccountId: AccountId)
 
-  case class Offline(accountId: AccountId)
+  case class Offline(accountId: AccountId, client: ActorRef)
 
   // matchmaking -> account
 
@@ -269,7 +269,7 @@ class MatchMaking(interval: FiniteDuration,
         sender ! InGameResponse(Some(gameInfo.get.gameRef), searchOpponents = false, topDto)
 
     /** Аккаунт отсоединился */
-    case Offline(accountId) ⇒
+    case Offline(accountId, client) ⇒
       if (accountIdToAccountRef.contains(accountId) && accountIdToAccountRef(accountId) == sender) {
         accountIdToAccountRef = accountIdToAccountRef - accountId
         val gameInfo = accountIdToGameInfo.get(accountId)
@@ -282,7 +282,7 @@ class MatchMaking(interval: FiniteDuration,
             onGameOver(gameInfo.get.gameRef)
             context stop gameInfo.get.gameRef
           } else {
-            gameInfo.get.gameRef ! Offline(accountId)
+            gameInfo.get.gameRef ! Offline(accountId, client)
           }
         }
       }
