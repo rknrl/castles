@@ -15,13 +15,11 @@ import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.AccountState.{Items, Slots}
 import ru.rknrl.castles.bot.{Bot, TutorBot}
-import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
-import ru.rknrl.castles.matchmaking.{Top, TopUser, ELO}
-import ru.rknrl.castles.rmi.B2C.ServerHealth
-import ru.rknrl.castles.rmi.C2B.GetServerHealth
+import ru.rknrl.castles.matchmaking.{ELO, Top, TopUser}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto._
 import ru.rknrl.utils.IdIterator
@@ -53,6 +51,14 @@ object MatchMaking {
                        gamesCount: Int,
                        isBot: Boolean,
                        isTutor: Boolean)
+
+  case class GameInfo(gameRef: ActorRef,
+                      orders: Iterable[GameOrder],
+                      isTutor: Boolean) {
+    def big = orders.size == 4
+
+    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
+  }
 
   // admin -> matchmaking
 
@@ -112,21 +118,13 @@ class MatchMaking(interval: FiniteDuration,
     case _ ⇒ true
   })
 
-  class GameInfo(val gameRef: ActorRef,
-                 val orders: Iterable[GameOrder],
-                 val isTutor: Boolean) {
-    def big = orders.size == 4
+  var gameOrders = List.empty[GameOrder]
 
-    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
-  }
+  var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
 
-  var gameOrders = List[GameOrder]()
+  var gameRefToGameInfo = Map.empty[ActorRef, GameInfo]
 
-  var accountIdToGameInfo = Map[AccountId, GameInfo]()
-
-  var gameRefToGameInfo = Map[ActorRef, GameInfo]()
-
-  var accountIdToAccountRef = Map[AccountId, ActorRef]()
+  var accountIdToAccountRef = Map.empty[AccountId, ActorRef]
 
   case object TryCreateGames
 
@@ -211,47 +209,16 @@ class MatchMaking(interval: FiniteDuration,
     )
     val game = context.actorOf(Props(classOf[Game], gameState, config.isDev, classOf[GameScheduler], self, bugs), gameIdIterator.next)
 
-    if (!isTutor) {
-      if (orders.count(_.isBot) == orders.size - 1) {
-        if (orders.size == 4)
-          database ! StatAction.START_GAME_4_WITH_BOTS
-        else
-          database ! StatAction.START_GAME_2_WITH_BOTS
-      } else {
-        if (orders.size == 4)
-          database ! StatAction.START_GAME_4_WITH_PLAYERS
-        else
-          database ! StatAction.START_GAME_2_WITH_PLAYERS
-      }
-    }
+    if (!isTutor) Statistics.sendCreateGameStatistics(orders, database)
 
     new GameInfo(game, orders, isTutor)
   }
 
-  val healthStartTime = System.currentTimeMillis()
-  var health = List.empty[ServerHealthItemDTO]
-
   def receive = logged({
-    case RegisterHealth ⇒
-      health = health :+ ServerHealthItemDTO(
-        online = accountIdToAccountRef.size,
-        games = gameRefToGameInfo.size,
-        totalMem = (Runtime.getRuntime.totalMemory() / 1024 / 1024).toInt
-      )
-
     /** from Admin or PaymentTransaction */
     case msg@AdminSetAccountState(accountId, _) ⇒
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
-
-    /** from Admin */
-    case GetServerHealth ⇒
-      sender ! ServerHealth(
-        ServerHealthDTO(
-          startTime = healthStartTime,
-          items = health
-        )
-      )
 
     /** from Admin */
     case Database.AccountDeleted(accountId) ⇒
@@ -343,36 +310,7 @@ class MatchMaking(interval: FiniteDuration,
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, top.dto) // todo - если он ушел в оффлайн, ничо не сохранится
 
-    if (!order.isBot) {
-      val gameWithBots = orders.count(_.isBot) == orders.size - 1
-      if (gameWithBots) {
-        if (orders.size == 4) {
-          if (place == 1) {
-            if (gameInfo.isTutor)
-              database ! StatAction.TUTOR_4_WIN
-            else
-              database ! StatAction.WIN_4_BOTS
-          } else {
-            if (gameInfo.isTutor)
-              database ! StatAction.TUTOR_4_LOSE
-            else
-              database ! StatAction.LOSE_4_BOTS
-          }
-        } else if (orders.size == 2) {
-          if (place == 1) {
-            if (gameInfo.isTutor)
-              database ! StatAction.TUTOR_2_WIN
-            else
-              database ! StatAction.WIN_2_BOTS
-          } else {
-            if (gameInfo.isTutor)
-              database ! StatAction.TUTOR_2_LOSE
-            else
-              database ! StatAction.LOSE_2_BOTS
-          }
-        }
-      }
-    }
+    Statistics.sendLeaveGameStatistics(place, gameInfo, orders, order, database)
   }
 
   def onGameOver(gameRef: ActorRef) = {

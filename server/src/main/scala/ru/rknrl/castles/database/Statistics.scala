@@ -8,6 +8,8 @@
 
 package ru.rknrl.castles.database
 
+import akka.actor.{ActorContext, ActorRef}
+import ru.rknrl.castles.MatchMaking.{GameInfo, GameOrder}
 import ru.rknrl.dto._
 
 object Statistics {
@@ -66,4 +68,59 @@ object Statistics {
           case SkillLevel.SKILL_LEVEL_3 ⇒ StatAction.BUY_SPEED3
         }
     }
+
+
+  def sendLeaveGameStatistics(place: Int,
+                              gameInfo: GameInfo,
+                              orders: Iterable[GameOrder],
+                              order: GameOrder,
+                              database: ActorRef)
+                             (implicit context: ActorContext): Unit = {
+    if (!order.isBot) {
+      val gameWithBots = orders.count(_.isBot) == orders.size - 1
+      if (gameWithBots) {
+        if (orders.size == 4) {
+          if (place == 1) {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_4_WIN
+            else
+              database ! StatAction.WIN_4_BOTS
+          } else {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_4_LOSE
+            else
+              database ! StatAction.LOSE_4_BOTS
+          }
+        } else if (orders.size == 2) {
+          if (place == 1) {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_2_WIN
+            else
+              database ! StatAction.WIN_2_BOTS
+          } else {
+            if (gameInfo.isTutor)
+              database ! StatAction.TUTOR_2_LOSE
+            else
+              database ! StatAction.LOSE_2_BOTS
+          }
+        }
+      }
+    }
+  }
+
+  def sendCreateGameStatistics(orders: Iterable[GameOrder],
+                               database: ActorRef)
+                              (implicit context: ActorContext): Unit = {
+    if (orders.count(_.isBot) == orders.size - 1) {
+      if (orders.size == 4)
+        database ! StatAction.START_GAME_4_WITH_BOTS
+      else
+        database ! StatAction.START_GAME_2_WITH_BOTS
+    } else {
+      if (orders.size == 4)
+        database ! StatAction.START_GAME_4_WITH_PLAYERS
+      else
+        database ! StatAction.START_GAME_2_WITH_PLAYERS
+    }
+  }
 }
