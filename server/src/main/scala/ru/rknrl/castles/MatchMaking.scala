@@ -19,6 +19,7 @@ import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
+import ru.rknrl.castles.matchmaking.ELO
 import ru.rknrl.castles.rmi.B2C.ServerHealth
 import ru.rknrl.castles.rmi.C2B.GetServerHealth
 import ru.rknrl.core.Stat

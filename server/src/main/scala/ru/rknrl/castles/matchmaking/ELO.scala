@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles
+package ru.rknrl.castles.matchmaking
 
 object ELO {
   def getSA(big: Boolean, place: Int) =

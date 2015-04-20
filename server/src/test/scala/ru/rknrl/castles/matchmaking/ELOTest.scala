@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles
+package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
 

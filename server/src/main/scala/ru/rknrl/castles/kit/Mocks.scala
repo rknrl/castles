@@ -9,12 +9,16 @@
 package ru.rknrl.castles.kit
 
 import org.scalatest.Matchers
+import ru.rknrl.BugsConfig
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState.{Items, Slots}
+import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
+import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state._
-import ru.rknrl.core.{Stat, Damaged, Damager}
-import ru.rknrl.core.points.{Points, Point}
-import ru.rknrl.core.social.{ProductInfo, SocialConfig, SocialConfigs}
+import ru.rknrl.core.points.{Point, Points}
+import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
+import ru.rknrl.core.{Damaged, Damager, Stat}
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto.BuildingType.HOUSE
 import ru.rknrl.dto._
@@ -105,6 +109,105 @@ object Mocks extends Matchers {
       ok = ok,
       mm = mm,
       fb = fb
+    )
+
+  def dbConfigMock(username: String = "root",
+                   host: String = "localhost",
+                   port: Int = 6767,
+                   password: String = "123",
+                   database: String = "catles",
+                   poolMaxObjects: Int = 10,
+                   poolMaxIdle: Long = 11,
+                   poolMaxQueueSize: Int = 12) =
+    new DbConfiguration(
+      username = username,
+      host = host,
+      port = port,
+      password = password,
+      database = database,
+      poolMaxObjects = poolMaxObjects,
+      poolMaxIdle = poolMaxIdle,
+      poolMaxQueueSize = poolMaxQueueSize
+    )
+
+
+  def buildingPricesMock(level1: Int = 4,
+                         level2: Int = 16,
+                         level3: Int = 64): BuildingPrices =
+    new BuildingPrices(Map(
+      BuildingLevel.LEVEL_1 → level1,
+      BuildingLevel.LEVEL_2 → level2,
+      BuildingLevel.LEVEL_3 → level3
+    ))
+
+  def skillUpgradePricesMock(): SkillUpgradePrices =
+    new SkillUpgradePrices((for (i ← 1 to 9) yield i → i).toMap)
+
+  def accountConfigMock(buildingPrices: BuildingPrices = buildingPricesMock(),
+                        skillUpgradePrices: SkillUpgradePrices = skillUpgradePricesMock(),
+                        itemPrice: Int = 1,
+                        initGold: Int = 1000,
+                        initRating: Double = 1400,
+                        initItemCount: Int = 4,
+                        maxAttack: Double = 3,
+                        maxDefence: Double = 3,
+                        maxSpeed: Double = 1.2) =
+    new AccountConfig(
+      buildingPrices = buildingPrices,
+      skillUpgradePrices = skillUpgradePrices,
+      itemPrice = itemPrice,
+      initGold = initGold,
+      initRating = initRating,
+      initItemCount = initItemCount,
+      maxAttack = maxAttack,
+      maxDefence = maxDefence,
+      maxSpeed = maxSpeed
+    )
+
+  def bugsConfigMock(clientDir: String = "bugs/client/",
+                     gameDir: String = "bugs/game/",
+                     botDir: String = "bugs/bot/",
+                     accountDir: String = "bugs/account/") =
+    new BugsConfig(
+      clientDir = clientDir,
+      gameDir = gameDir,
+      botDir = botDir,
+      accountDir = accountDir
+    )
+
+  def configMock(host: String = "localhost",
+                 staticHost: String = "localhot",
+                 gamePort: Int = 2305,
+                 policyPort: Int = 2306,
+                 adminPort: Int = 2307,
+                 httpPort: Int = 80,
+                 adminLogin: String = "adminLogin",
+                 adminPassword: String = "adminPass",
+                 isDev: Boolean = true,
+                 mapsDir: String = "maps/dir/",
+                 db: DbConfiguration = dbConfigMock(),
+                 products: List[Product] = List.empty,
+                 social: SocialConfigs = socialConfigsMock(),
+                 account: AccountConfig = accountConfigMock(),
+                 game: GameConfig = gameConfigMock(),
+                 bugs: BugsConfig = bugsConfigMock()) =
+    new Config(
+      host = host,
+      staticHost = host,
+      gamePort = gamePort,
+      policyPort = policyPort,
+      adminPort = adminPort,
+      httpPort = httpPort,
+      adminLogin = adminLogin,
+      adminPassword = adminPassword,
+      isDev = isDev,
+      mapsDir = mapsDir,
+      db = db,
+      products = products,
+      social = social,
+      account = account,
+      game = game,
+      bugs = bugs
     )
 
 
