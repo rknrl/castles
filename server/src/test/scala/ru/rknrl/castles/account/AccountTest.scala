@@ -9,17 +9,53 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
+import ru.rknrl.castles.account.auth.Auth.SecretChecked
+import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
+import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.dto.PlatformType.CANVAS
+import ru.rknrl.castles.rmi.B2C.Authenticated
+import ru.rknrl.dto.{StatAction, TutorStateDTO}
 
 class AccountTest extends AccountTestSpec {
 
-  multi("Стопается после получения DuplicateAccount", {
-    val account = newAccount()
-    account ! DuplicateAccount
-    watch(account)
-    expectTerminated(account)
-  })
+  "DuplicateAccount" should {
+    multi("Если клиент авторизовался - Стопается после получения DuplicateAccount", {
+      val account = newAccount()
+
+      val authenticate = authenticateMock()
+      val accountId = authenticate.userInfo.accountId
+      account ! authenticate
+
+      expectMsg(authenticate)
+      account ! SecretChecked(valid = true)
+
+      expectMsg(Database.GetAccountState(accountId))
+      expectMsg(StatAction.AUTHENTICATED)
+      account ! AccountStateResponse(accountId, accountStateMock().dto)
+
+      expectMsg(Database.GetTutorState(accountId))
+      account ! TutorStateResponse(accountId, TutorStateDTO())
+
+      expectMsg(Online(accountId))
+      expectMsg(InGame(accountId))
+      account ! InGameResponse(gameRef = None, searchOpponents = false, top = List.empty)
+
+      expectMsgClass(classOf[Authenticated])
+
+      account ! DuplicateAccount
+      watch(account)
+      expectMsg(Offline(authenticate.userInfo.accountId, self))
+      expectTerminated(account)
+    })
+
+    multi("Если клиент НЕ авторизовался - игнорируется", {
+      val account = newAccount()
+      account ! DuplicateAccount
+      watch(account)
+      expectNoMsg()
+    })
+  }
 
   "Offline" should {
     multi("Если клиент авторизовался - Offline отправляется перед остановкой", {
@@ -28,7 +64,7 @@ class AccountTest extends AccountTestSpec {
       val database = new TestProbe(system)
       val account = newAccount(auth = auth.ref, database = database.ref)
 
-      val authenticate = authenticateMock(platformType = CANVAS)
+      val authenticate = authenticateMock()
       client.send(account, authenticate)
       auth.expectMsg(authenticate)
 

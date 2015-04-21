@@ -22,9 +22,10 @@ class AccountTestSpec extends ActorsTest {
   def newAccount(matchmaking: ActorRef = self,
                  auth: ActorRef = self,
                  database: ActorRef = self,
+                 bugs: ActorRef = self,
                  config: Config = configMock()) = {
     accountIterator += 1
-    system.actorOf(Props(classOf[NewAccount], matchmaking, auth, database, config), "account-" + accountIterator)
+    system.actorOf(Props(classOf[NewAccount], matchmaking, auth, database, bugs, config), "account-" + accountIterator)
   }
 
   def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),

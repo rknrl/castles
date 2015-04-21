@@ -9,7 +9,6 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.Assertion
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.NewAccount.ClientInfo
 import ru.rknrl.castles.account.auth.Auth.SecretChecked
@@ -18,6 +17,7 @@ import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
+import ru.rknrl.{Assertion, BugType, Logged, SilentLog}
 
 
 object NewAccount {
@@ -31,8 +31,9 @@ object NewAccount {
 }
 
 class NewAccount(matchmaking: ActorRef,
-                 auth: ActorRef,
+                 secretChecher: ActorRef,
                  database: ActorRef,
+                 bugs: ActorRef,
                  config: Config) extends Actor {
 
   var _client: Option[ClientInfo] = None
@@ -45,17 +46,23 @@ class NewAccount(matchmaking: ActorRef,
 
   def tutorState = _tutorState.get
 
-  def receive = {
+  val log = new SilentLog
+
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.ACCOUNT), any ⇒ true)
+
+  def receive = auth
+
+  def auth = logged({
     case authenticate@AuthenticateDTO(userInfo, platformType, deviceType, secret) ⇒
       _client = Some(ClientInfo(sender, userInfo.accountId, deviceType, platformType, userInfo))
-      auth ! authenticate
+      secretChecher ! authenticate
 
     case SecretChecked(valid) ⇒
       if (valid) {
         database ! GetAccountState(client.accountId)
         database ! StatAction.AUTHENTICATED
       } else {
-        //log.info("reject")
+        log.info("reject")
         client.ref ! CloseConnection
         database ! StatAction.NOT_AUTHENTICATED
       }
@@ -75,7 +82,10 @@ class NewAccount(matchmaking: ActorRef,
       _tutorState = Some(tutorState)
       matchmaking ! Online(client.accountId)
       matchmaking ! InGame(client.accountId)
+      context become enterAccount
+  })
 
+  def enterAccount = logged({
     case InGameResponse(gameRef, searchOpponents, top) ⇒
       client.ref ! Authenticated(AuthenticatedDTO(
         state.dto,
@@ -86,9 +96,11 @@ class NewAccount(matchmaking: ActorRef,
         searchOpponents,
         game = if (gameRef.isDefined) Some(NodeLocator(config.host, config.gamePort)) else None
       ))
+  }).orElse(persistent)
 
+  def persistent = logged({
     case DuplicateAccount ⇒ context stop self
-  }
+  })
 
   override def postStop(): Unit =
     if (_client.isDefined) matchmaking ! Offline(client.accountId, client.ref)
