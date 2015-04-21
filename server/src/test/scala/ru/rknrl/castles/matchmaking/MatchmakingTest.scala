@@ -10,10 +10,12 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor._
 import akka.testkit.TestProbe
+import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.kit.ActorsTest
+import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, UserInfoDTO}
+import ru.rknrl.dto.{AccountId, DeviceType, ItemType, UserInfoDTO}
 
 class MatchmakingTest extends ActorsTest {
 
@@ -49,6 +51,18 @@ class MatchmakingTest extends ActorsTest {
     system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new FakeGameFactory(self)), top5), "matchmaking-" + matchmakingIterator)
   }
 
+  def newGameOrder(accountId: AccountId,
+                   deviceType: DeviceType = DeviceType.PC,
+                   accountState: AccountState = accountStateMock(),
+                   isBot: Boolean = false) =
+    GameOrder(
+      accountId = accountId,
+      deviceType = deviceType,
+      userInfo = UserInfoDTO(accountId),
+      accountState = accountState,
+      isBot = isBot
+    )
+
   multi("Два актора отправляют PlaceGameOrderNew - оба получают ConnectToGame", {
     val matchmaking = newMatchmaking
     val accountId1 = AccountId(VKONTAKTE, "1")
@@ -56,11 +70,11 @@ class MatchmakingTest extends ActorsTest {
 
     val client1 = new TestProbe(system)
     client1.send(matchmaking, Online(accountId1))
-    client1.send(matchmaking, GameOrderNew(accountId1))
+    client1.send(matchmaking, newGameOrder(accountId1))
 
     val client2 = new TestProbe(system)
     client2.send(matchmaking, Online(accountId2))
-    client2.send(matchmaking, GameOrderNew(accountId2))
+    client2.send(matchmaking, newGameOrder(accountId2))
     client2.send(matchmaking, TryCreateGames)
 
     client1.expectMsgPF(timeout.duration) {
@@ -83,12 +97,12 @@ class MatchmakingTest extends ActorsTest {
     val accountId = AccountId(VKONTAKTE, "1")
     var game: Option[ActorRef] = None
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ gameRef shouldBe game.get
     }
@@ -102,7 +116,7 @@ class MatchmakingTest extends ActorsTest {
     var game: Option[ActorRef] = None
 
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
@@ -121,7 +135,7 @@ class MatchmakingTest extends ActorsTest {
     var game2: Option[ActorRef] = None
     val client1 = new TestProbe(system)
     client1.send(matchmaking, Online(accountId1))
-    client1.send(matchmaking, GameOrderNew(accountId1))
+    client1.send(matchmaking, newGameOrder(accountId1))
     client1.send(matchmaking, TryCreateGames)
     client1.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game1 = Some(gameRef)
@@ -129,7 +143,7 @@ class MatchmakingTest extends ActorsTest {
 
     val client2 = new TestProbe(system)
     client2.send(matchmaking, Online(accountId2))
-    client2.send(matchmaking, GameOrderNew(accountId2))
+    client2.send(matchmaking, newGameOrder(accountId2))
     client2.send(matchmaking, TryCreateGames)
     client2.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game2 = Some(gameRef)
@@ -141,7 +155,7 @@ class MatchmakingTest extends ActorsTest {
     client2.expectNoMsg()
   })
 
-  multi("PlayerLeaveGameNew", {
+  multi("PlayerLeaveGame", {
     val matchmaking = newMatchmaking
 
     val accountId = AccountId(VKONTAKTE, "1")
@@ -149,12 +163,12 @@ class MatchmakingTest extends ActorsTest {
     var game: Option[ActorRef] = None
 
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! PlayerLeaveGameNew(accountId)
+    matchmaking ! PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap)
     matchmaking ! InGame(accountId)
     expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
   })
@@ -172,7 +186,7 @@ class MatchmakingTest extends ActorsTest {
       case InGameResponse(None, false, top) ⇒ true
     }
 
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! InGame(accountId)
     expectMsgPF(timeout.duration) {
       case InGameResponse(None, true, top) ⇒ true
@@ -220,7 +234,7 @@ class MatchmakingTest extends ActorsTest {
     val matchmaking = newMatchmaking
     val accountId = AccountId(VKONTAKTE, "1")
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! Offline(accountId, self)
     matchmaking ! TryCreateGames
     expectNoMsg()
@@ -230,7 +244,7 @@ class MatchmakingTest extends ActorsTest {
     val matchmaking = newMatchmakingWithSelfAsGameFactory
     val accountId = AccountId(VKONTAKTE, "1")
     matchmaking ! Online(accountId)
-    matchmaking ! GameOrderNew(accountId)
+    matchmaking ! newGameOrder(accountId)
     matchmaking ! TryCreateGames
     expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
@@ -251,10 +265,10 @@ class MatchmakingTest extends ActorsTest {
     val client2 = new TestProbe(system)
 
     client1.send(matchmaking, Online(accountId))
-    client1.send(matchmaking, GameOrderNew(accountId))
+    client1.send(matchmaking, newGameOrder(accountId))
 
     client2.send(matchmaking, Online(accountId))
-    client2.send(matchmaking, GameOrderNew(accountId))
+    client2.send(matchmaking, newGameOrder(accountId))
 
     client1.expectMsg(DuplicateAccount)
     client1.expectNoMsg()

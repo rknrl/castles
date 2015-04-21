@@ -9,15 +9,25 @@
 package ru.rknrl.castles.matchmaking
 
 import akka.actor.{Actor, ActorRef}
+import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.dto.{AccountId, TopUserInfoDTO}
+import ru.rknrl.dto._
 
 object NewMatchmaking {
 
-  case class GameOrderNew(accountId: AccountId)
+  case class GameOrder(accountId: AccountId,
+                       deviceType: DeviceType,
+                       userInfo: UserInfoDTO,
+                       accountState: AccountState,
+                       isBot: Boolean)
 
-  case class GameInfoNew(ref: ActorRef)
+  case class GameInfo(gameRef: ActorRef,
+                      orders: Iterable[GameOrder],
+                      isTutor: Boolean) {
+    def big = orders.size == 4
 
+    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
+  }
 
   case class Online(accountId: AccountId)
 
@@ -29,7 +39,7 @@ object NewMatchmaking {
 
   case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Seq[TopUserInfoDTO])
 
-  case class PlayerLeaveGameNew(accountId: AccountId)
+  case class PlayerLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int])
 
   case class AllPlayersLeaveGame(gameRef: ActorRef)
 
@@ -43,8 +53,8 @@ class NewMatchmaking(gamesFactory: IGamesFactory,
                      var top: Top) extends Actor {
 
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
-  var accountIdToGameOrder = Map.empty[AccountId, GameOrderNew]
-  var accountIdToGameInfo = Map.empty[AccountId, GameInfoNew]
+  var accountIdToGameOrder = Map.empty[AccountId, GameOrder]
+  var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
 
   def receive = {
     case Online(accountId) ⇒
@@ -56,18 +66,19 @@ class NewMatchmaking(gamesFactory: IGamesFactory,
     case o@Offline(accountId, client) ⇒
       accountIdToAccount = accountIdToAccount - accountId
       if (accountIdToGameInfo contains accountId)
-        accountIdToGameInfo(accountId).ref forward o
+        accountIdToGameInfo(accountId).gameRef forward o
 
     case InGame(accountId) ⇒
       sender ! InGameResponse(
-        gameRef = if (accountIdToGameInfo contains accountId) Some(accountIdToGameInfo(accountId).ref) else None,
+        gameRef = if (accountIdToGameInfo contains accountId) Some(accountIdToGameInfo(accountId).gameRef) else None,
         searchOpponents = accountIdToGameOrder contains accountId,
         top = top.dto
       )
 
-    case order@GameOrderNew(accountId) ⇒
+    case order: GameOrder ⇒
+      val accountId = order.accountId
       if (accountIdToGameInfo contains accountId)
-        sender ! ConnectToGame(accountIdToGameInfo(accountId).ref)
+        sender ! ConnectToGame(accountIdToGameInfo(accountId).gameRef)
       else
         accountIdToGameOrder = accountIdToGameOrder + (accountId → order)
 
@@ -79,13 +90,13 @@ class NewMatchmaking(gamesFactory: IGamesFactory,
 
       for ((accountId, gameInfo) ← newAccountIdToGameInfo)
         if (accountIdToAccount contains accountId)
-          accountIdToAccount(accountId) ! ConnectToGame(gameInfo.ref)
+          accountIdToAccount(accountId) ! ConnectToGame(gameInfo.gameRef)
 
-    case PlayerLeaveGameNew(accountId) ⇒
+    case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
       accountIdToGameInfo = accountIdToGameInfo - accountId
 
     case AllPlayersLeaveGame(gameRef) ⇒
-      accountIdToGameInfo = accountIdToGameInfo.filter { case (accountId, gameInfo) ⇒ gameInfo.ref != gameRef }
+      accountIdToGameInfo = accountIdToGameInfo.filter { case (accountId, gameInfo) ⇒ gameInfo.gameRef != gameRef }
       context stop gameRef
   }
 }

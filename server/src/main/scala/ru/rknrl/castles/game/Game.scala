@@ -9,10 +9,9 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{Actor, ActorRef, Props}
-import ru.rknrl.castles.MatchMaking.PlayerLeaveGame
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{AllPlayersLeaveGame, Offline}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{PlayerLeaveGame, AllPlayersLeaveGame, Offline}
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._
@@ -181,8 +180,7 @@ class Game(var gameState: GameState,
       accountId = player.accountId,
       place = gameOver.place,
       reward = gameOver.reward,
-      usedItems = gameState.items.states(playerId).usedItems,
-      userInfo = player.userInfo
+      usedItems = gameState.items.states(playerId).usedItems
     )
 
     if (leaved.size == playersIds.size)

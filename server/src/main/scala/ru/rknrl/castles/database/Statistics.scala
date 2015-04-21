@@ -9,7 +9,7 @@
 package ru.rknrl.castles.database
 
 import akka.actor.{ActorContext, ActorRef}
-import ru.rknrl.castles.MatchMaking.{GameInfo, GameOrder}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{GameInfo, GameOrder}
 import ru.rknrl.dto._
 
 object Statistics {

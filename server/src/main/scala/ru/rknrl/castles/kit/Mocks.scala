@@ -11,8 +11,8 @@ package ru.rknrl.castles.kit
 import org.scalatest.Matchers
 import ru.rknrl.BugsConfig
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState.{Items, Slots}
-import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
+import ru.rknrl.castles.account.AccountState._
+import ru.rknrl.castles.account.{AccountState, AccountConfig, BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.state._
@@ -20,7 +20,9 @@ import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
-import ru.rknrl.dto.BuildingType.HOUSE
+import ru.rknrl.dto.BuildingType.{CHURCH, TOWER, HOUSE}
+import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_0
+import ru.rknrl.dto.SlotId._
 import ru.rknrl.dto._
 
 object Mocks extends Matchers {
@@ -91,6 +93,37 @@ object Mocks extends Matchers {
       useCount = useCount
     )
 
+
+  def slotsMock: Slots =
+    Map(
+      SLOT_1 → None,
+      SLOT_2 → None,
+      SLOT_3 → Some(BuildingPrototype(HOUSE, LEVEL_1)),
+      SLOT_4 → Some(BuildingPrototype(TOWER, LEVEL_1)),
+      SLOT_5 → Some(BuildingPrototype(CHURCH, LEVEL_1))
+    )
+
+  def skillsMock: Skills =
+    SkillType.values.map(_ → SKILL_LEVEL_0).toMap
+
+  def itemsMock: Items =
+    ItemType.values.map(_ → 4).toMap
+
+  def accountStateMock(slots: Slots = slotsMock,
+                       skills: Skills = skillsMock,
+                       items: Items = itemsMock,
+                       gold: Int = 10,
+                       rating: Double = 1400,
+                       gamesCount: Int = 0) =
+    new AccountState(
+      slots = slots,
+      skills = skills,
+      items = items,
+      gold = gold,
+      rating = rating,
+      gamesCount = gamesCount
+    )
+
   def socialConfigMock(appId: String = "",
                        appSecret: String = "",
                        productsInfo: List[ProductInfo] = List.empty) =
@@ -129,7 +162,6 @@ object Mocks extends Matchers {
       poolMaxIdle = poolMaxIdle,
       poolMaxQueueSize = poolMaxQueueSize
     )
-
 
   def buildingPricesMock(level1: Int = 4,
                          level2: Int = 16,

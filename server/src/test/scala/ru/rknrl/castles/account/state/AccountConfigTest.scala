@@ -10,6 +10,7 @@ package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.account.AccountState.Skills
+import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.dto.SkillLevel._
 import ru.rknrl.dto.SkillType._
 
@@ -21,7 +22,7 @@ class AccountConfigTest extends WordSpec with Matchers {
       SPEED → SKILL_LEVEL_3
     )
 
-    val config = AccountMock.config(
+    val config = Mocks.accountConfigMock(
       maxAttack = 2,
       maxDefence = 5.2,
       maxSpeed = 1.6

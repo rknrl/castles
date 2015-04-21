@@ -11,7 +11,7 @@ package ru.rknrl.castles
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.MatchMaking.{GameInfo, GameOrder, PlayerLeaveGame, _}
+import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState.Items
@@ -43,23 +43,7 @@ class PlayerIdIterator extends IdIterator {
 
 object MatchMaking {
 
-  case class GameOrder(accountId: AccountId,
-                       deviceType: DeviceType,
-                       userInfo: UserInfoDTO,
-                       accountState: AccountState,
-                       isBot: Boolean)
-
-  case class GameInfo(gameRef: ActorRef,
-                      orders: Iterable[GameOrder],
-                      isTutor: Boolean) {
-    def big = orders.size == 4
-
-    def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
-  }
-
   case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
-
-  case class PlayerLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO)
 
 }
 
@@ -79,7 +63,7 @@ class MatchMaking(interval: FiniteDuration,
         for (order ← gameInfo.orders;
              accountId = order.accountId
              if accountIdToGameInfo.contains(accountId) && accountIdToGameInfo(accountId) == gameInfo) {
-          onAccountLeaveGame(accountId, place = gameInfo.orders.size, reward = 0, usedItems = Map.empty, gameInfo.orders.find(_.accountId == accountId).get.userInfo)
+          onAccountLeaveGame(accountId, place = gameInfo.orders.size, reward = 0, usedItems = Map.empty)
         }
         onGameOver(sender)
       }
@@ -262,8 +246,8 @@ class MatchMaking(interval: FiniteDuration,
       placeGameOrder(gameOrder, sender)
 
     /** Game оповещает, что игрок вышел из игры */
-    case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
-      onAccountLeaveGame(accountId, place, reward, usedItems, userInfo)
+    case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
+      onAccountLeaveGame(accountId, place, reward, usedItems)
 
     /** Game оповещает, что игра закончена - останавливаем актор игры */
     case AllPlayersLeaveGame(gameRef) ⇒
@@ -291,19 +275,19 @@ class MatchMaking(interval: FiniteDuration,
     }
   }
 
-  def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int], userInfo: UserInfoDTO) = {
+  def onAccountLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int]) = {
     accountIdToGameInfo = accountIdToGameInfo - accountId
 
     val gameInfo = gameRefToGameInfo(sender)
     val orders = gameInfo.orders
-    val order = orders.find(_.accountId == accountId).get
+    val order = gameInfo.order(accountId)
 
     val averageEnemyRating = orders.filter(_ != order).map(_.accountState.rating).sum / (orders.size - 1)
 
     val sA = ELO.getSA(gameInfo.big, place)
     val newRating = ELO.getNewRating(order.accountState.rating, averageEnemyRating, order.accountState.gamesCount, sA)
 
-    top = top.insert(TopUser(accountId, newRating, userInfo))
+    top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, top.dto) // todo - если он ушел в оффлайн, ничо не сохранится
 

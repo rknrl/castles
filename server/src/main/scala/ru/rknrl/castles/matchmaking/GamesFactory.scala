@@ -12,28 +12,32 @@ import akka.actor.{ActorContext, ActorRef, Props}
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.{Game, GameScheduler}
 import ru.rknrl.castles.kit.Mocks
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{GameInfoNew, GameOrderNew}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{GameInfo, GameOrder}
 import ru.rknrl.dto.AccountId
 
 trait IGamesFactory {
-  def createGames(accountIdToGameOrder: Map[AccountId, GameOrderNew],
+  def createGames(accountIdToGameOrder: Map[AccountId, GameOrder],
                   matchmaking: ActorRef)
-                 (implicit context: ActorContext): Map[AccountId, GameInfoNew]
+                 (implicit context: ActorContext): Map[AccountId, GameInfo]
 }
 
 class GamesFactory(gameFactory: IGameFactory) extends IGamesFactory {
 
-  def createGames(accountIdToGameOrder: Map[AccountId, GameOrderNew],
+  def createGames(accountIdToGameOrder: Map[AccountId, GameOrder],
                   matchmaking: ActorRef)
                  (implicit context: ActorContext) =
     for ((accountId, order) ← accountIdToGameOrder) yield
-    accountId → GameInfoNew(ref = gameFactory.create(
-      gameState = Mocks.gameStateMock(),
-      isDev = true,
-      schedulerClass = classOf[GameScheduler],
-      matchmaking = matchmaking,
-      bugs = matchmaking
-    ))
+    accountId → GameInfo(
+      gameRef = gameFactory.create(
+        gameState = Mocks.gameStateMock(),
+        isDev = true,
+        schedulerClass = classOf[GameScheduler],
+        matchmaking = matchmaking,
+        bugs = matchmaking
+      ),
+      orders = List(order),
+      isTutor = false
+    )
 
 }
 

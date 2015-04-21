@@ -9,10 +9,8 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.MatchMaking.PlayerLeaveGame
-import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.Game.UpdateGameState
-import ru.rknrl.castles.matchmaking.NewMatchmaking.AllPlayersLeaveGame
+import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{PlayerLeaveGame, AllPlayersLeaveGame}
 import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender
@@ -100,23 +98,21 @@ class GameLeaveTest extends GameTestSpec {
     client0.send(game, C2B.LeaveGame)
     client0.expectNoMsg()
     expectMsgPF(TIMEOUT) {
-      case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
+      case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
         accountId shouldBe AccountId(VKONTAKTE, "1")
         place shouldBe 2
         reward shouldBe 0
         usedItems shouldBe ItemType.values.map(_ → 0).toMap
-        userInfo shouldBe initGameState.players(PlayerId(0)).userInfo
     }
 
     client1.send(game, C2B.LeaveGame)
     client1.expectNoMsg()
     expectMsgPF(TIMEOUT) {
-      case PlayerLeaveGame(accountId, place, reward, usedItems, userInfo) ⇒
+      case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
         accountId shouldBe AccountId(FACEBOOK, "1")
         place shouldBe 1
         reward shouldBe 2
         usedItems shouldBe ItemType.values.map(_ → 0).toMap
-        userInfo shouldBe initGameState.players(PlayerId(1)).userInfo
     }
 
     // Матчмайкинг получает AllPlayersLeaveGame
