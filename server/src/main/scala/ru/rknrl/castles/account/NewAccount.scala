@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.NewAccount.ClientInfo
-import ru.rknrl.castles.account.auth.Auth.SecretChecked
+import SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
@@ -31,7 +31,7 @@ object NewAccount {
 }
 
 class NewAccount(matchmaking: ActorRef,
-                 secretChecher: ActorRef,
+                 secretChecker: ActorRef,
                  database: ActorRef,
                  bugs: ActorRef,
                  config: Config) extends Actor {
@@ -55,14 +55,13 @@ class NewAccount(matchmaking: ActorRef,
   def auth = logged({
     case authenticate@AuthenticateDTO(userInfo, platformType, deviceType, secret) ⇒
       _client = Some(ClientInfo(sender, userInfo.accountId, deviceType, platformType, userInfo))
-      secretChecher ! authenticate
+      secretChecker ! authenticate
 
     case SecretChecked(valid) ⇒
       if (valid) {
         database ! GetAccountState(client.accountId)
         database ! StatAction.AUTHENTICATED
       } else {
-        log.info("reject")
         client.ref ! CloseConnection
         database ! StatAction.NOT_AUTHENTICATED
       }
@@ -96,6 +95,26 @@ class NewAccount(matchmaking: ActorRef,
         searchOpponents,
         game = if (gameRef.isDefined) Some(NodeLocator(config.host, config.gamePort)) else None
       ))
+
+      if (searchOpponents)
+        context become enterGame
+      else if (gameRef.isDefined)
+        context become game
+      else
+        context become account
+
+  }).orElse(persistent)
+
+  def account = logged({
+    case "a" ⇒
+  }).orElse(persistent)
+
+  def enterGame = logged({
+    case "a" ⇒
+  }).orElse(persistent)
+
+  def game = logged({
+    case "a" ⇒
   }).orElse(persistent)
 
   def persistent = logged({

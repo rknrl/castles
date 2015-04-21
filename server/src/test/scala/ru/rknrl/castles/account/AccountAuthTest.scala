@@ -9,7 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.account.auth.Auth.SecretChecked
+import SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
 import ru.rknrl.castles.kit.Mocks._
@@ -24,16 +24,16 @@ class AccountAuthTest extends AccountTestSpec {
   "auth" should {
 
     multi("reject", {
-      val auth = new TestProbe(system)
+      val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
       val client = new TestProbe(system)
-      val account = newAccount(auth = auth.ref, database = database.ref)
+      val account = newAccount(secretChecker = secretChecker.ref, database = database.ref)
 
       val authenticate = authenticateMock()
       client.send(account, authenticate)
 
-      auth.expectMsg(authenticate)
-      auth.send(account, SecretChecked(valid = false))
+      secretChecker.expectMsg(authenticate)
+      secretChecker.send(account, SecretChecked(valid = false))
 
       client.expectMsg(CloseConnection)
 
@@ -43,13 +43,13 @@ class AccountAuthTest extends AccountTestSpec {
     multi("success new account", {
 
       val config = configMock()
-      val auth = new TestProbe(system)
+      val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val client = new TestProbe(system)
       val account = newAccount(
         matchmaking = matchmaking.ref,
-        auth = auth.ref,
+        secretChecker = secretChecker.ref,
         database = database.ref,
         config = config
       )
@@ -58,8 +58,8 @@ class AccountAuthTest extends AccountTestSpec {
       val accountId = authenticate.userInfo.accountId
       client.send(account, authenticate)
 
-      auth.expectMsg(authenticate)
-      auth.send(account, SecretChecked(valid = true))
+      secretChecker.expectMsg(authenticate)
+      secretChecker.send(account, SecretChecked(valid = true))
 
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(StatAction.AUTHENTICATED)
@@ -92,13 +92,13 @@ class AccountAuthTest extends AccountTestSpec {
     multi("success", {
 
       val config = configMock()
-      val auth = new TestProbe(system)
+      val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val client = new TestProbe(system)
       val account = newAccount(
         matchmaking = matchmaking.ref,
-        auth = auth.ref,
+        secretChecker = secretChecker.ref,
         database = database.ref,
         config = config
       )
@@ -107,8 +107,8 @@ class AccountAuthTest extends AccountTestSpec {
       val accountId = authenticate.userInfo.accountId
       client.send(account, authenticate)
 
-      auth.expectMsg(authenticate)
-      auth.send(account, SecretChecked(valid = true))
+      secretChecker.expectMsg(authenticate)
+      secretChecker.send(account, SecretChecked(valid = true))
 
       val accountState = accountStateMock()
       val tutorState = TutorStateDTO()

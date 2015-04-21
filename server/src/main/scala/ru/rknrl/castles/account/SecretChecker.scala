@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.account.auth
+package ru.rknrl.castles.account
 
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -16,12 +16,12 @@ import akka.util.Crypt
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.auth.Auth._
+import ru.rknrl.castles.account.SecretChecker.{SecretChecked, _}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.AccountType._
 import ru.rknrl.dto.AuthenticateDTO
 
-object Auth {
+object SecretChecker {
 
   case class SecretChecked(valid: Boolean)
 
@@ -71,7 +71,7 @@ object Auth {
   private def encode(bs: Array[Byte]): String = new String(Base64.encodeBase64URLSafe(bs), charset)
 }
 
-class Auth(config: Config) extends Actor {
+class SecretChecker(config: Config) extends Actor {
   def receive = {
     case authenticate: AuthenticateDTO ⇒
       sender ! SecretChecked(checkSecret(authenticate))

@@ -9,43 +9,31 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.account.auth.Auth.SecretChecked
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
-import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.rmi.B2C.Authenticated
-import ru.rknrl.dto.{StatAction, TutorStateDTO}
 
-class AccountTest extends AccountTestSpec {
+class AccountPersistentTest extends AccountTestSpec {
 
   "DuplicateAccount" should {
     multi("Если клиент авторизовался - Стопается после получения DuplicateAccount", {
-      val account = newAccount()
-
-      val authenticate = authenticateMock()
-      val accountId = authenticate.userInfo.accountId
-      account ! authenticate
-
-      expectMsg(authenticate)
-      account ! SecretChecked(valid = true)
-
-      expectMsg(Database.GetAccountState(accountId))
-      expectMsg(StatAction.AUTHENTICATED)
-      account ! AccountStateResponse(accountId, accountStateMock().dto)
-
-      expectMsg(Database.GetTutorState(accountId))
-      account ! TutorStateResponse(accountId, TutorStateDTO())
-
-      expectMsg(Online(accountId))
-      expectMsg(InGame(accountId))
-      account ! InGameResponse(gameRef = None, searchOpponents = false, top = List.empty)
-
-      expectMsgClass(classOf[Authenticated])
-
+      val secretChecker = new TestProbe(system)
+      val database = new TestProbe(system)
+      val client = new TestProbe(system)
+      val matchmaking = new TestProbe(system)
+      val account = newAccount(
+        secretChecker = secretChecker.ref,
+        database = database.ref,
+        matchmaking = matchmaking.ref
+      )
+      authorize(
+        secretChecker = secretChecker,
+        matchmaking = matchmaking,
+        database = database,
+        client = client,
+        account = account
+      )
       account ! DuplicateAccount
       watch(account)
-      expectMsg(Offline(authenticate.userInfo.accountId, self))
+      matchmaking.expectMsgClass(classOf[Offline])
       expectTerminated(account)
     })
 
@@ -60,13 +48,13 @@ class AccountTest extends AccountTestSpec {
   "Offline" should {
     multi("Если клиент авторизовался - Offline отправляется перед остановкой", {
       val client = new TestProbe(system)
-      val auth = new TestProbe(system)
+      val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
-      val account = newAccount(auth = auth.ref, database = database.ref)
+      val account = newAccount(secretChecker = secretChecker.ref, database = database.ref)
 
       val authenticate = authenticateMock()
       client.send(account, authenticate)
-      auth.expectMsg(authenticate)
+      secretChecker.expectMsg(authenticate)
 
       system stop account
       expectMsg(Offline(authenticate.userInfo.accountId, client.ref))
