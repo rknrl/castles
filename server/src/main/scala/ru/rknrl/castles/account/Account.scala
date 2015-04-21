@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.ActorRef
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.MatchMaking._
-import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
+import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
@@ -30,8 +30,6 @@ object Account {
                        reward: Int,
                        newRating: Double,
                        top: Iterable[TopUserInfoDTO])
-
-  case object DuplicateAccount
 
 }
 

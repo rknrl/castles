@@ -45,6 +45,8 @@ object NewMatchmaking {
 
   case object TryCreateGames
 
+  case object AccountLeaveGame
+
 }
 
 class NewMatchmaking(gamesFactory: IGamesFactory,

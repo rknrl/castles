@@ -9,10 +9,10 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.Database.{AccountStateResponse, UpdateAccountState}
 import ru.rknrl.castles.database.Statistics
 import ru.rknrl.castles.kit.Mocks._
+import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2}
@@ -99,4 +99,39 @@ class AccountTest extends AccountTestSpec {
 
     client.expectMsg(AccountStateUpdated(expectedAccountState.dto))
   }
+
+  multi("EnterGame", {
+    val secretChecker = new TestProbe(system)
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = new TestProbe(system)
+    val account = newAccount(
+      secretChecker = secretChecker.ref,
+      database = database.ref,
+      matchmaking = matchmaking.ref,
+      config = config
+    )
+    val accountId = authenticateMock().userInfo.accountId
+    authorize(
+      secretChecker = secretChecker,
+      matchmaking = matchmaking,
+      database = database,
+      client = client,
+      account = account,
+      config = config,
+      accountState = accountState
+    )
+
+    client.send(account, EnterGame)
+
+    matchmaking.expectMsg(
+      GameOrder(
+        accountId,
+        authenticateMock().deviceType,
+        authenticateMock().userInfo,
+        accountState,
+        isBot = false
+      )
+    )
+  })
 }

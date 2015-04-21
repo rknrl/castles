@@ -12,7 +12,7 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.MatchMaking._
-import ru.rknrl.castles.account.Account.{DuplicateAccount, LeaveGame}
+import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.bot.{Bot, TutorBot}

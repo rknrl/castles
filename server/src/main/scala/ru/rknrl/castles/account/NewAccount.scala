@@ -13,10 +13,12 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.NewAccount.ClientInfo
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.{GetAccountState, _}
-import ru.rknrl.castles.database.Statistics
+import ru.rknrl.castles.database.{Database, Statistics}
+import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated}
+import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
 import ru.rknrl.castles.rmi.C2B._
+import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
 import ru.rknrl.{Assertion, BugType, Logged, SilentLog}
@@ -41,6 +43,7 @@ class NewAccount(matchmaking: ActorRef,
   var _client: Option[ClientInfo] = None
   var _state: Option[AccountState] = None
   var _tutorState: Option[TutorStateDTO] = None
+  var _game: Option[ActorRef] = None
 
   def client = _client.get
 
@@ -48,13 +51,15 @@ class NewAccount(matchmaking: ActorRef,
 
   def tutorState = _tutorState.get
 
+  def game = _game.get
+
   val log = new SilentLog
 
   def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.ACCOUNT), any ⇒ true)
 
   def receive = auth
 
-  def auth = logged({
+  def auth: Receive = logged({
     case authenticate@AuthenticateDTO(userInfo, platformType, deviceType, secret) ⇒
       _client = Some(ClientInfo(sender, userInfo.accountId, deviceType, platformType, userInfo))
       secretChecker ! authenticate
@@ -86,7 +91,7 @@ class NewAccount(matchmaking: ActorRef,
       context become enterAccount
   })
 
-  def enterAccount = logged({
+  def enterAccount: Receive = logged({
     case InGameResponse(gameRef, searchOpponents, top) ⇒
       client.ref ! Authenticated(AuthenticatedDTO(
         state.dto,
@@ -95,19 +100,21 @@ class NewAccount(matchmaking: ActorRef,
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
         searchOpponents,
-        game = if (gameRef.isDefined) Some(NodeLocator(config.host, config.gamePort)) else None
+        game = if (gameRef.isDefined) Some(nodeLocator) else None
       ))
+
+      // todo start tutor if gamesCount = 0
 
       if (searchOpponents)
         context become enterGame
       else if (gameRef.isDefined)
-        context become game
+        context become inGame
       else
         context become account
 
   }).orElse(persistent)
 
-  def account = logged({
+  def account: Receive = logged({
     case BuyBuilding(dto) ⇒
       updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
       database ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
@@ -129,8 +136,8 @@ class NewAccount(matchmaking: ActorRef,
       database ! Statistics.buyItem(dto.itemType)
 
     case EnterGame ⇒
-    //      matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
-    //      context become enterGame
+      matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
+      context become enterGame
 
   }).orElse(persistent)
 
@@ -139,20 +146,50 @@ class NewAccount(matchmaking: ActorRef,
     database ! UpdateAccountState(client.accountId, newState.dto)
   }
 
-  def enterGame = logged({
-    case "a" ⇒
+  def enterGame: Receive = logged({
+    case ConnectToGame(gameRef) ⇒
+      _game = Some(gameRef)
+      client.ref ! EnteredGame(nodeLocator)
+
+    case C2B.JoinGame ⇒
+      game ! Join(client.accountId, client.ref)
+      context become inGame
+
   }).orElse(persistent)
 
-  def game = logged({
-    case "a" ⇒
+  def inGame: Receive = logged({
+    case msg: GameMsg ⇒ game forward msg
+
+    case msg: UpdateStatistics ⇒
+      game forward msg.stat.action
+      database forward msg.stat.action
+
+    case AccountLeaveGame ⇒
+      client.ref ! B2C.LeavedGame
+      context become account
+
   }).orElse(persistent)
 
-  def persistent = logged({
+  def persistent: Receive = logged({
     case AccountStateResponse(accountId, stateDto) ⇒
       client.ref ! AccountStateUpdated(stateDto)
 
+    /*
+        case AdminSetAccountState(_, accountStateDto) ⇒
+          _state = Some(AccountState(accountStateDto))
+          client.ref ! AccountStateUpdated(accountStateDto)
+
+    */
+
+    case msg: UpdateStatistics ⇒ database ! msg.stat.action
+
+    case C2B.UpdateTutorState(state) ⇒
+      database ! Database.UpdateTutorState(client.accountId, state)
+
     case DuplicateAccount ⇒ context stop self
   })
+
+  def nodeLocator = NodeLocator(config.host, config.gamePort)
 
   override def postStop(): Unit =
     if (_client.isDefined) matchmaking ! Offline(client.accountId, client.ref)

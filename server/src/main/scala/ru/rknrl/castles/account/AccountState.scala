@@ -14,12 +14,12 @@ import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto._
 
-class AccountState(val slots: Slots,
-                   val skills: Skills,
-                   val items: Items,
-                   val gold: Int,
-                   val rating: Double,
-                   val gamesCount: Int) {
+case class AccountState(slots: Slots,
+                        skills: Skills,
+                        items: Items,
+                        gold: Int,
+                        rating: Double,
+                        gamesCount: Int) {
 
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
     val price = config.buildingPrices(LEVEL_1)
