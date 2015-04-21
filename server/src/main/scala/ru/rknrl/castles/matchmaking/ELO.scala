@@ -8,9 +8,11 @@
 
 package ru.rknrl.castles.matchmaking
 
+import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
+
 object ELO {
-  def getSA(big: Boolean, place: Int) =
-    if (big)
+  def getSA(playersCount: Int, place: Int) =
+    if (playersCount == 4)
       place match {
         case 1 ⇒ 1.0
         case 2 ⇒ 0.5
@@ -27,5 +29,11 @@ object ELO {
     val k: Double = if (ratingA > 2400) 10 else if (gamesCountA <= 30) 30 else 15
 
     ratingA + k * (sA - eA)
+  }
+
+  def newRating(orders: Iterable[GameOrder], order: GameOrder, place: Int) = {
+    val averageEnemyRating = orders.filter(_ != order).map(_.accountState.rating).sum / (orders.size - 1)
+    val sA = ELO.getSA(orders.size, place)
+    getNewRating(order.accountState.rating, averageEnemyRating, order.accountState.gamesCount, sA)
   }
 }

@@ -51,18 +51,6 @@ class MatchmakingTest extends ActorsTest {
     system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new FakeGameFactory(self)), top5), "matchmaking-" + matchmakingIterator)
   }
 
-  def newGameOrder(accountId: AccountId,
-                   deviceType: DeviceType = DeviceType.PC,
-                   accountState: AccountState = accountStateMock(),
-                   isBot: Boolean = false) =
-    GameOrder(
-      accountId = accountId,
-      deviceType = deviceType,
-      userInfo = UserInfoDTO(accountId),
-      accountState = accountState,
-      isBot = isBot
-    )
-
   multi("Два актора отправляют PlaceGameOrderNew - оба получают ConnectToGame", {
     val matchmaking = newMatchmaking
     val accountId1 = AccountId(VKONTAKTE, "1")

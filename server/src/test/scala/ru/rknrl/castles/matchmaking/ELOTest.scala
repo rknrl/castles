@@ -9,6 +9,9 @@
 package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
+import ru.rknrl.castles.kit.Mocks._
+import ru.rknrl.dto.AccountId
+import ru.rknrl.dto.AccountType.VKONTAKTE
 
 class ELOTest extends WordSpec with Matchers {
   "getNewRating" in {
@@ -20,6 +23,20 @@ class ELOTest extends WordSpec with Matchers {
   "getNewRating2" in {
     // Новичок выигрывает такого же новичка в бою два на два
     val newRating = ELO.getNewRating(ratingA = 1400, ratingB = 1400, gamesCountA = 1, sA = 1)
+    newRating shouldBe (1415.0 +- 1)
+  }
+
+  "newRating" in {
+    // like getNewRating2 test
+    val order1 = newGameOrder(
+      AccountId(VKONTAKTE, "1"),
+      accountState = accountStateMock(rating = 1400, gamesCount = 1)
+    )
+    val order2 = newGameOrder(
+      AccountId(VKONTAKTE, "2"),
+      accountState = accountStateMock(rating = 1400, gamesCount = 1)
+    )
+    val newRating = ELO.newRating(List(order1, order2), order1, place = 1)
     newRating shouldBe (1415.0 +- 1)
   }
 

@@ -282,11 +282,7 @@ class MatchMaking(interval: FiniteDuration,
     val orders = gameInfo.orders
     val order = gameInfo.order(accountId)
 
-    val averageEnemyRating = orders.filter(_ != order).map(_.accountState.rating).sum / (orders.size - 1)
-
-    val sA = ELO.getSA(gameInfo.big, place)
-    val newRating = ELO.getNewRating(order.accountState.rating, averageEnemyRating, order.accountState.gamesCount, sA)
-
+    val newRating = ELO.newRating(gameInfo.orders, order, place)
     top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
     accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, top.dto) // todo - если он ушел в оффлайн, ничо не сохранится

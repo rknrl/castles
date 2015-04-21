@@ -24,8 +24,6 @@ object NewMatchmaking {
   case class GameInfo(gameRef: ActorRef,
                       orders: Iterable[GameOrder],
                       isTutor: Boolean) {
-    def big = orders.size == 4
-
     def order(accountId: AccountId) = orders.find(_.accountId == accountId).get
   }
 
