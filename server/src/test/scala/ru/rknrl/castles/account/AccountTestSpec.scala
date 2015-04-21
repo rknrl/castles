@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.{ActorRef, Props}
 import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
-import SecretChecker.SecretChecked
+import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, GetTutorState, TutorStateResponse}
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
@@ -45,7 +45,8 @@ class AccountTestSpec extends ActorsTest {
                 database: TestProbe,
                 matchmaking: TestProbe,
                 client: TestProbe,
-                account: ActorRef) = {
+                account: ActorRef,
+                accountState: AccountState = accountStateMock()) = {
 
     val authenticate = authenticateMock(platformType = CANVAS)
     val accountId = authenticate.userInfo.accountId
@@ -54,7 +55,6 @@ class AccountTestSpec extends ActorsTest {
     secretChecker.expectMsg(authenticate)
     secretChecker.send(account, SecretChecked(valid = true))
 
-    val accountState = accountStateMock()
     val tutorState = TutorStateDTO()
 
     database.expectMsg(GetAccountState(accountId))

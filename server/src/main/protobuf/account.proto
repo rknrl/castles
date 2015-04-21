@@ -64,9 +64,9 @@ message RemoveBuildingDTO {
 }
 
 message UpgradeSkillDTO {
-    required SkillType type = 1;
+    required SkillType skillType = 1;
 }
 
 message BuyItemDTO {
-    required ItemType type = 1;
+    required ItemType itemType = 1;
 }

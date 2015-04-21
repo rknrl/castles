@@ -197,7 +197,7 @@ public class MenuController {
             }
 
             const dto:BuyItemDTO = new BuyItemDTO();
-            dto.type = event.itemType;
+            dto.itemType = event.itemType;
             server.buyItem(dto);
 
             view.animateMagicItem(event.itemType);
@@ -217,7 +217,7 @@ public class MenuController {
                 }
 
                 const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
-                dto.type = event.skillType;
+                dto.skillType = event.skillType;
                 server.upgradeSkill(dto);
 
                 view.animateFlask(event.skillType);

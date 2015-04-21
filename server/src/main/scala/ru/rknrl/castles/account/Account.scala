@@ -161,12 +161,12 @@ class Account(matchmaking: ActorRef,
       database ! StatAction.REMOVE_BUILDING
 
     case UpgradeSkill(dto) ⇒
-      updateState(state.upgradeSkill(dto.`type`, config.account))
-      database ! Statistics.buySkill(dto.`type`, state.skills(dto.`type`))
+      updateState(state.upgradeSkill(dto.skillType, config.account))
+      database ! Statistics.buySkill(dto.skillType, state.skills(dto.skillType))
 
     case BuyItem(dto) ⇒
-      updateState(state.buyItem(dto.`type`, config.account))
-      database ! Statistics.buyItem(dto.`type`)
+      updateState(state.buyItem(dto.itemType, config.account))
+      database ! Statistics.buyItem(dto.itemType)
 
     case EnterGame ⇒
       placeGameOrder(isTutor = false)

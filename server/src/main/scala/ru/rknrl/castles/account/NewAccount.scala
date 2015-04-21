@@ -11,10 +11,12 @@ package ru.rknrl.castles.account
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.NewAccount.ClientInfo
-import SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.account.SecretChecker.SecretChecked
+import ru.rknrl.castles.database.Database.{GetAccountState, _}
+import ru.rknrl.castles.database.Statistics
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.rmi.B2C.Authenticated
+import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated}
+import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
 import ru.rknrl.{Assertion, BugType, Logged, SilentLog}
@@ -106,8 +108,36 @@ class NewAccount(matchmaking: ActorRef,
   }).orElse(persistent)
 
   def account = logged({
-    case "a" ⇒
+    case BuyBuilding(dto) ⇒
+      updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
+      database ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
+
+    case UpgradeBuilding(dto) ⇒
+      updateState(state.upgradeBuilding(dto.id, config.account))
+      database ! Statistics.buyBuilding(state.slots(dto.id).get)
+
+    case RemoveBuilding(dto) ⇒
+      updateState(state.removeBuilding(dto.id))
+      database ! StatAction.REMOVE_BUILDING
+
+    case UpgradeSkill(dto) ⇒
+      updateState(state.upgradeSkill(dto.skillType, config.account))
+      database ! Statistics.buySkill(dto.skillType, state.skills(dto.skillType))
+
+    case BuyItem(dto) ⇒
+      updateState(state.buyItem(dto.itemType, config.account))
+      database ! Statistics.buyItem(dto.itemType)
+
+    case EnterGame ⇒
+    //      matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
+    //      context become enterGame
+
   }).orElse(persistent)
+
+  def updateState(newState: AccountState): Unit = {
+    _state = Some(newState)
+    database ! UpdateAccountState(client.accountId, newState.dto)
+  }
 
   def enterGame = logged({
     case "a" ⇒
@@ -118,6 +148,9 @@ class NewAccount(matchmaking: ActorRef,
   }).orElse(persistent)
 
   def persistent = logged({
+    case AccountStateResponse(accountId, stateDto) ⇒
+      client.ref ! AccountStateUpdated(stateDto)
+
     case DuplicateAccount ⇒ context stop self
   })
 
