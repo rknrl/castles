@@ -368,9 +368,9 @@ object Mocks extends Matchers {
   def buildingsConfigMock(house1: BuildingConfig = buildingConfigMock(),
                           house2: BuildingConfig = buildingConfigMock(),
                           house3: BuildingConfig = buildingConfigMock(),
-                          tower1: BuildingConfig = buildingConfigMock(),
-                          tower2: BuildingConfig = buildingConfigMock(),
-                          tower3: BuildingConfig = buildingConfigMock(),
+                          tower1: BuildingConfig = buildingConfigMock(shotPower = Some(1.0)),
+                          tower2: BuildingConfig = buildingConfigMock(shotPower = Some(1.0)),
+                          tower3: BuildingConfig = buildingConfigMock(shotPower = Some(1.0)),
                           church1: BuildingConfig = buildingConfigMock(),
                           church2: BuildingConfig = buildingConfigMock(),
                           church3: BuildingConfig = buildingConfigMock()) =

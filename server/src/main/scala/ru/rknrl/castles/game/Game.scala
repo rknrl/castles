@@ -8,10 +8,11 @@
 
 package ru.rknrl.castles.game
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorContext, ActorRef, Props}
+import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{PlayerLeaveGame, AllPlayersLeaveGame, Offline}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._
@@ -28,9 +29,16 @@ object Game {
 
 class Game(var gameState: GameState,
            isDev: Boolean,
+           isTutor: Boolean,
+           botFactory: IBotFactory,
            schedulerClass: Class[_],
            matchmaking: ActorRef,
            bugs: ActorRef) extends Actor {
+
+  for ((playerId, player) ← gameState.players if player.isBot) {
+    val bot = botFactory.create(player.accountId, isTutor, gameState.config, bugs)
+    bot ! ConnectToGame(self)
+  }
 
   val playersIds = gameState.players.keys
 

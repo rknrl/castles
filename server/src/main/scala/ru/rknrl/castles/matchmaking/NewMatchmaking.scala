@@ -8,9 +8,12 @@
 
 package ru.rknrl.castles.matchmaking
 
-import akka.actor.{Props, Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import org.slf4j.LoggerFactory
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
+import ru.rknrl.castles.game.{Game, GameScheduler}
+import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto._
 import ru.rknrl.{Logged, Slf4j}
@@ -63,15 +66,18 @@ object NewMatchmaking {
 // Offline - // Если это тутор и игрок отвалился, то убиваем игру.
 // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
 
-// delete bots on AllPlayersLeave
-
-class NewMatchmaking(gamesFactory: IGamesFactory,
+class NewMatchmaking(gameCreator: GameCreator,
                      interval: FiniteDuration,
-                     var top: Top) extends Actor {
+                     var top: Top,
+                     config: Config,
+                     database: ActorRef,
+                     bugs: ActorRef) extends Actor {
 
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
   var accountIdToGameOrder = Map.empty[AccountId, GameOrder]
   var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
+
+  val gameIterator = new GameIdIterator
 
   import context.dispatcher
 
@@ -111,14 +117,21 @@ class NewMatchmaking(gamesFactory: IGamesFactory,
         accountIdToGameOrder = accountIdToGameOrder + (accountId → order)
 
     case TryCreateGames ⇒
-      val newAccountIdToGameInfo = gamesFactory.createGames(accountIdToGameOrder, self)
+      val matchedOrders = matchOrders(accountIdToGameOrder.values.toSeq)
+      val newGames = matchedOrders.map(gameCreator.newGame)
+
+      for (newGame ← newGames) {
+        val game = context.actorOf(Props(classOf[Game], newGame.gameState, config.isDev, newGame.isTutor, classOf[GameScheduler], self, bugs), gameIterator.next)
+        val gameInfo = GameInfo(game, newGame.gameOrders, newGame.isTutor)
+
+        for (order ← newGame.gameOrders if !order.isBot) {
+          accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
+          if (accountIdToAccount contains order.accountId)
+            accountIdToAccount(order.accountId) ! ConnectToGame(game)
+        }
+      }
+
       accountIdToGameOrder = Map.empty
-
-      accountIdToGameInfo = accountIdToGameInfo ++ newAccountIdToGameInfo
-
-      for ((accountId, gameInfo) ← newAccountIdToGameInfo)
-        if (accountIdToAccount contains accountId)
-          accountIdToAccount(accountId) ! ConnectToGame(gameInfo.gameRef)
 
     case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
       accountIdToGameInfo = accountIdToGameInfo - accountId
