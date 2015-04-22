@@ -11,7 +11,6 @@ package ru.rknrl.castles
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.bot.{Bot, TutorBot}
@@ -20,7 +19,7 @@ import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.matchmaking.{ELO, Top, TopUser}
+import ru.rknrl.castles.matchmaking.{ELO, Patcher, Top, TopUser}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto._
 import ru.rknrl.utils.IdIterator
@@ -274,11 +273,12 @@ class MatchMaking(interval: FiniteDuration,
     val gameInfo = gameRefToGameInfo(sender)
     val orders = gameInfo.orders
     val order = gameInfo.order(accountId)
-
     val newRating = ELO.newRating(gameInfo.orders, order, place)
     top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
-    accountIdToAccountRef(accountId) ! LeaveGame(usedItems, reward, newRating, top.dto) // todo - если он ушел в оффлайн, ничо не сохранится
+    context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database))
+
+    accountIdToAccountRef(accountId) ! AccountLeaveGame(top.dto)
 
     Statistics.sendLeaveGameStatistics(place, gameInfo, orders, order, database)
   }

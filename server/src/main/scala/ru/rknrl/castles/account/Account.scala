@@ -10,7 +10,6 @@ package ru.rknrl.castles.account
 
 import akka.actor.ActorRef
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
@@ -22,15 +21,6 @@ import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto._
 import ru.rknrl.{BugType, EscalateStrategyActor, Logged, SilentLog}
-
-object Account {
-
-  case class LeaveGame(usedItems: Map[ItemType, Int],
-                       reward: Int,
-                       newRating: Double,
-                       top: Iterable[TopUserInfoDTO])
-
-}
 
 class Account(matchmaking: ActorRef,
               database: ActorRef,
@@ -194,15 +184,8 @@ class Account(matchmaking: ActorRef,
       database forward msg.stat.action
 
     /** Matchmaking говорит, что для этого игрока бой завершен */
-    case LeaveGame(usedItems, reward, newRating, top) ⇒
+    case AccountLeaveGame(top) ⇒
       client ! B2C.LeavedGame
-
-      state = state.addGold(reward)
-        .incGamesCount
-        .setNewRating(newRating)
-        .applyUsedItems(usedItems)
-
-      database ! UpdateAccountState(accountId, state.dto)
       client ! TopUpdated(TopDTO(top.toSeq))
       context become account
 

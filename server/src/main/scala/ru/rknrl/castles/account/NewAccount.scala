@@ -162,8 +162,9 @@ class NewAccount(matchmaking: ActorRef,
       game forward msg.stat.action
       database forward msg.stat.action
 
-    case AccountLeaveGame ⇒
+    case AccountLeaveGame(top) ⇒
       client.ref ! B2C.LeavedGame
+      client.ref ! B2C.TopUpdated(TopDTO(top))
       context become account
 
   }).orElse(persistent)

@@ -45,7 +45,7 @@ object NewMatchmaking {
 
   case object TryCreateGames
 
-  case object AccountLeaveGame
+  case class AccountLeaveGame(top: Seq[TopUserInfoDTO])
 
   case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
 

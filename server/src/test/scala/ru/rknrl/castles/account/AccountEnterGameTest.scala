@@ -15,7 +15,7 @@ import ru.rknrl.castles.matchmaking.NewMatchmaking.{AccountLeaveGame, ConnectToG
 import ru.rknrl.castles.rmi.B2C.EnteredGame
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.castles.rmi.C2B.{CastFireball, EnterGame, UpdateStatistics}
-import ru.rknrl.dto.{NodeLocator, PointDTO, StatAction, StatDTO}
+import ru.rknrl.dto._
 
 class AccountEnterGameTest extends AccountTestSpec {
   val config = configMock()
@@ -71,8 +71,9 @@ class AccountEnterGameTest extends AccountTestSpec {
     game.expectMsg(StatAction.TUTOR_BIG_TOWER)
     database.expectMsg(StatAction.TUTOR_BIG_TOWER)
 
-    matchmaking.send(account, AccountLeaveGame)
+    matchmaking.send(account, AccountLeaveGame(List.empty))
     client.expectMsg(B2C.LeavedGame)
+    client.expectMsg(B2C.TopUpdated(TopDTO(List.empty)))
   })
 
 }
