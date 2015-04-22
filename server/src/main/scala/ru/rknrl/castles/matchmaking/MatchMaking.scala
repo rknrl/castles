@@ -6,11 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles
+package ru.rknrl.castles.matchmaking
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.bot.{Bot, TutorBot}
@@ -19,7 +20,6 @@ import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.matchmaking.{ELO, Patcher, Top, TopUser}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto._
 import ru.rknrl.utils.IdIterator

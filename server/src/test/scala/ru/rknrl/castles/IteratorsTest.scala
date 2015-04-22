@@ -10,6 +10,7 @@ package ru.rknrl.castles
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.game.state.{BuildingIdIterator, UnitIdIterator}
+import ru.rknrl.castles.matchmaking.{PlayerIdIterator, GameIdIterator, BotIdIterator}
 import ru.rknrl.dto.AccountType.DEV
 import ru.rknrl.dto.{AccountId, BuildingId, PlayerId, UnitId}
 

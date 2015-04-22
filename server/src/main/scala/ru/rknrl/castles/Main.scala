@@ -15,7 +15,7 @@ import net.liftweb.json._
 import ru.rknrl.castles.account.SecretChecker
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.game.init.GameMaps
-import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.matchmaking.{MatchMaking, Top}
 import ru.rknrl.{Bugs, PolicyServer}
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database

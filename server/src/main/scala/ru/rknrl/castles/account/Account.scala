@@ -142,11 +142,6 @@ class Account(matchmaking: ActorRef,
 
   }).orElse(persistent)
 
-  def updateState(newState: AccountState): Unit = {
-    _state = Some(newState)
-    database ! UpdateAccountState(client.accountId, newState.dto)
-  }
-
   def enterGame: Receive = logged({
     case ConnectToGame(gameRef) ⇒
       _game = Some(gameRef)
@@ -187,6 +182,11 @@ class Account(matchmaking: ActorRef,
 
     case DuplicateAccount ⇒ client.ref ! CloseConnection
   })
+
+  def updateState(newState: AccountState): Unit = {
+    _state = Some(newState)
+    database ! UpdateAccountState(client.accountId, newState.dto)
+  }
 
   def sendGameOrder(): Unit = {
     matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
