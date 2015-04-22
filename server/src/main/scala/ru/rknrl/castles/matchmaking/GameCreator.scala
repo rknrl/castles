@@ -17,7 +17,7 @@ import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
 
 object GameCreator {
 
-  case class NewGame(gameOrders: Seq[GameOrder],
+  case class NewGame(orders: Seq[GameOrder],
                      isTutor: Boolean,
                      gameState: GameState)
 
@@ -41,7 +41,7 @@ class GameCreator(gameMaps: GameMaps,
     val gameMap = if (matched.isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
     val gameState = GameStateInit.init(
-      time = System.currentTimeMillis(),
+      time = 0,
       players = players.toList,
       big = big,
       isTutor = matched.isTutor,

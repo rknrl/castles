@@ -43,19 +43,6 @@ class MatchmakingTest extends ActorsTest {
     TopUser(id5, 1200, info5)
   ))
 
-  def gameMapMock() =
-    new GameMap(List.empty)
-
-  def gameMapsMock() =
-    new GameMaps(
-      Array(gameMapMock()),
-      Array(gameMapMock()),
-      gameMapMock(),
-      gameMapMock()
-    )
-
-  def gameCreatorMock() = new GameCreator(gameMapsMock(), configMock())
-
   def newMatchmaking = {
     matchmakingIterator += 1
     system.actorOf(

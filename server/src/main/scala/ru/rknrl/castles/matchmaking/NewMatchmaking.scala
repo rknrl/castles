@@ -122,9 +122,9 @@ class NewMatchmaking(gameCreator: GameCreator,
 
       for (newGame ← newGames) {
         val game = context.actorOf(Props(classOf[Game], newGame.gameState, config.isDev, newGame.isTutor, classOf[GameScheduler], self, bugs), gameIterator.next)
-        val gameInfo = GameInfo(game, newGame.gameOrders, newGame.isTutor)
+        val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
 
-        for (order ← newGame.gameOrders if !order.isBot) {
+        for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
           if (accountIdToAccount contains order.accountId)
             accountIdToAccount(order.accountId) ! ConnectToGame(game)

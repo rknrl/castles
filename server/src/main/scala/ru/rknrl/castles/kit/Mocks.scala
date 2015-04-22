@@ -12,16 +12,18 @@ import org.scalatest.Matchers
 import ru.rknrl.BugsConfig
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.account.{AccountState, AccountConfig, BuildingPrices, SkillUpgradePrices}
+import ru.rknrl.castles.account.{AccountConfig, AccountState, BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
+import ru.rknrl.castles.game.init.{GameMap, GameMaps}
 import ru.rknrl.castles.game.state._
+import ru.rknrl.castles.matchmaking.GameCreator
 import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
-import ru.rknrl.dto.BuildingType.{CHURCH, TOWER, HOUSE}
+import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
 import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_0
 import ru.rknrl.dto.SlotId._
 import ru.rknrl.dto._
@@ -554,5 +556,27 @@ object Mocks extends Matchers {
       accountState = accountState,
       isBot = isBot
     )
+
+  val notTutorMap2 =
+    new GameMap(List.empty)
+
+  val notTutorMap4 =
+    new GameMap(List.empty)
+
+  val tutorMap2 =
+    new GameMap(List.empty)
+
+  val tutorMap4 =
+    new GameMap(List.empty)
+
+  def gameMapsMock() =
+    new GameMaps(
+      Array(notTutorMap4),
+      Array(notTutorMap2),
+      tutorMap4,
+      tutorMap2
+    )
+
+  def gameCreatorMock() = new GameCreator(gameMapsMock(), configMock())
 
 }

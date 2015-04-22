@@ -31,21 +31,21 @@ class UnitIdIterator extends IdIterator {
   def next = UnitId(nextInt)
 }
 
-class GameState(val width: Int,
-                val height: Int,
-                val slotsPos: Iterable[SlotsPosDTO],
-                val time: Long,
-                val players: Map[PlayerId, Player],
-                val buildings: Seq[Building],
-                val units: Seq[GameUnit],
-                val fireballs: Iterable[Fireball],
-                val volcanoes: Iterable[Volcano],
-                val tornadoes: Iterable[Tornado],
-                val bullets: Iterable[Bullet],
-                val items: GameItems,
-                val config: GameConfig,
-                val unitIdIterator: UnitIdIterator,
-                val assistancePositions: Map[PlayerId, Point]) {
+case class GameState(width: Int,
+                     height: Int,
+                     slotsPos: Iterable[SlotsPosDTO],
+                     time: Long,
+                     players: Map[PlayerId, Player],
+                     buildings: Seq[Building],
+                     units: Seq[GameUnit],
+                     fireballs: Iterable[Fireball],
+                     volcanoes: Iterable[Volcano],
+                     tornadoes: Iterable[Tornado],
+                     bullets: Iterable[Bullet],
+                     items: GameItems,
+                     config: GameConfig,
+                     unitIdIterator: UnitIdIterator,
+                     assistancePositions: Map[PlayerId, Point]) {
 
   def update(newTime: Long,
              moveActions: Map[PlayerId, MoveDTO],
