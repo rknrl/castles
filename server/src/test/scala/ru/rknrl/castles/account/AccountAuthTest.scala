@@ -15,6 +15,7 @@ import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateRespo
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
+import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.AccountType.VKONTAKTE
 import ru.rknrl.dto.PlatformType.CANVAS
@@ -30,7 +31,7 @@ class AccountAuthTest extends AccountTestSpec {
       val account = newAccount(secretChecker = secretChecker.ref, database = database.ref)
 
       val authenticate = authenticateMock()
-      client.send(account, authenticate)
+      client.send(account,Authenticate(authenticate))
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = false))
@@ -56,7 +57,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       val authenticate = authenticateMock(platformType = CANVAS)
       val accountId = authenticate.userInfo.accountId
-      client.send(account, authenticate)
+      client.send(account, Authenticate(authenticate))
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
@@ -109,7 +110,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       val authenticate = authenticateMock(platformType = CANVAS)
       val accountId = authenticate.userInfo.accountId
-      client.send(account, authenticate)
+      client.send(account, Authenticate(authenticate))
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))

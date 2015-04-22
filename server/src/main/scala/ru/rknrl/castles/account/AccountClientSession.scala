@@ -14,10 +14,11 @@ import ru.rknrl.rmi.Client
 
 class AccountClientSession(tcpSender: ActorRef,
                            matchmaking: ActorRef,
+                           secretChecker: ActorRef,
                            database: ActorRef,
                            bugs: ActorRef,
                            config: Config,
                            name: String) extends Client(tcpSender, name) {
 
-  val handler = context.actorOf(Props(classOf[Account], matchmaking, database, bugs, config, name), "account" + name)
+  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, bugs, config), "account" + name)
 }

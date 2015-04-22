@@ -8,133 +8,116 @@
 
 package ru.rknrl.castles.account
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.account.Account.ClientInfo
+import ru.rknrl.castles.account.SecretChecker.SecretChecked
+import ru.rknrl.castles.database.Database.{GetAccountState, _}
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
-import ru.rknrl.castles.rmi.B2C._
+import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.core.social.SocialAuth
 import ru.rknrl.dto._
-import ru.rknrl.{BugType, EscalateStrategyActor, Logged, SilentLog}
+import ru.rknrl.{Assertion, BugType, Logged, SilentLog}
+
+
+object Account {
+
+  sealed case class ClientInfo(ref: ActorRef,
+                               accountId: AccountId,
+                               deviceType: DeviceType,
+                               platformType: PlatformType,
+                               userInfo: UserInfoDTO)
+
+}
 
 class Account(matchmaking: ActorRef,
+              secretChecker: ActorRef,
               database: ActorRef,
               bugs: ActorRef,
-              config: Config,
-              name: String) extends EscalateStrategyActor {
+              config: Config) extends Actor {
+
+  var _client: Option[ClientInfo] = None
+  var _state: Option[AccountState] = None
+  var _tutorState: Option[TutorStateDTO] = None
+  var _game: Option[ActorRef] = None
+
+  def client = _client.get
+
+  def state = _state.get
+
+  def tutorState = _tutorState.get
+
+  def game = _game.get
 
   val log = new SilentLog
 
   def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.ACCOUNT), any ⇒ true)
 
-  // auth
-
-  var client: ActorRef = null
-  var accountId: AccountId = null
-  var deviceType: DeviceType = null
-  var platformType: PlatformType = null
-  var userInfo: UserInfoDTO = null
-  var state: AccountState = null
-
-  def checkSecret(authenticate: AuthenticateDTO) =
-    authenticate.userInfo.accountId.accountType match {
-      case AccountType.DEV ⇒
-        config.isDev
-      case AccountType.VKONTAKTE ⇒
-        if (authenticate.secret.accessToken.isDefined)
-          true // todo: check access token
-        else
-          SocialAuth.checkSecretVk(authenticate.secret.body, authenticate.userInfo.accountId.id, config.social.vk.get)
-
-      case AccountType.ODNOKLASSNIKI ⇒
-        if (authenticate.secret.accessToken.isDefined)
-          true // todo: check access token
-        else
-          SocialAuth.checkSecretOk(authenticate.secret.body, authenticate.secret.getParams, authenticate.userInfo.accountId.id, config.social.ok.get)
-
-      case AccountType.MOIMIR ⇒
-        if (authenticate.secret.accessToken.isDefined)
-          true // todo: check access token
-        else
-          SocialAuth.checkSecretMm(authenticate.secret.body, authenticate.secret.getParams, config.social.mm.get)
-
-      case AccountType.FACEBOOK ⇒
-        SocialAuth.checkSecretFb(authenticate.secret.body, authenticate.userInfo.accountId.id, config.social.fb.get)
-
-      case AccountType.DEVICE_ID ⇒
-        true
-
-      case _ ⇒ false
-    }
-
-  override def receive = auth
+  def receive = auth
 
   def auth: Receive = logged({
     case Authenticate(authenticate) ⇒
-      if (checkSecret(authenticate)) {
-        client = sender
-        accountId = authenticate.userInfo.accountId
-        deviceType = authenticate.deviceType
-        platformType = authenticate.platformType
-        userInfo = authenticate.userInfo
-        database ! Database.GetAccountState(accountId)
+      _client = Some(ClientInfo(sender, authenticate.userInfo.accountId, authenticate.deviceType, authenticate.platformType, authenticate.userInfo))
+      secretChecker ! authenticate
+
+    case SecretChecked(valid) ⇒
+      if (valid) {
+        database ! GetAccountState(client.accountId)
         database ! StatAction.AUTHENTICATED
       } else {
-        log.info("reject")
         database ! StatAction.NOT_AUTHENTICATED
-        sender ! CloseConnection
+        client.ref ! CloseConnection
       }
 
     case AccountNoExists ⇒
-      database ! Insert(accountId, config.account.initAccount.dto, userInfo, TutorStateDTO())
+      val initAccountState = config.account.initAccount
+      val initTutorState = TutorStateDTO()
+      database ! Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState)
       database ! StatAction.FIRST_AUTHENTICATED
 
-    case AccountStateResponse(id, dto) ⇒
-      state = AccountState(dto)
-      database ! GetTutorState(accountId)
+    case AccountStateResponse(accountId, stateDto) ⇒
+      Assertion.check(accountId == client.accountId)
+      _state = Some(AccountState(stateDto))
+      database ! GetTutorState(client.accountId)
 
-    case TutorStateResponse(id, tutorState) ⇒
-      matchmaking ! InGame(accountId)
-      context become enterAccount(tutorState)
+    case TutorStateResponse(accountId, tutorState) ⇒
+      Assertion.check(accountId == client.accountId)
+      _tutorState = Some(tutorState)
+      matchmaking ! Online(client.accountId)
+      matchmaking ! InGame(client.accountId)
+      context become enterAccount
   })
 
-  def enterAccount(tutorState: TutorStateDTO): Receive = logged({
-    /** Matchmaking ответил на InGame */
-    case InGameResponse(game, searchOpponents, top) ⇒
-      if (game.isDefined) {
-        client ! authenticated(searchOpponents = false, Some(gameAddress), top, tutorState)
-        context become inGame(game.get)
-      } else if (searchOpponents) {
-        client ! authenticated(searchOpponents = true, None, top, tutorState)
+  def enterAccount: Receive = logged({
+    case InGameResponse(gameRef, searchOpponents, top) ⇒
+
+      client.ref ! Authenticated(AuthenticatedDTO(
+        state.dto,
+        config.account.dto,
+        TopDTO(top),
+        config.productsDto(client.platformType, client.accountId.accountType),
+        tutorState,
+        searchOpponents,
+        game = if (gameRef.isDefined) Some(nodeLocator) else None
+      ))
+
+      if (searchOpponents)
         context become enterGame
-      } else if (state.gamesCount == 0) {
-        placeGameOrder(isTutor = true); // При первом заходе сразу попадаем в бой
-        client ! authenticated(searchOpponents = true, None, top, tutorState)
+      else if (gameRef.isDefined)
+        context become inGame
+      else if (state.gamesCount == 0) {
         database ! StatAction.START_TUTOR
-        context become enterGame
-      } else {
-        client ! authenticated(searchOpponents = false, None, top, tutorState)
+        sendGameOrder()
+      } else
         context become account
-      }
-  })
 
-  def authenticated(searchOpponents: Boolean, gameAddress: Option[NodeLocator], top: Iterable[TopUserInfoDTO], tutorState: TutorStateDTO) =
-    Authenticated(AuthenticatedDTO(
-      accountState = state.dto,
-      config = config.account.dto,
-      top = TopDTO(top.toSeq),
-      products = config.productsDto(platformType, accountId.accountType),
-      tutor = tutorState,
-      searchOpponents = searchOpponents,
-      game = gameAddress
-    ))
+  }).orElse(persistent)
 
-  def account: Receive = persistent.orElse(logged({
+  def account: Receive = logged({
     case BuyBuilding(dto) ⇒
       updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
       database ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
@@ -155,69 +138,63 @@ class Account(matchmaking: ActorRef,
       updateState(state.buyItem(dto.itemType, config.account))
       database ! Statistics.buyItem(dto.itemType)
 
-    case EnterGame ⇒
-      placeGameOrder(isTutor = false)
-      context become enterGame
-  }))
+    case EnterGame ⇒ sendGameOrder()
 
-  def updateState(newState: AccountState) = {
-    state = newState
-    database ! UpdateAccountState(accountId, state.dto)
+  }).orElse(persistent)
+
+  def updateState(newState: AccountState): Unit = {
+    _state = Some(newState)
+    database ! UpdateAccountState(client.accountId, newState.dto)
   }
 
-  def enterGame: Receive = persistent.orElse(logged({
-    /** Matchmaking говорит к какой игре коннектится */
-    case ConnectToGame(game) ⇒
-      client ! EnteredGame(gameAddress)
-      context become inGame(game)
-  }))
+  def enterGame: Receive = logged({
+    case ConnectToGame(gameRef) ⇒
+      _game = Some(gameRef)
+      client.ref ! EnteredGame(nodeLocator)
 
-  def inGame(game: ActorRef): Receive = logged({
-    case msg: GameMsg ⇒
-      msg match {
-        case C2B.JoinGame ⇒ game ! Join(accountId, sender)
-        case _ ⇒ game forward msg
-      }
+    case C2B.JoinGame ⇒
+      game ! Join(client.accountId, client.ref)
+      context become inGame
+
+  }).orElse(persistent)
+
+  def inGame: Receive = logged({
+    case msg: GameMsg ⇒ game forward msg
 
     case msg: UpdateStatistics ⇒
       game forward msg.stat.action
       database forward msg.stat.action
 
-    /** Matchmaking говорит, что для этого игрока бой завершен */
     case AccountLeaveGame(top) ⇒
-      client ! B2C.LeavedGame
-      client ! TopUpdated(TopDTO(top.toSeq))
+      client.ref ! B2C.LeavedGame
+      client.ref ! B2C.TopUpdated(TopDTO(top))
       context become account
 
   }).orElse(persistent)
 
   def persistent: Receive = logged({
-    case msg: UpdateStatistics ⇒
-      database forward msg.stat.action
+    case AccountStateResponse(accountId, stateDto) ⇒
+      client.ref ! AccountStateUpdated(stateDto)
 
-    /** from Database, ответ на Update */
-    case AccountStateResponse(_, accountStateDto) ⇒
-      client ! AccountStateUpdated(accountStateDto)
-
-    /** from Admin or Payments */
     case SetAccountState(_, accountStateDto) ⇒
-      state = AccountState(accountStateDto)
-      client ! AccountStateUpdated(accountStateDto)
+      _state = Some(AccountState(accountStateDto))
+      client.ref ! AccountStateUpdated(accountStateDto)
+
+    case msg: UpdateStatistics ⇒ database ! msg.stat.action
 
     case C2B.UpdateTutorState(state) ⇒
-      database ! Database.UpdateTutorState(accountId, state)
+      database ! Database.UpdateTutorState(client.accountId, state)
 
-    /** Matchmaking говорит, что кто-то зашел под этим же аккаунтом - закрываем соединение */
-    case DuplicateAccount ⇒
-      client ! CloseConnection
+    case DuplicateAccount ⇒ client.ref ! CloseConnection
   })
 
-  def placeGameOrder(isTutor: Boolean) =
-    matchmaking ! GameOrder(accountId, deviceType, userInfo, state, isBot = false)
-
-  def gameAddress = NodeLocator(config.host, config.gamePort)
-
-  override def postStop() = {
-    matchmaking ! Offline(accountId, client)
+  def sendGameOrder(): Unit = {
+    matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
+    context become enterGame
   }
+
+  def nodeLocator = NodeLocator(config.host, config.gamePort)
+
+  override def postStop(): Unit =
+    if (_client.isDefined) matchmaking ! Offline(client.accountId, client.ref)
 }

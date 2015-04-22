@@ -17,6 +17,7 @@ import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.rmi.B2C.Authenticated
+import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.dto.AccountType.VKONTAKTE
 import ru.rknrl.dto.PlatformType.CANVAS
 import ru.rknrl.dto._
@@ -31,7 +32,7 @@ class AccountTestSpec extends ActorsTest {
                  bugs: ActorRef = self,
                  config: Config = configMock()) = {
     accountIterator += 1
-    system.actorOf(Props(classOf[NewAccount], matchmaking, secretChecker, database, bugs, config), "account-" + accountIterator)
+    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, bugs, config), "account-" + accountIterator)
   }
 
   def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),
@@ -50,7 +51,7 @@ class AccountTestSpec extends ActorsTest {
 
     val authenticate = authenticateMock(platformType = CANVAS)
     val accountId = authenticate.userInfo.accountId
-    client.send(account, authenticate)
+    client.send(account, Authenticate(authenticate))
 
     secretChecker.expectMsg(authenticate)
     secretChecker.send(account, SecretChecked(valid = true))

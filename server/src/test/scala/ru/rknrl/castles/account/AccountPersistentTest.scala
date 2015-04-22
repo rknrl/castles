@@ -14,7 +14,7 @@ import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B.{BuyItem, UpdateStatistics}
+import ru.rknrl.castles.rmi.C2B.{Authenticate, BuyItem, UpdateStatistics}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.ItemType.FIREBALL
 import ru.rknrl.dto.{BuyItemDTO, StatAction, StatDTO, TutorStateDTO}
@@ -120,7 +120,7 @@ class AccountPersistentTest extends AccountTestSpec {
       val account = newAccount(secretChecker = secretChecker.ref, database = database.ref)
 
       val authenticate = authenticateMock()
-      client.send(account, authenticate)
+      client.send(account, Authenticate(authenticate))
       secretChecker.expectMsg(authenticate)
 
       system stop account

@@ -12,6 +12,8 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
+import ru.rknrl.castles.account.SecretChecker
+import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.{Bugs, PolicyServer}
@@ -44,6 +46,7 @@ object Main {
     implicit val system = ActorSystem("main-actor-system")
 
     val bugs = system.actorOf(Props(classOf[Bugs], config.bugs), "bugs")
+    val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
     val database = system.actorOf(Props(classOf[Database], config.db), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
@@ -57,6 +60,6 @@ object Main {
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
     system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking), "admin-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, bugs), "tcp-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, bugs, secretChecker), "tcp-server")
   }
 }
