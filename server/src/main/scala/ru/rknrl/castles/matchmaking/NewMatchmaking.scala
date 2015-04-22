@@ -8,10 +8,14 @@
 
 package ru.rknrl.castles.matchmaking
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
+import org.slf4j.LoggerFactory
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto._
+import ru.rknrl.{Logged, Slf4j}
+
+import scala.concurrent.duration.FiniteDuration
 
 object NewMatchmaking {
 
@@ -51,14 +55,36 @@ object NewMatchmaking {
 
 }
 
+// supervision
+// create games & bots
+// SetAccountState
+// AccountDeleted?
+
+// Offline - // Если это тутор и игрок отвалился, то убиваем игру.
+// При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
+
+// delete bots on AllPlayersLeave
+
 class NewMatchmaking(gamesFactory: IGamesFactory,
+                     interval: FiniteDuration,
                      var top: Top) extends Actor {
 
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
   var accountIdToGameOrder = Map.empty[AccountId, GameOrder]
   var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
 
-  def receive = {
+  import context.dispatcher
+
+  val scheduler = context.system.scheduler.schedule(interval, interval, self, TryCreateGames)
+
+  val log = new Slf4j(LoggerFactory.getLogger(getClass))
+
+  def logged(r: Receive) = new Logged(r, log, None, None, {
+    case TryCreateGames ⇒ false
+    case _ ⇒ true
+  })
+
+  def receive = logged({
     case Online(accountId) ⇒
       if ((accountIdToAccount contains accountId) && (accountIdToAccount(accountId) != sender))
         accountIdToAccount(accountId) ! DuplicateAccount
@@ -100,5 +126,5 @@ class NewMatchmaking(gamesFactory: IGamesFactory,
     case AllPlayersLeaveGame(gameRef) ⇒
       accountIdToGameInfo = accountIdToGameInfo.filter { case (accountId, gameInfo) ⇒ gameInfo.gameRef != gameRef }
       context stop gameRef
-  }
+  })
 }

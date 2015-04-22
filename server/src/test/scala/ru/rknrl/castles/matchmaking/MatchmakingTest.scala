@@ -10,12 +10,13 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor._
 import akka.testkit.TestProbe
-import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, DeviceType, ItemType, UserInfoDTO}
+import ru.rknrl.dto.{AccountId, ItemType, UserInfoDTO}
+
+import scala.concurrent.duration._
 
 class MatchmakingTest extends ActorsTest {
 
@@ -43,12 +44,12 @@ class MatchmakingTest extends ActorsTest {
 
   def newMatchmaking = {
     matchmakingIterator += 1
-    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new GameFactory), top5), "matchmaking-" + matchmakingIterator)
+    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new GameFactory), 30 hours, top5), "matchmaking-" + matchmakingIterator)
   }
 
   def newMatchmakingWithSelfAsGameFactory = {
     matchmakingIterator += 1
-    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new FakeGameFactory(self)), top5), "matchmaking-" + matchmakingIterator)
+    system.actorOf(Props(classOf[NewMatchmaking], new GamesFactory(new FakeGameFactory(self)), 30 hours, top5), "matchmaking-" + matchmakingIterator)
   }
 
   multi("Два актора отправляют PlaceGameOrderNew - оба получают ConnectToGame", {

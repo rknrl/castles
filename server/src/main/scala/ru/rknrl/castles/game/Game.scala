@@ -77,7 +77,7 @@ class Game(var gameState: GameState,
     case _ ⇒ true
   })
 
-  val scheduler = context.actorOf(Props(schedulerClass, self), "game-scheduler")
+  val scheduler = context.actorOf(Props(schedulerClass, self))
 
   def receive = logged({
     case Join(accountId, client) ⇒
