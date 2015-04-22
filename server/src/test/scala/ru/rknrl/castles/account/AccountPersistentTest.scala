@@ -10,10 +10,13 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
+import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B.UpdateStatistics
-import ru.rknrl.dto.{StatAction, StatDTO, TutorStateDTO}
+import ru.rknrl.castles.rmi.C2B.{BuyItem, UpdateStatistics}
+import ru.rknrl.dto.ItemType.FIREBALL
+import ru.rknrl.dto.{BuyItemDTO, StatAction, StatDTO, TutorStateDTO}
 
 class AccountPersistentTest extends AccountTestSpec {
 
@@ -132,4 +135,35 @@ class AccountPersistentTest extends AccountTestSpec {
     })
 
   }
+
+  multi("SetAccountState", {
+    val secretChecker = new TestProbe(system)
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = new TestProbe(system)
+    val config = configMock()
+    val account = newAccount(
+      secretChecker = secretChecker.ref,
+      database = database.ref,
+      matchmaking = matchmaking.ref,
+      config = config
+    )
+    val accountId = authenticateMock().userInfo.accountId
+    authorize(
+      secretChecker = secretChecker,
+      matchmaking = matchmaking,
+      database = database,
+      client = client,
+      account = account,
+      config = config
+    )
+    val newState = accountStateMock(gold = 777)
+    matchmaking.send(account, SetAccountState(accountId, newState.dto))
+    client.expectMsg(AccountStateUpdated(newState.dto))
+
+    client.send(account, BuyItem(BuyItemDTO(FIREBALL)))
+    val expectedState = newState.buyItem(FIREBALL, config.account)
+    database.expectMsg(Database.UpdateAccountState(accountId, expectedState.dto))
+  })
+
 }

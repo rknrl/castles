@@ -10,7 +10,6 @@ package ru.rknrl.castles.account
 
 import akka.actor.ActorRef
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.{Database, Statistics}
@@ -220,7 +219,7 @@ class Account(matchmaking: ActorRef,
       client ! AccountStateUpdated(accountStateDto)
 
     /** from Admin or Payments */
-    case AdminSetAccountState(_, accountStateDto) ⇒
+    case SetAccountState(_, accountStateDto) ⇒
       state = AccountState(accountStateDto)
       client ! AccountStateUpdated(accountStateDto)
 

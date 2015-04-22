@@ -174,12 +174,9 @@ class NewAccount(matchmaking: ActorRef,
     case AccountStateResponse(accountId, stateDto) ⇒
       client.ref ! AccountStateUpdated(stateDto)
 
-    /*
-        case AdminSetAccountState(_, accountStateDto) ⇒
-          _state = Some(AccountState(accountStateDto))
-          client.ref ! AccountStateUpdated(accountStateDto)
-
-    */
+    case SetAccountState(_, accountStateDto) ⇒
+      _state = Some(AccountState(accountStateDto))
+      client.ref ! AccountStateUpdated(accountStateDto)
 
     case msg: UpdateStatistics ⇒ database ! msg.stat.action
 

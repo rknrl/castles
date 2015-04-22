@@ -14,13 +14,13 @@ import akka.actor.ActorRef
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
 import ru.rknrl.Bugs.Bug
-import ru.rknrl.{BugType, StoppingStrategyActor}
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.matchmaking.NewMatchmaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
+import ru.rknrl.{BugType, StoppingStrategyActor}
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -124,7 +124,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
                 result match {
                   case msg@AccountStateResponse(_, newAccountStateDto) ⇒
                     if (newAccountStateDto.gold == newState.gold) {
-                      matchmaking ! AdminSetAccountState(accountId, newAccountStateDto)
+                      matchmaking ! SetAccountState(accountId, newAccountStateDto)
                       complete(httpResponse)
                     } else {
                       log.info("invalid gold=" + newAccountStateDto.gold + ", but expected " + newState.gold)

@@ -47,6 +47,8 @@ object NewMatchmaking {
 
   case object AccountLeaveGame
 
+  case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
+
 }
 
 class NewMatchmaking(gamesFactory: IGamesFactory,

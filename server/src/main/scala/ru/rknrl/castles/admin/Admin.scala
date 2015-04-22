@@ -11,10 +11,10 @@ package ru.rknrl.castles.admin
 import akka.actor.ActorRef
 import akka.pattern.Patterns
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.MatchMaking.AdminSetAccountState
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
+import ru.rknrl.castles.matchmaking.NewMatchmaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
@@ -123,7 +123,7 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        matchmaking ! AdminSetAccountState(accountId, accountStateDto)
+        matchmaking ! SetAccountState(accountId, accountStateDto)
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

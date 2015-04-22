@@ -11,7 +11,6 @@ package ru.rknrl.castles
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor._
 import org.slf4j.LoggerFactory
-import ru.rknrl.castles.MatchMaking._
 import ru.rknrl.castles.account.Account.LeaveGame
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState.Items
@@ -39,12 +38,6 @@ class GameIdIterator extends IdIterator {
 
 class PlayerIdIterator extends IdIterator {
   def next = PlayerId(nextInt)
-}
-
-object MatchMaking {
-
-  case class AdminSetAccountState(accountId: AccountId, accountState: AccountStateDTO)
-
 }
 
 class MatchMaking(interval: FiniteDuration,
@@ -197,7 +190,7 @@ class MatchMaking(interval: FiniteDuration,
 
   def receive = logged({
     /** from Admin or PaymentTransaction */
-    case msg@AdminSetAccountState(accountId, _) ⇒
+    case msg@SetAccountState(accountId, _) ⇒
       if (accountIdToAccountRef.contains(accountId))
         accountIdToAccountRef(accountId) forward msg
 
