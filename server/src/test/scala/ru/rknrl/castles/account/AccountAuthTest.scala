@@ -9,7 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import SecretChecker.SecretChecked
+import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
 import ru.rknrl.castles.kit.Mocks._
@@ -76,7 +76,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
-      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = true, top = List.empty))
+      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
 
       client.expectMsg(Authenticated(AuthenticatedDTO(
         initAccountState.dto,
@@ -84,9 +84,11 @@ class AccountAuthTest extends AccountTestSpec {
         TopDTO(List.empty),
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
-        searchOpponents = true,
+        searchOpponents = false,
         game = None
       )))
+
+      matchmaking.expectMsgClass(classOf[GameOrder])
     })
 
     multi("success", {

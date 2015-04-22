@@ -103,12 +103,12 @@ class NewAccount(matchmaking: ActorRef,
         game = if (gameRef.isDefined) Some(nodeLocator) else None
       ))
 
-      // todo start tutor if gamesCount = 0
-
       if (searchOpponents)
         context become enterGame
       else if (gameRef.isDefined)
         context become inGame
+      else if (state.gamesCount == 0)
+        sendGameOrder()
       else
         context become account
 
@@ -135,9 +135,7 @@ class NewAccount(matchmaking: ActorRef,
       updateState(state.buyItem(dto.itemType, config.account))
       database ! Statistics.buyItem(dto.itemType)
 
-    case EnterGame ⇒
-      matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
-      context become enterGame
+    case EnterGame ⇒ sendGameOrder()
 
   }).orElse(persistent)
 
@@ -185,6 +183,11 @@ class NewAccount(matchmaking: ActorRef,
 
     case DuplicateAccount ⇒ context stop self
   })
+
+  def sendGameOrder(): Unit = {
+    matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
+    context become enterGame
+  }
 
   def nodeLocator = NodeLocator(config.host, config.gamePort)
 

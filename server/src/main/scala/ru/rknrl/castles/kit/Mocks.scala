@@ -115,7 +115,7 @@ object Mocks extends Matchers {
                        items: Items = itemsMock,
                        gold: Int = 10,
                        rating: Double = 1400,
-                       gamesCount: Int = 0) =
+                       gamesCount: Int = 1) =
     new AccountState(
       slots = slots,
       skills = skills,
