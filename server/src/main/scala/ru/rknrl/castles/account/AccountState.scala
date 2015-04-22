@@ -87,6 +87,13 @@ case class AccountState(slots: Slots,
 
   def setNewRating(newRating: Double) = copy(newRating = newRating)
 
+  def applyUsedItems(usedItems: Map[ItemType, Int]) = {
+    var state = this
+    for ((itemType, count) ← usedItems)
+      state = state.addItem(itemType, -count)
+    state
+  }
+
   private def copy(newSlots: Slots = slots,
                    newSkills: Skills = skills,
                    newItems: Items = items,

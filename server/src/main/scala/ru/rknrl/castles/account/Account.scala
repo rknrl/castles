@@ -200,9 +200,7 @@ class Account(matchmaking: ActorRef,
       state = state.addGold(reward)
         .incGamesCount
         .setNewRating(newRating)
-
-      for ((itemType, count) ← usedItems)
-        state = state.addItem(itemType, -count)
+        .applyUsedItems(usedItems)
 
       database ! UpdateAccountState(accountId, state.dto)
       client ! TopUpdated(TopDTO(top.toSeq))

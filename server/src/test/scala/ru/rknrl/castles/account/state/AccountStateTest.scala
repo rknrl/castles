@@ -16,7 +16,7 @@ import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel._
 import ru.rknrl.dto.BuildingPrototype
 import ru.rknrl.dto.BuildingType._
-import ru.rknrl.dto.ItemType.{FIREBALL, TORNADO, VOLCANO}
+import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto.SkillLevel._
 import ru.rknrl.dto.SkillType._
 import ru.rknrl.dto.SlotId._
@@ -339,5 +339,24 @@ class AccountStateTest extends WordSpec with Matchers {
       }
 
     }
+  }
+
+  "applyUsedItems" in {
+    val oldState = accountStateMock()
+    val state = oldState.applyUsedItems(Map(
+      FIREBALL → 1,
+      TORNADO → 2,
+      STRENGTHENING → 3
+    ))
+
+    state.items shouldBe Map(
+      FIREBALL → 3,
+      STRENGTHENING → 1,
+      VOLCANO → 4,
+      TORNADO → 2,
+      ASSISTANCE → 4
+    )
+
+    checkEquals(oldState, state, Set(FIREBALL, TORNADO, STRENGTHENING))
   }
 }
