@@ -15,6 +15,7 @@ import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.{BuyItem, UpdateStatistics}
+import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.ItemType.FIREBALL
 import ru.rknrl.dto.{BuyItemDTO, StatAction, StatDTO, TutorStateDTO}
 
@@ -39,9 +40,7 @@ class AccountPersistentTest extends AccountTestSpec {
         account = account
       )
       account ! DuplicateAccount
-      watch(account)
-      matchmaking.expectMsgClass(classOf[Offline])
-      expectTerminated(account)
+      client.expectMsg(CloseConnection)
     })
 
     multi("Если клиент НЕ авторизовался - игнорируется", {

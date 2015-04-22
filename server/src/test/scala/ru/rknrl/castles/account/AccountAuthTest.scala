@@ -71,6 +71,7 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.Insert(accountId, initAccountState.dto, authenticate.userInfo, initTutorState))
       database.send(account, AccountStateResponse(accountId, initAccountState.dto))
 
+      database.expectMsg(StatAction.FIRST_AUTHENTICATED)
       database.expectMsg(Database.GetTutorState(accountId))
       database.send(account, TutorStateResponse(accountId, initTutorState))
 
@@ -88,6 +89,7 @@ class AccountAuthTest extends AccountTestSpec {
         game = None
       )))
 
+      database.expectMsg(StatAction.START_TUTOR)
       matchmaking.expectMsgClass(classOf[GameOrder])
     })
 

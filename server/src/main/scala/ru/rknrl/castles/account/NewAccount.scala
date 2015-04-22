@@ -69,14 +69,15 @@ class NewAccount(matchmaking: ActorRef,
         database ! GetAccountState(client.accountId)
         database ! StatAction.AUTHENTICATED
       } else {
-        client.ref ! CloseConnection
         database ! StatAction.NOT_AUTHENTICATED
+        client.ref ! CloseConnection
       }
 
     case AccountNoExists ⇒
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
       database ! Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState)
+      database ! StatAction.FIRST_AUTHENTICATED
 
     case AccountStateResponse(accountId, stateDto) ⇒
       Assertion.check(accountId == client.accountId)
@@ -93,6 +94,7 @@ class NewAccount(matchmaking: ActorRef,
 
   def enterAccount: Receive = logged({
     case InGameResponse(gameRef, searchOpponents, top) ⇒
+
       client.ref ! Authenticated(AuthenticatedDTO(
         state.dto,
         config.account.dto,
@@ -107,9 +109,10 @@ class NewAccount(matchmaking: ActorRef,
         context become enterGame
       else if (gameRef.isDefined)
         context become inGame
-      else if (state.gamesCount == 0)
+      else if (state.gamesCount == 0) {
+        database ! StatAction.START_TUTOR
         sendGameOrder()
-      else
+      } else
         context become account
 
   }).orElse(persistent)
@@ -182,7 +185,7 @@ class NewAccount(matchmaking: ActorRef,
     case C2B.UpdateTutorState(state) ⇒
       database ! Database.UpdateTutorState(client.accountId, state)
 
-    case DuplicateAccount ⇒ context stop self
+    case DuplicateAccount ⇒ client.ref ! CloseConnection
   })
 
   def sendGameOrder(): Unit = {
