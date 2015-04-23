@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.testkit.TestProbe
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{AccountLeaveGame, ConnectToGame, GameOrder}
+import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
 import ru.rknrl.castles.rmi.B2C.EnteredGame
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.castles.rmi.C2B.{CastFireball, EnterGame, UpdateStatistics}

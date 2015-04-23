@@ -15,7 +15,7 @@ import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.{GetAccountState, _}
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.matchmaking.NewMatchmaking._
+import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}

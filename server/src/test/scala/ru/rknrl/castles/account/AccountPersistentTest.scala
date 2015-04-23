@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.testkit.TestProbe
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking._
+import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.{Authenticate, BuyItem, UpdateStatistics}

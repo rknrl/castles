@@ -17,7 +17,7 @@ import ru.rknrl.Bugs.Bug
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
-import ru.rknrl.castles.matchmaking.NewMatchmaking.SetAccountState
+import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.{BugType, StoppingStrategyActor}

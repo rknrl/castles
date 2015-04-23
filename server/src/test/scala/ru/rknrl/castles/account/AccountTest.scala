@@ -12,7 +12,7 @@ import akka.testkit.TestProbe
 import ru.rknrl.castles.database.Database.{AccountStateResponse, UpdateAccountState}
 import ru.rknrl.castles.database.Statistics
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2}

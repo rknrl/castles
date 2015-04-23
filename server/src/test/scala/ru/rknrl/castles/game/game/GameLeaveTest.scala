@@ -10,7 +10,7 @@ package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{PlayerLeaveGame, AllPlayersLeaveGame}
+import ru.rknrl.castles.matchmaking.MatchMaking.{PlayerLeaveGame, AllPlayersLeaveGame}
 import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.Surrender

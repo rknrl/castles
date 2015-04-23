@@ -10,7 +10,7 @@ package ru.rknrl.castles
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.game.state.{BuildingIdIterator, UnitIdIterator}
-import ru.rknrl.castles.matchmaking.{PlayerIdIterator, GameIdIterator, BotIdIterator}
+import ru.rknrl.castles.matchmaking.{BotIdIterator, PlayerIdIterator}
 import ru.rknrl.dto.AccountType.DEV
 import ru.rknrl.dto.{AccountId, BuildingId, PlayerId, UnitId}
 
@@ -37,11 +37,5 @@ class IteratorsTest extends WordSpec with Matchers {
     val iterator = new BotIdIterator
     iterator.next shouldBe AccountId(DEV, "bot0")
     iterator.next shouldBe AccountId(DEV, "bot1")
-  }
-
-  "gameId" in {
-    val iterator = new GameIdIterator
-    iterator.next shouldBe "game0"
-    iterator.next shouldBe "game1"
   }
 }

@@ -15,7 +15,7 @@ import net.liftweb.json._
 import ru.rknrl.castles.account.SecretChecker
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.game.init.GameMaps
-import ru.rknrl.castles.matchmaking.{MatchMaking, Top}
+import ru.rknrl.castles.matchmaking.{GameFactory, GameCreator, MatchMaking, Top}
 import ru.rknrl.{Bugs, PolicyServer}
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
@@ -52,7 +52,8 @@ object Main {
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], 7 seconds, database, bugs, top, config, gameMaps), "matchmaking")
+    val gameCreator = new GameCreator(gameMaps, config)
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, bugs), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)

@@ -14,7 +14,7 @@ import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.GameCreator.NewGame
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
-import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.dto.AccountType.{DEV, VKONTAKTE}
 import ru.rknrl.dto.DeviceType.{PC, PHONE, TABLET}
 import ru.rknrl.dto.{AccountId, PlayerId}
@@ -66,7 +66,7 @@ class GameCreatorTest extends WordSpec with Matchers {
       orders = expectedOrders,
       gameState = GameStateInit.init(
         time = 0,
-        players = gameCreator.ordersToPlayers(expectedOrders).toList,
+        players = gameCreator.ordersToPlayers(expectedOrders, isTutor = true).toList,
         big = false,
         isTutor = true,
         config = configMock().game,
@@ -93,7 +93,7 @@ class GameCreatorTest extends WordSpec with Matchers {
       orders = expectedOrders,
       gameState = GameStateInit.init(
         time = 0,
-        players = gameCreator.ordersToPlayers(expectedOrders).toList,
+        players = gameCreator.ordersToPlayers(expectedOrders, isTutor = false).toList,
         big = true,
         isTutor = false,
         config = configMock().game,
@@ -164,7 +164,7 @@ class GameCreatorTest extends WordSpec with Matchers {
 
     val accountConfig = accountConfigMock()
 
-    gameCreatorMock().ordersToPlayers(List(order0, order1)) shouldBe List(
+    gameCreatorMock().ordersToPlayers(List(order0, order1), isTutor = false) shouldBe List(
       Player(
         PlayerId(0),
         AccountId(VKONTAKTE, "0"),
@@ -180,6 +180,48 @@ class GameCreatorTest extends WordSpec with Matchers {
         order1.userInfo,
         accountState.slots,
         accountConfig.skillsToStat(accountState.skills),
+        accountState.items,
+        isBot = true
+      )
+    )
+  }
+
+  "ordersToPlayers tutor" in {
+    val accountState = accountStateMock()
+
+    val order0 = newGameOrder(
+      accountId = AccountId(VKONTAKTE, "0"),
+      deviceType = PC,
+      accountState = accountState,
+      isBot = false
+    )
+
+    val order1 = newGameOrder(
+      accountId = AccountId(VKONTAKTE, "1"),
+      deviceType = TABLET,
+      accountState = accountState,
+      isBot = true
+    )
+
+    val accountConfig = accountConfigMock()
+
+    val gameCreator = gameCreatorMock()
+    gameCreator.ordersToPlayers(List(order0, order1), isTutor = true) shouldBe List(
+      Player(
+        PlayerId(0),
+        AccountId(VKONTAKTE, "0"),
+        order0.userInfo,
+        accountState.slots,
+        gameCreator.tutorHumanStat,
+        accountState.items,
+        isBot = false
+      ),
+      Player(
+        PlayerId(1),
+        AccountId(VKONTAKTE, "1"),
+        order1.userInfo,
+        accountState.slots,
+        gameCreator.tutorBotStat,
         accountState.items,
         isBot = true
       )

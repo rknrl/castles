@@ -9,7 +9,7 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.matchmaking.NewMatchmaking.Offline
+import ru.rknrl.castles.matchmaking.MatchMaking.Offline
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.Game.UpdateGameState
 import ru.rknrl.castles.game.state.GameStateDiff

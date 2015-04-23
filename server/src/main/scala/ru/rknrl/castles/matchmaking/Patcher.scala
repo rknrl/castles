@@ -11,7 +11,7 @@ package ru.rknrl.castles.matchmaking
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, UpdateAccountState}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.SetAccountState
+import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.dto.{AccountId, ItemType}
 
 class Patcher(accountId: AccountId,

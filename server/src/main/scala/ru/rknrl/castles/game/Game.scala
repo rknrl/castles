@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorContext, ActorRef, Props}
 import ru.rknrl.castles.bot.{Bot, TutorBot}
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
+import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._

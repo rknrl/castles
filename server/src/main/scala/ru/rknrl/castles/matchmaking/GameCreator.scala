@@ -14,9 +14,12 @@ import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.{GameState, Player}
 import ru.rknrl.castles.matchmaking.GameCreator.NewGame
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
-import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
 import ru.rknrl.core.Stat
+import ru.rknrl.dto.AccountType.DEV
+import ru.rknrl.dto.{AccountId, PlayerId}
+import ru.rknrl.utils.IdIterator
 
 object GameCreator {
 
@@ -24,6 +27,14 @@ object GameCreator {
                      isTutor: Boolean,
                      gameState: GameState)
 
+}
+
+class BotIdIterator extends IdIterator {
+  def next = AccountId(DEV, "bot" + nextInt)
+}
+
+class PlayerIdIterator extends IdIterator {
+  def next = PlayerId(nextInt)
 }
 
 class GameCreator(gameMaps: GameMaps,
@@ -39,7 +50,7 @@ class GameCreator(gameMaps: GameMaps,
     val botsOrders = createBotOrders(botsCount, humanOrder)
 
     val orders = matched.orders ++ botsOrders
-    val players = ordersToPlayers(orders)
+    val players = ordersToPlayers(orders, matched.isTutor)
 
     val gameMap = if (matched.isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
@@ -54,23 +65,6 @@ class GameCreator(gameMaps: GameMaps,
 
     NewGame(orders, matched.isTutor, gameState)
   }
-
-  /*
-    val realStat = config.account.skillsToStat(order.accountState.skills)
-    val stat = if (order.isBot) {
-      if (isTutor) tutorBotStat else realStat
-    } else {
-      if (isTutor)
-        Stat(
-          attack = realStat.attack * 3,
-          defence = realStat.defence * 3,
-          speed = realStat.speed
-        )
-      else
-        realStat
-  */
-
-  val tutorBotStat = new Stat(attack = 0.3, defence = 0.3, speed = 1)
 
   def createBotOrders(botsCount: Int, humanOrder: GameOrder) =
     for (i ← 0 until botsCount) yield {
@@ -97,10 +91,17 @@ class GameCreator(gameMaps: GameMaps,
   def botItems(humanItems: Items) =
     humanItems.mapValues(count ⇒ count * 2)
 
-  def ordersToPlayers(orders: Iterable[GameOrder]) = {
+  val tutorHumanStat = new Stat(attack = 3, defence = 3, speed = 1)
+  val tutorBotStat = new Stat(attack = 0.3, defence = 0.3, speed = 1)
+
+  def ordersToPlayers(orders: Iterable[GameOrder], isTutor: Boolean) = {
     val playerIdIterator = new PlayerIdIterator
     for (order ← orders) yield {
-      val stat = config.account.skillsToStat(order.accountState.skills)
+      val stat = if (isTutor) {
+        if (order.isBot) tutorBotStat else tutorHumanStat
+      } else {
+        config.account.skillsToStat(order.accountState.skills)
+      }
       val playerId = playerIdIterator.next
       Player(
         playerId,

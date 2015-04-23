@@ -11,7 +11,7 @@ package ru.rknrl.castles.game.game
 import akka.testkit.TestProbe
 import ru.rknrl.castles.game.FakeBotFactory
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking.ConnectToGame
+import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
 import ru.rknrl.dto.{AccountId, PlayerId}
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.SetAccountState
+import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._

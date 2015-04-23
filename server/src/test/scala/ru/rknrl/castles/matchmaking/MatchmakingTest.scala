@@ -14,7 +14,7 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking._
+import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
 import ru.rknrl.dto.StatAction.START_GAME_4_WITH_BOTS
 import ru.rknrl.dto._
@@ -55,7 +55,7 @@ class MatchmakingTest extends ActorsTest {
     matchmakingIterator += 1
     system.actorOf(
       Props(
-        classOf[NewMatchmaking],
+        classOf[MatchMaking],
         gameCreator,
         gameFactory,
         interval,
@@ -364,4 +364,7 @@ class MatchmakingTest extends ActorsTest {
 
     client2.expectNoMsg()
   })
+
+  // todo supervision
+  // todo playerLeaveGame
 }

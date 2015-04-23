@@ -18,7 +18,7 @@ import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMap, GameMaps}
 import ru.rknrl.castles.game.state._
 import ru.rknrl.castles.matchmaking.GameCreator
-import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}

@@ -13,7 +13,7 @@ import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking._
+import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
 import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.core.rmi.CloseConnection

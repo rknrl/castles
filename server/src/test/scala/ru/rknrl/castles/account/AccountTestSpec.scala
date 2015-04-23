@@ -15,7 +15,7 @@ import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, GetTutorState, TutorStateResponse}
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.matchmaking.NewMatchmaking.{InGame, InGameResponse, Online}
+import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.rmi.B2C.Authenticated
 import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.dto.AccountType.VKONTAKTE

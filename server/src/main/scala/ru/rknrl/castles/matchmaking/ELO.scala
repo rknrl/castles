@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.matchmaking
 
-import ru.rknrl.castles.matchmaking.NewMatchmaking.GameOrder
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 
 object ELO {
   def getSA(playersCount: Int, place: Int) =

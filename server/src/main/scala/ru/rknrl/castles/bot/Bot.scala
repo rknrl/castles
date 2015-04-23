@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.{Building, GameState, Player}
-import ru.rknrl.castles.matchmaking.NewMatchmaking.ConnectToGame
+import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C.JoinedGame
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
