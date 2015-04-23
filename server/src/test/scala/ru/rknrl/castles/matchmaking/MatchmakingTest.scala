@@ -188,6 +188,7 @@ class MatchmakingTest extends ActorsTest {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
     client.send(matchmaking, PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap))
+    client.expectMsgClass(classOf[AccountLeaveGame])
     client.send(matchmaking, InGame(accountId))
     client.expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
   })
@@ -225,12 +226,12 @@ class MatchmakingTest extends ActorsTest {
       case InGameResponse(game, false, top) ⇒ true
     }
 
-    matchmaking ! AllPlayersLeaveGame(game.get)
+    client.send(matchmaking, PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap))
+    client.expectMsgClass(classOf[AccountLeaveGame])
     client.send(matchmaking, InGame(accountId))
     client.expectMsgPF(timeout.duration) {
       case InGameResponse(None, false, top) ⇒ true
     }
-
     client.expectNoMsg()
   })
 

@@ -60,8 +60,6 @@ object MatchMaking {
 
 }
 
-// supervision
-
 class MatchMaking(gameCreator: GameCreator,
                   gameFactory: IGameFactory,
                   interval: FiniteDuration,
@@ -78,9 +76,7 @@ class MatchMaking(gameCreator: GameCreator,
 
         for (order ← gameInfo.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo - order.accountId
-
-          if (accountIdToAccount contains order.accountId)
-            accountIdToAccount(order.accountId) ! AccountLeaveGame(top.dto)
+          sendToAccount(order.accountId, AccountLeaveGame(top.dto))
         }
       }
       Stop
@@ -147,8 +143,7 @@ class MatchMaking(gameCreator: GameCreator,
 
         for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
-          if (accountIdToAccount contains order.accountId)
-            accountIdToAccount(order.accountId) ! ConnectToGame(game)
+          sendToAccount(order.accountId, ConnectToGame(game))
         }
       }
 
@@ -165,19 +160,20 @@ class MatchMaking(gameCreator: GameCreator,
 
       context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database))
 
-      if (accountIdToAccount contains accountId)
-        accountIdToAccount(accountId) ! AccountLeaveGame(top.dto)
+      sendToAccount(accountId, AccountLeaveGame(top.dto))
 
       sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, database)
 
     case AllPlayersLeaveGame(gameRef) ⇒ context stop gameRef
 
     case msg@SetAccountState(accountId, _) ⇒
-      if (accountIdToAccount contains accountId)
-        accountIdToAccount(accountId) forward msg
+      sendToAccount(accountId, msg)
 
     case Database.DeleteAccount(accountId) ⇒
-      if (accountIdToAccount contains accountId)
-        accountIdToAccount(accountId) ! DuplicateAccount
+      sendToAccount(accountId, DuplicateAccount)
   })
+
+  def sendToAccount(accountId: AccountId, msg: Any): Unit =
+    if (accountIdToAccount contains accountId)
+      accountIdToAccount(accountId) ! msg
 }
