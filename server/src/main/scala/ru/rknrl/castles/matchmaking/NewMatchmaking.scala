@@ -8,11 +8,12 @@
 
 package ru.rknrl.castles.matchmaking
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef}
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.game.{BotFactory, Game, GameScheduler}
+import ru.rknrl.castles.database.Statistics.sendCreateGameStatistics
+import ru.rknrl.castles.database.{Statistics, Database}
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto._
@@ -59,12 +60,6 @@ object NewMatchmaking {
 }
 
 // supervision
-// create games & bots
-// SetAccountState
-// AccountDeleted?
-
-// Offline - // Если это тутор и игрок отвалился, то убиваем игру.
-// При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
 
 class NewMatchmaking(gameCreator: GameCreator,
                      gameFactory: IGameFactory,
@@ -98,8 +93,16 @@ class NewMatchmaking(gameCreator: GameCreator,
 
     case o@Offline(accountId, client) ⇒
       accountIdToAccount = accountIdToAccount - accountId
-      if (accountIdToGameInfo contains accountId)
-        accountIdToGameInfo(accountId).gameRef forward o
+      if (accountIdToGameInfo contains accountId) {
+        val gameInfo = accountIdToGameInfo(accountId)
+
+        if (gameInfo.isTutor)
+        // Если это тутор и игрок отвалился, то убиваем игру.
+        // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
+          stopGame(gameInfo.gameRef)
+        else
+          gameInfo.gameRef forward o
+      }
 
     case InGame(accountId) ⇒
       sender ! InGameResponse(
@@ -122,6 +125,7 @@ class NewMatchmaking(gameCreator: GameCreator,
       for (newGame ← newGames) {
         val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self, bugs)
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
+        if (!newGame.isTutor) sendCreateGameStatistics(newGame.orders, database)
 
         for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
@@ -135,8 +139,19 @@ class NewMatchmaking(gameCreator: GameCreator,
     case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
       accountIdToGameInfo = accountIdToGameInfo - accountId
 
-    case AllPlayersLeaveGame(gameRef) ⇒
-      accountIdToGameInfo = accountIdToGameInfo.filter { case (accountId, gameInfo) ⇒ gameInfo.gameRef != gameRef }
-      context stop gameRef
+    case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
+
+    case msg@SetAccountState(accountId, _) ⇒
+      if (accountIdToAccount contains accountId)
+        accountIdToAccount(accountId) forward msg
+
+    case Database.DeleteAccount(accountId) ⇒
+      if (accountIdToAccount contains accountId)
+        accountIdToAccount(accountId) ! DuplicateAccount
   })
+
+  def stopGame(gameRef: ActorRef): Unit = {
+    accountIdToGameInfo = accountIdToGameInfo.filter { case (accountId, gameInfo) ⇒ gameInfo.gameRef != gameRef }
+    context stop gameRef
+  }
 }

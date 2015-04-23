@@ -10,11 +10,14 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor._
 import akka.testkit.TestProbe
+import ru.rknrl.castles.Config
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, ItemType, UserInfoDTO}
+import ru.rknrl.dto.StatAction.START_GAME_4_WITH_BOTS
+import ru.rknrl.dto._
 
 import scala.concurrent.duration._
 
@@ -42,42 +45,32 @@ class MatchmakingTest extends ActorsTest {
     TopUser(id5, 1200, info5)
   ))
 
-  def newMatchmaking = {
+  def newMatchmaking(gameCreator: GameCreator = gameCreatorMock(),
+                     gameFactory: IGameFactory = new GameFactory,
+                     interval: FiniteDuration = 30 hours,
+                     top: Top = top5,
+                     config: Config = configMock(),
+                     database: ActorRef,
+                     bugs: ActorRef = self) = {
     matchmakingIterator += 1
     system.actorOf(
       Props(
         classOf[NewMatchmaking],
-        gameCreatorMock(),
-        new GameFactory(),
-        30 hours,
-        top5,
-        configMock(),
-        self,
-        self
-      ),
-      "matchmaking-" + matchmakingIterator
-    )
-  }
-
-  def newMatchmakingWithSelfAsGameFactory = {
-    matchmakingIterator += 1
-    system.actorOf(
-      Props(
-        classOf[NewMatchmaking],
-        gameCreatorMock(),
-        new FakeGameFactory(self),
-        30 hours,
-        top5,
-        configMock(),
-        self,
-        self
+        gameCreator,
+        gameFactory,
+        interval,
+        top,
+        config,
+        database,
+        bugs
       ),
       "matchmaking-" + matchmakingIterator
     )
   }
 
   multi("Два актора отправляют PlaceGameOrder - оба получают ConnectToGame", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
 
@@ -89,6 +82,8 @@ class MatchmakingTest extends ActorsTest {
     client2.send(matchmaking, Online(accountId2))
     client2.send(matchmaking, newGameOrder(accountId2))
     client2.send(matchmaking, TryCreateGames)
+
+    database.expectMsg(10 seconds, StatAction.START_GAME_4_WITH_PLAYERS)
 
     client1.expectMsgPF(10 seconds) {
       case ConnectToGame(gameRef) ⇒ true
@@ -106,46 +101,54 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("Уже находимся в игре и отправляем еще PlaceGameOrder - получаем ConnectToGame", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
     val accountId = AccountId(VKONTAKTE, "1")
     var game: Option[ActorRef] = None
-    matchmaking ! Online(accountId)
-    matchmaking ! newGameOrder(accountId)
-    matchmaking ! TryCreateGames
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId))
+    client.send(matchmaking, TryCreateGames)
+    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! newGameOrder(accountId)
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, newGameOrder(accountId))
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ gameRef shouldBe game.get
     }
   })
 
   multi("игра удаляется после AllPlayersLeaveGame", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
     var game: Option[ActorRef] = None
 
-    matchmaking ! Online(accountId)
-    matchmaking ! newGameOrder(accountId)
-    matchmaking ! TryCreateGames
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId))
+    client.send(matchmaking, TryCreateGames)
+    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! AllPlayersLeaveGame(game.get)
-
+    client.send(matchmaking, AllPlayersLeaveGame(game.get))
     watch(game.get)
     expectTerminated(game.get)
   })
 
+
   multi("AllPlayersLeaveGame удаляет только одну игру", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
     var game1: Option[ActorRef] = None
     var game2: Option[ActorRef] = None
+
     val client1 = new TestProbe(system)
     client1.send(matchmaking, Online(accountId1))
     client1.send(matchmaking, newGameOrder(accountId1))
@@ -169,62 +172,70 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("PlayerLeaveGame", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
     var game: Option[ActorRef] = None
 
-    matchmaking ! Online(accountId)
-    matchmaking ! newGameOrder(accountId)
-    matchmaking ! TryCreateGames
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId))
+    client.send(matchmaking, TryCreateGames)
+    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    matchmaking ! PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap)
-    matchmaking ! InGame(accountId)
-    expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
+    client.send(matchmaking, PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap))
+    client.send(matchmaking, InGame(accountId))
+    client.expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
   })
 
+
   multi("InGame", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
     var game: Option[ActorRef] = None
 
-    matchmaking ! Online(accountId)
-    matchmaking ! InGame(accountId)
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, InGame(accountId))
+    client.expectMsgPF(timeout.duration) {
       case InGameResponse(None, false, top) ⇒ true
     }
 
-    matchmaking ! newGameOrder(accountId)
-    matchmaking ! InGame(accountId)
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, newGameOrder(accountId))
+    client.send(matchmaking, InGame(accountId))
+    client.expectMsgPF(timeout.duration) {
       case InGameResponse(None, true, top) ⇒ true
     }
 
-    matchmaking ! TryCreateGames
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, TryCreateGames)
+    database.expectMsgClass(classOf[StatAction])
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
 
-    matchmaking ! InGame(accountId)
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, InGame(accountId))
+    client.expectMsgPF(timeout.duration) {
       case InGameResponse(game, false, top) ⇒ true
     }
 
     matchmaking ! AllPlayersLeaveGame(game.get)
-    matchmaking ! InGame(accountId)
-    expectMsgPF(timeout.duration) {
+    client.send(matchmaking, InGame(accountId))
+    client.expectMsgPF(timeout.duration) {
       case InGameResponse(None, false, top) ⇒ true
     }
 
-    expectNoMsg()
+    client.expectNoMsg()
   })
+
   multi("2 раза Online с одного актора", {
-    val matchmaking = newMatchmaking
+    val matchmaking = newMatchmaking(database = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -234,7 +245,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("Offline без Online", {
-    val matchmaking = newMatchmaking
+    val matchmaking = newMatchmaking(database = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -243,33 +254,56 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("Offline", {
-    val matchmaking = newMatchmaking
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
     val accountId = AccountId(VKONTAKTE, "1")
-    matchmaking ! Online(accountId)
-    matchmaking ! newGameOrder(accountId)
-    matchmaking ! Offline(accountId, self)
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId))
+    client.send(matchmaking, Offline(accountId, self))
     matchmaking ! TryCreateGames
-    expectNoMsg()
+    database.expectMsg(START_GAME_4_WITH_BOTS)
+    client.expectNoMsg()
   })
 
-  multi("Matchmaking форвадит Offline to Game", {
-    val matchmaking = newMatchmakingWithSelfAsGameFactory
+  multi("Matchmaking форвадит Offline to Game если не тутор", {
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(gameFactory = new FakeGameFactory(self), database = database.ref)
     val accountId = AccountId(VKONTAKTE, "1")
-    matchmaking ! Online(accountId)
-    matchmaking ! newGameOrder(accountId)
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId))
     matchmaking ! TryCreateGames
-    expectMsgPF(timeout.duration) {
+    database.expectMsgClass(classOf[StatAction])
+    client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
     }
-    matchmaking ! Offline(accountId, self)
+    client.send(matchmaking, Offline(accountId, client.ref))
     expectMsgPF(timeout.duration) {
       case Offline(id, client) ⇒ id shouldBe accountId
     }
     expectNoMsg()
   })
 
+  multi("Matchmaking получает Offline и убивает игру если тутор", {
+    val database = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref)
+    val accountId = AccountId(VKONTAKTE, "1")
+    client.send(matchmaking, Online(accountId))
+    client.send(matchmaking, newGameOrder(accountId, accountState = accountStateMock(gamesCount = 0)))
+    matchmaking ! TryCreateGames
+    var game: Option[ActorRef] = None
+    client.expectMsgPF(timeout.duration) {
+      case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
+    }
+    client.send(matchmaking, Offline(accountId, client.ref))
+    watch(game.get)
+    expectTerminated(game.get)
+  })
+
   multi("Double Online", {
-    val matchmaking = newMatchmaking
+    val matchmaking = newMatchmaking(database = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -287,6 +321,47 @@ class MatchmakingTest extends ActorsTest {
 
     client2.send(matchmaking, TryCreateGames)
     client2.expectMsgClass(classOf[ConnectToGame])
+    client2.expectNoMsg()
+  })
+
+  multi("SetAccountState forward to Account", {
+    val matchmaking = newMatchmaking(database = self)
+
+    val accountId1 = AccountId(VKONTAKTE, "1")
+    val accountId2 = AccountId(VKONTAKTE, "2")
+
+    val client1 = new TestProbe(system)
+    val client2 = new TestProbe(system)
+
+    client1.send(matchmaking, Online(accountId1))
+    client2.send(matchmaking, Online(accountId2))
+
+    val msg = SetAccountState(accountId1, accountStateMock().dto)
+    matchmaking ! msg
+
+    client1.expectMsg(msg)
+    client1.expectNoMsg()
+
+    client2.expectNoMsg()
+  })
+
+  multi("DeleteAccount forward to Account", {
+    val matchmaking = newMatchmaking(database = self)
+
+    val accountId1 = AccountId(VKONTAKTE, "1")
+    val accountId2 = AccountId(VKONTAKTE, "2")
+
+    val client1 = new TestProbe(system)
+    val client2 = new TestProbe(system)
+
+    client1.send(matchmaking, Online(accountId1))
+    client2.send(matchmaking, Online(accountId2))
+
+    matchmaking ! Database.DeleteAccount(accountId1)
+
+    client1.expectMsg(DuplicateAccount)
+    client1.expectNoMsg()
+
     client2.expectNoMsg()
   })
 }

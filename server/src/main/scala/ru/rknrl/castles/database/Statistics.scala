@@ -71,34 +71,34 @@ object Statistics {
 
 
   def sendLeaveGameStatistics(place: Int,
-                              gameInfo: GameInfo,
+                              isTutor: Boolean,
                               orders: Iterable[GameOrder],
                               order: GameOrder,
                               database: ActorRef)
-                             (implicit context: ActorContext): Unit = {
+                             (implicit sender: ActorRef): Unit = {
     if (!order.isBot) {
       val gameWithBots = orders.count(_.isBot) == orders.size - 1
       if (gameWithBots) {
         if (orders.size == 4) {
           if (place == 1) {
-            if (gameInfo.isTutor)
+            if (isTutor)
               database ! StatAction.TUTOR_4_WIN
             else
               database ! StatAction.WIN_4_BOTS
           } else {
-            if (gameInfo.isTutor)
+            if (isTutor)
               database ! StatAction.TUTOR_4_LOSE
             else
               database ! StatAction.LOSE_4_BOTS
           }
         } else if (orders.size == 2) {
           if (place == 1) {
-            if (gameInfo.isTutor)
+            if (isTutor)
               database ! StatAction.TUTOR_2_WIN
             else
               database ! StatAction.WIN_2_BOTS
           } else {
-            if (gameInfo.isTutor)
+            if (isTutor)
               database ! StatAction.TUTOR_2_LOSE
             else
               database ! StatAction.LOSE_2_BOTS
@@ -110,7 +110,7 @@ object Statistics {
 
   def sendCreateGameStatistics(orders: Iterable[GameOrder],
                                database: ActorRef)
-                              (implicit context: ActorContext): Unit = {
+                              (implicit sender: ActorRef): Unit = {
     if (orders.count(_.isBot) == orders.size - 1) {
       if (orders.size == 4)
         database ! StatAction.START_GAME_4_WITH_BOTS

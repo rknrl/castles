@@ -280,7 +280,7 @@ class MatchMaking(interval: FiniteDuration,
 
     accountIdToAccountRef(accountId) ! AccountLeaveGame(top.dto)
 
-    Statistics.sendLeaveGameStatistics(place, gameInfo, orders, order, database)
+    Statistics.sendLeaveGameStatistics(place, gameInfo.isTutor, orders, order, database)
   }
 
   def onGameOver(gameRef: ActorRef) = {

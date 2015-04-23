@@ -17,7 +17,7 @@ class ActorsTest
   with ImplicitSender with WordSpecLike with Matchers with DefaultTimeout with BeforeAndAfterAll {
 
   def multi(s: String, f: ⇒ Unit) = {
-    for (i ← 0 to 10) (s + i) in f
+    for (i ← 0 until 10) (s + i) in f
   }
 
   override protected def afterAll() = system.shutdown()
