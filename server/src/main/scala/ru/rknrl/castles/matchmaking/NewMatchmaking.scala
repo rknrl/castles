@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import org.slf4j.LoggerFactory
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.game.{Game, GameScheduler}
+import ru.rknrl.castles.game.{BotFactory, Game, GameScheduler}
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.castles.matchmaking.NewMatchmaking._
 import ru.rknrl.dto._
@@ -67,6 +67,7 @@ object NewMatchmaking {
 // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
 
 class NewMatchmaking(gameCreator: GameCreator,
+                     gameFactory: IGameFactory,
                      interval: FiniteDuration,
                      var top: Top,
                      config: Config,
@@ -76,8 +77,6 @@ class NewMatchmaking(gameCreator: GameCreator,
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
   var accountIdToGameOrder = Map.empty[AccountId, GameOrder]
   var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
-
-  val gameIterator = new GameIdIterator
 
   import context.dispatcher
 
@@ -121,7 +120,7 @@ class NewMatchmaking(gameCreator: GameCreator,
       val newGames = matchedOrders.map(gameCreator.newGame)
 
       for (newGame ← newGames) {
-        val game = context.actorOf(Props(classOf[Game], newGame.gameState, config.isDev, newGame.isTutor, classOf[GameScheduler], self, bugs), gameIterator.next)
+        val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self, bugs)
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
 
         for (order ← newGame.orders if !order.isBot) {
