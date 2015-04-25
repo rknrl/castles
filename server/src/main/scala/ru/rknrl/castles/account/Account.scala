@@ -107,9 +107,10 @@ class Account(matchmaking: ActorRef,
 
       if (searchOpponents)
         context become enterGame
-      else if (gameRef.isDefined)
-        context become inGame
-      else if (state.gamesCount == 0) {
+      else if (gameRef.isDefined) {
+        _game = gameRef
+        context become enterGame
+      } else if (state.gamesCount == 0) {
         database ! StatAction.START_TUTOR
         sendGameOrder()
       } else
