@@ -11,7 +11,6 @@ package ru.rknrl.castles.bot
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
@@ -43,7 +42,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
   val log = new SilentLog
 
   def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.BOT), {
-    case state: GameState ⇒ false
+    case state: GameStateUpdated ⇒ false
     case _ ⇒ true
   })
 
@@ -52,15 +51,15 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
       game = Some(gameRef)
       gameRef ! Join(accountId, self)
 
-    case JoinedGame(gameState) ⇒
-      playerId = Some(gameState.selfId)
-      mapDiagonal = Math.sqrt(gameState.width * gameState.height)
+    case JoinedGame(newGameState) ⇒
+      gameState = Some(newGameState)
+      playerId = Some(newGameState.selfId)
+      mapDiagonal = Math.sqrt(newGameState.width * newGameState.height)
 
     case GameStateUpdated(gameStateUpdate) ⇒
+      update(GameStateMerge.merge(gameState.get, gameStateUpdate))
 
     case GameOver(gameOver) ⇒
-
-    case newGameState: GameStateDTO ⇒ update(newGameState)
   })
 
   def update(newGameState: GameStateDTO) = {
@@ -112,8 +111,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
           val availableCast = items.filter(itemState ⇒
             itemState.count > 0 &&
-              itemState.itemType != ItemType.TORNADO &&
-              itemState.millisFromStart > itemState.cooldownDuration)
+              itemState.itemType != ItemType.TORNADO)
 
           if (availableCast.size > 0) {
             val rnd = Math.floor(Math.random() * availableCast.size).toInt

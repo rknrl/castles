@@ -67,7 +67,6 @@ class Game(var gameState: GameState,
 
   def sendToPlayers(msg: Any): Unit =
     for ((playerId, client) ← playerIdToClient
-         if !gameState.players(playerId).isBot
          if !(leaved contains playerId))
       client ! msg
 
@@ -76,12 +75,6 @@ class Game(var gameState: GameState,
          if gameState.players(playerId).isBot
          if !(leaved contains playerId))
       client ! msg
-
-  def sendGameStateToBots(): Unit =
-    for ((playerId, client) ← playerIdToClient
-         if gameState.players(playerId).isBot
-         if !(leaved contains playerId))
-      client ! gameState.dto(playerId, gameOvers.values.toSeq)
 
   val log = new SilentLog
 
@@ -118,7 +111,6 @@ class Game(var gameState: GameState,
       val gameStateUpdate = GameStateDiff.diff(gameState, newGameState)
 
       sendToPlayers(GameStateUpdated(gameStateUpdate))
-      sendGameStateToBots()
 
       gameState = newGameState
 

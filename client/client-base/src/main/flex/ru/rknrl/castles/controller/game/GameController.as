@@ -228,7 +228,6 @@ public class GameController extends EventDispatcher {
         for each(var newTornado:TornadoDTO in update.newTornadoes) addTornado(newTornado);
         for each(var newBullet:BulletDTO in update.newBullets) addBullet(newBullet);
         for each(var itemStateUpdate:ItemStatesDTO in update.itemStatesUpdates) updateItemStates(itemStateUpdate);
-        for each(var newGameOver:GameOverDTO in update.newGameOvers) gameOver(newGameOver);
     }
 
     private function addUnit(dto:UnitDTO):void {
