@@ -31,8 +31,7 @@ object GameStateDiff {
       unitUpdates = getUnitUpdates(oldState.units, newState.units).toSeq,
       killUnits = killedUnits.map(_.id),
       buildingUpdates = getBuildingUpdates(oldState.buildings, newState.buildings).toSeq,
-      itemStatesUpdates = getItemStatesUpdates(oldState.items, newState.items, oldState.config, newTime).toSeq,
-      newGameOvers = Nil
+      itemStatesUpdates = getItemStatesUpdates(oldState.items, newState.items, oldState.config, newTime).toSeq
     )
   }
 

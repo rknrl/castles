@@ -51,7 +51,6 @@ class GameStateDiffTest extends WordSpec with Matchers {
     gameStateUpdate.newVolcanoes shouldBe empty
     gameStateUpdate.newBullets shouldBe empty
     gameStateUpdate.itemStatesUpdates shouldBe empty
-    gameStateUpdate.newGameOvers shouldBe empty
   }
 
   "no changes" in {

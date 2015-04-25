@@ -60,7 +60,6 @@ message GameStateUpdateDTO {
     repeated VolcanoDTO newVolcanoes = 7;
     repeated BulletDTO newBullets = 8;
     repeated ItemStatesDTO itemStatesUpdates = 9;
-    repeated GameOverDTO newGameOvers = 10;
 }
 
 enum SlotsOrientation {
