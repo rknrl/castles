@@ -68,8 +68,6 @@ class GameLeaveTest extends GameTestSpec {
         dto.place shouldBe 1
     }
 
-    client1.send(game, Surrender)
-
     client1.expectMsgPF(TIMEOUT) {
       case GameOver(dto) ⇒
         dto.playerId shouldBe PlayerId(0)

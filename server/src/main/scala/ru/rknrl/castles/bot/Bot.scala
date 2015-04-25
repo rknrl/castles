@@ -10,7 +10,6 @@ package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
@@ -18,7 +17,7 @@ import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 import ru.rknrl.{BugType, Logged, SilentLog}
 
-class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Actor {
+class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L
@@ -49,7 +48,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
   override def receive: Receive = logged({
     case ConnectToGame(gameRef) ⇒
       game = Some(gameRef)
-      gameRef ! Join(accountId, self)
+      send(gameRef, Join(accountId, self))
 
     case JoinedGame(newGameState) ⇒
       gameState = Some(newGameState)
@@ -60,6 +59,8 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
       update(GameStateMerge.merge(gameState.get, gameStateUpdate))
 
     case GameOver(gameOver) ⇒
+      if (gameOver.playerId == playerId.get)
+        send(game.get, LeaveGame)
   })
 
   def update(newGameState: GameStateDTO) = {
@@ -97,12 +98,12 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
         myBuildingsSize = myBuildings.size
 
-        sender ! Move(
+        send(sender, Move(
           MoveDTO(
             fromBuildings.map(_.id),
             toBuildingId.get
           )
-        )
+        ))
 
         if (time - lastCastTime > castInterval) {
           lastCastTime = time
@@ -121,13 +122,13 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
             itemType match {
               case ItemType.FIREBALL ⇒
-                sender ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos)
+                send(sender, CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos))
               case ItemType.VOLCANO ⇒
-                sender ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos)
+                send(sender, CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos))
               case ItemType.STRENGTHENING ⇒
-                sender ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Int.reverse).head.id)
+                send(sender, CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Int.reverse).head.id))
               case ItemType.ASSISTANCE ⇒
-                sender ! CastAssistance(myBuildings.sortBy(_.population).head.id)
+                send(sender, CastAssistance(myBuildings.sortBy(_.population).head.id))
             }
           }
         }
@@ -164,4 +165,9 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
   def populationWeight(population: Double) = population * 3 / 99
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
+
+  def send(to: ActorRef, msg: Any): Unit = {
+    log.debug("send " + msg)
+    to ! msg
+  }
 }

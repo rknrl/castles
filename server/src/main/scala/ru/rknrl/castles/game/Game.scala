@@ -35,7 +35,7 @@ class Game(var gameState: GameState,
            bugs: ActorRef) extends Actor {
 
   for ((playerId, player) ← gameState.players if player.isBot) {
-    val bot = botFactory.create(player.accountId, isTutor, gameState.config, bugs)
+    val bot = botFactory.create(player.accountId, isTutor, bugs)
     bot ! ConnectToGame(self)
   }
 
@@ -181,12 +181,13 @@ class Game(var gameState: GameState,
     val gameOver = gameOvers(playerId)
     val player = gameState.players(playerId)
 
-    matchmaking ! PlayerLeaveGame(
-      accountId = player.accountId,
-      place = gameOver.place,
-      reward = gameOver.reward,
-      usedItems = gameState.items.states(playerId).usedItems
-    )
+    if (!player.isBot)
+      matchmaking ! PlayerLeaveGame(
+        accountId = player.accountId,
+        place = gameOver.place,
+        reward = gameOver.reward,
+        usedItems = gameState.items.states(playerId).usedItems
+      )
 
     if (leaved.size == playersIds.size)
       matchmaking ! AllPlayersLeaveGame(self)

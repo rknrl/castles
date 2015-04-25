@@ -24,8 +24,10 @@ class SilentLog extends Log {
 
   def info(s: String) = {
     builder append s + "\n"
-//    println(s)
+    println(s)
   }
+
+  def debug(s: String) = info(s)
 
   def result = builder.result
 }

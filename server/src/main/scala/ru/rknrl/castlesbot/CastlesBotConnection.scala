@@ -9,6 +9,7 @@
 package ru.rknrl.castlesbot
 
 import akka.actor.Props
+import ru.rknrl.dto.AccountId
 import ru.rknrl.rmi.Server
 
 class CastlesBotConnection(host: String, port: Int) extends Server(host, port) {
