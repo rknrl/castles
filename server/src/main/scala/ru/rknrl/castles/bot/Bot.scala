@@ -11,11 +11,10 @@ package ru.rknrl.castles.bot
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.castles.game.state.{Building, GameState, Player}
+import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
-import ru.rknrl.castles.rmi.B2C.JoinedGame
+import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.castles.rmi._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 import ru.rknrl.{BugType, Logged, SilentLog}
@@ -28,7 +27,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
   var mapDiagonal = Double.NaN
 
   var game: Option[ActorRef] = None
-  var gameState: Option[GameState] = None
+  var gameState: Option[GameStateDTO] = None
   var playerId: Option[PlayerId] = None
 
   var toBuildingId: Option[BuildingId] = None
@@ -57,19 +56,23 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
       playerId = Some(gameState.selfId)
       mapDiagonal = Math.sqrt(gameState.width * gameState.height)
 
-    case newGameState: GameState ⇒ update(newGameState)
+    case GameStateUpdated(gameStateUpdate) ⇒
+
+    case GameOver(gameOver) ⇒
+
+    case newGameState: GameStateDTO ⇒ update(newGameState)
   })
 
-  def update(newGameState: GameState) = {
+  def update(newGameState: GameStateDTO) = {
     gameState = Some(newGameState)
-    val time = newGameState.time
+    val time = System.currentTimeMillis()
 
     if (time - lastTime > moveInterval) {
       lastTime = time
 
       val myBuildings = getMyBuildings
 
-      val fromBuildings = myBuildings.filter(_.count > 5)
+      val fromBuildings = myBuildings.filter(_.population > 5)
 
       val enemyBuildings = getEnemyBuildings
 
@@ -85,7 +88,7 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
           val friendly = Math.random() < 0.33
           if (friendly) {
-            toBuildingId = Some(myBuildings.minBy(_.count).id)
+            toBuildingId = Some(myBuildings.minBy(_.population).id)
           } else {
             val rnd = Math.floor(Math.random() * toBuildings.size).toInt
             toBuildingId = Some(toBuildings(rnd).id)
@@ -105,12 +108,12 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
         if (time - lastCastTime > castInterval) {
           lastCastTime = time
 
-          val items = newGameState.items.states(playerId.get).items.map { case (_, itemState) ⇒ itemState }
+          val items = newGameState.itemStates.items
 
           val availableCast = items.filter(itemState ⇒
             itemState.count > 0 &&
               itemState.itemType != ItemType.TORNADO &&
-              newGameState.items.canCast(playerId.get, itemState.itemType, config, time))
+              itemState.millisFromStart > itemState.cooldownDuration)
 
           if (availableCast.size > 0) {
             val rnd = Math.floor(Math.random() * availableCast.size).toInt
@@ -120,13 +123,13 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
             itemType match {
               case ItemType.FIREBALL ⇒
-                sender ! CastFireball(ownedEnemyBuildings.sortBy(_.count)(Ordering.Double.reverse).head.pos.dto)
+                sender ! CastFireball(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos)
               case ItemType.VOLCANO ⇒
-                sender ! CastVolcano(ownedEnemyBuildings.sortBy(_.count)(Ordering.Double.reverse).head.pos.dto)
+                sender ! CastVolcano(ownedEnemyBuildings.sortBy(_.population)(Ordering.Int.reverse).head.pos)
               case ItemType.STRENGTHENING ⇒
-                sender ! CastStrengthening(myBuildings.sortBy(_.count)(Ordering.Double.reverse).head.id)
+                sender ! CastStrengthening(myBuildings.sortBy(_.population)(Ordering.Int.reverse).head.id)
               case ItemType.ASSISTANCE ⇒
-                sender ! CastAssistance(myBuildings.sortBy(_.count).head.id)
+                sender ! CastAssistance(myBuildings.sortBy(_.population).head.id)
             }
           }
         }
@@ -140,24 +143,25 @@ class Bot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends Acto
 
   def getEnemyBuildings = buildings.filterNot(my).toList
 
-  def my(b: Building) = b.owner.isDefined && b.owner.get.id == playerId.get
+  def my(b: BuildingDTO) = b.owner.isDefined && b.owner.get == playerId.get
 
-  def buildingsToWeights(enemyBuildings: Iterable[Building], myBuildings: Iterable[Building]) =
+  def buildingsToWeights(enemyBuildings: Seq[BuildingDTO], myBuildings: Seq[BuildingDTO]) =
     for (b ← enemyBuildings)
       yield Weight(
         b.id,
         distanceWeight(b.pos, myBuildings) +
           ownerWeight(b.owner) +
-          populationWeight(b.count) +
-          strengthenedWeight(b.strengthening.isDefined)
+          populationWeight(b.population) +
+          strengthenedWeight(b.strengthened)
       )
 
-  def distanceWeight(pos: Point, myBuildings: Iterable[Building]) = {
-    val distances = myBuildings.map(_.pos.distance(pos))
+  def distanceWeight(pos: PointDTO, myBuildings: Seq[BuildingDTO]) = {
+    val myPos = Point(pos)
+    val distances = myBuildings.map(b ⇒ Point(b.pos).distance(myPos))
     (distances.sum / myBuildings.size) / mapDiagonal // from 0 to 1
   }
 
-  def ownerWeight(owner: Option[Player]) = if (owner.isDefined) 0.3 else 0.0
+  def ownerWeight(owner: Option[PlayerId]) = if (owner.isDefined) 0.3 else 0.0
 
   def populationWeight(population: Double) = population * 3 / 99
 

@@ -8,8 +8,7 @@
 
 package ru.rknrl.castles.game
 
-import akka.actor.{Actor, ActorContext, ActorRef, Props}
-import ru.rknrl.castles.bot.{Bot, TutorBot}
+import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
@@ -78,6 +77,12 @@ class Game(var gameState: GameState,
          if !(leaved contains playerId))
       client ! msg
 
+  def sendGameStateToBots(): Unit =
+    for ((playerId, client) ← playerIdToClient
+         if gameState.players(playerId).isBot
+         if !(leaved contains playerId))
+      client ! gameState.dto(playerId, gameOvers.values.toSeq)
+
   val log = new SilentLog
 
   def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.GAME), {
@@ -113,7 +118,7 @@ class Game(var gameState: GameState,
       val gameStateUpdate = GameStateDiff.diff(gameState, newGameState)
 
       sendToPlayers(GameStateUpdated(gameStateUpdate))
-      sendToBots(newGameState)
+      sendGameStateToBots()
 
       gameState = newGameState
 

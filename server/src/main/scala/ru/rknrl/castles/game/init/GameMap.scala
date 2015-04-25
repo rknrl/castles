@@ -10,15 +10,13 @@ package ru.rknrl.castles.game.init
 
 import java.io.File
 
-import ru.rknrl.Assertion
 import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.{Building, BuildingIdIterator}
 import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
+import ru.rknrl.{Assertion, RandomUtil}
 
 import scala.io.Source
-
-import GameMap._
 
 class MapCell(val i: Int,
               val j: Int,
@@ -29,8 +27,8 @@ class GameMap(val cells: Iterable[MapCell]) {
 
   private def topLeftBuildings(iterator: BuildingIdIterator, config: GameConfig) =
     for (cell ← cells) yield {
-      val buildingType = cell.buildingType.getOrElse(random(BuildingType.values))
-      val buildingLevel = cell.buildingLevel.getOrElse(random(BuildingLevel.values))
+      val buildingType = cell.buildingType.getOrElse(RandomUtil.random(BuildingType.values))
+      val buildingLevel = cell.buildingLevel.getOrElse(RandomUtil.random(BuildingLevel.values))
       val prototype = BuildingPrototype(buildingType, buildingLevel)
 
       val stat = config.units(prototype)
@@ -101,15 +99,13 @@ class GameMaps(val big: Array[GameMap],
                val bigTutor: GameMap,
                val smallTutor: GameMap) {
   def random(isBig: Boolean) =
-    if (isBig) GameMap.random(big) else GameMap.random(small)
+    if (isBig) RandomUtil.random(big) else RandomUtil.random(small)
 
   def tutor(isBig: Boolean) =
     if (isBig) bigTutor else smallTutor
 }
 
 object GameMap {
-  def random[T](list: Seq[T]): T =
-    list((Math.random() * list.length).toInt)
 
   private def toBuildingType(s: String) =
     s match {

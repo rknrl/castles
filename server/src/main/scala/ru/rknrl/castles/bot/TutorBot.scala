@@ -38,11 +38,11 @@ class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends
 
   override def receive = tutorBotReceive.orElse(super.receive)
 
-  override def update(newGameState: GameState) = {
+  override def update(newGameState: GameStateDTO) = {
     gameState = Some(newGameState)
     mode match {
       case SEND_UNITS_TO_ONE_BUILDING ⇒
-        val time = newGameState.time
+        val time = System.currentTimeMillis()
 
         if (time - lastTime > moveInterval) {
           lastTime = time
@@ -60,7 +60,7 @@ class TutorBot(accountId: AccountId, config: GameConfig, bugs: ActorRef) extends
     }
 
     def towers = buildings
-      .filter(b ⇒ b.buildingPrototype.buildingType == BuildingType.TOWER &&
-      b.buildingPrototype.buildingLevel == BuildingLevel.LEVEL_2)
+      .filter(b ⇒ b.building.buildingType == BuildingType.TOWER &&
+      b.building.buildingLevel == BuildingLevel.LEVEL_2)
   }
 }
