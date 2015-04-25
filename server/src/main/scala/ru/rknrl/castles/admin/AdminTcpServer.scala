@@ -11,8 +11,8 @@ package ru.rknrl.castles.admin
 import java.net.InetSocketAddress
 
 import akka.actor.{ActorRef, Props}
-import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
+import ru.rknrl.logging.MiniLog
 
 class AdminTcpServer(tcp: ActorRef,
                      host: String,
@@ -24,7 +24,7 @@ class AdminTcpServer(tcp: ActorRef,
 
   import akka.io.Tcp._
 
-  val log = LoggerFactory.getLogger(getClass)
+  val log = new MiniLog
 
   val address = new InetSocketAddress(host, port)
 

@@ -9,6 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef}
+import ru.rknrl.Assertion
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
@@ -21,7 +22,7 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
-import ru.rknrl.{Assertion, BugType, Logged, SilentLog}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 
 object Account {
@@ -53,9 +54,9 @@ class Account(matchmaking: ActorRef,
 
   def game = _game.get
 
-  val log = new SilentLog
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.ACCOUNT), any ⇒ true)
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Account", any ⇒ true)
 
   def receive = auth
 

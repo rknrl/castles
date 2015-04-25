@@ -16,7 +16,7 @@ import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto._
-import ru.rknrl.{BugType, Logged, SilentLog}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 object Game {
 
@@ -76,9 +76,9 @@ class Game(var gameState: GameState,
          if !(leaved contains playerId))
       client ! msg
 
-  val log = new SilentLog
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.GAME), {
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Game", {
     case UpdateGameState ⇒ false
     case _ ⇒ true
   })

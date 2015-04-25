@@ -15,7 +15,7 @@ import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
-import ru.rknrl.{BugType, Logged, SilentLog}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
   val moveInterval = 5000
@@ -38,9 +38,9 @@ class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
 
   case class Weight(id: BuildingId, weight: Double)
 
-  val log = new SilentLog
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), Some(BugType.BOT), {
+  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Bot", {
     case state: GameStateUpdated ⇒ false
     case _ ⇒ true
   })

@@ -11,15 +11,15 @@ package ru.rknrl.castles
 import java.net.InetSocketAddress
 
 import akka.actor.{ActorRef, Props}
-import org.slf4j.LoggerFactory
 import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.account.AccountClientSession
+import ru.rknrl.logging.MiniLog
 
 class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, bugs: ActorRef, secretChecker: ActorRef) extends StoppingStrategyActor {
 
   import akka.io.Tcp._
 
-  val log = LoggerFactory.getLogger(getClass)
+  val log = new MiniLog
 
   val address = new InetSocketAddress(config.host, config.gamePort)
 

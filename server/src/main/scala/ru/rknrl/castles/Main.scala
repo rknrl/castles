@@ -12,15 +12,15 @@ import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
 import akka.pattern._
 import net.liftweb.json._
+import ru.rknrl.PolicyServer
 import ru.rknrl.castles.account.SecretChecker
-import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.game.init.GameMaps
-import ru.rknrl.castles.matchmaking.{GameFactory, GameCreator, MatchMaking, Top}
-import ru.rknrl.{Bugs, PolicyServer}
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.GetTop
+import ru.rknrl.castles.game.init.GameMaps
+import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
+import ru.rknrl.logging.Bugs
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -45,7 +45,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val bugs = system.actorOf(Props(classOf[Bugs], config.bugs), "bugs")
+    val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
     val database = system.actorOf(Props(classOf[Database], config.db), "database")

@@ -14,7 +14,7 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef}
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
-import org.slf4j.LoggerFactory
+import ru.rknrl.logging.MiniLog
 
 import scala.annotation.tailrec
 
@@ -23,7 +23,7 @@ abstract class TcpClientConnection(host: String, port: Int) extends Actor {
   import Tcp._
   import context.system
 
-  val log = LoggerFactory.getLogger(getClass)
+  val log = new MiniLog
 
   val headerSize = 4
   val commandIdSize = 1

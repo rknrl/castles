@@ -10,7 +10,7 @@ package ru.rknrl.castles.game
 
 import akka.actor.Props
 import ru.rknrl.castles.game.Game.UpdateGameState
-import ru.rknrl.castles.kit.ActorsTest
+import ru.rknrl.test.ActorsTest
 
 import scala.concurrent.duration._
 

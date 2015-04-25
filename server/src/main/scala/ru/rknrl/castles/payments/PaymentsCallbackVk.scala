@@ -162,7 +162,7 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
         }
     } catch {
       case e: Throwable ⇒
-        log.error("error request parsing ", e)
+        log.error(e)
         response(VkPaymentsError.INVALID_REQUEST.toString)
     }
 

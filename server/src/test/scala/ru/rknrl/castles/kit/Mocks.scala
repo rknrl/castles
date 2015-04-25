@@ -9,7 +9,6 @@
 package ru.rknrl.castles.kit
 
 import org.scalatest.Matchers
-import ru.rknrl.BugsConfig
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.account.{AccountConfig, AccountState, BuildingPrices, SkillUpgradePrices}
@@ -199,17 +198,6 @@ object Mocks extends Matchers {
       maxSpeed = maxSpeed
     )
 
-  def bugsConfigMock(clientDir: String = "bugs/client/",
-                     gameDir: String = "bugs/game/",
-                     botDir: String = "bugs/bot/",
-                     accountDir: String = "bugs/account/") =
-    new BugsConfig(
-      clientDir = clientDir,
-      gameDir = gameDir,
-      botDir = botDir,
-      accountDir = accountDir
-    )
-
   def configMock(host: String = "localhost",
                  staticHost: String = "localhot",
                  gamePort: Int = 2305,
@@ -225,7 +213,7 @@ object Mocks extends Matchers {
                  social: SocialConfigs = socialConfigsMock(),
                  account: AccountConfig = accountConfigMock(),
                  game: GameConfig = gameConfigMock(),
-                 bugs: BugsConfig = bugsConfigMock()) =
+                 bugsDir: String = "bugs/") =
     new Config(
       host = host,
       staticHost = host,
@@ -242,7 +230,7 @@ object Mocks extends Matchers {
       social = social,
       account = account,
       game = game,
-      bugs = bugs
+      bugsDir = bugsDir
     )
 
 

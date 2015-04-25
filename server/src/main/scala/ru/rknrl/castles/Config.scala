@@ -8,7 +8,6 @@
 
 package ru.rknrl.castles
 
-import ru.rknrl.BugsConfig
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
@@ -30,7 +29,7 @@ class Config(val host: String,
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig,
-             val bugs: BugsConfig) {
+             val bugsDir: String) {
 
   private def checkProductInfoConfig() =
     for (p ← products)

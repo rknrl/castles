@@ -11,12 +11,12 @@ package ru.rknrl.castles.account
 import akka.actor.Props
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.dto.AccountType._
 import ru.rknrl.dto.DeviceType._
 import ru.rknrl.dto.PlatformType._
 import ru.rknrl.dto._
+import ru.rknrl.test.ActorsTest
 
 import scala.concurrent.duration._
 

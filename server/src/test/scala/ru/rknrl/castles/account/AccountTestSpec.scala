@@ -13,7 +13,6 @@ import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, GetTutorState, TutorStateResponse}
-import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.rmi.B2C.Authenticated
@@ -21,6 +20,7 @@ import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.dto.AccountType.VKONTAKTE
 import ru.rknrl.dto.PlatformType.CANVAS
 import ru.rknrl.dto._
+import ru.rknrl.test.ActorsTest
 
 class AccountTestSpec extends ActorsTest {
 

@@ -10,10 +10,11 @@ package ru.rknrl.castles.database
 
 import akka.testkit.TestProbe
 import org.scalatest.Matchers
-import ru.rknrl.castles.kit.{ActorsTest, Mocks}
+import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.dto.AccountId
 import ru.rknrl.dto.AccountType.VKONTAKTE
 import ru.rknrl.dto.StatAction._
+import ru.rknrl.test.ActorsTest
 
 class StatisticsTest extends ActorsTest with Matchers {
   val human = Mocks.newGameOrder(AccountId(VKONTAKTE, "1"), isBot = false)

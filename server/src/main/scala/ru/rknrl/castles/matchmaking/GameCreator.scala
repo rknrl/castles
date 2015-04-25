@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.matchmaking
 
+import ru.rknrl.IdIterator
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.account.AccountState._
@@ -19,7 +20,6 @@ import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
 import ru.rknrl.core.Stat
 import ru.rknrl.dto.AccountType.DEV
 import ru.rknrl.dto.{AccountId, PlayerId}
-import ru.rknrl.utils.IdIterator
 
 object GameCreator {
 

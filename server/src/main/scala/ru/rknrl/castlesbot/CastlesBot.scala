@@ -10,20 +10,18 @@ package ru.rknrl.castlesbot
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Tcp.Connected
-import org.slf4j.LoggerFactory
 import ru.rknrl.RandomUtil.random
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.Bot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.AccountType.DEV
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_3}
 import ru.rknrl.dto.DeviceType.PC
 import ru.rknrl.dto.PlatformType.CANVAS
 import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_3
 import ru.rknrl.dto._
-import ru.rknrl.{BugType, Logged, Slf4j}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 import scala.concurrent.duration._
 
@@ -40,21 +38,18 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class CastlesBot(server: ActorRef) extends Actor {
-  val log = new Slf4j(LoggerFactory.getLogger(getClass))
+class CastlesBot(server: ActorRef, accountId: AccountId) extends Actor {
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, None, None, {
+  def logged(r: Receive) = new Logged(r, log, None, "CastlesBot", {
     case state: GameStateUpdated ⇒ false
     case DoMenuAction ⇒ false
     case _ ⇒ true
   })
 
-  var _accountId: Option[AccountId] = None
   var _config: Option[AccountConfigDTO] = None
   var _accountState: Option[AccountStateDTO] = None
   var gameBot: Option[ActorRef] = None
-
-  def accountId = _accountId.get
 
   def config = _config.get
 
@@ -69,7 +64,6 @@ class CastlesBot(server: ActorRef) extends Actor {
 
   def receive = logged {
     case _: Connected ⇒
-      _accountId = Some(AccountId(DEV, "1"))
       send(Authenticate(AuthenticateDTO(UserInfoDTO(accountId), CANVAS, PC, AuthenticationSecretDTO(""))))
 
     case Authenticated(dto) ⇒
@@ -132,7 +126,7 @@ class CastlesBot(server: ActorRef) extends Actor {
 
         case UPGRADE_SKILL ⇒
           val totalLevel = getTotalLevel(accountState.skills)
-          if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel)) {
+          if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel + 1)) {
             val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
             val skillType = random(upgradableSkills).skillType
             send(UpgradeSkill(UpgradeSkillDTO(skillType)))

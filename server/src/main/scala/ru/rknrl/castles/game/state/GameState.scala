@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.game.state
 
+import ru.rknrl.IdIterator
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.game.state.Building._
@@ -21,7 +22,6 @@ import ru.rknrl.castles.game.state.Volcanoes._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto._
-import ru.rknrl.utils.IdIterator
 
 class BuildingIdIterator extends IdIterator {
   def next = BuildingId(nextInt)

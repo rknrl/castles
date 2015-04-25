@@ -12,15 +12,15 @@ import java.net.URLDecoder
 
 import akka.actor.ActorRef
 import akka.pattern.Patterns
-import org.slf4j.LoggerFactory
-import ru.rknrl.Bugs.Bug
+import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.{BugType, StoppingStrategyActor}
+import ru.rknrl.logging.Bugs.Bug
+import ru.rknrl.logging.MiniLog
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -31,7 +31,7 @@ import scala.concurrent.duration._
 
 class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends StoppingStrategyActor with HttpService {
 
-  val log = LoggerFactory.getLogger(getClass)
+  val log = new MiniLog
 
   val crossdomain = """<?xml version="1.0"?>
                       |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
@@ -49,7 +49,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
     path("bug") {
       post {
         entity(as[String]) { log =>
-          bugs ! Bug(BugType.CLIENT, log)
+          bugs ! Bug("client", log)
           complete(StatusCodes.OK)
         }
       }

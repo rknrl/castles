@@ -12,8 +12,8 @@ import java.io.{DataOutputStream, InputStream}
 
 import akka.actor.ActorRef
 import akka.util.ByteString
-import org.slf4j.LoggerFactory
 import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.logging.MiniLog
 
 import scala.annotation.tailrec
 
@@ -27,7 +27,7 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Escal
 
   import akka.io.Tcp._
 
-  val log = LoggerFactory.getLogger(getClass)
+  val log = new MiniLog
 
   val headerSize = 4
   val commandIdSize = 1

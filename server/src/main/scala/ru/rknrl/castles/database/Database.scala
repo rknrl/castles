@@ -12,11 +12,11 @@ import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
-import org.slf4j.LoggerFactory
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
-import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 class DbConfiguration(username: String,
                       host: String,
@@ -69,10 +69,9 @@ object Database {
 
 class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
 
-  val logger = LoggerFactory.getLogger(getClass)
-  val log = new Slf4j(logger)
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, None, None, any ⇒ true)
+  def logged(r: Receive) = new Logged(r, log, None, "Database", any ⇒ true)
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)

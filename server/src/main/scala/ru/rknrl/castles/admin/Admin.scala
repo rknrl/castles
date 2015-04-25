@@ -10,7 +10,7 @@ package ru.rknrl.castles.admin
 
 import akka.actor.ActorRef
 import akka.pattern.Patterns
-import org.slf4j.LoggerFactory
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
@@ -20,7 +20,7 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.{AccountId, AccountStateDTO, AdminAccountStateDTO}
-import ru.rknrl.{EscalateStrategyActor, Logged, Slf4j}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -31,10 +31,9 @@ class Admin(database: ActorRef,
             password: String,
             name: String) extends EscalateStrategyActor {
 
-  val logger = LoggerFactory.getLogger(getClass)
-  val log = new Slf4j(logger)
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, None, None, any ⇒ true)
+  def logged(r: Receive) = new Logged(r, log, None, "Admin", any ⇒ true)
 
   var client: ActorRef = null
 

@@ -13,12 +13,12 @@ import org.scalatest.{Matchers, WordSpecLike}
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.game.{BotFactory, IBotFactory, Game}
 import ru.rknrl.castles.game.state.{GameItems, GameState}
-import ru.rknrl.castles.kit.ActorsTest
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto._
+import ru.rknrl.test.ActorsTest
 
 import scala.concurrent.duration._
 

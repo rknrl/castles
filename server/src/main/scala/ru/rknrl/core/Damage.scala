@@ -9,7 +9,6 @@
 package ru.rknrl.core
 
 import ru.rknrl.castles.game.{DamagerConfig, GameConfig}
-import ru.rknrl.core.Stat
 import ru.rknrl.core.points.Point
 
 trait Damager {

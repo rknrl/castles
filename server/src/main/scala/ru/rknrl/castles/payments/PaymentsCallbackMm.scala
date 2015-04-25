@@ -115,7 +115,7 @@ class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallbac
         )
     } catch {
       case e: Throwable ⇒
-        log.error("error request parsing ", e)
+        log.error(e)
         super.response(errorResponse(MmStatus.FAIL, MmErrorCode.OTHER_ERROR))
     }
 

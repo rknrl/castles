@@ -10,7 +10,6 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
-import org.slf4j.LoggerFactory
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
@@ -18,7 +17,7 @@ import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeave
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.dto._
-import ru.rknrl.{Logged, Slf4j}
+import ru.rknrl.logging.{Logged, MiniLog}
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -90,9 +89,9 @@ class MatchMaking(gameCreator: GameCreator,
 
   val scheduler = context.system.scheduler.schedule(interval, interval, self, TryCreateGames)
 
-  val log = new Slf4j(LoggerFactory.getLogger(getClass))
+  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, None, None, {
+  def logged(r: Receive) = new Logged(r, log, None, "Matchmaking", {
     case TryCreateGames ⇒ false
     case _ ⇒ true
   })
