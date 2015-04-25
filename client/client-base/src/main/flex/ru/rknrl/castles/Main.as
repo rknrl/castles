@@ -87,6 +87,10 @@ public class Main extends Sprite {
 
     private var _layout:Layout;
 
+    public function get layout():Layout {
+        return _layout;
+    }
+
     public function set layout(value:Layout):void {
         _layout = value;
         if (view) view.layout = value;

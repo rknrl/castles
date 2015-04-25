@@ -1,0 +1,46 @@
+play	Играть
+bank_button	Купить $1★ за $2 $3
+balance	У вас $1★
+shop_title	Любой предмет за $1★
+upgrades_complete	Собраны все улучшения
+upgrades_title	Любое улучшение за $1★
+top_title	Лучшие на этой неделе
+attack	Атака
+defence	Защита
+speed	Скорость
+house	Домик
+tower	Башня
+church	Церковь
+build	Построить
+cancel	Отмена
+upgrade	Улучшить
+remove	Удалить
+win	Победа! Награда $1★
+lost	Поражение! Награда $1★
+default_name	Гость
+loading	Загрузка
+search_opponents	Ищем\nпротивников
+no_connection	Нет интернет соединения
+fast_and_trust	Быстро\nи\nнадежно
+dead	Выбыл
+tutor_self_buildings	Твои домики желтого цвета 
+tutor_enemy_buildings_big	У тебя 3 противника
+tutor_enemy_buildings_small	Твой противник бирюзовый
+next	Дальше
+tutor_arrow	Отправляй отряды и захватывай чужие домики
+tutor_arrows	Можно отправлять отряды сразу из нескольких домиков
+tutor_big_tower	Захвати большую башню усиленными отрядами
+tutor_click_fireball	Внизу находятся твои магические предметы
+tutor_click_strengthening	Усиление
+tutor_click_volcano	Создай вулкан под башней противника
+tutor_click_tornado	Используй торнадо против противника
+tutor_click_assistance	Вызывай подмогу
+tutor_cast_fireball	Запусти фаербол в противника
+tutor_cast_strengthening	Выбери свой домик, все его параметры увеличатся
+tutor_cast_volcano	Выбери место, где образуется вулкан
+tutor_cast_tornado	Нарисуй траекторию, по которой двинется торнадо
+tutor_cast_assistance	Выбери свой домик, и к нему отправится подмога
+tutor_win	Захвати все домики противников, чтобы выиграть
+game_splash	Нажимай мышкой на желтую башню и не отпуская тащи на другую
+enter_first_game	Отлично!\nЗаходим в бой
+tutor_no_owner_buildings	Серые домики пока не имеют владельца

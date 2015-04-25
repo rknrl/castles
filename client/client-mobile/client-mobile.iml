@@ -11,10 +11,10 @@
             <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="dto-core-client" build-configuration-name="dto-core-client">
+            <entry module-name="dto-client" build-configuration-name="dto-core-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="rmi-core-client" build-configuration-name="rmi-core-client">
+            <entry module-name="rmi-client" build-configuration-name="rmi-core-client">
               <dependency linkage="Merged" />
             </entry>
             <entry library-id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7">
@@ -85,7 +85,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
-    <orderEntry type="module" module-name="rmi-core-client" exported="" />
+    <orderEntry type="module" module-name="rmi-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="b9a2f52b-011b-47cf-a7c2-cfe63424c2f7" />
@@ -119,6 +119,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="dto-core-client" exported="" />
+    <orderEntry type="module" module-name="dto-client" exported="" />
   </component>
 </module>

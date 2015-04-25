@@ -54,21 +54,3 @@ public class BuildPopup extends Popup {
 }
 }
 
-import flash.display.DisplayObject;
-
-import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.BuildingType;
-
-class BuildItem extends PopupItem {
-    private var _buildingType:BuildingType;
-
-    public function get buildingType():BuildingType {
-        return _buildingType;
-    }
-
-    public function BuildItem(buildingType:BuildingType, layout:Layout, icon:DisplayObject, text:String, price:int) {
-        super(layout, icon, text, price);
-        _buildingType = buildingType;
-    }
-}
