@@ -7,7 +7,7 @@ rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 
 interfaces_dir="${project}/server/src/main/scala/ru/rknrl/castles/rmi/"
 scala_out="${project}/server/src/generated/scala/"
-as3_out="${project}/client/client-base/src/main/flex/"
+as3_out="${project}/client/client-base/src/generated/flex/"
 package_out="ru.rknrl.rmi"
 
 rm -rf ${scala_out}/ru/rknrl/rmi/*

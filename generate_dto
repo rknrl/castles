@@ -6,7 +6,7 @@ project="/Users/tolyayanot/dev/rknrl/castles"
 rknrl_core="/Users/tolyayanot/dev/rknrl/core"
 
 proto_dir="${project}/server/src/main/protobuf"
-as3_out="${project}/client/client-base/src/main/flex/"
+as3_out="${project}/client/client-base/src/generated/flex/"
 
 sbt clean
 sbt protobuf:protobufScalaGenerate

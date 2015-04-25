@@ -19,6 +19,7 @@
                 <source-path path-element="${asocial}/base/src"/>
                 <source-path path-element="${asocial}/web/src"/>
 
+                <source-path path-element="${castles}/client/client-base/src/generated/flex"/>
                 <source-path path-element="${castles}/client/client-base/src/main/flex"/>
                 <source-path path-element="${castles}/client/client-web/src/main/flex"/>
                 <source-path path-element="${castles}/client/client-web/src/main/resources"/>
