@@ -49,7 +49,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
     path("bug") {
       post {
         entity(as[String]) { log =>
-          bugs ! Bug("client", log)
+          bugs ! Bug("client", log.takeWhile(_ != '\n'), log)
           complete(StatusCodes.OK)
         }
       }
