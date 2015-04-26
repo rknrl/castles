@@ -22,7 +22,7 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountId, bugs: ActorRef) extends Bot(accountId, bugs) {
+class TutorBot(accountId: AccountId, bugs: ActorRef) extends GameBot(accountId, bugs) {
 
   var mode = NONE
 

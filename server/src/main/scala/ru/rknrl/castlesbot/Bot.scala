@@ -8,11 +8,12 @@
 
 package ru.rknrl.castlesbot
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
 import akka.io.Tcp.Connected
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.RandomUtil.random
 import ru.rknrl.castles.account.AccountConfig
-import ru.rknrl.castles.bot.Bot
+import ru.rknrl.castles.bot.GameBot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
@@ -38,7 +39,7 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
+class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends EscalateStrategyActor with ActorLog {
 
   override val logFilter: Any ⇒ Boolean = {
     case state: GameStateUpdated ⇒ false
@@ -131,8 +132,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
             send(UpgradeSkill(UpgradeSkillDTO(skillType)))
           }
 
-        case BUY_STARS ⇒
-        // todo
+        case BUY_STARS ⇒ // todo
 
         case ENTER_GAME ⇒
           send(EnterGame)
@@ -146,7 +146,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
 
     case msg: JoinedGame ⇒
       val bugs = self
-      gameBot = Some(context.actorOf(Props(classOf[Bot], accountId, bugs)))
+      gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId, bugs)))
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
       context become inGame

@@ -13,7 +13,7 @@ import ru.rknrl.dto.AccountId
 import ru.rknrl.dto.AccountType.DEV
 import ru.rknrl.logging.Bugs
 
-object CastlesBotMain {
+object BotMain {
   val host = "127.0.0.1"
   val port = 2335
   val count = 2
@@ -24,6 +24,6 @@ object CastlesBotMain {
     implicit val system = ActorSystem("main-actor-system")
     val bugs = system.actorOf(Props(classOf[Bugs], "/Users/tolyayanot/bugs/"), "bugs")
     for (i ← 1 to count)
-      system.actorOf(Props(classOf[CastlesBotConnection], host, port, AccountId(DEV, i.toString), bugs))
+      system.actorOf(Props(classOf[BotConnection], host, port, AccountId(DEV, i.toString), bugs))
   }
 }

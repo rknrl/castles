@@ -9,7 +9,7 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{ActorContext, ActorRef, Props}
-import ru.rknrl.castles.bot.{Bot, TutorBot}
+import ru.rknrl.castles.bot.{GameBot, TutorBot}
 import ru.rknrl.dto.AccountId
 
 trait IBotFactory {
@@ -20,7 +20,7 @@ trait IBotFactory {
 class BotFactory extends IBotFactory {
   def create(accountId: AccountId, isTutor: Boolean, bugs: ActorRef)
             (implicit context: ActorContext) = {
-    val botClass = if (isTutor) classOf[TutorBot] else classOf[Bot]
+    val botClass = if (isTutor) classOf[TutorBot] else classOf[GameBot]
     context.actorOf(Props(botClass, accountId, bugs), accountId.id)
   }
 }

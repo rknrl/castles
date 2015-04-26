@@ -11,14 +11,15 @@ package ru.rknrl.core.rmi
 import java.io.{DataOutputStream, InputStream}
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.ActorRef
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
+import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.logging.MiniLog
 
 import scala.annotation.tailrec
 
-abstract class TcpClientConnection(host: String, port: Int) extends Actor {
+abstract class TcpClientConnection(host: String, port: Int) extends EscalateStrategyActor {
 
   import Tcp._
   import context.system
