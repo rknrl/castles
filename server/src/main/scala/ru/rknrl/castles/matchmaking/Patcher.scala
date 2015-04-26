@@ -13,19 +13,21 @@ import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.dto.{AccountId, ItemType}
+import ru.rknrl.logging.ActorLog
 
 class Patcher(accountId: AccountId,
               reward: Int,
               usedItems: Map[ItemType, Int],
               newRating: Double,
               matchmaking: ActorRef,
-              database: ActorRef) extends Actor {
+              database: ActorRef,
+              val bugs: ActorRef) extends Actor with ActorLog {
 
   database ! GetAccountState(accountId)
 
   var updated: Boolean = false
 
-  def receive = {
+  def receive = logged({
     case AccountStateResponse(accountId, stateDto) ⇒
       if (!updated) {
         val state = AccountState(stateDto)
@@ -41,5 +43,5 @@ class Patcher(accountId: AccountId,
         matchmaking ! SetAccountState(accountId, stateDto)
         context stop self
       }
-  }
+  })
 }

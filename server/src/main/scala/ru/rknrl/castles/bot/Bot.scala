@@ -15,9 +15,9 @@ import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
-class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
+class Bot(accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L
@@ -38,12 +38,10 @@ class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
 
   case class Weight(id: BuildingId, weight: Double)
 
-  val log = new MiniLog
-
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Bot", {
+  override val logFilter: Any ⇒ Boolean = {
     case state: GameStateUpdated ⇒ false
     case _ ⇒ true
-  })
+  }
 
   override def receive: Receive = logged({
     case ConnectToGame(gameRef) ⇒
@@ -165,9 +163,4 @@ class Bot(accountId: AccountId, bugs: ActorRef) extends Actor {
   def populationWeight(population: Double) = population * 3 / 99
 
   def strengthenedWeight(strengthened: Boolean) = if (strengthened) 0.3 else 0.0
-
-  def send(to: ActorRef, msg: Any): Unit = {
-    log.debug("send " + msg)
-    to ! msg
-  }
 }

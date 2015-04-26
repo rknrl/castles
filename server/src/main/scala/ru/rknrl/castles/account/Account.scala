@@ -22,7 +22,7 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.{ActorLog, Logged, MiniLog}
 
 
 object Account {
@@ -38,8 +38,8 @@ object Account {
 class Account(matchmaking: ActorRef,
               secretChecker: ActorRef,
               database: ActorRef,
-              bugs: ActorRef,
-              config: Config) extends Actor {
+              val bugs: ActorRef,
+              config: Config) extends Actor with ActorLog {
 
   var _client: Option[ClientInfo] = None
   var _state: Option[AccountState] = None
@@ -53,10 +53,6 @@ class Account(matchmaking: ActorRef,
   def tutorState = _tutorState.get
 
   def game = _game.get
-
-  val log = new MiniLog
-
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Account", any ⇒ true)
 
   def receive = auth
 

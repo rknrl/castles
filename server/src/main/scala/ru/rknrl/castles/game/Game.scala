@@ -16,7 +16,7 @@ import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 object Game {
 
@@ -32,7 +32,7 @@ class Game(var gameState: GameState,
            botFactory: IBotFactory,
            schedulerClass: Class[_],
            matchmaking: ActorRef,
-           bugs: ActorRef) extends Actor {
+           val bugs: ActorRef) extends Actor with ActorLog {
 
   for ((playerId, player) ← gameState.players if player.isBot) {
     val bot = botFactory.create(player.accountId, isTutor, bugs)
@@ -76,12 +76,11 @@ class Game(var gameState: GameState,
          if !(leaved contains playerId))
       client ! msg
 
-  val log = new MiniLog
 
-  def logged(r: Receive) = new Logged(r, log, Some(bugs), "Game", {
-    case UpdateGameState ⇒ false
+  override val logFilter: Any ⇒ Boolean = {
+    case UpdateGameState(time) ⇒ false
     case _ ⇒ true
-  })
+  }
 
   val scheduler = context.actorOf(Props(schedulerClass, self))
 

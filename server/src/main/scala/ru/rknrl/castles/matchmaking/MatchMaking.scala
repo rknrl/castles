@@ -17,7 +17,7 @@ import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeave
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -65,7 +65,7 @@ class MatchMaking(gameCreator: GameCreator,
                   var top: Top,
                   config: Config,
                   database: ActorRef,
-                  bugs: ActorRef) extends Actor {
+                  val bugs: ActorRef) extends Actor with ActorLog {
 
   override def supervisorStrategy = OneForOneStrategy() {
     case e: Exception ⇒
@@ -89,12 +89,10 @@ class MatchMaking(gameCreator: GameCreator,
 
   val scheduler = context.system.scheduler.schedule(interval, interval, self, TryCreateGames)
 
-  val log = new MiniLog
-
-  def logged(r: Receive) = new Logged(r, log, None, "Matchmaking", {
+  override val logFilter: Any ⇒ Boolean = {
     case TryCreateGames ⇒ false
     case _ ⇒ true
-  })
+  }
 
   def receive = logged({
     case Online(accountId) ⇒
@@ -157,7 +155,7 @@ class MatchMaking(gameCreator: GameCreator,
       val newRating = ELO.newRating(gameInfo.orders, order, place)
       top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
-      context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database))
+      context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database, bugs))
 
       sendToAccount(accountId, AccountLeaveGame(top.dto))
 

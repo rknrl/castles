@@ -48,7 +48,7 @@ object Main {
     val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
-    val database = system.actorOf(Props(classOf[Database], config.db), "database")
+    val database = system.actorOf(Props(classOf[Database], config.db, bugs), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
@@ -60,7 +60,7 @@ object Main {
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking), "admin-server")
+    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking, bugs), "admin-server")
     system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, bugs, secretChecker), "tcp-server")
   }
 }

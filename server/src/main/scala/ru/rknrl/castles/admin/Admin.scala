@@ -20,20 +20,17 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.{AccountId, AccountStateDTO, AdminAccountStateDTO}
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class Admin(database: ActorRef,
             matchmaking: ActorRef,
+            val bugs: ActorRef,
             login: String,
             password: String,
-            name: String) extends EscalateStrategyActor {
-
-  val log = new MiniLog
-
-  def logged(r: Receive) = new Logged(r, log, None, "Admin", any ⇒ true)
+            name: String) extends EscalateStrategyActor with ActorLog {
 
   var client: ActorRef = null
 

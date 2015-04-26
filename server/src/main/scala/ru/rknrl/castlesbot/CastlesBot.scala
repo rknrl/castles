@@ -21,7 +21,7 @@ import ru.rknrl.dto.DeviceType.PC
 import ru.rknrl.dto.PlatformType.CANVAS
 import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_3
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 import scala.concurrent.duration._
 
@@ -38,14 +38,13 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class CastlesBot(server: ActorRef, accountId: AccountId) extends Actor {
-  val log = new MiniLog
+class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
 
-  def logged(r: Receive) = new Logged(r, log, None, "CastlesBot", {
+  override val logFilter: Any ⇒ Boolean = {
     case state: GameStateUpdated ⇒ false
     case DoMenuAction ⇒ false
     case _ ⇒ true
-  })
+  }
 
   var _config: Option[AccountConfigDTO] = None
   var _accountState: Option[AccountStateDTO] = None
@@ -165,10 +164,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId) extends Actor {
       context become inMenu
   })
 
-  def send(msg: Any): Unit = {
-    log.debug("send " + msg)
-    server ! msg
-  }
+  def send(msg: Any): Unit = send(server, msg)
 
   def getTotalLevel(skillLevels: Seq[SkillLevelDTO]) = {
     var total = 0

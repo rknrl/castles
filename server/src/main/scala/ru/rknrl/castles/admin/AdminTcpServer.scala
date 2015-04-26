@@ -20,7 +20,8 @@ class AdminTcpServer(tcp: ActorRef,
                      login: String,
                      password: String,
                      database: ActorRef,
-                     matchmaking: ActorRef) extends StoppingStrategyActor {
+                     matchmaking: ActorRef,
+                     bugs: ActorRef) extends StoppingStrategyActor {
 
   import akka.io.Tcp._
 
@@ -40,7 +41,7 @@ class AdminTcpServer(tcp: ActorRef,
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val client = context.actorOf(Props(classOf[AdminClientSession], sender, database, matchmaking, login, password, name), "admin-client" + name)
+      val client = context.actorOf(Props(classOf[AdminClientSession], sender, database, matchmaking, bugs, login, password, name), "admin-client" + name)
       sender ! Register(client)
   }
 }

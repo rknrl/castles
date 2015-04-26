@@ -8,6 +8,7 @@
 
 package ru.rknrl.castles.database
 
+import akka.actor.ActorRef
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
@@ -16,7 +17,7 @@ import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
-import ru.rknrl.logging.{Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 class DbConfiguration(username: String,
                       host: String,
@@ -67,11 +68,7 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration) extends EscalateStrategyActor {
-
-  val log = new MiniLog
-
-  def logged(r: Receive) = new Logged(r, log, None, "Database", any ⇒ true)
+class Database(configuration: DbConfiguration, val bugs: ActorRef) extends EscalateStrategyActor with ActorLog {
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
