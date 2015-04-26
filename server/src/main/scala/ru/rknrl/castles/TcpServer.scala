@@ -10,14 +10,16 @@ package ru.rknrl.castles
 
 import java.net.InetSocketAddress
 
-import akka.actor.{ActorRef, Props}
-import ru.rknrl.StoppingStrategyActor
+import akka.actor.{Actor, ActorRef, Props}
+import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountClientSession
 import ru.rknrl.logging.MiniLog
 
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, bugs: ActorRef, secretChecker: ActorRef) extends StoppingStrategyActor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, bugs: ActorRef, secretChecker: ActorRef) extends Actor {
 
   import akka.io.Tcp._
+
+  override def supervisorStrategy = StopStrategy
 
   val log = new MiniLog
 

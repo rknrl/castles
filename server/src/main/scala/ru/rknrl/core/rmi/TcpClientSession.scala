@@ -10,9 +10,9 @@ package ru.rknrl.core.rmi
 
 import java.io.{DataOutputStream, InputStream}
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import akka.util.ByteString
-import ru.rknrl.EscalateStrategyActor
+import ru.rknrl.Supervisor._
 import ru.rknrl.logging.MiniLog
 
 import scala.annotation.tailrec
@@ -23,9 +23,11 @@ case object CloseConnection
 
 abstract class Msg(id: Byte)
 
-abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends EscalateStrategyActor {
+abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor {
 
   import akka.io.Tcp._
+
+  override def supervisorStrategy = EscalateStrategy
 
   val log = new MiniLog
 

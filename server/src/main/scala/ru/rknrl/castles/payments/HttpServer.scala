@@ -10,9 +10,8 @@ package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
-import ru.rknrl.StoppingStrategyActor
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
@@ -29,7 +28,7 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends StoppingStrategyActor with HttpService {
+class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends Actor with HttpService {
 
   val log = new MiniLog
 

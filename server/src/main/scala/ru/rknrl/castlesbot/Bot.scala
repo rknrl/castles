@@ -8,10 +8,10 @@
 
 package ru.rknrl.castlesbot
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Tcp.Connected
-import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.RandomUtil.random
+import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.GameBot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
@@ -39,7 +39,9 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends EscalateStrategyActor with ActorLog {
+class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
+
+  override def supervisorStrategy = EscalateStrategy
 
   override val logFilter: Any ⇒ Boolean = {
     case state: GameStateUpdated ⇒ false

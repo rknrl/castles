@@ -9,6 +9,7 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{Actor, ActorRef, Props}
+import ru.rknrl.Supervisor._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
@@ -33,6 +34,8 @@ class Game(var gameState: GameState,
            schedulerClass: Class[_],
            matchmaking: ActorRef,
            val bugs: ActorRef) extends Actor with ActorLog {
+
+  override def supervisorStrategy = StopStrategy
 
   for ((playerId, player) ← gameState.players if player.isBot) {
     val bot = botFactory.create(player.accountId, isTutor, bugs)

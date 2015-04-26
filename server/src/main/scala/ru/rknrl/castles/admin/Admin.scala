@@ -8,9 +8,8 @@
 
 package ru.rknrl.castles.admin
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
-import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
@@ -30,7 +29,7 @@ class Admin(database: ActorRef,
             val bugs: ActorRef,
             login: String,
             password: String,
-            name: String) extends EscalateStrategyActor with ActorLog {
+            name: String) extends Actor with ActorLog {
 
   var client: ActorRef = null
 

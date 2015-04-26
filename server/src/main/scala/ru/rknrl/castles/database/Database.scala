@@ -8,12 +8,11 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, RowData}
-import ru.rknrl.EscalateStrategyActor
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
@@ -68,7 +67,7 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration, val bugs: ActorRef) extends EscalateStrategyActor with ActorLog {
+class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor with ActorLog {
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
