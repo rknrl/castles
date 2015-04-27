@@ -29,10 +29,11 @@ class AccountTestSpec extends ActorsTest {
   def newAccount(matchmaking: ActorRef = self,
                  secretChecker: ActorRef = self,
                  database: ActorRef = self,
+                 graphite: ActorRef = self,
                  bugs: ActorRef = self,
                  config: Config = configMock()) = {
     accountIterator += 1
-    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, bugs, config), "account-" + accountIterator)
+    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, bugs, config), "account-" + accountIterator)
   }
 
   def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),
@@ -44,6 +45,7 @@ class AccountTestSpec extends ActorsTest {
   def authorize(config: Config = configMock(),
                 secretChecker: TestProbe,
                 database: TestProbe,
+                graphite: TestProbe,
                 matchmaking: TestProbe,
                 client: TestProbe,
                 account: ActorRef,
@@ -59,7 +61,7 @@ class AccountTestSpec extends ActorsTest {
     val tutorState = TutorStateDTO()
 
     database.expectMsg(GetAccountState(accountId))
-    database.expectMsg(StatAction.AUTHENTICATED)
+    graphite.expectMsg(StatAction.AUTHENTICATED)
     database.send(account, AccountStateResponse(accountId, accountState.dto))
 
     database.expectMsg(GetTutorState(accountId))

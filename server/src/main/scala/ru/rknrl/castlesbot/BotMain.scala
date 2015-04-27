@@ -16,7 +16,7 @@ import ru.rknrl.logging.Bugs
 object BotMain {
   val host = "127.0.0.1"
   val port = 2335
-  val count = 2
+  val count = 100
 
   def main(args: Array[String]) {
     println("CASTLES BOT 25 apr 2015")

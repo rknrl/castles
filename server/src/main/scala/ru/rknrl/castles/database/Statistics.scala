@@ -74,7 +74,7 @@ object Statistics {
                               isTutor: Boolean,
                               orders: Iterable[GameOrder],
                               order: GameOrder,
-                              database: ActorRef)
+                              graphite: ActorRef)
                              (implicit sender: ActorRef): Unit = {
     if (!order.isBot) {
       val gameWithBots = orders.count(_.isBot) == orders.size - 1
@@ -82,26 +82,26 @@ object Statistics {
         if (orders.size == 4) {
           if (place == 1) {
             if (isTutor)
-              database ! StatAction.TUTOR_4_WIN
+              graphite ! StatAction.TUTOR_4_WIN
             else
-              database ! StatAction.WIN_4_BOTS
+              graphite ! StatAction.WIN_4_BOTS
           } else {
             if (isTutor)
-              database ! StatAction.TUTOR_4_LOSE
+              graphite ! StatAction.TUTOR_4_LOSE
             else
-              database ! StatAction.LOSE_4_BOTS
+              graphite ! StatAction.LOSE_4_BOTS
           }
         } else if (orders.size == 2) {
           if (place == 1) {
             if (isTutor)
-              database ! StatAction.TUTOR_2_WIN
+              graphite ! StatAction.TUTOR_2_WIN
             else
-              database ! StatAction.WIN_2_BOTS
+              graphite ! StatAction.WIN_2_BOTS
           } else {
             if (isTutor)
-              database ! StatAction.TUTOR_2_LOSE
+              graphite ! StatAction.TUTOR_2_LOSE
             else
-              database ! StatAction.LOSE_2_BOTS
+              graphite ! StatAction.LOSE_2_BOTS
           }
         }
       }
@@ -109,18 +109,18 @@ object Statistics {
   }
 
   def sendCreateGameStatistics(orders: Iterable[GameOrder],
-                               database: ActorRef)
+                               graphire: ActorRef)
                               (implicit sender: ActorRef): Unit = {
     if (orders.count(_.isBot) == orders.size - 1) {
       if (orders.size == 4)
-        database ! StatAction.START_GAME_4_WITH_BOTS
+        graphire ! StatAction.START_GAME_4_WITH_BOTS
       else
-        database ! StatAction.START_GAME_2_WITH_BOTS
+        graphire ! StatAction.START_GAME_2_WITH_BOTS
     } else {
       if (orders.size == 4)
-        database ! StatAction.START_GAME_4_WITH_PLAYERS
+        graphire ! StatAction.START_GAME_4_WITH_PLAYERS
       else
-        database ! StatAction.START_GAME_2_WITH_PLAYERS
+        graphire ! StatAction.START_GAME_2_WITH_PLAYERS
     }
   }
 }

@@ -38,6 +38,7 @@ object Account {
 class Account(matchmaking: ActorRef,
               secretChecker: ActorRef,
               database: ActorRef,
+              graphite: ActorRef,
               val bugs: ActorRef,
               config: Config) extends Actor with ActorLog {
 
@@ -64,9 +65,9 @@ class Account(matchmaking: ActorRef,
     case SecretChecked(valid) ⇒
       if (valid) {
         database ! GetAccountState(client.accountId)
-        database ! StatAction.AUTHENTICATED
+        graphite ! StatAction.AUTHENTICATED
       } else {
-        database ! StatAction.NOT_AUTHENTICATED
+        graphite ! StatAction.NOT_AUTHENTICATED
         client.ref ! CloseConnection
       }
 
@@ -74,7 +75,7 @@ class Account(matchmaking: ActorRef,
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
       database ! Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState)
-      database ! StatAction.FIRST_AUTHENTICATED
+      graphite ! StatAction.FIRST_AUTHENTICATED
 
     case AccountStateResponse(accountId, stateDto) ⇒
       Assertion.check(accountId == client.accountId)
@@ -108,7 +109,7 @@ class Account(matchmaking: ActorRef,
         _game = gameRef
         context become enterGame
       } else if (state.gamesCount == 0) {
-        database ! StatAction.START_TUTOR
+        graphite ! StatAction.START_TUTOR
         sendGameOrder()
       } else
         context become account
@@ -118,23 +119,23 @@ class Account(matchmaking: ActorRef,
   def account: Receive = logged({
     case BuyBuilding(dto) ⇒
       updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
-      database ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
+      graphite ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
 
     case UpgradeBuilding(dto) ⇒
       updateState(state.upgradeBuilding(dto.id, config.account))
-      database ! Statistics.buyBuilding(state.slots(dto.id).get)
+      graphite ! Statistics.buyBuilding(state.slots(dto.id).get)
 
     case RemoveBuilding(dto) ⇒
       updateState(state.removeBuilding(dto.id))
-      database ! StatAction.REMOVE_BUILDING
+      graphite ! StatAction.REMOVE_BUILDING
 
     case UpgradeSkill(dto) ⇒
       updateState(state.upgradeSkill(dto.skillType, config.account))
-      database ! Statistics.buySkill(dto.skillType, state.skills(dto.skillType))
+      graphite ! Statistics.buySkill(dto.skillType, state.skills(dto.skillType))
 
     case BuyItem(dto) ⇒
       updateState(state.buyItem(dto.itemType, config.account))
-      database ! Statistics.buyItem(dto.itemType)
+      graphite ! Statistics.buyItem(dto.itemType)
 
     case EnterGame ⇒ sendGameOrder()
 
@@ -156,7 +157,7 @@ class Account(matchmaking: ActorRef,
 
     case msg: UpdateStatistics ⇒
       game forward msg.stat.action
-      database forward msg.stat.action
+      graphite forward msg.stat.action
 
     case AccountLeaveGame(top) ⇒
       client.ref ! B2C.LeavedGame
@@ -173,7 +174,7 @@ class Account(matchmaking: ActorRef,
       _state = Some(AccountState(accountStateDto))
       client.ref ! AccountStateUpdated(accountStateDto)
 
-    case msg: UpdateStatistics ⇒ database ! msg.stat.action
+    case msg: UpdateStatistics ⇒ graphite ! msg.stat.action
 
     case C2B.UpdateTutorState(state) ⇒
       database ! Database.UpdateTutorState(client.accountId, state)

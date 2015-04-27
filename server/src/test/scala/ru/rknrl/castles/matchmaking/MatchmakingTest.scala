@@ -51,6 +51,7 @@ class MatchmakingTest extends ActorsTest {
                      top: Top = top5,
                      config: Config = configMock(),
                      database: ActorRef,
+                     graphite: ActorRef,
                      bugs: ActorRef = self) = {
     matchmakingIterator += 1
     system.actorOf(
@@ -62,6 +63,7 @@ class MatchmakingTest extends ActorsTest {
         top,
         config,
         database,
+        graphite,
         bugs
       ),
       "matchmaking-" + matchmakingIterator
@@ -70,7 +72,8 @@ class MatchmakingTest extends ActorsTest {
 
   multi("Два актора отправляют PlaceGameOrder - оба получают ConnectToGame", {
     val database = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val graphite = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
 
@@ -83,7 +86,7 @@ class MatchmakingTest extends ActorsTest {
     client2.send(matchmaking, newGameOrder(accountId2))
     client2.send(matchmaking, TryCreateGames)
 
-    database.expectMsg(10 seconds, StatAction.START_GAME_4_WITH_PLAYERS)
+    graphite.expectMsg(10 seconds, StatAction.START_GAME_4_WITH_PLAYERS)
 
     client1.expectMsgPF(10 seconds) {
       case ConnectToGame(gameRef) ⇒ true
@@ -102,14 +105,15 @@ class MatchmakingTest extends ActorsTest {
 
   multi("Уже находимся в игре и отправляем еще PlaceGameOrder - получаем ConnectToGame", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
     val accountId = AccountId(VKONTAKTE, "1")
     var game: Option[ActorRef] = None
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
     client.send(matchmaking, TryCreateGames)
-    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    graphite.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
@@ -121,8 +125,9 @@ class MatchmakingTest extends ActorsTest {
 
   multi("игра удаляется после AllPlayersLeaveGame", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -131,7 +136,7 @@ class MatchmakingTest extends ActorsTest {
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
     client.send(matchmaking, TryCreateGames)
-    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    graphite.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
@@ -143,7 +148,8 @@ class MatchmakingTest extends ActorsTest {
 
   multi("AllPlayersLeaveGame удаляет только одну игру", {
     val database = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val graphite = new TestProbe(system)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
     var game1: Option[ActorRef] = None
@@ -173,8 +179,9 @@ class MatchmakingTest extends ActorsTest {
 
   multi("PlayerLeaveGame", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -183,7 +190,7 @@ class MatchmakingTest extends ActorsTest {
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
     client.send(matchmaking, TryCreateGames)
-    database.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
+    graphite.expectMsg(StatAction.START_GAME_4_WITH_BOTS)
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
@@ -196,8 +203,9 @@ class MatchmakingTest extends ActorsTest {
 
   multi("InGame", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -216,7 +224,7 @@ class MatchmakingTest extends ActorsTest {
     }
 
     client.send(matchmaking, TryCreateGames)
-    database.expectMsgClass(classOf[StatAction])
+    graphite.expectMsgClass(classOf[StatAction])
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
@@ -236,7 +244,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("2 раза Online с одного актора", {
-    val matchmaking = newMatchmaking(database = self)
+    val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -246,7 +254,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("Offline без Online", {
-    val matchmaking = newMatchmaking(database = self)
+    val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -256,26 +264,28 @@ class MatchmakingTest extends ActorsTest {
 
   multi("Offline", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
     val accountId = AccountId(VKONTAKTE, "1")
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
     client.send(matchmaking, Offline(accountId, self))
     matchmaking ! TryCreateGames
-    database.expectMsg(START_GAME_4_WITH_BOTS)
+    graphite.expectMsg(START_GAME_4_WITH_BOTS)
     client.expectNoMsg()
   })
 
   multi("Matchmaking форвадит Offline to Game если не тутор", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(gameFactory = new FakeGameFactory(self), database = database.ref)
+    val matchmaking = newMatchmaking(gameFactory = new FakeGameFactory(self), database = database.ref, graphite = graphite.ref)
     val accountId = AccountId(VKONTAKTE, "1")
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
     matchmaking ! TryCreateGames
-    database.expectMsgClass(classOf[StatAction])
+    graphite.expectMsgClass(classOf[StatAction])
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
     }
@@ -288,8 +298,9 @@ class MatchmakingTest extends ActorsTest {
 
   multi("Matchmaking получает Offline и убивает игру если тутор", {
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
-    val matchmaking = newMatchmaking(database = database.ref)
+    val matchmaking = newMatchmaking(database = database.ref, graphite = graphite.ref)
     val accountId = AccountId(VKONTAKTE, "1")
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId, accountState = accountStateMock(gamesCount = 0)))
@@ -304,7 +315,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("Double Online", {
-    val matchmaking = newMatchmaking(database = self)
+    val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId = AccountId(VKONTAKTE, "1")
 
@@ -326,7 +337,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("SetAccountState forward to Account", {
-    val matchmaking = newMatchmaking(database = self)
+    val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")
@@ -347,7 +358,7 @@ class MatchmakingTest extends ActorsTest {
   })
 
   multi("DeleteAccount forward to Account", {
-    val matchmaking = newMatchmaking(database = self)
+    val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId1 = AccountId(VKONTAKTE, "1")
     val accountId2 = AccountId(VKONTAKTE, "2")

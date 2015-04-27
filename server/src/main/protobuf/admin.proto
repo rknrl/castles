@@ -8,18 +8,6 @@ import "common.proto";
 
 import "account.proto";
 
-
-message ServerHealthDTO {
-    required int64 startTime = 1;
-    repeated ServerHealthItemDTO items = 2;
-}
-
-message ServerHealthItemDTO {
-    required int32 online = 1;
-    required int32 games = 2;
-    required int32 totalMem = 3;
-}
-
 message AdminAuthenticateDTO {
     required string login = 1;
     required string password = 2;

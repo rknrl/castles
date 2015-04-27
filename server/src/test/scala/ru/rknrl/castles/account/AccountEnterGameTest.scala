@@ -24,11 +24,13 @@ class AccountEnterGameTest extends AccountTestSpec {
   multi("ConnectToGame", {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
     val matchmaking = new TestProbe(system)
     val account = newAccount(
       secretChecker = secretChecker.ref,
       database = database.ref,
+      graphite = graphite.ref,
       matchmaking = matchmaking.ref,
       config = config
     )
@@ -37,6 +39,7 @@ class AccountEnterGameTest extends AccountTestSpec {
       secretChecker = secretChecker,
       matchmaking = matchmaking,
       database = database,
+      graphite = graphite,
       client = client,
       account = account,
       config = config,
@@ -69,7 +72,7 @@ class AccountEnterGameTest extends AccountTestSpec {
 
     client.send(account, UpdateStatistics(StatDTO(StatAction.TUTOR_BIG_TOWER)))
     game.expectMsg(StatAction.TUTOR_BIG_TOWER)
-    database.expectMsg(StatAction.TUTOR_BIG_TOWER)
+    graphite.expectMsg(StatAction.TUTOR_BIG_TOWER)
 
     matchmaking.send(account, AccountLeaveGame(List.empty))
     client.expectMsg(B2C.LeavedGame)

@@ -20,6 +20,7 @@ import ru.rknrl.castles.database.Database.GetTop
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
+import ru.rknrl.core.Graphite
 import ru.rknrl.logging.Bugs
 import spray.can.Http
 
@@ -48,12 +49,13 @@ object Main {
     val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
+    val graphite = system.actorOf(Props(classOf[Graphite], config.graphiteHost, config.graphitePort), "graphite")
     val database = system.actorOf(Props(classOf[Database], config.db, bugs), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
     val gameCreator = new GameCreator(gameMaps, config)
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, bugs), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, graphite, bugs), "matchmaking")
 
     val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
@@ -61,6 +63,6 @@ object Main {
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
     system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking, bugs), "admin-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, bugs, secretChecker), "tcp-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, graphite, bugs, secretChecker), "tcp-server")
   }
 }

@@ -16,10 +16,11 @@ import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
+import ru.rknrl.core.Graphite.Health
 import ru.rknrl.dto._
 import ru.rknrl.logging.ActorLog
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.{FiniteDuration, _}
 
 object MatchMaking {
 
@@ -53,6 +54,8 @@ object MatchMaking {
 
   case object TryCreateGames
 
+  case object RegisterHealth
+
   case class AccountLeaveGame(top: Seq[TopUserInfoDTO])
 
   case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
@@ -65,6 +68,7 @@ class MatchMaking(gameCreator: GameCreator,
                   var top: Top,
                   config: Config,
                   database: ActorRef,
+                  graphite: ActorRef,
                   val bugs: ActorRef) extends Actor with ActorLog {
 
   override def supervisorStrategy = OneForOneStrategy() {
@@ -84,13 +88,17 @@ class MatchMaking(gameCreator: GameCreator,
   var accountIdToAccount = Map.empty[AccountId, ActorRef]
   var accountIdToGameOrder = Map.empty[AccountId, GameOrder]
   var accountIdToGameInfo = Map.empty[AccountId, GameInfo]
+  var gamesCount = 0
 
   import context.dispatcher
 
   val scheduler = context.system.scheduler.schedule(interval, interval, self, TryCreateGames)
 
+  val healthScheduler = context.system.scheduler.schedule(10 seconds, 10 seconds, self, RegisterHealth)
+
   override val logFilter: Any ⇒ Boolean = {
     case TryCreateGames ⇒ false
+    case RegisterHealth ⇒ false
     case _ ⇒ true
   }
 
@@ -135,8 +143,9 @@ class MatchMaking(gameCreator: GameCreator,
 
       for (newGame ← newGames) {
         val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self, bugs)
+        gamesCount = gamesCount + 1
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
-        if (!newGame.isTutor) sendCreateGameStatistics(newGame.orders, database)
+        if (!newGame.isTutor) sendCreateGameStatistics(newGame.orders, graphite)
 
         for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
@@ -159,15 +168,20 @@ class MatchMaking(gameCreator: GameCreator,
 
       sendToAccount(accountId, AccountLeaveGame(top.dto))
 
-      sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, database)
+      sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, graphite)
 
-    case AllPlayersLeaveGame(gameRef) ⇒ context stop gameRef
+    case AllPlayersLeaveGame(gameRef) ⇒
+      context stop gameRef
+      gamesCount = gamesCount - 1
 
     case msg@SetAccountState(accountId, _) ⇒
       sendToAccount(accountId, msg)
 
     case Database.DeleteAccount(accountId) ⇒
       sendToAccount(accountId, DuplicateAccount)
+
+    case RegisterHealth ⇒
+      graphite ! Health(online = accountIdToAccount.size, games = gamesCount)
   })
 
   def sendToAccount(accountId: AccountId, msg: Any): Unit =

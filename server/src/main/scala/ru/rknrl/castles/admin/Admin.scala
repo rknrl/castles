@@ -14,7 +14,7 @@ import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
-import ru.rknrl.castles.rmi.B2C.{AuthenticatedAsAdmin, ServerHealth}
+import ru.rknrl.castles.rmi.B2C.AuthenticatedAsAdmin
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
@@ -64,12 +64,6 @@ class Admin(database: ActorRef,
 
     case msg: Database.AccountDeleted ⇒
       matchmaking forward msg
-
-    case GetServerHealth ⇒
-      matchmaking ! GetServerHealth
-
-    case msg: ServerHealth ⇒
-      client ! msg
 
     case AddGold(dto) ⇒
       getState(dto.accountId,

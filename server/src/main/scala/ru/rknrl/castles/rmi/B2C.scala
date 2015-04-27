@@ -22,8 +22,6 @@ object B2C {
 
   case object AuthenticatedAsAdmin extends Msg(10)
 
-  case class ServerHealth(serverHealth: ServerHealthDTO) extends Msg(11)
-
   // account 20 - 29
 
   case class AccountStateUpdated(accountState: AccountStateDTO) extends Msg(20)

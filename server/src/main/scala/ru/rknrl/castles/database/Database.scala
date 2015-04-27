@@ -198,14 +198,5 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
             log.error("Get tutor state: get none " + queryResult)
         }
       )
-
-    case statAction: StatAction ⇒
-      pool.sendPreparedStatement("UPDATE stat SET count=count+1 WHERE action=?;", Seq(statAction.id)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1) {
-            // ok
-          } else
-            log.error("Update stat: invalid rows affected count " + queryResult)
-      )
   }
 }

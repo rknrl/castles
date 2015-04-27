@@ -27,8 +27,9 @@ class AccountAuthTest extends AccountTestSpec {
     multi("reject", {
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val client = new TestProbe(system)
-      val account = newAccount(secretChecker = secretChecker.ref, database = database.ref)
+      val account = newAccount(secretChecker = secretChecker.ref, database = database.ref, graphite = graphite.ref)
 
       val authenticate = authenticateMock()
       client.send(account,Authenticate(authenticate))
@@ -38,7 +39,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       client.expectMsg(CloseConnection)
 
-      database.expectMsg(StatAction.NOT_AUTHENTICATED)
+      graphite.expectMsg(StatAction.NOT_AUTHENTICATED)
     })
 
     multi("success new account", {
@@ -46,12 +47,14 @@ class AccountAuthTest extends AccountTestSpec {
       val config = configMock()
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val client = new TestProbe(system)
       val account = newAccount(
         matchmaking = matchmaking.ref,
         secretChecker = secretChecker.ref,
         database = database.ref,
+        graphite = graphite.ref,
         config = config
       )
 
@@ -63,7 +66,7 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.send(account, SecretChecked(valid = true))
 
       database.expectMsg(Database.GetAccountState(accountId))
-      database.expectMsg(StatAction.AUTHENTICATED)
+      graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, Database.AccountNoExists)
 
       val initAccountState = config.account.initAccount
@@ -72,7 +75,7 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.Insert(accountId, initAccountState.dto, authenticate.userInfo, initTutorState))
       database.send(account, AccountStateResponse(accountId, initAccountState.dto))
 
-      database.expectMsg(StatAction.FIRST_AUTHENTICATED)
+      graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
       database.expectMsg(Database.GetTutorState(accountId))
       database.send(account, TutorStateResponse(accountId, initTutorState))
 
@@ -90,7 +93,7 @@ class AccountAuthTest extends AccountTestSpec {
         game = None
       )))
 
-      database.expectMsg(StatAction.START_TUTOR)
+      graphite.expectMsg(StatAction.START_TUTOR)
       matchmaking.expectMsgClass(classOf[GameOrder])
     })
 
@@ -99,12 +102,14 @@ class AccountAuthTest extends AccountTestSpec {
       val config = configMock()
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val client = new TestProbe(system)
       val account = newAccount(
         matchmaking = matchmaking.ref,
         secretChecker = secretChecker.ref,
         database = database.ref,
+        graphite = graphite.ref,
         config = config
       )
 
@@ -119,7 +124,7 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorStateDTO()
 
       database.expectMsg(Database.GetAccountState(accountId))
-      database.expectMsg(StatAction.AUTHENTICATED)
+      graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, AccountStateResponse(accountId, accountState.dto))
 
       database.expectMsg(Database.GetTutorState(accountId))
@@ -141,7 +146,7 @@ class AccountAuthTest extends AccountTestSpec {
     })
 
     multi("other", {
-      // todo Другие сообщение игнорируются
+      // todo Другие сообщения игнорируются
     })
   }
 }

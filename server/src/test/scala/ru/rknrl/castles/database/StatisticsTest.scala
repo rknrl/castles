@@ -22,101 +22,101 @@ class StatisticsTest extends ActorsTest with Matchers {
 
   "sendLeaveGameStatistics tutor" in {
     implicit val client = new TestProbe(system)
-    val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
 
     Statistics.sendLeaveGameStatistics(
       place = 1,
       isTutor = true,
       orders = List(human, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(TUTOR_2_WIN)
+    graphite.expectMsg(TUTOR_2_WIN)
 
     Statistics.sendLeaveGameStatistics(
       place = 2,
       isTutor = true,
       orders = List(human, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(TUTOR_2_LOSE)
+    graphite.expectMsg(TUTOR_2_LOSE)
 
     Statistics.sendLeaveGameStatistics(
       place = 1,
       isTutor = true,
       orders = List(human, bot, bot, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(TUTOR_4_WIN)
+    graphite.expectMsg(TUTOR_4_WIN)
 
     Statistics.sendLeaveGameStatistics(
       place = 2,
       isTutor = true,
       orders = List(human, bot, bot, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(TUTOR_4_LOSE)
+    graphite.expectMsg(TUTOR_4_LOSE)
   }
 
   "sendLeaveGameStatistics not tutor" in {
     implicit val client = new TestProbe(system)
-    val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
 
     Statistics.sendLeaveGameStatistics(
       place = 1,
       isTutor = false,
       orders = List(human, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(WIN_2_BOTS)
+    graphite.expectMsg(WIN_2_BOTS)
 
     Statistics.sendLeaveGameStatistics(
       place = 2,
       isTutor = false,
       orders = List(human, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(LOSE_2_BOTS)
+    graphite.expectMsg(LOSE_2_BOTS)
 
     Statistics.sendLeaveGameStatistics(
       place = 1,
       isTutor = false,
       orders = List(human, bot, bot, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(WIN_4_BOTS)
+    graphite.expectMsg(WIN_4_BOTS)
 
     Statistics.sendLeaveGameStatistics(
       place = 2,
       isTutor = false,
       orders = List(human, bot, bot, bot),
       order = human,
-      database.ref
+      graphite.ref
     )
-    database.expectMsg(LOSE_4_BOTS)
+    graphite.expectMsg(LOSE_4_BOTS)
   }
 
   "sendCreateGameStatistics" in {
     implicit val client = new TestProbe(system)
-    val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
 
-    Statistics.sendCreateGameStatistics(List(human, bot), database.ref)
-    database.expectMsg(START_GAME_2_WITH_BOTS)
+    Statistics.sendCreateGameStatistics(List(human, bot), graphite.ref)
+    graphite.expectMsg(START_GAME_2_WITH_BOTS)
 
-    Statistics.sendCreateGameStatistics(List(human, human), database.ref)
-    database.expectMsg(START_GAME_2_WITH_PLAYERS)
+    Statistics.sendCreateGameStatistics(List(human, human), graphite.ref)
+    graphite.expectMsg(START_GAME_2_WITH_PLAYERS)
 
-    Statistics.sendCreateGameStatistics(List(human, bot, bot, bot), database.ref)
-    database.expectMsg(START_GAME_4_WITH_BOTS)
+    Statistics.sendCreateGameStatistics(List(human, bot, bot, bot), graphite.ref)
+    graphite.expectMsg(START_GAME_4_WITH_BOTS)
 
-    Statistics.sendCreateGameStatistics(List(human, human, bot, bot), database.ref)
-    database.expectMsg(START_GAME_4_WITH_PLAYERS)
+    Statistics.sendCreateGameStatistics(List(human, human, bot, bot), graphite.ref)
+    graphite.expectMsg(START_GAME_4_WITH_PLAYERS)
   }
 
 

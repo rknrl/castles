@@ -72,11 +72,13 @@ class AccountTest extends AccountTestSpec {
             statMessage: Any) = {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
     val matchmaking = new TestProbe(system)
     val account = newAccount(
       secretChecker = secretChecker.ref,
       database = database.ref,
+      graphite = graphite.ref,
       matchmaking = matchmaking.ref,
       config = config
     )
@@ -85,6 +87,7 @@ class AccountTest extends AccountTestSpec {
       secretChecker = secretChecker,
       matchmaking = matchmaking,
       database = database,
+      graphite = graphite,
       client = client,
       account = account,
       config = config,
@@ -94,7 +97,7 @@ class AccountTest extends AccountTestSpec {
     client.send(account, clientMessage)
 
     database.expectMsg(UpdateAccountState(accountId, expectedAccountState.dto))
-    database.expectMsg(statMessage)
+    graphite.expectMsg(statMessage)
     database.send(account, AccountStateResponse(accountId, expectedAccountState.dto))
 
     client.expectMsg(AccountStateUpdated(expectedAccountState.dto))
@@ -103,11 +106,13 @@ class AccountTest extends AccountTestSpec {
   multi("EnterGame", {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
     val matchmaking = new TestProbe(system)
     val account = newAccount(
       secretChecker = secretChecker.ref,
       database = database.ref,
+      graphite = graphite.ref,
       matchmaking = matchmaking.ref,
       config = config
     )
@@ -116,6 +121,7 @@ class AccountTest extends AccountTestSpec {
       secretChecker = secretChecker,
       matchmaking = matchmaking,
       database = database,
+      graphite = graphite,
       client = client,
       account = account,
       config = config,

@@ -25,17 +25,20 @@ class AccountPersistentTest extends AccountTestSpec {
     multi("Если клиент авторизовался - Стопается после получения DuplicateAccount", {
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val client = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val account = newAccount(
         secretChecker = secretChecker.ref,
         database = database.ref,
+        graphite = graphite.ref,
         matchmaking = matchmaking.ref
       )
       authorize(
         secretChecker = secretChecker,
         matchmaking = matchmaking,
         database = database,
+        graphite = graphite,
         client = client,
         account = account
       )
@@ -55,22 +58,25 @@ class AccountPersistentTest extends AccountTestSpec {
     multi("StatAction форвардится базе данных", {
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val client = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val account = newAccount(
         secretChecker = secretChecker.ref,
         database = database.ref,
+        graphite = graphite.ref,
         matchmaking = matchmaking.ref
       )
       authorize(
         secretChecker = secretChecker,
         matchmaking = matchmaking,
         database = database,
+        graphite = graphite,
         client = client,
         account = account
       )
       client.send(account, UpdateStatistics(StatDTO(StatAction.TUTOR_BIG_TOWER)))
-      database.expectMsg(StatAction.TUTOR_BIG_TOWER)
+      graphite.expectMsg(StatAction.TUTOR_BIG_TOWER)
     })
 
     multi("Если клиент НЕ авторизовался - игнорируется", {
@@ -84,11 +90,13 @@ class AccountPersistentTest extends AccountTestSpec {
     multi("UpdateTutorState форвардится базе данных", {
       val secretChecker = new TestProbe(system)
       val database = new TestProbe(system)
+      val graphite = new TestProbe(system)
       val client = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val account = newAccount(
         secretChecker = secretChecker.ref,
         database = database.ref,
+        graphite = graphite.ref,
         matchmaking = matchmaking.ref
       )
       val accountId = authenticateMock().userInfo.accountId
@@ -96,6 +104,7 @@ class AccountPersistentTest extends AccountTestSpec {
         secretChecker = secretChecker,
         matchmaking = matchmaking,
         database = database,
+        graphite = graphite,
         client = client,
         account = account
       )
@@ -138,12 +147,14 @@ class AccountPersistentTest extends AccountTestSpec {
   multi("SetAccountState", {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
     val client = new TestProbe(system)
     val matchmaking = new TestProbe(system)
     val config = configMock()
     val account = newAccount(
       secretChecker = secretChecker.ref,
       database = database.ref,
+      graphite = graphite.ref,
       matchmaking = matchmaking.ref,
       config = config
     )
@@ -152,6 +163,7 @@ class AccountPersistentTest extends AccountTestSpec {
       secretChecker = secretChecker,
       matchmaking = matchmaking,
       database = database,
+      graphite = graphite,
       client = client,
       account = account,
       config = config

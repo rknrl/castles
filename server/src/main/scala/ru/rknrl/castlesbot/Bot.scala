@@ -115,7 +115,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
 
         case REMOVE_BUILDING ⇒
           val notEmptySlots = accountState.slots.filter(_.buildingPrototype.isDefined)
-          if (notEmptySlots.size > 0) {
+          if (notEmptySlots.size > 1) {
             val slotId = random(notEmptySlots).id
             send(RemoveBuilding(RemoveBuildingDTO(slotId)))
           }
