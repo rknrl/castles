@@ -10,7 +10,7 @@ package ru.rknrl.core
 
 import java.net.InetSocketAddress
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
 import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
@@ -25,6 +25,25 @@ object Graphite {
 }
 
 class Graphite(host: String, port: Int) extends Actor {
+  val graphite = context.actorOf(Props(classOf[GraphiteConnection], host, port))
+  val aggregator = context.actorOf(Props(classOf[GraphiteConnection], host, 2023))
+
+  def receive = {
+    case Health(online, games) ⇒
+      graphite ! message("totalmem", Runtime.getRuntime.totalMemory)
+      graphite ! message("online", online)
+      graphite ! message("games", games)
+
+    case a: StatAction ⇒
+      aggregator ! message(a.name + "_sum", 1)
+  }
+
+  def message(name: String, value: Long) = Write(ByteString("dev." + name + " " + value + " " + currentTime + "\n"))
+
+  def currentTime = (System.currentTimeMillis / 1000).toString
+}
+
+class GraphiteConnection(host: String, port: Int) extends Actor {
   val log = new MiniLog(verbose = true)
 
   import context.system
@@ -33,7 +52,7 @@ class Graphite(host: String, port: Int) extends Actor {
 
   def receive = {
     case CommandFailed(_: Connect) ⇒
-      log.debug("connect failed")
+      log.debug("connect failed " + port)
       context stop self
 
     case c@Connected(remote, local) ⇒
@@ -48,19 +67,8 @@ class Graphite(host: String, port: Int) extends Actor {
         case _: ConnectionClosed ⇒
           log.debug("connection closed")
 
-        case Health(online, games) ⇒
-          val path = "dev"
-          connection ! Write(ByteString(path + ".totalmem" + " " + totalMem + " " + currentTime + "\n"))
-          connection ! Write(ByteString(path + ".online" + " " + online + " " + currentTime + "\n"))
-          connection ! Write(ByteString(path + ".games" + " " + games + " " + currentTime + "\n"))
-
-        case a: StatAction ⇒
-          val path = "castles"
-          connection ! Write(ByteString(path + "." + a.name + ".count" + " 1 " + currentTime + "\n"))
+        case w: Write ⇒
+          connection ! w
       }
   }
-
-  def totalMem = Runtime.getRuntime.totalMemory.toString
-
-  def currentTime = (System.currentTimeMillis / 1000).toString
 }
