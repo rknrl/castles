@@ -49,7 +49,7 @@ object Main {
     val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
-    val graphite = system.actorOf(Props(classOf[Graphite], config.graphiteHost, config.graphitePort), "graphite")
+    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite), "graphite")
     val database = system.actorOf(Props(classOf[Database], config.db, bugs), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)

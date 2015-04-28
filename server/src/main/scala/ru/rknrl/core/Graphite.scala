@@ -14,7 +14,7 @@ import akka.actor.{Actor, Props}
 import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
-import ru.rknrl.core.Graphite.Health
+import ru.rknrl.core.Graphite.{GraphiteConfig, Health}
 import ru.rknrl.dto.StatAction
 import ru.rknrl.logging.MiniLog
 
@@ -22,11 +22,15 @@ object Graphite {
 
   case class Health(online: Int, games: Int)
 
+  case class GraphiteConfig(host: String,
+                            port: Int,
+                            aggregatorPort: Int)
+
 }
 
-class Graphite(host: String, port: Int) extends Actor {
-  val graphite = context.actorOf(Props(classOf[GraphiteConnection], host, port))
-  val aggregator = context.actorOf(Props(classOf[GraphiteConnection], host, 2023))
+class Graphite(config: GraphiteConfig) extends Actor {
+  val graphite = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.port))
+  val aggregator = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.aggregatorPort))
 
   def receive = {
     case Health(online, games) ⇒

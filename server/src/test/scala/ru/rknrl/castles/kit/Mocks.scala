@@ -18,6 +18,7 @@ import ru.rknrl.castles.game.init.{GameMap, GameMaps}
 import ru.rknrl.castles.game.state._
 import ru.rknrl.castles.matchmaking.GameCreator
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
+import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}
@@ -198,6 +199,8 @@ object Mocks extends Matchers {
       maxSpeed = maxSpeed
     )
 
+  def graphiteConfigMock() = GraphiteConfig(host = "host", port = 2003, aggregatorPort = 2023)
+
   def configMock(host: String = "localhost",
                  staticHost: String = "localhot",
                  gamePort: Int = 2305,
@@ -209,8 +212,7 @@ object Mocks extends Matchers {
                  isDev: Boolean = true,
                  mapsDir: String = "maps/dir/",
                  db: DbConfiguration = dbConfigMock(),
-                 graphiteHost: String = "graph",
-                 graphitePort: Int = 2003,
+                 graphite: GraphiteConfig = graphiteConfigMock(),
                  products: List[Product] = List.empty,
                  social: SocialConfigs = socialConfigsMock(),
                  account: AccountConfig = accountConfigMock(),
@@ -228,8 +230,7 @@ object Mocks extends Matchers {
       isDev = isDev,
       mapsDir = mapsDir,
       db = db,
-      graphiteHost = graphiteHost,
-      graphitePort = graphitePort,
+      graphite = graphite,
       products = products,
       social = social,
       account = account,

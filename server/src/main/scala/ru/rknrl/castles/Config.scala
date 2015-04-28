@@ -11,6 +11,7 @@ package ru.rknrl.castles
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
+import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.social.{Product, SocialConfigs}
 import ru.rknrl.dto._
 
@@ -25,8 +26,7 @@ class Config(val host: String,
              val isDev: Boolean,
              val mapsDir: String,
              val db: DbConfiguration,
-             val graphiteHost: String,
-             val graphitePort: Int,
+             val graphite: GraphiteConfig,
              val products: List[Product],
              val social: SocialConfigs,
              val account: AccountConfig,
