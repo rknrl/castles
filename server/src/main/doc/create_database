@@ -1,13 +1,9 @@
 create database castles;
 
-use database castles;
+use castles;
 
 create table account_state(id VARBINARY(128) NOT NULL, rating DOUBLE, state VARBINARY(256) NOT NULL, userInfo VARBINARY(1024) NOT NULL,PRIMARY KEY (id)) engine=InnoDb;
 
 CREATE INDEX rating ON account_state(rating);
 
 create table tutor_state(id VARBINARY(128) NOT NULL, state VARBINARY(32) NOT NULL, PRIMARY KEY (id)) engine=InnoDb;
-
-create table stat(action INT, count INT, PRIMARY KEY (action)) engine=InnoDb;
-
-and use CreateStatTable.scala

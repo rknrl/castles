@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# build server via sbt
+
+sbt assembly &&
+
+# copy config json to dev server
+
+scp server/src/main/resources/dev.json root@dev.rknrl.ru:/var/castles/server &&
+
+# copy maps to dev server
+
+scp -r server/src/main/resources/maps/. root@dev.rknrl.ru:/var/castles/server/maps &&
+
+# copy server jar to dev server
+
+scp server/target/scala-2.11/castles.jar root@dev.rknrl.ru:/var/castles/server/server.jar &&
+
+ssh root@dev.rknrl.ru "service castles restart"

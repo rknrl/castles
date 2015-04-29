@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -f castles.pid ]; then
+    echo "Already runned"
+    exit 1
+fi
+
+java -jar -Dlogback.configurationFile=/home/castles/logback.xml /var/castles/server/server.jar /var/castles/server/dev.json /var/castles/my.json &
+echo $! > castles.pid

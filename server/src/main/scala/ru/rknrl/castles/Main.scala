@@ -32,7 +32,7 @@ object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
-    println(s"ver: 18 apr 2015 00:34")
+    println(s"ver: 28 apr 2015 19:58")
     configPaths.foreach(path ⇒ println(s"configPath='$path'"))
 
     val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
@@ -46,10 +46,10 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir), "bugs")
+    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite), "graphite")
+    val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir, graphite), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
-    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite), "graphite")
     val database = system.actorOf(Props(classOf[Database], config.db, bugs), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)

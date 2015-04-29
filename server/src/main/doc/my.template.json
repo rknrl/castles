@@ -1,0 +1,21 @@
+{
+  "isDev": true,
+  "host": "dev.rknrl.ru",
+  "staticHost": "rknrl.ru",
+  "httpPort": 80,
+  "mapsDir": "/var/castles/server/maps/",
+  "bugsDis": "/var/castles/bugs/",
+  "db": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "username": "root",
+    "password": "password",
+    "database": "castles"
+  },
+  "social": {
+    "vk": {
+      "appId": "4628723",
+      "appSecret": "secret"
+    }
+  }
+}
