@@ -22,7 +22,7 @@ import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto._
-import ru.rknrl.logging.{ActorLog, Logged, MiniLog}
+import ru.rknrl.logging.ActorLog
 
 
 object Account {
@@ -99,7 +99,7 @@ class Account(matchmaking: ActorRef,
         TopDTO(top),
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
-        searchOpponents,
+        searchOpponents || state.gamesCount == 0,
         game = if (gameRef.isDefined) Some(nodeLocator) else None
       ))
 
