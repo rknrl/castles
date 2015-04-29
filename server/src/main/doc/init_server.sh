@@ -38,6 +38,8 @@ chmod +x /etc/init.d/castles
 
 update-rc.d castles defaults
 
+scp logback.xml root@dev.rknrl.ru:/var/castles/logback.xml
+
 # todo logback config
 
 service castles start
