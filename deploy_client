@@ -4,7 +4,7 @@ SWF_NAME="game4.swf"
 
 # build client-web.swf via ant
 
-ant -buildfile build-web.xml castles-web-swf &&
+ant -buildfile client/build-web.xml castles-web-swf &&
 
 # clear out folder
 
