@@ -99,9 +99,6 @@ class GameLeaveBotTest extends GameTestSpec {
         usedItems shouldBe ItemType.values.map(_ → 0).toMap
     }
 
-    client1.send(game, C2B.LeaveGame)
-    client1.expectNoMsg()
-
     // Матчмайкинг получает AllPlayersLeaveGame
 
     expectMsg(AllPlayersLeaveGame(game))

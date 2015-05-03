@@ -175,6 +175,12 @@ class Game(var gameState: GameState,
     }
   }
 
+  def humansLeft =
+    for ((playerId, player) ← gameState.players
+         if !player.isBot
+         if !(leaved contains playerId))
+      yield playerId
+
   def placeToReward(place: Int) = if (place == 1) 2 else 0
 
   def leave(playerId: PlayerId): Unit = {
@@ -191,7 +197,7 @@ class Game(var gameState: GameState,
         usedItems = gameState.items.states(playerId).usedItems
       )
 
-    if (leaved.size == playersIds.size)
+    if (humansLeft.size == 0)
       matchmaking ! AllPlayersLeaveGame(self)
   }
 }

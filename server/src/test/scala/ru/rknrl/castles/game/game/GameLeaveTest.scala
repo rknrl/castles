@@ -54,33 +54,11 @@ class GameLeaveTest extends GameTestSpec {
 
     client0.send(game, Surrender)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
-        dto.playerId shouldBe PlayerId(0)
-        dto.reward shouldBe 0
-        dto.place shouldBe 2
-    }
+    client0.expectMsgClass(classOf[GameOver])
+    client0.expectMsgClass(classOf[GameOver])
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
-        dto.playerId shouldBe PlayerId(1)
-        dto.reward shouldBe 2
-        dto.place shouldBe 1
-    }
-
-    client1.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
-        dto.playerId shouldBe PlayerId(0)
-        dto.reward shouldBe 0
-        dto.place shouldBe 2
-    }
-
-    client1.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
-        dto.playerId shouldBe PlayerId(1)
-        dto.reward shouldBe 2
-        dto.place shouldBe 1
-    }
+    client1.expectMsgClass(classOf[GameOver])
+    client1.expectMsgClass(classOf[GameOver])
 
     // Если отправить LeaveGame с невалидного адреса - он игнорируется
 
@@ -102,6 +80,8 @@ class GameLeaveTest extends GameTestSpec {
         reward shouldBe 0
         usedItems shouldBe ItemType.values.map(_ → 0).toMap
     }
+
+    expectNoMsg() // Матчмайкинг НЕ получает AllPlayersLeaveGame раньше чем надо
 
     client1.send(game, C2B.LeaveGame)
     client1.expectNoMsg()

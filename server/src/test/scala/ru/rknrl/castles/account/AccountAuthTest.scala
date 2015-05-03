@@ -89,7 +89,7 @@ class AccountAuthTest extends AccountTestSpec {
         TopDTO(List.empty),
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
-        searchOpponents = false,
+        searchOpponents = true,
         game = None
       )))
 
