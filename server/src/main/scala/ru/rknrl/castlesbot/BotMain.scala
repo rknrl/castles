@@ -19,7 +19,7 @@ object BotMain {
   val count = 100
 
   def main(args: Array[String]) {
-    println("CASTLES BOT 25 apr 2015")
+    println("CASTLES BOT 3 may 2015")
 
     implicit val system = ActorSystem("main-actor-system")
     val bugs = system.actorOf(Props(classOf[Bugs], "/Users/tolyayanot/bugs/", system.deadLetters), "bugs")

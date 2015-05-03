@@ -39,7 +39,7 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
+class Bot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
 
   override def supervisorStrategy = EscalateStrategy
 
@@ -82,7 +82,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
       }
   }
 
-  def inMenu: Receive = logged({
+  def inMenu: Receive = logged {
     case AccountStateUpdated(newAccountState) ⇒
       _accountState = Some(newAccountState)
 
@@ -140,9 +140,9 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
           send(EnterGame)
           context become enterGame
       }
-  })
+  }
 
-  def enterGame: Receive = logged({
+  def enterGame: Receive = logged {
     case EnteredGame(node) ⇒
       send(JoinGame)
 
@@ -152,9 +152,9 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
       context become inGame
-  })
+  }
 
-  def inGame: Receive = logged({
+  def inGame: Receive = logged {
     case msg: GameStateUpdated ⇒
       gameBot.get forward msg
 
@@ -164,7 +164,7 @@ class CastlesBot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) ext
     case LeavedGame ⇒
       context stop gameBot.get
       context become inMenu
-  })
+  }
 
   def send(msg: Any): Unit = send(server, msg)
 

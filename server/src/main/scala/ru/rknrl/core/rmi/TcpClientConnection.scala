@@ -15,18 +15,16 @@ import akka.actor.{Actor, ActorRef}
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import ru.rknrl.Supervisor._
-import ru.rknrl.logging.MiniLog
+import ru.rknrl.logging.ActorLog
 
 import scala.annotation.tailrec
 
-abstract class TcpClientConnection(host: String, port: Int) extends Actor {
+abstract class TcpClientConnection(host: String, port: Int) extends Actor with ActorLog {
 
   import Tcp._
   import context.system
 
   override def supervisorStrategy = EscalateStrategy
-
-  val log = new MiniLog
 
   val headerSize = 4
   val commandIdSize = 1
@@ -44,16 +42,15 @@ abstract class TcpClientConnection(host: String, port: Int) extends Actor {
   IO(Tcp) ! Connect(new InetSocketAddress(host, port))
   val handler: ActorRef
 
-  def receive = {
+  def receive = catched {
     case CommandFailed(_: Connect) ⇒
-      log.debug("connect failed")
-      context stop self
+      throw new Exception("connect failed")
 
     case c@Connected(remote, local) ⇒
       connection = Some(sender)
       connection.get ! Register(self)
       handler ! c
-      context become {
+      context become catched {
 
         case CommandFailed(w: Write) ⇒
           throw new Exception("write failed")
@@ -68,8 +65,7 @@ abstract class TcpClientConnection(host: String, port: Int) extends Actor {
           connection.get ! Close
 
         case _: ConnectionClosed ⇒
-          log.debug("connection closed")
-          context stop self
+          throw new Exception("connection closed")
 
         case msg: Msg ⇒ sendMessages(List(msg))
 

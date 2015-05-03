@@ -12,8 +12,8 @@ import akka.actor.{ActorRef, Props}
 import ru.rknrl.dto.AccountId
 import ru.rknrl.rmi.Server
 
-class BotConnection(host: String, port: Int, accountId: AccountId, bugs: ActorRef) extends Server(host, port) {
+class BotConnection(host: String, port: Int, accountId: AccountId, val bugs: ActorRef) extends Server(host, port) {
 
-  val handler = context.actorOf(Props(classOf[CastlesBot], self, accountId, bugs))
+  val handler = context.actorOf(Props(classOf[Bot], self, accountId, bugs))
 
 }

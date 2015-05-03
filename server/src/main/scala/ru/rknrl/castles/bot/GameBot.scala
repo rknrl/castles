@@ -39,11 +39,11 @@ class GameBot(accountId: AccountId, val bugs: ActorRef) extends Actor with Actor
   case class Weight(id: BuildingId, weight: Double)
 
   override val logFilter: Any ⇒ Boolean = {
-    case state: GameStateUpdated ⇒ false
+    case _: GameStateUpdated ⇒ false
     case _ ⇒ true
   }
 
-  override def receive: Receive = logged({
+  override def receive: Receive = logged {
     case ConnectToGame(gameRef) ⇒
       game = Some(gameRef)
       send(gameRef, Join(accountId, self))
@@ -59,7 +59,7 @@ class GameBot(accountId: AccountId, val bugs: ActorRef) extends Actor with Actor
     case GameOver(gameOver) ⇒
       if (gameOver.playerId == playerId.get)
         send(game.get, LeaveGame)
-  })
+  }
 
   def update(newGameState: GameStateDTO) = {
     gameState = Some(newGameState)
