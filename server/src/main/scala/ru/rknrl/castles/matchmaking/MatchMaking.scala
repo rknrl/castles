@@ -174,8 +174,8 @@ class MatchMaking(gameCreator: GameCreator,
       context stop gameRef
       gamesCount = gamesCount - 1
 
-    case msg@SetAccountState(accountId, _) ⇒
-      sendToAccount(accountId, msg)
+    case msg: SetAccountState ⇒
+      sendToAccount(msg.accountId, msg)
 
     case Database.DeleteAccount(accountId) ⇒
       sendToAccount(accountId, DuplicateAccount)
