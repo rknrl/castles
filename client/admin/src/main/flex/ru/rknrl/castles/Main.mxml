@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-               xmlns:mx="library://ns.adobe.com/flex/mx">
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
 
     <s:Group id="authGroup" width="100%" height="100%">
         <s:Form horizontalCenter="0" verticalCenter="0">
@@ -24,90 +23,31 @@
         <s:Label text="Loading" horizontalCenter="0" verticalCenter="0"/>
     </s:Group>
 
-    <mx:TabNavigator id="adminGroup"
-                     includeInLayout="false" visible="false"
-                     width="100%" height="100%">
+    <s:Group id="adminGroup" width="100%" height="100%" includeInLayout="false" visible="false">
+        <s:Scroller width="100%" height="100%"
+                    creationComplete="onCreationComplete(event)">
 
-        <mx:VBox label="Graph" width="100%" height="100%">
+            <s:VGroup width="100%">
+                <s:HGroup>
+                    <s:DropDownList id="accountTypeComboBox"
+                                    dataProvider="{Utils.accountTypes}"
+                                    labelFunction="{Utils.enumLabelFunction}"
+                                    selectedIndex="1"/>
 
-            <mx:HBox width="100%" height="100%">
-                <mx:LineChart id="onlineChart" width="100%" height="100%" showDataTips="true">
+                    <s:TextInput id="accountIdInput"/>
 
-                    <mx:seriesFilters>
-                        <fx:Array/>
-                    </mx:seriesFilters>
+                    <s:Button label="Get" click="onGetClick(event)"/>
+                </s:HGroup>
 
-                    <mx:series>
-                        <mx:LineSeries xField="date" yField="online" form="segment" displayName="Online"/>
-                        <mx:LineSeries xField="date" yField="games" form="segment" displayName="Games"/>
-                    </mx:series>
+                <s:Spacer height="50"/>
 
-                    <mx:verticalAxis>
-                        <mx:LinearAxis/>
-                    </mx:verticalAxis>
+                <s:VGroup id="stateHolder"/>
 
-                    <mx:horizontalAxis>
-                        <mx:DateTimeAxis interval="1" dataUnits="minutes" displayLocalTime="true"/>
-                    </mx:horizontalAxis>
+                <s:Button label="Delete Account" click="onDeleteClick(event)"/>
 
-                </mx:LineChart>
-
-                <mx:Legend dataProvider="{onlineChart}"/>
-            </mx:HBox>
-
-            <mx:HBox width="100%" height="100%">
-                <mx:LineChart id="memChart" width="100%" height="100%" showDataTips="true">
-
-                    <mx:seriesFilters>
-                        <fx:Array/>
-                    </mx:seriesFilters>
-
-                    <mx:series>
-                        <mx:LineSeries xField="date" yField="totalMem" form="segment" displayName="Mem (Mb)"/>
-                    </mx:series>
-
-                    <mx:verticalAxis>
-                        <mx:LinearAxis/>
-                    </mx:verticalAxis>
-
-                    <mx:horizontalAxis>
-                        <mx:DateTimeAxis interval="1" dataUnits="minutes" displayLocalTime="true"/>
-                    </mx:horizontalAxis>
-
-                </mx:LineChart>
-
-                <mx:Legend dataProvider="{memChart}"/>
-            </mx:HBox>
-
-        </mx:VBox>
-
-        <mx:Box label="Admin" width="100%" height="100%">
-            <s:Scroller width="100%" height="100%"
-                        creationComplete="onCreationComplete(event)">
-
-                <s:VGroup width="100%">
-                    <s:HGroup>
-                        <s:DropDownList id="accountTypeComboBox"
-                                        dataProvider="{Utils.accountTypes}"
-                                        labelFunction="{Utils.enumLabelFunction}"
-                                        selectedIndex="1"/>
-
-                        <s:TextInput id="accountIdInput"/>
-
-                        <s:Button label="Get" click="onGetClick(event)"/>
-                    </s:HGroup>
-
-                    <s:Spacer height="50"/>
-
-                    <s:VGroup id="stateHolder"/>
-
-                    <s:Button label="Delete Account" click="onDeleteClick(event)"/>
-
-                </s:VGroup>
-            </s:Scroller>
-        </mx:Box>
-
-    </mx:TabNavigator>
+            </s:VGroup>
+        </s:Scroller>
+    </s:Group>
 
     <fx:Script><![CDATA[
         import mx.controls.Alert;
@@ -126,19 +66,16 @@
         import ru.rknrl.dto.AdminSetSkillDTO;
         import ru.rknrl.dto.AdminSetSlotDTO;
         import ru.rknrl.dto.ItemDTO;
-        import ru.rknrl.dto.ServerHealthItemDTO;
         import ru.rknrl.dto.SkillLevelDTO;
         import ru.rknrl.dto.SlotDTO;
         import ru.rknrl.rmi.AccountStateEvent;
         import ru.rknrl.rmi.AuthenticatedAsAdminEvent;
         import ru.rknrl.rmi.Server;
-        import ru.rknrl.rmi.ServerHealthEvent;
 
         private static const port:int = 2337;
         private static const policyPort:int = 2336;
 
         private var server:Server;
-        private var getHealthInterval:int;
 
         private function onCreationComplete(event:FlexEvent):void {
             stateHolder.addEventListener(AddBalanceEvent.ADD_BALANCE, onAddBalance);
@@ -183,10 +120,6 @@
             loadingGroup.includeInLayout = loadingGroup.visible = false;
             adminGroup.includeInLayout = adminGroup.visible = true;
             server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState);
-            server.addEventListener(ServerHealthEvent.SERVERHEALTH, onServerHealth);
-
-            getHealthInterval = setInterval(server.getServerHealth, 60 * 1000);
-            server.getServerHealth();
         }
 
         private function onGetClick(event:MouseEvent):void {
@@ -277,28 +210,6 @@
             dto.skilType = event.skillType;
             dto.skillLevel = event.skillLevel;
             server.setSkill(dto)
-        }
-
-        private function onServerHealth(event:ServerHealthEvent):void {
-            const online:Array = [];
-            const mem:Array = [];
-            const items:Vector.<ServerHealthItemDTO> = event.serverHealth.items;
-            const startTime:Number = event.serverHealth.startTime.toNumber();
-            for (var i:int = 0; i < items.length; i++) {
-                const item:ServerHealthItemDTO = items[i];
-                const date:Date = new Date(startTime + 60 * 1000 * i);
-                online.push({
-                    date: date,
-                    online: item.online,
-                    games: item.games
-                });
-                mem.push({
-                    date: date,
-                    totalMem: item.totalMem
-                })
-            }
-            onlineChart.dataProvider = online;
-            memChart.dataProvider = mem;
         }
 
         private function onDeleteClick(event:MouseEvent):void {
