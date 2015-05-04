@@ -30,10 +30,9 @@ class AccountTestSpec extends ActorsTest {
                  secretChecker: ActorRef = self,
                  database: ActorRef = self,
                  graphite: ActorRef = self,
-                 bugs: ActorRef = self,
                  config: Config = configMock()) = {
     accountIterator += 1
-    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, bugs, config), "account-" + accountIterator)
+    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account-" + accountIterator)
   }
 
   def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),

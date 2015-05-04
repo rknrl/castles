@@ -216,8 +216,7 @@ object Mocks extends Matchers {
                  products: List[Product] = List.empty,
                  social: SocialConfigs = socialConfigsMock(),
                  account: AccountConfig = accountConfigMock(),
-                 game: GameConfig = gameConfigMock(),
-                 bugsDir: String = "bugs/") =
+                 game: GameConfig = gameConfigMock()) =
     new Config(
       host = host,
       staticHost = host,
@@ -234,8 +233,7 @@ object Mocks extends Matchers {
       products = products,
       social = social,
       account = account,
-      game = game,
-      bugsDir = bugsDir
+      game = game
     )
 
 

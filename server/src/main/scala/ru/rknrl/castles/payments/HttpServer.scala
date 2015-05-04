@@ -18,8 +18,7 @@ import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.logging.Bugs.Bug
-import ru.rknrl.logging.MiniLog
+import ru.rknrl.logging.ActorLog
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -28,9 +27,7 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs: ActorRef) extends Actor with HttpService {
-
-  val log = new MiniLog
+class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends Actor with ActorLog with HttpService {
 
   val crossdomain = """<?xml version="1.0"?>
                       |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
@@ -47,8 +44,8 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef, bugs
   val paymentsCallbacks =
     path("bug") {
       post {
-        entity(as[String]) { log =>
-          bugs ! Bug("client", log.takeWhile(_ != '\n'), log)
+        entity(as[String]) { clientLog =>
+          log.error("client", clientLog)
           complete(StatusCodes.OK)
         }
       }

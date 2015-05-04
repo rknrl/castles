@@ -8,12 +8,6 @@
   "adminLogin": "enter admin login",
   "adminPassword": "enter admin login",
   "mapsDir": "/Users/tolyayanot/dev/rknrl/castles/server/src/main/resources/maps/",
-  "bugs": {
-    "clientDir": "/Users/tolyayanot/bugs/client/",
-    "gameDir": "/Users/tolyayanot/bugs/game/",
-    "botDir": "/Users/tolyayanot/bugs/bot/",
-    "accountDir": "/Users/tolyayanot/bugs/account/"
-  },
   "db": {
     "host": "localhost",
     "port": 3306,

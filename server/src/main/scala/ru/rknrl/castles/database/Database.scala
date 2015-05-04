@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.Actor
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
@@ -18,6 +18,8 @@ import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
 import ru.rknrl.logging.ActorLog
 
+import scala.concurrent.Future
+
 class DbConfiguration(username: String,
                       host: String,
                       port: Int,
@@ -26,9 +28,19 @@ class DbConfiguration(username: String,
                       poolMaxObjects: Int,
                       poolMaxIdle: Long,
                       poolMaxQueueSize: Int) {
-  def configuration = new Configuration(username, host, port, Some(password), Some(database))
+  def configuration = Configuration(
+    username = username,
+    host = host,
+    port = port,
+    password = Some(password),
+    database = Some(database)
+  )
 
-  def poolConfiguration = new PoolConfiguration(poolMaxObjects, poolMaxIdle, poolMaxQueueSize)
+  def poolConfiguration = PoolConfiguration(
+    maxObjects = poolMaxObjects,
+    maxIdle = poolMaxIdle,
+    maxQueueSize = poolMaxQueueSize
+  )
 }
 
 object Database {
@@ -67,7 +79,7 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor with ActorLog {
+class Database(configuration: DbConfiguration) extends Actor with ActorLog {
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
@@ -86,34 +98,38 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
 
   override def receive = logged {
     case GetTop ⇒
-      val ref = sender()
+      val ref = sender
       pool.sendQuery("SELECT id, rating, userInfo FROM account_state ORDER BY rating DESC LIMIT 5;").map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
-            ref ! Top(resultSet.map(`rowData→topUser`).toList)
+            send(ref, Top(resultSet.map(`rowData→topUser`).toList))
           case None ⇒
             log.error("Get top: get none " + queryResult)
         }
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case DeleteAccount(accountId) ⇒
-      val ref = sender()
+      val ref = sender
       pool.sendPreparedStatement("DELETE FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
             pool.sendPreparedStatement("DELETE FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
               queryResult ⇒
                 if (queryResult.rowsAffected == 1)
-                  ref ! AccountDeleted(accountId)
+                  send(ref, AccountDeleted(accountId))
                 else
                   log.error("Delete tutor state: invalid rows affected count " + queryResult)
             )
           else
             log.error("Delete account: invalid rows affected count " + queryResult)
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case Insert(accountId, accountState, userInfo, tutorState) ⇒
-      val ref = sender()
+      val ref = sender
 
       pool.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.rating, accountState.toByteArray, userInfo.toByteArray)).map(
         queryResult ⇒
@@ -121,23 +137,27 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
             pool.sendPreparedStatement("INSERT INTO tutor_state (id,state) VALUES (?,?);", Seq(accountId.toByteArray, tutorState.toByteArray)).map(
               queryResult ⇒
                 if (queryResult.rowsAffected == 1)
-                  ref ! AccountStateResponse(accountId, accountState)
+                  send(ref, AccountStateResponse(accountId, accountState))
                 else
                   log.error("Insert tutor state: invalid rows affected count " + queryResult)
             )
           else
             log.error("Insert account state: invalid rows affected count " + queryResult)
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case UpdateAccountState(accountId, accountState) ⇒
-      val ref = sender()
+      val ref = sender
       pool.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.rating, accountState.toByteArray, accountId.toByteArray)).map(
         queryResult ⇒
           if (queryResult.rowsAffected == 1)
-            ref ! AccountStateResponse(accountId, accountState)
+            send(ref, AccountStateResponse(accountId, accountState))
           else
             log.error("Update account state: invalid rows affected count " + queryResult)
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case UpdateUserInfo(accountId, userInfo) ⇒
       pool.sendPreparedStatement("UPDATE account_state SET userInfo=? WHERE id=?;", Seq(userInfo.toByteArray, accountId.toByteArray)).map(
@@ -146,7 +166,9 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
             // ok
           } else
             log.error("Update user info: invalid rows affected count " + queryResult)
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case UpdateTutorState(accountId, tutorState) ⇒
       pool.sendPreparedStatement("UPDATE tutor_state SET state=? WHERE id=?;", Seq(tutorState.toByteArray, accountId.toByteArray)).map(
@@ -155,32 +177,36 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
             // ok
           } else
             log.error("Update tutor state: invalid rows affected count " + queryResult)
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case GetAccountState(accountId) ⇒
-      val ref = sender()
+      val ref = sender
       pool.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
             if (resultSet.size == 0)
-              ref ! AccountNoExists
+              send(ref, AccountNoExists)
             else if (resultSet.size == 1) {
               val row: RowData = resultSet.head
 
               val byteArray = row("state").asInstanceOf[Array[Byte]]
               val state = AccountStateDTO.parseFrom(byteArray)
 
-              ref ! AccountStateResponse(accountId, state)
+              send(ref, AccountStateResponse(accountId, state))
             } else
               log.error("Get account state: invalid result rows count = " + resultSet.size)
 
           case None ⇒
             log.error("Get account state: get none " + queryResult)
         }
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
 
     case GetTutorState(accountId) ⇒
-      val ref = sender()
+      val ref = sender
       pool.sendPreparedStatement("SELECT state FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
         queryResult ⇒ queryResult.rows match {
           case Some(resultSet) ⇒
@@ -190,13 +216,15 @@ class Database(configuration: DbConfiguration, val bugs: ActorRef) extends Actor
               val byteArray = row("state").asInstanceOf[Array[Byte]]
               val state = TutorStateDTO.parseFrom(byteArray)
 
-              ref ! TutorStateResponse(accountId, state)
+              send(ref, TutorStateResponse(accountId, state))
             } else
               log.error("Get tutor state: invalid result rows count = " + resultSet.size)
 
           case None ⇒
             log.error("Get tutor state: get none " + queryResult)
         }
-      )
+      ) onFailure {
+        case t: Throwable ⇒ log.error("Database error", t)
+      }
   }
 }

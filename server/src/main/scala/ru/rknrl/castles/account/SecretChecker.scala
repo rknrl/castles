@@ -20,6 +20,7 @@ import ru.rknrl.castles.account.SecretChecker.{SecretChecked, _}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.AccountType._
 import ru.rknrl.dto.AuthenticateDTO
+import ru.rknrl.logging.ActorLog
 
 object SecretChecker {
 
@@ -71,10 +72,10 @@ object SecretChecker {
   private def encode(bs: Array[Byte]): String = new String(Base64.encodeBase64URLSafe(bs), charset)
 }
 
-class SecretChecker(config: Config) extends Actor {
-  def receive = {
+class SecretChecker(config: Config) extends Actor with ActorLog {
+  def receive = logged {
     case authenticate: AuthenticateDTO ⇒
-      sender ! SecretChecked(checkSecret(authenticate))
+      send(sender, SecretChecked(checkSecret(authenticate)))
   }
 
   def checkSecret(authenticate: AuthenticateDTO) =

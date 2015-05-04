@@ -16,8 +16,7 @@ import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import ru.rknrl.core.Graphite.{GraphiteConfig, Health}
 import ru.rknrl.dto.StatAction
-import ru.rknrl.logging.Bugs.BugStatistics
-import ru.rknrl.logging.MiniLog
+import ru.rknrl.logging.ActorLog
 
 object Graphite {
 
@@ -39,10 +38,6 @@ class Graphite(config: GraphiteConfig) extends Actor {
       graphite ! message("online", online)
       graphite ! message("games", games)
 
-    case BugStatistics(counts) ⇒
-      for ((tag, count) ← counts)
-        graphite ! message("bugs." + tag, count)
-
     case a: StatAction ⇒
       aggregator ! message(a.name + "_sum", 1)
   }
@@ -52,8 +47,7 @@ class Graphite(config: GraphiteConfig) extends Actor {
   def currentTime = (System.currentTimeMillis / 1000).toString
 }
 
-class GraphiteConnection(host: String, port: Int) extends Actor {
-  val log = new MiniLog(verbose = true)
+class GraphiteConnection(host: String, port: Int) extends Actor with ActorLog {
 
   import context.system
 

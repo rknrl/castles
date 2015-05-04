@@ -38,10 +38,9 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
               isTutor: Boolean = false,
               isDev: Boolean = true,
               schedulerClass: Class[_] = classOf[FakeScheduler],
-              matchmaking: ActorRef = self,
-              bugs: ActorRef = self) = {
+              matchmaking: ActorRef = self) = {
     gameIterator += 1
-    system.actorOf(Props(classOf[Game], gameState, isDev, isTutor, botFactory, schedulerClass, matchmaking, bugs), "game" + gameIterator)
+    system.actorOf(Props(classOf[Game], gameState, isDev, isTutor, botFactory, schedulerClass, matchmaking), "game" + gameIterator)
   }
 
   def updateGameState(gameState: GameState,

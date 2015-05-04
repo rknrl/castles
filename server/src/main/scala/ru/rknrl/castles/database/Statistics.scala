@@ -70,6 +70,7 @@ object Statistics {
     }
 
 
+  // todo: send logging
   def sendLeaveGameStatistics(place: Int,
                               isTutor: Boolean,
                               orders: Iterable[GameOrder],
@@ -108,19 +109,20 @@ object Statistics {
     }
   }
 
+  // todo: send logging
   def sendCreateGameStatistics(orders: Iterable[GameOrder],
-                               graphire: ActorRef)
+                               graphite: ActorRef)
                               (implicit sender: ActorRef): Unit = {
     if (orders.count(_.isBot) == orders.size - 1) {
       if (orders.size == 4)
-        graphire ! StatAction.START_GAME_4_WITH_BOTS
+        graphite ! StatAction.START_GAME_4_WITH_BOTS
       else
-        graphire ! StatAction.START_GAME_2_WITH_BOTS
+        graphite ! StatAction.START_GAME_2_WITH_BOTS
     } else {
       if (orders.size == 4)
-        graphire ! StatAction.START_GAME_4_WITH_PLAYERS
+        graphite ! StatAction.START_GAME_4_WITH_PLAYERS
       else
-        graphire ! StatAction.START_GAME_2_WITH_PLAYERS
+        graphite ! StatAction.START_GAME_2_WITH_PLAYERS
     }
   }
 }

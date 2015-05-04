@@ -17,7 +17,7 @@ import ru.rknrl.core.points.Point
 import ru.rknrl.dto._
 import ru.rknrl.logging.ActorLog
 
-class GameBot(accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
+class GameBot(accountId: AccountId) extends Actor with ActorLog {
   val moveInterval = 5000
   val castInterval = 10000
   var lastTime = 0L

@@ -16,8 +16,8 @@ trait IGameFactory {
   def create(gameState: GameState,
              isDev: Boolean,
              isTutor: Boolean,
-             matchmaking: ActorRef,
-             bugs: ActorRef)(implicit context: ActorContext): ActorRef
+             matchmaking: ActorRef)
+            (implicit context: ActorContext): ActorRef
 }
 
 class GameFactory extends IGameFactory {
@@ -26,9 +26,8 @@ class GameFactory extends IGameFactory {
   def create(gameState: GameState,
              isDev: Boolean,
              isTutor: Boolean,
-             matchmaking: ActorRef,
-             bugs: ActorRef)(implicit context: ActorContext) = {
-    val game = context.actorOf(Props(classOf[Game], gameState, isDev, isTutor, new BotFactory(), classOf[GameScheduler], matchmaking, bugs), "game-" + gameIterator)
+             matchmaking: ActorRef)(implicit context: ActorContext) = {
+    val game = context.actorOf(Props(classOf[Game], gameState, isDev, isTutor, new BotFactory(), classOf[GameScheduler], matchmaking), "game-" + gameIterator)
     gameIterator += 1
     game
   }
@@ -38,8 +37,7 @@ class FakeGameFactory(ref: ActorRef) extends IGameFactory {
   def create(gameState: GameState,
              isDev: Boolean,
              isTutor: Boolean,
-             matchmaking: ActorRef,
-             bugs: ActorRef)(implicit context: ActorContext) = ref
+             matchmaking: ActorRef)(implicit context: ActorContext) = ref
 }
 
 

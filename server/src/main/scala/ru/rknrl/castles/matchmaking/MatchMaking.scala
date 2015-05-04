@@ -68,8 +68,7 @@ class MatchMaking(gameCreator: GameCreator,
                   var top: Top,
                   config: Config,
                   database: ActorRef,
-                  graphite: ActorRef,
-                  val bugs: ActorRef) extends Actor with ActorLog {
+                  graphite: ActorRef) extends Actor with ActorLog {
 
   override def supervisorStrategy = OneForOneStrategy() {
     case e: Exception ⇒
@@ -105,7 +104,7 @@ class MatchMaking(gameCreator: GameCreator,
   def receive = logged({
     case Online(accountId) ⇒
       if ((accountIdToAccount contains accountId) && (accountIdToAccount(accountId) != sender))
-        accountIdToAccount(accountId) ! DuplicateAccount
+        send(accountIdToAccount(accountId), DuplicateAccount)
 
       accountIdToAccount = accountIdToAccount + (accountId → sender)
 
@@ -120,20 +119,20 @@ class MatchMaking(gameCreator: GameCreator,
           accountIdToGameInfo = accountIdToGameInfo - accountId
           context stop gameInfo.gameRef
         } else
-          gameInfo.gameRef forward o
+          forward(gameInfo.gameRef, o)
       }
 
     case InGame(accountId) ⇒
-      sender ! InGameResponse(
+      send(sender, InGameResponse(
         gameRef = if (accountIdToGameInfo contains accountId) Some(accountIdToGameInfo(accountId).gameRef) else None,
         searchOpponents = accountIdToGameOrder contains accountId,
         top = top.dto
-      )
+      ))
 
     case order: GameOrder ⇒
       val accountId = order.accountId
       if (accountIdToGameInfo contains accountId)
-        sender ! ConnectToGame(accountIdToGameInfo(accountId).gameRef)
+        send(sender, ConnectToGame(accountIdToGameInfo(accountId).gameRef))
       else
         accountIdToGameOrder = accountIdToGameOrder + (accountId → order)
 
@@ -142,7 +141,7 @@ class MatchMaking(gameCreator: GameCreator,
       val newGames = matchedOrders.map(gameCreator.newGame)
 
       for (newGame ← newGames) {
-        val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self, bugs)
+        val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self)
         gamesCount = gamesCount + 1
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
         if (!newGame.isTutor) sendCreateGameStatistics(newGame.orders, graphite)
@@ -164,7 +163,7 @@ class MatchMaking(gameCreator: GameCreator,
       val newRating = ELO.newRating(gameInfo.orders, order, place)
       top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
-      context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database, bugs))
+      context.actorOf(Props(classOf[Patcher], accountId, reward, usedItems, newRating, self, database))
 
       sendToAccount(accountId, AccountLeaveGame(top.dto))
 
@@ -181,10 +180,10 @@ class MatchMaking(gameCreator: GameCreator,
       sendToAccount(accountId, DuplicateAccount)
 
     case RegisterHealth ⇒
-      graphite ! Health(online = accountIdToAccount.size, games = gamesCount)
+      send(graphite, Health(online = accountIdToAccount.size, games = gamesCount))
   })
 
   def sendToAccount(accountId: AccountId, msg: Any): Unit =
     if (accountIdToAccount contains accountId)
-      accountIdToAccount(accountId) ! msg
+      send(accountIdToAccount(accountId), msg)
 }

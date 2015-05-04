@@ -3,7 +3,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
-            <pattern>%X{akkaTimestamp} %-5level[%thread] %logger{0} - %msg%n</pattern>
+            <pattern>[%logger{0}] %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -11,7 +11,7 @@
         <file>/var/castles/server.log</file>
         <append>false</append>
         <encoder>
-            <pattern>%date{yyyy-MM-dd} %X{akkaTimestamp} %-5level[%thread] %logger{1} - %msg%n</pattern>
+            <pattern>[%logger{0}] %msg%n</pattern>
         </encoder>
     </appender>
 

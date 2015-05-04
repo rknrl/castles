@@ -21,7 +21,6 @@ import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
-import ru.rknrl.logging.Bugs
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -47,22 +46,21 @@ object Main {
     implicit val system = ActorSystem("main-actor-system")
 
     val graphite = system.actorOf(Props(classOf[Graphite], config.graphite), "graphite")
-    val bugs = system.actorOf(Props(classOf[Bugs], config.bugsDir, graphite), "bugs")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
-    val database = system.actorOf(Props(classOf[Database], config.db, bugs), "database")
+    val database = system.actorOf(Props(classOf[Database], config.db), "database")
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
 
     val gameCreator = new GameCreator(gameMaps, config)
-    val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, graphite, bugs), "matchmaking")
+    val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, graphite), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
+    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
     IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking, bugs), "admin-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, graphite, bugs, secretChecker), "tcp-server")
+    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking), "admin-server")
+    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, graphite, secretChecker), "tcp-server")
   }
 }

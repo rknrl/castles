@@ -12,7 +12,7 @@ import java.net.InetSocketAddress
 
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.Supervisor._
-import ru.rknrl.logging.MiniLog
+import ru.rknrl.logging.ActorLog
 
 class AdminTcpServer(tcp: ActorRef,
                      host: String,
@@ -20,14 +20,11 @@ class AdminTcpServer(tcp: ActorRef,
                      login: String,
                      password: String,
                      database: ActorRef,
-                     matchmaking: ActorRef,
-                     bugs: ActorRef) extends Actor {
+                     matchmaking: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
   override def supervisorStrategy = StopStrategy
-
-  val log = new MiniLog
 
   val address = new InetSocketAddress(host, port)
 
@@ -43,7 +40,7 @@ class AdminTcpServer(tcp: ActorRef,
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val client = context.actorOf(Props(classOf[AdminClientSession], sender, database, matchmaking, bugs, login, password, name), "admin-client" + name)
+      val client = context.actorOf(Props(classOf[AdminClientSession], sender, database, matchmaking, login, password, name), "admin-client" + name)
       sender ! Register(client)
   }
 }

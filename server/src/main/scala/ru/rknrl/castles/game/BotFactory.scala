@@ -13,20 +13,20 @@ import ru.rknrl.castles.bot.{GameBot, TutorBot}
 import ru.rknrl.dto.AccountId
 
 trait IBotFactory {
-  def create(accountId: AccountId, isTutor: Boolean, bugs: ActorRef)
+  def create(accountId: AccountId, isTutor: Boolean)
             (implicit context: ActorContext): ActorRef
 }
 
 class BotFactory extends IBotFactory {
-  def create(accountId: AccountId, isTutor: Boolean, bugs: ActorRef)
+  def create(accountId: AccountId, isTutor: Boolean)
             (implicit context: ActorContext) = {
     val botClass = if (isTutor) classOf[TutorBot] else classOf[GameBot]
-    context.actorOf(Props(botClass, accountId, bugs), accountId.id)
+    context.actorOf(Props(botClass, accountId), accountId.id)
   }
 }
 
 class FakeBotFactory(ref: ActorRef) extends IBotFactory {
-  def create(accountId: AccountId, isTutor: Boolean, bugs: ActorRef)
+  def create(accountId: AccountId, isTutor: Boolean)
             (implicit context: ActorContext) =
     ref
 }

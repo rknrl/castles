@@ -32,14 +32,13 @@ class Game(var gameState: GameState,
            isTutor: Boolean,
            botFactory: IBotFactory,
            schedulerClass: Class[_],
-           matchmaking: ActorRef,
-           val bugs: ActorRef) extends Actor with ActorLog {
+           matchmaking: ActorRef) extends Actor with ActorLog {
 
   override def supervisorStrategy = StopStrategy
 
   for ((playerId, player) ← gameState.players if player.isBot) {
-    val bot = botFactory.create(player.accountId, isTutor, bugs)
-    bot ! ConnectToGame(self)
+    val bot = botFactory.create(player.accountId, isTutor)
+    send(bot, ConnectToGame(self))
   }
 
   val playersIds = gameState.players.keys
@@ -91,7 +90,7 @@ class Game(var gameState: GameState,
     case Join(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
       playerIdToClient = playerIdToClient + (playerId → client)
-      client ! JoinedGame(gameState.dto(playerId, gameOvers.values.toSeq))
+      send(client, JoinedGame(gameState.dto(playerId, gameOvers.values.toSeq)))
 
     case Offline(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
@@ -190,14 +189,14 @@ class Game(var gameState: GameState,
     val player = gameState.players(playerId)
 
     if (!player.isBot)
-      matchmaking ! PlayerLeaveGame(
+      send(matchmaking, PlayerLeaveGame(
         accountId = player.accountId,
         place = gameOver.place,
         reward = gameOver.reward,
         usedItems = gameState.items.states(playerId).usedItems
-      )
+      ))
 
     if (humansLeft.size == 0)
-      matchmaking ! AllPlayersLeaveGame(self)
+      send(matchmaking, AllPlayersLeaveGame(self))
   }
 }

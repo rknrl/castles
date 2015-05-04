@@ -13,15 +13,13 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountClientSession
-import ru.rknrl.logging.MiniLog
+import ru.rknrl.logging.ActorLog
 
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, graphite: ActorRef, bugs: ActorRef, secretChecker: ActorRef) extends Actor {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, graphite: ActorRef, secretChecker: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
   override def supervisorStrategy = StopStrategy
-
-  val log = new MiniLog
 
   val address = new InetSocketAddress(config.host, config.gamePort)
 
@@ -38,7 +36,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       log.debug("connected " + name)
-      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, database, graphite, bugs, config, name), "client" + name)
+      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, database, graphite, config, name), "client" + name)
       sender ! Register(client)
   }
 }

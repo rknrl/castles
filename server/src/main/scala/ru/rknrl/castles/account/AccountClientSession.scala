@@ -17,9 +17,8 @@ class AccountClientSession(tcpSender: ActorRef,
                            secretChecker: ActorRef,
                            database: ActorRef,
                            graphite: ActorRef,
-                           bugs: ActorRef,
                            config: Config,
                            name: String) extends Client(tcpSender, name) {
 
-  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, bugs, config), "account" + name)
+  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account" + name)
 }

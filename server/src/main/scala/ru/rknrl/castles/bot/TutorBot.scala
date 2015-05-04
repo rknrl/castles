@@ -8,7 +8,6 @@
 
 package ru.rknrl.castles.bot
 
-import akka.actor.ActorRef
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto._
 
@@ -22,7 +21,7 @@ object BotMode extends Enumeration {
 
 import ru.rknrl.castles.bot.BotMode._
 
-class TutorBot(accountId: AccountId, bugs: ActorRef) extends GameBot(accountId, bugs) {
+class TutorBot(accountId: AccountId) extends GameBot(accountId) {
 
   var mode = NONE
 
@@ -45,12 +44,12 @@ class TutorBot(accountId: AccountId, bugs: ActorRef) extends GameBot(accountId, 
         if (time - lastTime > moveInterval) {
           lastTime = time
 
-          sender ! Move(
+          send(sender, Move(
             MoveDTO(
               getMyBuildings.map(_.id),
               towers.last.id
             )
-          )
+          ))
         }
       case GAME ⇒
         super.update(newGameState)

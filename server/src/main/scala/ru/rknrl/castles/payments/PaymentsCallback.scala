@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.payments
 
+import org.slf4j.LoggerFactory
 import ru.rknrl.castles.payments.PaymentsCallback.{Response, ResponseBase}
 import ru.rknrl.dto.AccountId
-import ru.rknrl.logging.MiniLog
 import spray.http.HttpResponse
 
 object PaymentsCallback {
@@ -37,7 +37,7 @@ object PaymentsCallback {
  * Обработчик платежных сообщений от соц. сети
  */
 trait PaymentsCallback {
-  val log = new MiniLog
+  val log = LoggerFactory.getLogger(getClass)
 
   def response: ResponseBase
 

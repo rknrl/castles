@@ -51,8 +51,7 @@ class MatchmakingTest extends ActorsTest {
                      top: Top = top5,
                      config: Config = configMock(),
                      database: ActorRef,
-                     graphite: ActorRef,
-                     bugs: ActorRef = self) = {
+                     graphite: ActorRef) = {
     matchmakingIterator += 1
     system.actorOf(
       Props(
@@ -63,8 +62,7 @@ class MatchmakingTest extends ActorsTest {
         top,
         config,
         database,
-        graphite,
-        bugs
+        graphite
       ),
       "matchmaking-" + matchmakingIterator
     )

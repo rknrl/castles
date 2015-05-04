@@ -20,10 +20,9 @@ class Patcher(accountId: AccountId,
               usedItems: Map[ItemType, Int],
               newRating: Double,
               matchmaking: ActorRef,
-              database: ActorRef,
-              val bugs: ActorRef) extends Actor with ActorLog {
+              database: ActorRef) extends Actor with ActorLog {
 
-  database ! GetAccountState(accountId)
+  send(database, GetAccountState(accountId))
 
   var updated: Boolean = false
 
@@ -37,10 +36,10 @@ class Patcher(accountId: AccountId,
           .setNewRating(newRating)
           .applyUsedItems(usedItems)
 
-        database ! UpdateAccountState(accountId, newState.dto)
+        send(database, UpdateAccountState(accountId, newState.dto))
         updated = true
       } else {
-        matchmaking ! SetAccountState(accountId, stateDto)
+        send(matchmaking, SetAccountState(accountId, stateDto))
         context stop self
       }
   })

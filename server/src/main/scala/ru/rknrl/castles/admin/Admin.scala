@@ -24,9 +24,10 @@ import ru.rknrl.logging.ActorLog
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+// todo: ask logging
+
 class Admin(database: ActorRef,
             matchmaking: ActorRef,
-            val bugs: ActorRef,
             login: String,
             password: String,
             name: String) extends Actor with ActorLog {
@@ -40,11 +41,11 @@ class Admin(database: ActorRef,
     case AuthenticateAsAdmin(authenticate) ⇒
       if (authenticate.login == login && authenticate.password == password) {
         client = sender
-        client ! AuthenticatedAsAdmin
-        context become admin
+        send(client, AuthenticatedAsAdmin)
+        become(admin, "admin")
       } else {
         log.debug("reject")
-        sender ! CloseConnection
+        send(sender, CloseConnection)
       }
   })
 
@@ -57,13 +58,13 @@ class Admin(database: ActorRef,
     case AccountNoExists ⇒
 
     case C2B.GetAccountState(dto) ⇒
-      database ! Database.GetAccountState(dto.accountId)
+      send(database, Database.GetAccountState(dto.accountId))
 
     case C2B.DeleteAccount(accountId) ⇒
-      database ! Database.DeleteAccount(accountId)
+      send(database, Database.DeleteAccount(accountId))
 
     case msg: Database.AccountDeleted ⇒
-      matchmaking forward msg
+      forward(matchmaking, msg)
 
     case AddGold(dto) ⇒
       getState(dto.accountId,
@@ -91,7 +92,7 @@ class Admin(database: ActorRef,
   })
 
   def sendToClient(accountId: AccountId, accountState: AccountStateDTO) =
-    client ! B2C.AccountState(AdminAccountStateDTO(accountId, accountState))
+    send(client, B2C.AccountState(AdminAccountStateDTO(accountId, accountState)))
 
   def getState(accountId: AccountId, f: (AccountId, AccountState) ⇒ Unit) = {
     val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
@@ -112,7 +113,7 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        matchmaking ! SetAccountState(accountId, accountStateDto)
+        send(matchmaking, SetAccountState(accountId, accountStateDto))
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

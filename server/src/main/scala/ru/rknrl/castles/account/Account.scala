@@ -39,7 +39,6 @@ class Account(matchmaking: ActorRef,
               secretChecker: ActorRef,
               database: ActorRef,
               graphite: ActorRef,
-              val bugs: ActorRef,
               config: Config) extends Actor with ActorLog {
 
   var _client: Option[ClientInfo] = None
@@ -60,82 +59,84 @@ class Account(matchmaking: ActorRef,
   def auth: Receive = logged({
     case Authenticate(authenticate) ⇒
       _client = Some(ClientInfo(sender, authenticate.userInfo.accountId, authenticate.deviceType, authenticate.platformType, authenticate.userInfo))
-      secretChecker ! authenticate
+      send(secretChecker, authenticate)
 
     case SecretChecked(valid) ⇒
       if (valid) {
-        database ! GetAccountState(client.accountId)
-        graphite ! StatAction.AUTHENTICATED
+        send(database, GetAccountState(client.accountId))
+        send(graphite, StatAction.AUTHENTICATED)
       } else {
-        graphite ! StatAction.NOT_AUTHENTICATED
-        client.ref ! CloseConnection
+        send(graphite, StatAction.NOT_AUTHENTICATED)
+        send(client.ref, CloseConnection)
       }
 
     case AccountNoExists ⇒
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
-      database ! Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState)
-      graphite ! StatAction.FIRST_AUTHENTICATED
+      send(database, Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState))
+      send(graphite, StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(accountId, stateDto) ⇒
       Assertion.check(accountId == client.accountId)
       _state = Some(AccountState(stateDto))
-      database ! GetTutorState(client.accountId)
+      send(database, GetTutorState(client.accountId))
 
     case TutorStateResponse(accountId, tutorState) ⇒
       Assertion.check(accountId == client.accountId)
       _tutorState = Some(tutorState)
-      matchmaking ! Online(client.accountId)
-      matchmaking ! InGame(client.accountId)
-      context become enterAccount
+      send(matchmaking, Online(client.accountId))
+      send(matchmaking, InGame(client.accountId))
+      become(enterAccount, "enterAccount")
   })
 
   def enterAccount: Receive = logged({
     case InGameResponse(gameRef, searchOpponents, top) ⇒
 
-      client.ref ! Authenticated(AuthenticatedDTO(
+      val isTutor = state.gamesCount == 0
+
+      send(client.ref, Authenticated(AuthenticatedDTO(
         state.dto,
         config.account.dto,
         TopDTO(top),
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
-        searchOpponents || state.gamesCount == 0,
+        searchOpponents || isTutor,
         game = if (gameRef.isDefined) Some(nodeLocator) else None
-      ))
+      )))
 
       if (searchOpponents)
-        context become enterGame
+        become(enterGame, "enterGame")
       else if (gameRef.isDefined) {
         _game = gameRef
-        context become enterGame
-      } else if (state.gamesCount == 0) {
-        graphite ! StatAction.START_TUTOR
+        become(enterGame, "enterGame")
+      } else if (isTutor) {
+        send(graphite, StatAction.START_TUTOR)
         sendGameOrder()
       } else
-        context become account
+        become(account, "account")
 
   }).orElse(persistent)
 
   def account: Receive = logged({
     case BuyBuilding(dto) ⇒
       updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
-      graphite ! Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1)
+      send(graphite, Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1))
 
     case UpgradeBuilding(dto) ⇒
       updateState(state.upgradeBuilding(dto.id, config.account))
-      graphite ! Statistics.buyBuilding(state.slots(dto.id).get)
+      send(graphite, Statistics.buyBuilding(state.slots(dto.id).get))
 
     case RemoveBuilding(dto) ⇒
       updateState(state.removeBuilding(dto.id))
-      graphite ! StatAction.REMOVE_BUILDING
+      send(graphite, StatAction.REMOVE_BUILDING)
 
     case UpgradeSkill(dto) ⇒
       updateState(state.upgradeSkill(dto.skillType, config.account))
-      graphite ! Statistics.buySkill(dto.skillType, state.skills(dto.skillType))
+      send(graphite, Statistics.buySkill(dto.skillType, state.skills(dto.skillType)))
 
     case BuyItem(dto) ⇒
       updateState(state.buyItem(dto.itemType, config.account))
-      graphite ! Statistics.buyItem(dto.itemType)
+      send(graphite, Statistics.buyItem(dto.itemType))
 
     case EnterGame ⇒ sendGameOrder()
 
@@ -144,56 +145,56 @@ class Account(matchmaking: ActorRef,
   def enterGame: Receive = logged({
     case ConnectToGame(gameRef) ⇒
       _game = Some(gameRef)
-      client.ref ! EnteredGame(nodeLocator)
+      send(client.ref, EnteredGame(nodeLocator))
 
     case C2B.JoinGame ⇒
-      game ! Join(client.accountId, client.ref)
-      context become inGame
+      send(game, Join(client.accountId, client.ref))
+      become(inGame, "inGame")
 
   }).orElse(persistent)
 
   def inGame: Receive = logged({
-    case msg: GameMsg ⇒ game forward msg
+    case msg: GameMsg ⇒ forward(game, msg)
 
     case msg: UpdateStatistics ⇒
-      game forward msg.stat.action
-      graphite forward msg.stat.action
+      forward(game, msg.stat.action)
+      forward(graphite, msg.stat.action)
 
     case AccountLeaveGame(top) ⇒
-      client.ref ! B2C.LeavedGame
-      client.ref ! B2C.TopUpdated(TopDTO(top))
-      context become account
+      send(client.ref, B2C.LeavedGame)
+      send(client.ref, B2C.TopUpdated(TopDTO(top)))
+      become(account, "account")
 
   }).orElse(persistent)
 
   def persistent: Receive = logged({
     case AccountStateResponse(accountId, stateDto) ⇒
-      client.ref ! AccountStateUpdated(stateDto)
+      send(client.ref, AccountStateUpdated(stateDto))
 
     case SetAccountState(_, accountStateDto) ⇒
       _state = Some(AccountState(accountStateDto))
-      client.ref ! AccountStateUpdated(accountStateDto)
+      send(client.ref, AccountStateUpdated(accountStateDto))
 
-    case msg: UpdateStatistics ⇒ graphite ! msg.stat.action
+    case msg: UpdateStatistics ⇒ send(graphite, msg.stat.action)
 
     case C2B.UpdateTutorState(state) ⇒
-      database ! Database.UpdateTutorState(client.accountId, state)
+      send(database, Database.UpdateTutorState(client.accountId, state))
 
-    case DuplicateAccount ⇒ client.ref ! CloseConnection
+    case DuplicateAccount ⇒ send(client.ref, CloseConnection)
   })
 
   def updateState(newState: AccountState): Unit = {
     _state = Some(newState)
-    database ! UpdateAccountState(client.accountId, newState.dto)
+    send(database, UpdateAccountState(client.accountId, newState.dto))
   }
 
   def sendGameOrder(): Unit = {
-    matchmaking ! GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false)
-    context become enterGame
+    send(matchmaking, GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false))
+    become(enterGame, "enterGame")
   }
 
   def nodeLocator = NodeLocator(config.host, config.gamePort)
 
   override def postStop(): Unit =
-    if (_client.isDefined) matchmaking ! Offline(client.accountId, client.ref)
+    if (_client.isDefined) send(matchmaking, Offline(client.accountId, client.ref))
 }

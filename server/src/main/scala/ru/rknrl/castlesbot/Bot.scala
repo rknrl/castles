@@ -39,7 +39,7 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
-class Bot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Actor with ActorLog {
+class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
 
   override def supervisorStrategy = EscalateStrategy
 
@@ -147,8 +147,7 @@ class Bot(server: ActorRef, accountId: AccountId, val bugs: ActorRef) extends Ac
       send(JoinGame)
 
     case msg: JoinedGame ⇒
-      val bugs = self
-      gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId, bugs)))
+      gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId)))
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
       context become inGame

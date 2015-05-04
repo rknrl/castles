@@ -23,7 +23,6 @@ mysql_install_db
 install_diamond.sh
 
 mkdir /var/castles
-mkdir /var/castles/bugs
 mkdir /var/castles/server
 mkdir /var/castles/server/maps
 
