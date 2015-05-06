@@ -15,32 +15,32 @@ import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.dto.{AccountId, ItemType}
 import ru.rknrl.logging.ActorLog
 
-class Patcher(accountId: AccountId,
-              reward: Int,
-              usedItems: Map[ItemType, Int],
-              newRating: Double,
-              matchmaking: ActorRef,
-              database: ActorRef) extends Actor with ActorLog {
+class AccountPatcher(accountId: AccountId,
+                     reward: Int,
+                     usedItems: Map[ItemType, Int],
+                     newRating: Double,
+                     matchmaking: ActorRef,
+                     database: ActorRef) extends Actor with ActorLog {
 
   send(database, GetAccountState(accountId))
 
-  var updated: Boolean = false
-
-  def receive = logged({
+  def receive = logged {
     case AccountStateResponse(accountId, stateDto) ⇒
-      if (!updated) {
-        val state = AccountState(stateDto)
+      val state = AccountState(stateDto)
 
-        val newState = state.addGold(reward)
-          .incGamesCount
-          .setNewRating(newRating)
-          .applyUsedItems(usedItems)
+      val newState = state.addGold(reward)
+        .incGamesCount
+        .setNewRating(newRating)
+        .applyUsedItems(usedItems)
 
-        send(database, UpdateAccountState(accountId, newState.dto))
-        updated = true
-      } else {
-        send(matchmaking, SetAccountState(accountId, stateDto))
-        context stop self
-      }
-  })
+      send(database, UpdateAccountState(accountId, newState.dto))
+
+      become(waitForUpdatedState, "waitForUpdatedState")
+  }
+
+  def waitForUpdatedState: Receive = logged {
+    case AccountStateResponse(accountId, stateDto) ⇒
+      send(matchmaking, SetAccountState(accountId, stateDto))
+      context stop self
+  }
 }
