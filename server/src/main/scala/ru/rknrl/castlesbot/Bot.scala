@@ -147,7 +147,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       send(JoinGame)
 
     case msg: JoinedGame ⇒
-      gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId)))
+      gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId), "game-bot-" + accountId.id))
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
       context become inGame

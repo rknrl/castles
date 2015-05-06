@@ -8,12 +8,12 @@
 
 package ru.rknrl.castlesbot
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.Props
 import ru.rknrl.dto.AccountId
 import ru.rknrl.rmi.Server
 
 class BotConnection(host: String, port: Int, accountId: AccountId) extends Server(host, port) {
 
-  val handler = context.actorOf(Props(classOf[Bot], self, accountId))
+  val handler = context.actorOf(Props(classOf[Bot], self, accountId), "bot-" + accountId.id)
 
 }

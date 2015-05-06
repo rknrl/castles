@@ -22,6 +22,6 @@ object BotMain {
 
     implicit val system = ActorSystem("main-actor-system")
     for (i ← 1 to count)
-      system.actorOf(Props(classOf[BotConnection], host, port, AccountId(DEV, i.toString)))
+      system.actorOf(Props(classOf[BotConnection], host, port, AccountId(DEV, i.toString)), "bot-connection-" + i)
   }
 }
