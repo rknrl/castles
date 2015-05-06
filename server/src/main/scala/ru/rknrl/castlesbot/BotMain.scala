@@ -15,7 +15,7 @@ import ru.rknrl.dto.AccountType.DEV
 object BotMain {
   val host = "localhost"
   val port = 2335
-  val count = 2
+  val count = 100
 
   def main(args: Array[String]) {
     println("CASTLES BOT 3 may 2015")

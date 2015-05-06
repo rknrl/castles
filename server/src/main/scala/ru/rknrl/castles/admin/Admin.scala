@@ -36,8 +36,7 @@ class Admin(database: ActorRef,
 
   override def receive = auth
 
-  def auth: Receive = logged({
-    /** from Client */
+  def auth: Receive = logged {
     case AuthenticateAsAdmin(authenticate) ⇒
       if (authenticate.login == login && authenticate.password == password) {
         client = sender
@@ -47,14 +46,12 @@ class Admin(database: ActorRef,
         log.debug("reject")
         send(sender, CloseConnection)
       }
-  })
+  }
 
-  def admin: Receive = logged({
-    /** from Database */
+  def admin: Receive = logged {
     case AccountStateResponse(accountId, accountState) ⇒
       sendToClient(accountId, accountState)
 
-    /** from Database */
     case AccountNoExists ⇒
 
     case C2B.GetAccountState(dto) ⇒
@@ -89,7 +86,7 @@ class Admin(database: ActorRef,
           else
             update(accountId, accountState.removeBuilding(dto.slot.id))
       )
-  })
+  }
 
   def sendToClient(accountId: AccountId, accountState: AccountStateDTO) =
     send(client, B2C.AccountState(AdminAccountStateDTO(accountId, accountState)))

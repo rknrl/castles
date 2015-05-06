@@ -25,15 +25,14 @@ class TutorBot(accountId: AccountId) extends GameBot(accountId) {
 
   var mode = NONE
 
-  def tutorBotReceive: Receive = logged({
+  override def receive = logged {
     case StatAction.TUTOR_WIN_CHALLENGE ⇒
       mode = GAME
 
     case StatAction.TUTOR_ARROWS ⇒
       if (playerId.get.id == 3) mode = SEND_UNITS_TO_ONE_BUILDING
-  })
 
-  override def receive = tutorBotReceive.orElse(super.receive)
+  }.orElse(super.receive)
 
   override def update(newGameState: GameStateDTO) = {
     gameState = Some(newGameState)

@@ -56,7 +56,7 @@ class Account(matchmaking: ActorRef,
 
   def receive = auth
 
-  def auth: Receive = logged({
+  def auth: Receive = logged {
     case Authenticate(authenticate) ⇒
       _client = Some(ClientInfo(sender, authenticate.userInfo.accountId, authenticate.deviceType, authenticate.platformType, authenticate.userInfo))
       send(secretChecker, authenticate)
@@ -87,9 +87,9 @@ class Account(matchmaking: ActorRef,
       send(matchmaking, Online(client.accountId))
       send(matchmaking, InGame(client.accountId))
       become(enterAccount, "enterAccount")
-  })
+  }
 
-  def enterAccount: Receive = logged({
+  def enterAccount: Receive = logged {
     case InGameResponse(gameRef, searchOpponents, top) ⇒
 
       val isTutor = state.gamesCount == 0
@@ -115,9 +115,9 @@ class Account(matchmaking: ActorRef,
       } else
         become(account, "account")
 
-  }).orElse(persistent)
+  }.orElse(persistent)
 
-  def account: Receive = logged({
+  def account: Receive = logged {
     case BuyBuilding(dto) ⇒
       updateState(state.buyBuilding(dto.id, dto.buildingType, config.account))
       send(graphite, Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1))
@@ -140,9 +140,9 @@ class Account(matchmaking: ActorRef,
 
     case EnterGame ⇒ sendGameOrder()
 
-  }).orElse(persistent)
+  }.orElse(persistent)
 
-  def enterGame: Receive = logged({
+  def enterGame: Receive = logged {
     case ConnectToGame(gameRef) ⇒
       _game = Some(gameRef)
       send(client.ref, EnteredGame(nodeLocator))
@@ -151,9 +151,9 @@ class Account(matchmaking: ActorRef,
       send(game, Join(client.accountId, client.ref))
       become(inGame, "inGame")
 
-  }).orElse(persistent)
+  }.orElse(persistent)
 
-  def inGame: Receive = logged({
+  def inGame: Receive = logged {
     case msg: GameMsg ⇒ forward(game, msg)
 
     case msg: UpdateStatistics ⇒
@@ -165,9 +165,9 @@ class Account(matchmaking: ActorRef,
       send(client.ref, B2C.TopUpdated(TopDTO(top)))
       become(account, "account")
 
-  }).orElse(persistent)
+  }.orElse(persistent)
 
-  def persistent: Receive = logged({
+  def persistent: Receive = logged {
     case AccountStateResponse(accountId, stateDto) ⇒
       send(client.ref, AccountStateUpdated(stateDto))
 
@@ -181,7 +181,7 @@ class Account(matchmaking: ActorRef,
       send(database, Database.UpdateTutorState(client.accountId, state))
 
     case DuplicateAccount ⇒ send(client.ref, CloseConnection)
-  })
+  }
 
   def updateState(newState: AccountState): Unit = {
     _state = Some(newState)

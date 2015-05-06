@@ -101,7 +101,7 @@ class MatchMaking(gameCreator: GameCreator,
     case _ ⇒ true
   }
 
-  def receive = logged({
+  def receive = logged {
     case Online(accountId) ⇒
       if ((accountIdToAccount contains accountId) && (accountIdToAccount(accountId) != sender))
         send(accountIdToAccount(accountId), DuplicateAccount)
@@ -163,7 +163,7 @@ class MatchMaking(gameCreator: GameCreator,
       val newRating = ELO.newRating(gameInfo.orders, order, place)
       top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
-      context.actorOf(Props(classOf[AccountPatcher], accountId, reward, usedItems, newRating, self, database), "account-patcher-"+accountId.accountType.name + "-" + accountId.id)
+      context.actorOf(Props(classOf[AccountPatcher], accountId, reward, usedItems, newRating, self, database), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
 
       sendToAccount(accountId, AccountLeaveGame(top.dto))
 
@@ -181,7 +181,7 @@ class MatchMaking(gameCreator: GameCreator,
 
     case RegisterHealth ⇒
       send(graphite, Health(online = accountIdToAccount.size, games = gamesCount))
-  })
+  }
 
   def sendToAccount(accountId: AccountId, msg: Any): Unit =
     if (accountIdToAccount contains accountId)

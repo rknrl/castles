@@ -76,17 +76,16 @@ class Game(var gameState: GameState,
     for ((playerId, client) ← playerIdToClient
          if gameState.players(playerId).isBot
          if !(leaved contains playerId))
-      client ! msg
-
+      send(client, msg)
 
   override val logFilter: Any ⇒ Boolean = {
-    case UpdateGameState(time) ⇒ false
+    case _: UpdateGameState ⇒ false
     case _ ⇒ true
   }
 
   val scheduler = context.actorOf(Props(schedulerClass, self))
 
-  def receive = logged({
+  def receive = logged {
     case Join(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
       playerIdToClient = playerIdToClient + (playerId → client)
@@ -156,7 +155,7 @@ class Game(var gameState: GameState,
 
     case statAction: StatAction ⇒
       sendToBots(statAction)
-  })
+  }
 
   def addLoser(playerId: PlayerId): Unit = {
     val place = playersIds.size - gameOvers.size
