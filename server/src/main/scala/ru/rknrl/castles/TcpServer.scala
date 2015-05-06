@@ -36,7 +36,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       log.debug("connected " + name)
-      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, database, graphite, config, name), "client" + name)
+      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, database, graphite, config, name), "client-" + name.replace('.', '-'))
       sender ! Register(client)
   }
 }

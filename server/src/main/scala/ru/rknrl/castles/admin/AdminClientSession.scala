@@ -17,5 +17,5 @@ class AdminClientSession(tcpSender: ActorRef,
                          login: String,
                          password: String,
                          name: String) extends Client(tcpSender, name) {
-  val handler = context.actorOf(Props(classOf[Admin], database, matchmaking, login, password, name), "admin" + name)
+  val handler = context.actorOf(Props(classOf[Admin], database, matchmaking, login, password, name), "admin" + name.replace('.', '-'))
 }

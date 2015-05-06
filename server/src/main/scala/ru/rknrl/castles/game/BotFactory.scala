@@ -21,7 +21,7 @@ class BotFactory extends IBotFactory {
   def create(accountId: AccountId, isTutor: Boolean)
             (implicit context: ActorContext) = {
     val botClass = if (isTutor) classOf[TutorBot] else classOf[GameBot]
-    context.actorOf(Props(botClass, accountId), accountId.id)
+    context.actorOf(Props(botClass, accountId), "game-bot-" + accountId.id)
   }
 }
 

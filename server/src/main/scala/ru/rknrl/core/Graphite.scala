@@ -29,8 +29,8 @@ object Graphite {
 }
 
 class Graphite(config: GraphiteConfig) extends Actor {
-  val graphite = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.port))
-  val aggregator = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.aggregatorPort))
+  val graphite = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.port), "graphite-connection")
+  val aggregator = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.aggregatorPort), "graphite-aggregator-connection")
 
   def receive = {
     case Health(online, games) ⇒

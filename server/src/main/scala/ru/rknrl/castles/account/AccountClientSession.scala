@@ -20,5 +20,5 @@ class AccountClientSession(tcpSender: ActorRef,
                            config: Config,
                            name: String) extends Client(tcpSender, name) {
 
-  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account" + name)
+  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account-" + name.replace('.', '-'))
 }
