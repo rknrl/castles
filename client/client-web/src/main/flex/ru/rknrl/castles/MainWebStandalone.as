@@ -18,8 +18,8 @@ import ru.rknrl.dto.AuthenticationSecretDTO;
 [SWF(width="1024", height="768", frameRate="60", quality="high")]
 public class MainWebStandalone extends MainWebBase {
 //    private static const host:String = "castles.rknrl.ru";
-    private static const host:String = "dev.rknrl.ru";
-//    private static const host:String = "127.0.0.1";
+//    private static const host:String = "dev.rknrl.ru";
+    private static const host:String = "127.0.0.1";
     private static const gamePort:int = 2335;
     private static const policyPort:int = 2336;
     private static const httpPort:int = 8080;

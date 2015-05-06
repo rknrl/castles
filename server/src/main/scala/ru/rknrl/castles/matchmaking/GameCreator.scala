@@ -42,7 +42,7 @@ class GameCreator(gameMaps: GameMaps,
 
   val botIdIterator = new BotIdIterator
 
-  def newGame(matched: MatchedGameOrders) = {
+  def newGame(matched: MatchedGameOrders, time: Long) = {
     val big = matched.playersCount == 4
 
     val humanOrder = matched.orders.head
@@ -55,7 +55,7 @@ class GameCreator(gameMaps: GameMaps,
     val gameMap = if (matched.isTutor) gameMaps.tutor(big) else gameMaps.random(big)
 
     val gameState = GameStateInit.init(
-      time = 0,
+      time = time,
       players = players.toList,
       big = big,
       isTutor = matched.isTutor,

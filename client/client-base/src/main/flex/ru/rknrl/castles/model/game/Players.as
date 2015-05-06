@@ -39,12 +39,16 @@ public class Players {
         return getPlayer(_selfId);
     }
 
-    public function getEnemiesPlayers():Vector.<PlayerDTO> {
+    public function getPlayersWithout(playerId:PlayerId):Vector.<PlayerDTO> {
         const result:Vector.<PlayerDTO> = new <PlayerDTO>[];
         for each(var player:PlayerDTO in players) {
-            if (player.id.id != _selfId.id) result.push(player);
+            if (player.id.id != playerId.id) result.push(player);
         }
         return result;
+    }
+
+    public function getEnemiesPlayers():Vector.<PlayerDTO> {
+        return getPlayersWithout(selfId);
     }
 
     public function getAll():Vector.<PlayerDTO> {

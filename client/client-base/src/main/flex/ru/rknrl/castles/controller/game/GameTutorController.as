@@ -199,7 +199,7 @@ public class GameTutorController extends TutorControllerBase {
     private function _highlightNextEnemyBuildings():void {
         const player:PlayerDTO = players.getEnemiesPlayers()[enemyIndex];
         view.tutorUnblur();
-        view.tutorBlur(Players.playersToIds(players.getEnemiesPlayers()), buildings.notPlayerId(player.id));
+        view.tutorBlur(Players.playersToIds(players.getPlayersWithout(player.id)), buildings.notPlayerId(player.id));
         enemyIndex++;
         if (enemyIndex == 3) enemyIndex = 0;
     }

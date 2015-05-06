@@ -295,7 +295,7 @@ public class GameController extends EventDispatcher {
         const wasOwned:Boolean = building.owner.equalsId(selfId);
         const willOwned:Boolean = newOwner.equalsId(selfId);
 
-        const capture:Boolean = !wasOwned && (willOwned || dto.population < building.population);
+        const capture:Boolean = !wasOwned && willOwned;
         if (capture) dispatchEvent(new Event(GameTutorEvents.BUILDING_CAPTURED));
 
         building.update(newOwner, dto.population, dto.strengthened);

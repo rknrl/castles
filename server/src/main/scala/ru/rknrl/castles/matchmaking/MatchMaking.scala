@@ -117,7 +117,7 @@ class MatchMaking(gameCreator: GameCreator,
           // Если это тутор и игрок отвалился, то убиваем игру.
           // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
           accountIdToGameInfo = accountIdToGameInfo - accountId
-          context stop gameInfo.gameRef
+          stopGame(gameInfo.gameRef)
         } else
           forward(gameInfo.gameRef, o)
       }
@@ -138,7 +138,7 @@ class MatchMaking(gameCreator: GameCreator,
 
     case TryCreateGames ⇒
       val matchedOrders = matchOrders(accountIdToGameOrder.values.toSeq)
-      val newGames = matchedOrders.map(gameCreator.newGame)
+      val newGames = matchedOrders.map(o ⇒ gameCreator.newGame(o, time = System.currentTimeMillis))
 
       for (newGame ← newGames) {
         val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self)
@@ -169,9 +169,7 @@ class MatchMaking(gameCreator: GameCreator,
 
       sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, graphite)
 
-    case AllPlayersLeaveGame(gameRef) ⇒
-      context stop gameRef
-      gamesCount = gamesCount - 1
+    case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 
     case msg: SetAccountState ⇒
       sendToAccount(msg.accountId, msg)
@@ -181,6 +179,11 @@ class MatchMaking(gameCreator: GameCreator,
 
     case RegisterHealth ⇒
       send(graphite, Health(online = accountIdToAccount.size, games = gamesCount))
+  }
+
+  def stopGame(gameRef: ActorRef): Unit = {
+    context stop gameRef
+    gamesCount = gamesCount - 1
   }
 
   def sendToAccount(accountId: AccountId, msg: Any): Unit =

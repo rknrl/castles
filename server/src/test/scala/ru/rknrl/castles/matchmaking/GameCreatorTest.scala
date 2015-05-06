@@ -74,7 +74,7 @@ class GameCreatorTest extends WordSpec with Matchers {
       )
     )
 
-    val newGame = gameCreator.newGame(matched)
+    val newGame = gameCreator.newGame(matched, time = 0)
 
     newGame.isTutor shouldBe expectedNewGame.isTutor
     newGame.orders shouldBe expectedNewGame.orders
@@ -101,7 +101,7 @@ class GameCreatorTest extends WordSpec with Matchers {
       )
     )
 
-    val newGame = gameCreator.newGame(matched)
+    val newGame = gameCreator.newGame(matched, time = 0)
 
     newGame.isTutor shouldBe expectedNewGame.isTutor
     newGame.orders shouldBe expectedNewGame.orders
