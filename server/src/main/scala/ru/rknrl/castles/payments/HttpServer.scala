@@ -9,6 +9,7 @@
 package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
+import java.util.regex.Pattern
 
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
@@ -19,6 +20,7 @@ import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.Bugs.Bug
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -27,7 +29,10 @@ import spray.routing.HttpService
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) extends Actor with ActorLog with HttpService {
+class HttpServer(config: Config,
+                 database: ActorRef,
+                 matchmaking: ActorRef,
+                 bugs: ActorRef) extends Actor with ActorLog with HttpService {
 
   val crossdomain = """<?xml version="1.0"?>
                       |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
@@ -45,7 +50,7 @@ class HttpServer(config: Config, database: ActorRef, matchmaking: ActorRef) exte
     path("bug") {
       post {
         entity(as[String]) { clientLog =>
-          log.error("client", clientLog)
+          bugs ! Bug(clientLog)
           complete(StatusCodes.OK)
         }
       }

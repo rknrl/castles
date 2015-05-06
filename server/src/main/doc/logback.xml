@@ -2,16 +2,25 @@
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
         <encoder>
-            <pattern>[%logger{0}] %msg%n</pattern>
+            <pattern>[%date{dd MMM HH:mm:ss}] %-5level [%logger{0}] %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>/var/castles/server.log</file>
-        <append>false</append>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/var/castles/logs/server.%d{dd-MMM-HH-mm-ss}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
         <encoder>
-            <pattern>[%logger{0}] %msg%n</pattern>
+            <pattern>[%date{dd MMM HH:mm:ss}] %-5level [%logger{0}] %msg%n</pattern>
         </encoder>
     </appender>
 

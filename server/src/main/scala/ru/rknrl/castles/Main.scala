@@ -21,6 +21,7 @@ import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
+import ru.rknrl.logging.Bugs
 import spray.can.Http
 
 import scala.concurrent.Await
@@ -55,8 +56,9 @@ object Main {
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(Props(classOf[MatchMaking], gameCreator, new GameFactory(), 7 seconds, top, config, database, graphite), "matchmaking")
 
-    val payments = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking), "http-server")
-    IO(Http) ! Http.Bind(payments, config.host, config.httpPort)
+    val bugs = system.actorOf(Props(classOf[Bugs], config.clientBugsDir), "bugs")
+    val httpServer = system.actorOf(Props(classOf[HttpServer], config, database, matchmaking, bugs), "http-server")
+    IO(Http) ! Http.Bind(httpServer, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")

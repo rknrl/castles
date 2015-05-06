@@ -211,6 +211,7 @@ object Mocks extends Matchers {
                  adminPassword: String = "adminPass",
                  isDev: Boolean = true,
                  mapsDir: String = "maps/dir/",
+                 clientBugsDir: String = "bugs/",
                  db: DbConfiguration = dbConfigMock(),
                  graphite: GraphiteConfig = graphiteConfigMock(),
                  products: List[Product] = List.empty,
@@ -228,6 +229,7 @@ object Mocks extends Matchers {
       adminPassword = adminPassword,
       isDev = isDev,
       mapsDir = mapsDir,
+      clientBugsDir = clientBugsDir,
       db = db,
       graphite = graphite,
       products = products,
@@ -235,7 +237,6 @@ object Mocks extends Matchers {
       account = account,
       game = game
     )
-
 
   def gameStateMock(width: Int = 10,
                     height: Int = 10,
