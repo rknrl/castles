@@ -12,7 +12,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/var/castles/logs/server.%d{dd-MMM-HH-mm-ss}.%i.log</fileNamePattern>
+            <fileNamePattern>/var/castles/logs/server.%d{dd-MMM}.%i.log</fileNamePattern>
             <maxHistory>10</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
