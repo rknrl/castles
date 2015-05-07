@@ -134,7 +134,7 @@ public class View extends Sprite {
 
     public function addNoConnectionScreen():void {
         if (loadingScreen) throw new Error("loadingScreen already exists");
-        addChild(loadingScreen = new NoConnectionScreen(locale.noConnection, _layout));
+        addChild(loadingScreen = new NoConnectionScreen(locale.serverUpdating, _layout)); // todo Сейчас всегда "Сервер обновляется". В мобильной версии должно быть "Нет интернет соединения"
     }
 
     public function removeNoConnectionScreen():void {

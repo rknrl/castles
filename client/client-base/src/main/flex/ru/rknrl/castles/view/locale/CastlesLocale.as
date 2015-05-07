@@ -51,6 +51,7 @@ public class CastlesLocale extends Locale {
     private static const TUTOR_WIN:String = "tutor_win";
     private static const GAME_SPLASH:String = "game_splash";
     private static const ENTER_FIRST_GAME:String = "enter_first_game";
+    private static const SERVER_UPDATING:String = "server_updating";
 
     public function CastlesLocale(data:String) {
         super(data);
@@ -202,6 +203,10 @@ public class CastlesLocale extends Locale {
 
     public function get enterFirstGame():String {
         return translate(ENTER_FIRST_GAME);
+    }
+
+    public function get serverUpdating():String {
+        return translate(SERVER_UPDATING);
     }
 }
 }
