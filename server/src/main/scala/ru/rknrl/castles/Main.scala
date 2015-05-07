@@ -32,7 +32,7 @@ object Main {
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
-    println(s"ver: 7 may 2015 19:22")
+    println(s"ver: 7 may 2015 21:22")
     configPaths.foreach(path ⇒ println(s"configPath='$path'"))
 
     val configStrings = configPaths.map(path ⇒ Source.fromFile(path, "UTF-8").mkString)
@@ -46,7 +46,7 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite), "graphite")
+    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite, config.isDev), "graphite")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
     val database = system.actorOf(Props(classOf[Database], config.db), "database")

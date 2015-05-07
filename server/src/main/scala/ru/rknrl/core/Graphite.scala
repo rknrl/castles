@@ -28,9 +28,10 @@ object Graphite {
 
 }
 
-class Graphite(config: GraphiteConfig) extends Actor {
+class Graphite(config: GraphiteConfig, isDev: Boolean) extends Actor {
   val graphite = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.port), "graphite-connection")
   val aggregator = context.actorOf(Props(classOf[GraphiteConnection], config.host, config.aggregatorPort), "graphite-aggregator-connection")
+  val prefix = if (isDev) "dev." else "prod."
 
   def receive = {
     case Health(online, games) ⇒
@@ -42,7 +43,7 @@ class Graphite(config: GraphiteConfig) extends Actor {
       aggregator ! message(a.name + "_sum", 1)
   }
 
-  def message(name: String, value: Long) = Write(ByteString("dev." + name + " " + value + " " + currentTime + "\n"))
+  def message(name: String, value: Long) = Write(ByteString(prefix + name + " " + value + " " + currentTime + "\n"))
 
   def currentTime = (System.currentTimeMillis / 1000).toString
 }

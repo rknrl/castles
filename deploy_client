@@ -1,10 +1,11 @@
 #!/bin/sh
 
-SWF_NAME="game4.swf"
+SWF_NAME="game5.swf"
 
 # build client-web.swf via ant
+cd client/ &&
 
-ant -buildfile client/build-web.xml castles-web-swf &&
+ant -buildfile build-web.xml castles-web-swf &&
 
 # clear out folder
 
@@ -12,7 +13,7 @@ rm -rf ~/dev/rknrl/castles-deploy/castles-client/www/* &&
 
 # copy client-web.swf to out folder
 
-cp ~/dev/rknrl/castles/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/${SWF_NAME} &&
+cp ~/dev/rknrl/castles/client/target/client-web.swf ~/dev/rknrl/castles-deploy/castles-client/www/${SWF_NAME} &&
 
 # copy html files to out folder
 
