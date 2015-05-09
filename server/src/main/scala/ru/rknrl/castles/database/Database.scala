@@ -12,13 +12,11 @@ import akka.actor.Actor
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
-import com.github.mauricio.async.db.{Configuration, RowData}
+import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
 import ru.rknrl.logging.ActorLog
-
-import scala.concurrent.Future
 
 class DbConfiguration(username: String,
                       host: String,
@@ -56,7 +54,7 @@ object Database {
   /** Ответом будет AccountStateResponse или AccountNoExists */
   case class GetAccountState(accountId: AccountId)
 
-  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO)
+  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO, rating: Option[Double])
 
   case object AccountNoExists
 
@@ -66,10 +64,10 @@ object Database {
   case class TutorStateResponse(accountId: AccountId, tutorState: TutorStateDTO)
 
   /** Ответом будет AccountStateResponse */
-  case class Insert(accountId: AccountId, accountState: AccountStateDTO, userInfo: UserInfoDTO, tutorState: TutorStateDTO)
+  case class Insert(accountId: AccountId, accountState: AccountStateDTO, userInfo: UserInfoDTO, tutorState: TutorStateDTO, rating: Double)
 
   /** Ответом будет AccountStateResponse */
-  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO)
+  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO, rating: Double)
 
   /** Без ответа */
   case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO)
@@ -84,147 +82,150 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
-  def `rowData→topUser`(rowData: RowData) = {
-    val idByteArray = rowData("id").asInstanceOf[Array[Byte]]
+  override def receive = logged {
+    case GetTop ⇒
+      val ref = sender
+      read(
+        "SELECT account_state.id,coalesce(ratings.rating,0) rating,userInfo " +
+          "FROM account_state " +
+          "LEFT JOIN ratings ON ratings.id=account_state.id " +
+          "GROUP BY ratings.id " +
+          "ORDER BY coalesce(ratings.rating,0) DESC " +
+          "LIMIT 5;",
+        Seq.empty,
+        resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
+      )
+
+    case DeleteAccount(accountId) ⇒
+      val ref = sender
+      write(
+        "DELETE FROM account_state WHERE id=?;",
+        Seq(accountId.toByteArray),
+        () ⇒ write(
+          "DELETE FROM tutor_state WHERE id=?;",
+          Seq(accountId.toByteArray),
+          () ⇒ send(ref, AccountDeleted(accountId))
+        )
+      )
+
+    case Insert(accountId, accountState, userInfo, tutorState, rating) ⇒
+      val ref = sender
+      write(
+        "INSERT INTO account_state (id,state,userInfo) VALUES (?,?,?);",
+        Seq(accountId.toByteArray, accountState.toByteArray, userInfo.toByteArray),
+        () ⇒
+          write(
+            "INSERT INTO tutor_state (id,state) VALUES (?,?);",
+            Seq(accountId.toByteArray, tutorState.toByteArray),
+            () ⇒ send(ref, AccountStateResponse(accountId, accountState, Some(rating)))
+          )
+      )
+
+    case UpdateAccountState(accountId, accountState, rating) ⇒
+      val ref = sender
+      write(
+        "UPDATE account_state SET state=? WHERE id=?;",
+        Seq(accountState.toByteArray, accountId.toByteArray),
+        () ⇒
+          write(
+            "REPLACE INTO ratings (id,rating) VALUES (?,?);",
+            Seq(accountId.toByteArray, rating),
+            () ⇒ send(ref, AccountStateResponse(accountId, accountState, Some(rating)))
+          )
+      )
+
+    case UpdateUserInfo(accountId, userInfo) ⇒
+      write(
+        "UPDATE account_state SET userInfo=? WHERE id=?;",
+        Seq(userInfo.toByteArray, accountId.toByteArray),
+        () ⇒ {}
+      )
+
+    case UpdateTutorState(accountId, tutorState) ⇒
+      write(
+        "UPDATE tutor_state SET state=? WHERE id=?;",
+        Seq(tutorState.toByteArray, accountId.toByteArray),
+        () ⇒ {}
+      )
+
+    case GetAccountState(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT state FROM account_state WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 0)
+            send(ref, AccountNoExists)
+          else if (resultSet.size == 1) {
+            val accountState = rowDataToAccountState(resultSet.head)
+            read(
+              "SELECT rating FROM ratings WHERE id=?;",
+              Seq(accountId.toByteArray),
+              resultSet ⇒
+                if (resultSet.size == 0)
+                  send(ref, AccountStateResponse(accountId, accountState, rating = None))
+                else if (resultSet.size == 1)
+                  send(ref, AccountStateResponse(accountId, accountState, rating = Some(resultSet.head.asInstanceOf[Double])))
+                else
+                  log.error("Get rating: invalid result rows count = " + resultSet.size)
+            )
+          } else
+            log.error("Get account state: invalid result rows count = " + resultSet.size)
+      )
+
+    case GetTutorState(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT state FROM tutor_state WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 1)
+            send(ref, TutorStateResponse(accountId, rowDataToTutorState(resultSet.head)))
+          else
+            log.error("Get tutor state: invalid result rows count = " + resultSet.size)
+      )
+  }
+
+  def rowDataToAccountState(row: RowData) = {
+    val byteArray = row("state").asInstanceOf[Array[Byte]]
+    AccountStateDTO.parseFrom(byteArray)
+  }
+
+  def rowDataToTutorState(row: RowData) = {
+    val byteArray = row("state").asInstanceOf[Array[Byte]]
+    TutorStateDTO.parseFrom(byteArray)
+  }
+
+  def rowDataToTopUser(rowData: RowData) = {
+    val idByteArray = rowData(0).asInstanceOf[Array[Byte]]
     val id = AccountId.parseFrom(idByteArray)
 
-    val rating = rowData("rating").asInstanceOf[Double]
+    val rating = rowData(1).asInstanceOf[Double]
 
-    val userInfoByteArray = rowData("userInfo").asInstanceOf[Array[Byte]]
+    val userInfoByteArray = rowData(2).asInstanceOf[Array[Byte]]
     val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
 
     TopUser(id, rating, userInfo)
   }
 
-  override def receive = logged {
-    case GetTop ⇒
-      val ref = sender
-      pool.sendQuery("SELECT id, rating, userInfo FROM account_state ORDER BY rating DESC LIMIT 5;").map(
-        queryResult ⇒ queryResult.rows match {
-          case Some(resultSet) ⇒
-            send(ref, Top(resultSet.map(`rowData→topUser`).toList))
-          case None ⇒
-            log.error("Get top: get none " + queryResult)
-        }
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
+  def write(query: String, values: Seq[Any], onWrite: () ⇒ Unit): Unit =
+    pool.sendPreparedStatement(query, values).map(
+      queryResult ⇒
+        if (queryResult.rowsAffected == 1)
+          onWrite()
+        else
+          log.error("Invalid rows affected count " + queryResult)
+    ) onFailure {
+      case t: Throwable ⇒ log.error("Database error", t)
+    }
+
+  def read(query: String, values: Seq[Any], onRead: ResultSet ⇒ Unit): Unit =
+    pool.sendPreparedStatement(query, values).map(
+      queryResult ⇒ queryResult.rows match {
+        case Some(resultSet) ⇒ onRead(resultSet)
+        case None ⇒ log.error("Get none " + queryResult)
       }
-
-    case DeleteAccount(accountId) ⇒
-      val ref = sender
-      pool.sendPreparedStatement("DELETE FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1)
-            pool.sendPreparedStatement("DELETE FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
-              queryResult ⇒
-                if (queryResult.rowsAffected == 1)
-                  send(ref, AccountDeleted(accountId))
-                else
-                  log.error("Delete tutor state: invalid rows affected count " + queryResult)
-            )
-          else
-            log.error("Delete account: invalid rows affected count " + queryResult)
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case Insert(accountId, accountState, userInfo, tutorState) ⇒
-      val ref = sender
-
-      pool.sendPreparedStatement("INSERT INTO account_state (id,rating,state,userInfo) VALUES (?,?,?,?);", Seq(accountId.toByteArray, accountState.rating, accountState.toByteArray, userInfo.toByteArray)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1)
-            pool.sendPreparedStatement("INSERT INTO tutor_state (id,state) VALUES (?,?);", Seq(accountId.toByteArray, tutorState.toByteArray)).map(
-              queryResult ⇒
-                if (queryResult.rowsAffected == 1)
-                  send(ref, AccountStateResponse(accountId, accountState))
-                else
-                  log.error("Insert tutor state: invalid rows affected count " + queryResult)
-            )
-          else
-            log.error("Insert account state: invalid rows affected count " + queryResult)
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case UpdateAccountState(accountId, accountState) ⇒
-      val ref = sender
-      pool.sendPreparedStatement("UPDATE account_state SET rating=?,state=? WHERE id=?;", Seq(accountState.rating, accountState.toByteArray, accountId.toByteArray)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1)
-            send(ref, AccountStateResponse(accountId, accountState))
-          else
-            log.error("Update account state: invalid rows affected count " + queryResult)
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case UpdateUserInfo(accountId, userInfo) ⇒
-      pool.sendPreparedStatement("UPDATE account_state SET userInfo=? WHERE id=?;", Seq(userInfo.toByteArray, accountId.toByteArray)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1) {
-            // ok
-          } else
-            log.error("Update user info: invalid rows affected count " + queryResult)
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case UpdateTutorState(accountId, tutorState) ⇒
-      pool.sendPreparedStatement("UPDATE tutor_state SET state=? WHERE id=?;", Seq(tutorState.toByteArray, accountId.toByteArray)).map(
-        queryResult ⇒
-          if (queryResult.rowsAffected == 1) {
-            // ok
-          } else
-            log.error("Update tutor state: invalid rows affected count " + queryResult)
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case GetAccountState(accountId) ⇒
-      val ref = sender
-      pool.sendPreparedStatement("SELECT state FROM account_state WHERE id=?;", Seq(accountId.toByteArray)).map(
-        queryResult ⇒ queryResult.rows match {
-          case Some(resultSet) ⇒
-            if (resultSet.size == 0)
-              send(ref, AccountNoExists)
-            else if (resultSet.size == 1) {
-              val row: RowData = resultSet.head
-
-              val byteArray = row("state").asInstanceOf[Array[Byte]]
-              val state = AccountStateDTO.parseFrom(byteArray)
-
-              send(ref, AccountStateResponse(accountId, state))
-            } else
-              log.error("Get account state: invalid result rows count = " + resultSet.size)
-
-          case None ⇒
-            log.error("Get account state: get none " + queryResult)
-        }
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-
-    case GetTutorState(accountId) ⇒
-      val ref = sender
-      pool.sendPreparedStatement("SELECT state FROM tutor_state WHERE id=?;", Seq(accountId.toByteArray)).map(
-        queryResult ⇒ queryResult.rows match {
-          case Some(resultSet) ⇒
-            if (resultSet.size == 1) {
-              val row: RowData = resultSet.head
-
-              val byteArray = row("state").asInstanceOf[Array[Byte]]
-              val state = TutorStateDTO.parseFrom(byteArray)
-
-              send(ref, TutorStateResponse(accountId, state))
-            } else
-              log.error("Get tutor state: invalid result rows count = " + resultSet.size)
-
-          case None ⇒
-            log.error("Get tutor state: get none " + queryResult)
-        }
-      ) onFailure {
-        case t: Throwable ⇒ log.error("Database error", t)
-      }
-  }
+    ) onFailure {
+      case t: Throwable ⇒ log.error("Database error", t)
+    }
 }

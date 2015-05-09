@@ -129,7 +129,6 @@ public class DtoMock {
         dto.skills = skills();
         dto.items = items();
         dto.gold = 100;
-        dto.rating = 1400;
         dto.gamesCount = 0;
         return dto;
     }

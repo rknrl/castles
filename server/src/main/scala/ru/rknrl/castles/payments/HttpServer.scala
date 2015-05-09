@@ -115,17 +115,18 @@ class HttpServer(config: Config,
             val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
             val result = Await.result(future, 5 seconds)
             result match {
-              case AccountStateResponse(_, accountStateDto) ⇒
-                val state = AccountState(accountStateDto)
+              case AccountStateResponse(_, accountStateDto, ratingOption) ⇒
+                val rating = ratingOption.getOrElse(config.account.initRating)
+                val state = AccountState.fromDto(accountStateDto, rating)
                 val newState = state.applyProduct(product, productInfo.count)
 
-                val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto), 5 seconds)
+                val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto, newState.rating), 5 seconds)
                 val result = Await.result(future, 5 seconds)
 
                 result match {
-                  case msg@AccountStateResponse(_, newAccountStateDto) ⇒
+                  case msg@AccountStateResponse(_, newAccountStateDto, _) ⇒
                     if (newAccountStateDto.gold == newState.gold) {
-                      matchmaking ! SetAccountState(accountId, newAccountStateDto)
+                      matchmaking ! SetAccountState(accountId, newAccountStateDto, rating)
                       complete(httpResponse)
                     } else {
                       log.info("invalid gold=" + newAccountStateDto.gold + ", but expected " + newState.gold)

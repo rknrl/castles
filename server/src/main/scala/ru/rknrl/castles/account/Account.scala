@@ -73,12 +73,13 @@ class Account(matchmaking: ActorRef,
     case AccountNoExists ⇒
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
-      send(database, Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState))
+      send(database, Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState, initAccountState.rating))
       send(graphite, StatAction.FIRST_AUTHENTICATED)
 
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(accountId, stateDto, ratingOption) ⇒
       Assertion.check(accountId == client.accountId)
-      _state = Some(AccountState(stateDto))
+      val rating = ratingOption.getOrElse(config.account.initRating)
+      _state = Some(AccountState.fromDto(stateDto, rating))
       send(database, GetTutorState(client.accountId))
 
     case TutorStateResponse(accountId, tutorState) ⇒
@@ -168,11 +169,11 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def persistent: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(accountId, stateDto, rating) ⇒
       send(client.ref, AccountStateUpdated(stateDto))
 
-    case SetAccountState(_, accountStateDto) ⇒
-      _state = Some(AccountState(accountStateDto))
+    case SetAccountState(_, accountStateDto, rating) ⇒
+      _state = Some(AccountState.fromDto(accountStateDto, rating))
       send(client.ref, AccountStateUpdated(accountStateDto))
 
     case msg: UpdateStatistics ⇒ send(graphite, msg.stat.action)
@@ -185,7 +186,7 @@ class Account(matchmaking: ActorRef,
 
   def updateState(newState: AccountState): Unit = {
     _state = Some(newState)
-    send(database, UpdateAccountState(client.accountId, newState.dto))
+    send(database, UpdateAccountState(client.accountId, newState.dto, newState.rating))
   }
 
   def sendGameOrder(): Unit = {

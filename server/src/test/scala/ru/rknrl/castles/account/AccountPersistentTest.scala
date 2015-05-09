@@ -169,12 +169,12 @@ class AccountPersistentTest extends AccountTestSpec {
       config = config
     )
     val newState = accountStateMock(gold = 777)
-    matchmaking.send(account, SetAccountState(accountId, newState.dto))
+    matchmaking.send(account, SetAccountState(accountId, newState.dto, newState.rating))
     client.expectMsg(AccountStateUpdated(newState.dto))
 
     client.send(account, BuyItem(BuyItemDTO(FIREBALL)))
     val expectedState = newState.buyItem(FIREBALL, config.account)
-    database.expectMsg(Database.UpdateAccountState(accountId, expectedState.dto))
+    database.expectMsg(Database.UpdateAccountState(accountId, expectedState.dto, expectedState.rating))
   })
 
 }

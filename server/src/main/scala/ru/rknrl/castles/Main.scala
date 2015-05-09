@@ -62,7 +62,7 @@ object Main {
 
     val tcp = IO(Tcp)
     system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[AdminTcpServer], tcp, config.host, config.adminPort, config.adminLogin, config.adminPassword, database, matchmaking), "admin-server")
+    system.actorOf(Props(classOf[AdminTcpServer], tcp, config, database, matchmaking), "admin-server")
     system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, database, graphite, secretChecker), "tcp-server")
   }
 }

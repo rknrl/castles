@@ -25,22 +25,22 @@ class AccountPatcher(accountId: AccountId,
   send(database, GetAccountState(accountId))
 
   def receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
-      val state = AccountState(stateDto)
+    case AccountStateResponse(accountId, stateDto, ratingOption) ⇒
+      val state = AccountState.fromDto(stateDto, newRating)
 
       val newState = state.addGold(reward)
         .incGamesCount
         .setNewRating(newRating)
         .applyUsedItems(usedItems)
 
-      send(database, UpdateAccountState(accountId, newState.dto))
+      send(database, UpdateAccountState(accountId, newState.dto, newState.rating))
 
       become(waitForUpdatedState, "waitForUpdatedState")
   }
 
   def waitForUpdatedState: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
-      send(matchmaking, SetAccountState(accountId, stateDto))
+    case AccountStateResponse(accountId, stateDto, rating) ⇒
+      send(matchmaking, SetAccountState(accountId, stateDto, newRating))
       context stop self
   }
 }

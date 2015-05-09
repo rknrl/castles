@@ -124,7 +124,6 @@ case class AccountState(slots: Slots,
     skillsDto.toSeq,
     itemsDto.toSeq,
     gold = gold,
-    rating = rating,
     gamesCount = gamesCount
   )
 }
@@ -143,12 +142,12 @@ object AccountState {
   private def skills(dto: Seq[SkillLevelDTO]) =
     dto.map(s ⇒ s.skillType → s.level).toMap
 
-  def apply(dto: AccountStateDTO) = new AccountState(
+  def fromDto(dto: AccountStateDTO, rating: Double) = new AccountState(
     slots = slots(dto.slots),
     skills = skills(dto.skills),
     items = items(dto.items),
     gold = dto.gold,
-    rating = dto.rating,
+    rating = rating,
     gamesCount = dto.gamesCount
   )
 }

@@ -10,6 +10,7 @@ package ru.rknrl.castles.admin
 
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
+import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
@@ -28,8 +29,7 @@ import scala.concurrent.duration._
 
 class Admin(database: ActorRef,
             matchmaking: ActorRef,
-            login: String,
-            password: String,
+            config: Config,
             name: String) extends Actor with ActorLog {
 
   var client: ActorRef = null
@@ -38,7 +38,7 @@ class Admin(database: ActorRef,
 
   def auth: Receive = logged {
     case AuthenticateAsAdmin(authenticate) ⇒
-      if (authenticate.login == login && authenticate.password == password) {
+      if (authenticate.login == config.adminLogin && authenticate.password == config.adminPassword) {
         client = sender
         send(client, AuthenticatedAsAdmin)
         become(admin, "admin")
@@ -49,7 +49,7 @@ class Admin(database: ActorRef,
   }
 
   def admin: Receive = logged {
-    case AccountStateResponse(accountId, accountState) ⇒
+    case AccountStateResponse(accountId, accountState, rating) ⇒
       sendToClient(accountId, accountState)
 
     case AccountNoExists ⇒
@@ -96,8 +96,8 @@ class Admin(database: ActorRef,
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case AccountStateResponse(accountId, accountStateDto) ⇒
-        f(accountId, AccountState(accountStateDto))
+      case AccountStateResponse(accountId, accountStateDto, ratingOption) ⇒
+        f(accountId, AccountState.fromDto(accountStateDto, ratingOption.getOrElse(config.account.initRating)))
 
       case invalid ⇒
         log.error("invalid result=" + invalid)
@@ -105,12 +105,12 @@ class Admin(database: ActorRef,
   }
 
   def update(accountId: AccountId, newAccountState: AccountState): Unit = {
-    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto), 5 seconds)
+    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto, newAccountState.rating), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case AccountStateResponse(accountId, accountStateDto) ⇒
-        send(matchmaking, SetAccountState(accountId, accountStateDto))
+      case AccountStateResponse(accountId, accountStateDto, ratingOption) ⇒
+        send(matchmaking, SetAccountState(accountId, accountStateDto, ratingOption.getOrElse(config.account.initRating)))
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

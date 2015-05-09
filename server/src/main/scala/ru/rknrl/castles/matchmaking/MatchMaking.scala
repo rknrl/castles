@@ -58,7 +58,7 @@ object MatchMaking {
 
   case class AccountLeaveGame(top: Seq[TopUserInfoDTO])
 
-  case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
+  case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO, rating: Double)
 
 }
 
