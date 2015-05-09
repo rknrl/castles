@@ -30,11 +30,13 @@ class ELOTest extends WordSpec with Matchers {
     // like getNewRating2 test
     val order1 = newGameOrder(
       AccountId(VKONTAKTE, "1"),
-      accountState = accountStateMock(rating = 1400, gamesCount = 1)
+      accountState = accountStateMock(gamesCount = 1),
+      rating = 1400
     )
     val order2 = newGameOrder(
       AccountId(VKONTAKTE, "2"),
-      accountState = accountStateMock(rating = 1400, gamesCount = 1)
+      accountState = accountStateMock(gamesCount = 1),
+      rating = 1400
     )
     val newRating = ELO.newRating(List(order1, order2), order1, place = 1)
     newRating shouldBe (1415.0 +- 1)

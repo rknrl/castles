@@ -49,7 +49,7 @@ class Admin(database: ActorRef,
   }
 
   def admin: Receive = logged {
-    case AccountStateResponse(accountId, accountState, rating) ⇒
+    case AccountStateResponse(accountId, accountState) ⇒
       sendToClient(accountId, accountState)
 
     case AccountNoExists ⇒
@@ -90,8 +90,8 @@ class Admin(database: ActorRef,
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case AccountStateResponse(accountId, accountStateDto, ratingOption) ⇒
-        f(accountId, AccountState.fromDto(accountStateDto, ratingOption.getOrElse(config.account.initRating)))
+      case AccountStateResponse(accountId, accountStateDto) ⇒
+        f(accountId, AccountState(accountStateDto))
 
       case invalid ⇒
         log.error("invalid result=" + invalid)
@@ -99,12 +99,12 @@ class Admin(database: ActorRef,
   }
 
   def update(accountId: AccountId, newAccountState: AccountState): Unit = {
-    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto, newAccountState.rating), 5 seconds)
+    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto), 5 seconds)
     val result = Await.result(future, 5 seconds)
 
     result match {
-      case AccountStateResponse(accountId, accountStateDto, ratingOption) ⇒
-        send(matchmaking, SetAccountState(accountId, accountStateDto, ratingOption.getOrElse(config.account.initRating)))
+      case AccountStateResponse(accountId, accountStateDto) ⇒
+        send(matchmaking, SetAccountState(accountId, accountStateDto))
         sendToClient(accountId, accountStateDto)
 
       case invalid ⇒

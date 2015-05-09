@@ -55,6 +55,8 @@ class Account(matchmaking: ActorRef,
 
   def receive = auth
 
+  var rating: Double = 0
+
   def auth: Receive = logged {
     case Authenticate(authenticate) ⇒
       _client = Some(ClientInfo(sender, authenticate.userInfo.accountId, authenticate.deviceType, authenticate.platformType, authenticate.userInfo))
@@ -71,23 +73,32 @@ class Account(matchmaking: ActorRef,
       }
 
     case AccountNoExists ⇒
-      val initAccountState = config.account.initAccount
-      send(database, Insert(client.accountId, initAccountState.dto, initAccountState.rating))
+      _state = Some(config.account.initAccount)
+      rating = config.account.initRating
+      _tutorState = Some(TutorStateDTO())
       send(graphite, StatAction.FIRST_AUTHENTICATED)
+      enterAccount()
 
-    case AccountStateResponse(accountId, stateDto, ratingOption) ⇒
-      val rating = ratingOption.getOrElse(config.account.initRating)
-      _state = Some(AccountState.fromDto(stateDto, rating))
+    case AccountStateResponse(accountId, stateDto) ⇒
+      _state = Some(AccountState(stateDto))
+      send(database, GetRating(client.accountId))
+
+    case RatingResponse(accountId, ratingOption) ⇒
+      rating = ratingOption.getOrElse(config.account.initRating)
       send(database, GetTutorState(client.accountId))
 
     case TutorStateResponse(accountId, tutorState) ⇒
-      _tutorState = Some(tutorState.getOrElse(TutorStateDTO()))
-      send(matchmaking, Online(client.accountId))
-      send(matchmaking, InGame(client.accountId))
-      become(enterAccount, "enterAccount")
+      _tutorState = tutorState.orElse(Some(TutorStateDTO()))
+      enterAccount()
   }
 
-  def enterAccount: Receive = logged {
+  def enterAccount(): Unit = {
+    send(matchmaking, Online(client.accountId))
+    send(matchmaking, InGame(client.accountId))
+    become(enteringAccount, "enteringAccount")
+  }
+
+  def enteringAccount: Receive = logged {
     case InGameResponse(gameRef, searchOpponents, top) ⇒
 
       val isTutor = state.gamesCount == 0
@@ -166,11 +177,14 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def persistent: Receive = logged {
-    case AccountStateResponse(accountId, stateDto, rating) ⇒
+    case AccountStateResponse(accountId, stateDto) ⇒
       send(client.ref, AccountStateUpdated(stateDto))
 
-    case SetAccountState(_, accountStateDto, rating) ⇒
-      _state = Some(AccountState.fromDto(accountStateDto, rating))
+    case SetRating(_, newRating) ⇒
+      rating = newRating
+
+    case SetAccountState(_, accountStateDto) ⇒
+      _state = Some(AccountState(accountStateDto))
       send(client.ref, AccountStateUpdated(accountStateDto))
 
     case msg: UpdateStatistics ⇒ send(graphite, msg.stat.action)
@@ -183,11 +197,11 @@ class Account(matchmaking: ActorRef,
 
   def updateState(newState: AccountState): Unit = {
     _state = Some(newState)
-    send(database, UpdateAccountState(client.accountId, newState.dto, newState.rating))
+    send(database, UpdateAccountState(client.accountId, newState.dto))
   }
 
   def sendGameOrder(): Unit = {
-    send(matchmaking, GameOrder(client.accountId, client.deviceType, client.userInfo, state, isBot = false))
+    send(matchmaking, GameOrder(client.accountId, client.deviceType, client.userInfo, state, rating, isBot = false))
     become(enterGame, "enterGame")
   }
 

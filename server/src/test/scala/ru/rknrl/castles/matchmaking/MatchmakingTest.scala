@@ -11,7 +11,6 @@ package ru.rknrl.castles.matchmaking
 import akka.actor._
 import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
@@ -346,7 +345,28 @@ class MatchmakingTest extends ActorsTest {
     client1.send(matchmaking, Online(accountId1))
     client2.send(matchmaking, Online(accountId2))
 
-    val msg = SetAccountState(accountId1, accountStateMock().dto, accountStateMock().rating)
+    val msg = SetAccountState(accountId1, accountStateMock().dto)
+    matchmaking ! msg
+
+    client1.expectMsg(msg)
+    client1.expectNoMsg()
+
+    client2.expectNoMsg()
+  })
+
+  multi("SetRating forward to Account", {
+    val matchmaking = newMatchmaking(database = self, graphite = self)
+
+    val accountId1 = AccountId(VKONTAKTE, "1")
+    val accountId2 = AccountId(VKONTAKTE, "2")
+
+    val client1 = new TestProbe(system)
+    val client2 = new TestProbe(system)
+
+    client1.send(matchmaking, Online(accountId1))
+    client2.send(matchmaking, Online(accountId2))
+
+    val msg = SetRating(accountId1, 313373)
     matchmaking ! msg
 
     client1.expectMsg(msg)

@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.testkit.TestProbe
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountStateResponse, TutorStateResponse}
+import ru.rknrl.castles.database.Database.{AccountStateResponse, RatingResponse, TutorStateResponse}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
@@ -73,13 +73,7 @@ class AccountAuthTest extends AccountTestSpec {
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
 
-      database.expectMsg(Database.Insert(accountId, initAccountState.dto, initAccountState.rating))
-      database.send(account, AccountStateResponse(accountId, initAccountState.dto, Some(initAccountState.rating)))
-
       graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
-      database.expectMsg(Database.GetTutorState(accountId))
-      database.send(account, TutorStateResponse(accountId, None))
-
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
       matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
@@ -123,11 +117,14 @@ class AccountAuthTest extends AccountTestSpec {
 
       val accountState = accountStateMock()
       val tutorState = TutorStateDTO()
+      val rating = config.account.initRating
 
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, AccountStateResponse(accountId, accountState.dto, Some(accountState.rating)))
+      database.send(account, AccountStateResponse(accountId, accountState.dto))
+      database.expectMsg(Database.GetRating(accountId))
+      database.send(account, RatingResponse(accountId, Some(rating)))
 
       database.expectMsg(Database.GetTutorState(accountId))
       database.send(account, TutorStateResponse(accountId, Some(tutorState)))

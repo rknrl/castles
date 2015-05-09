@@ -24,7 +24,6 @@ import ru.rknrl.dto.SlotId._
 class AccountStateTest extends WordSpec with Matchers {
 
   val GOLD = "gold"
-  val RATING = "rating"
   val GAMES_COUNT = "gamesCount"
 
   def checkEquals(a: AccountState, b: AccountState, without: Set[Any]) = {
@@ -38,7 +37,6 @@ class AccountStateTest extends WordSpec with Matchers {
       a.items(itemType) shouldBe b.items(itemType)
 
     if (!(without contains GOLD)) a.gold shouldBe b.gold
-    if (!(without contains RATING)) a.rating shouldBe b.rating
     if (!(without contains GAMES_COUNT)) a.gamesCount shouldBe b.gamesCount
   }
 
@@ -302,17 +300,6 @@ class AccountStateTest extends WordSpec with Matchers {
       val state = oldState.incGamesCount
       state.gamesCount shouldBe 1
       checkEquals(oldState, state, Set(GAMES_COUNT))
-
-    }
-  }
-
-  "setNewRating" should {
-    "Устанавливаем новый рейтинг и не меняем ничего другого" in {
-
-      val oldState = accountStateMock(rating = 1400)
-      val state = oldState.setNewRating(1489)
-      state.rating shouldBe 1489
-      checkEquals(oldState, state, Set(RATING))
 
     }
   }

@@ -116,14 +116,12 @@ object Mocks extends Matchers {
                        skills: Skills = skillsMock,
                        items: Items = itemsMock,
                        gold: Int = 10,
-                       rating: Double = 1400,
                        gamesCount: Int = 1) =
     new AccountState(
       slots = slots,
       skills = skills,
       items = items,
       gold = gold,
-      rating = rating,
       gamesCount = gamesCount
     )
 
@@ -540,12 +538,14 @@ object Mocks extends Matchers {
   def newGameOrder(accountId: AccountId,
                    deviceType: DeviceType = DeviceType.PC,
                    accountState: AccountState = accountStateMock(),
+                   rating: Double = 1400,
                    isBot: Boolean = false) =
     GameOrder(
       accountId = accountId,
       deviceType = deviceType,
       userInfo = UserInfoDTO(accountId),
       accountState = accountState,
+      rating = rating,
       isBot = isBot
     )
 

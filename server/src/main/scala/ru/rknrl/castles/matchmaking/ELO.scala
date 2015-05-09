@@ -32,8 +32,8 @@ object ELO {
   }
 
   def newRating(orders: Iterable[GameOrder], order: GameOrder, place: Int) = {
-    val averageEnemyRating = orders.filter(_ != order).map(_.accountState.rating).sum / (orders.size - 1)
+    val averageEnemyRating = orders.filter(_ != order).map(_.rating).sum / (orders.size - 1)
     val sA = ELO.getSA(orders.size, place)
-    getNewRating(order.accountState.rating, averageEnemyRating, order.accountState.gamesCount, sA)
+    getNewRating(order.rating, averageEnemyRating, order.accountState.gamesCount, sA)
   }
 }

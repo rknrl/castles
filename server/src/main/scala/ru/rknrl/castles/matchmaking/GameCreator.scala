@@ -74,6 +74,7 @@ class GameCreator(gameMaps: GameMaps,
         deviceType = humanOrder.deviceType,
         userInfo = config.botUserInfo(accountId, i),
         botAccountState(humanOrder),
+        rating = humanOrder.rating,
         isBot = true
       )
     }
@@ -84,7 +85,6 @@ class GameCreator(gameMaps: GameMaps,
       skills = humanOrder.accountState.skills,
       items = botItems(humanOrder.accountState.items),
       gold = humanOrder.accountState.gold,
-      rating = humanOrder.accountState.rating,
       gamesCount = humanOrder.accountState.gamesCount
     )
 

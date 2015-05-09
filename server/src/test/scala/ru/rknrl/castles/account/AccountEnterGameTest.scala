@@ -13,8 +13,8 @@ import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
 import ru.rknrl.castles.rmi.B2C.EnteredGame
-import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.castles.rmi.C2B.{CastFireball, EnterGame, UpdateStatistics}
+import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.dto._
 
 class AccountEnterGameTest extends AccountTestSpec {
@@ -54,6 +54,7 @@ class AccountEnterGameTest extends AccountTestSpec {
         authenticateMock().deviceType,
         authenticateMock().userInfo,
         accountState,
+        rating = config.account.initRating,
         isBot = false
       )
     )

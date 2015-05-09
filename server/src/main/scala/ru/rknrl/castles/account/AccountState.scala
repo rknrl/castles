@@ -18,7 +18,6 @@ case class AccountState(slots: Slots,
                         skills: Skills,
                         items: Items,
                         gold: Int,
-                        rating: Double,
                         gamesCount: Int) {
 
   def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
@@ -85,8 +84,6 @@ case class AccountState(slots: Slots,
 
   def incGamesCount = copy(newGamesCount = gamesCount + 1)
 
-  def setNewRating(newRating: Double) = copy(newRating = newRating)
-
   def applyUsedItems(usedItems: Map[ItemType, Int]) = {
     var state = this
     for ((itemType, count) ← usedItems)
@@ -98,9 +95,8 @@ case class AccountState(slots: Slots,
                    newSkills: Skills = skills,
                    newItems: Items = items,
                    newGold: Int = gold,
-                   newRating: Double = rating,
                    newGamesCount: Int = gamesCount) =
-    new AccountState(newSlots, newSkills, newItems, newGold, newRating, newGamesCount)
+    new AccountState(newSlots, newSkills, newItems, newGold, newGamesCount)
 
   def applyProduct(product: Product, count: Int) =
     product.id match {
@@ -142,12 +138,11 @@ object AccountState {
   private def skills(dto: Seq[SkillLevelDTO]) =
     dto.map(s ⇒ s.skillType → s.level).toMap
 
-  def fromDto(dto: AccountStateDTO, rating: Double) = new AccountState(
+  def apply(dto: AccountStateDTO) = new AccountState(
     slots = slots(dto.slots),
     skills = skills(dto.skills),
     items = items(dto.items),
     gold = dto.gold,
-    rating = rating,
     gamesCount = dto.gamesCount
   )
 }

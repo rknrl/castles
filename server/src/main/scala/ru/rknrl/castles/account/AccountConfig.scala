@@ -83,7 +83,6 @@ class AccountConfig(val buildingPrices: BuildingPrices,
     skills = initSkills,
     items = initItems,
     gold = initGold,
-    rating = initRating,
     gamesCount = 0
   )
 }

@@ -13,8 +13,8 @@ import ru.rknrl.castles.game.init.GameStateInit
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.GameCreator.NewGame
-import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
+import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
 import ru.rknrl.dto.AccountType.{DEV, VKONTAKTE}
 import ru.rknrl.dto.DeviceType.{PC, PHONE, TABLET}
 import ru.rknrl.dto.{AccountId, PlayerId}
@@ -24,33 +24,33 @@ class GameCreatorTest extends WordSpec with Matchers {
   val o0 = newGameOrder(
     AccountId(VKONTAKTE, "0"),
     accountState = accountStateMock(
-      gamesCount = 8,
-      rating = 1400
+      gamesCount = 8
     ),
+    rating = 1400,
     deviceType = TABLET
   )
   val o1 = newGameOrder(
     AccountId(VKONTAKTE, "1"),
     accountState = accountStateMock(
-      gamesCount = 0, // <- isTutor
-      rating = 1400
+      gamesCount = 0 // <- isTutor
     ),
+    rating = 1400,
     deviceType = TABLET
   )
   val o2 = newGameOrder(
     AccountId(VKONTAKTE, "2"),
     accountState = accountStateMock(
-      gamesCount = 1,
-      rating = 1450
+      gamesCount = 1
     ),
+    rating = 1450,
     deviceType = PC
   )
   val o3 = newGameOrder(
     AccountId(VKONTAKTE, "3"),
     accountState = accountStateMock(
-      gamesCount = 2,
-      rating = 1800
+      gamesCount = 2
     ),
+    rating = 1800,
     deviceType = PHONE
   )
 
@@ -115,6 +115,7 @@ class GameCreatorTest extends WordSpec with Matchers {
       accountId = AccountId(VKONTAKTE, "0"),
       deviceType = PC,
       accountState = accountState,
+      rating = 1400,
       isBot = false
     )
 
@@ -126,6 +127,7 @@ class GameCreatorTest extends WordSpec with Matchers {
         PC,
         configMock().botUserInfo(AccountId(DEV, "bot0"), 0),
         gameCreator.botAccountState(order),
+        rating = 1400,
         isBot = true
       ),
       GameOrder(
@@ -133,6 +135,7 @@ class GameCreatorTest extends WordSpec with Matchers {
         PC,
         configMock().botUserInfo(AccountId(DEV, "bot1"), 1),
         gameCreator.botAccountState(order),
+        rating = 1400,
         isBot = true
       ),
       GameOrder(
@@ -140,6 +143,7 @@ class GameCreatorTest extends WordSpec with Matchers {
         PC,
         configMock().botUserInfo(AccountId(DEV, "bot2"), 2),
         gameCreator.botAccountState(order),
+        rating = 1400,
         isBot = true
       )
     )

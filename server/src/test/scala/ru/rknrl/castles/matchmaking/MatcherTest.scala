@@ -20,33 +20,33 @@ class MatcherTest extends WordSpec with Matchers {
   val o0 = newGameOrder(
     AccountId(VKONTAKTE, "0"),
     accountState = accountStateMock(
-      gamesCount = 8,
-      rating = 1400
+      gamesCount = 8
     ),
+    rating = 1400,
     deviceType = TABLET
   )
   val o1 = newGameOrder(
     AccountId(VKONTAKTE, "1"),
     accountState = accountStateMock(
-      gamesCount = 0, // <- isTutor
-      rating = 1400
+      gamesCount = 0 // <- isTutor
     ),
+    rating = 1400,
     deviceType = TABLET
   )
   val o2 = newGameOrder(
     AccountId(VKONTAKTE, "2"),
     accountState = accountStateMock(
-      gamesCount = 1,
-      rating = 1450
+      gamesCount = 1
     ),
+    rating = 1450,
     deviceType = PC
   )
   val o3 = newGameOrder(
     AccountId(VKONTAKTE, "3"),
     accountState = accountStateMock(
-      gamesCount = 2,
-      rating = 1800
+      gamesCount = 2
     ),
+    rating = 1800,
     deviceType = PHONE
   )
 

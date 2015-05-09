@@ -29,7 +29,7 @@ object Matcher {
 
     var matched = tutorOrders.map(order ⇒ MatchedGameOrders(playersCount, List(order), isTutor = true))
 
-    var sorted = notTutorOrders.sortBy(_.accountState.rating)(Ordering.Double.reverse)
+    var sorted = notTutorOrders.sortBy(_.rating)(Ordering.Double.reverse)
 
     while (sorted.size > playersCount) {
       matched = matched :+ MatchedGameOrders(playersCount, sorted.take(playersCount), isTutor = false)

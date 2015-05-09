@@ -49,9 +49,14 @@ object Database {
   /** Ответом будет AccountStateResponse или AccountNoExists */
   case class GetAccountState(accountId: AccountId)
 
-  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO, rating: Option[Double])
+  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO)
 
   case object AccountNoExists
+
+  /** Ответом будет RatingResponse */
+  case class GetRating(accountId: AccountId)
+
+  case class RatingResponse(accountId: AccountId, rating: Option[Double])
 
   /** Ответом будет TutorStateResponse */
   case class GetTutorState(accountId: AccountId)
@@ -59,10 +64,10 @@ object Database {
   case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO])
 
   /** Ответом будет AccountStateResponse */
-  case class Insert(accountId: AccountId, accountState: AccountStateDTO, rating: Double)
+  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO)
 
-  /** Ответом будет AccountStateResponse */
-  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO, rating: Double)
+  /** Ответом будет RatingResponse */
+  case class UpdateRating(accountId: AccountId, rating: Double)
 
   /** Без ответа */
   case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO)
@@ -81,9 +86,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
     case GetTop ⇒
       val ref = sender
       read(
-        "SELECT account_state.id,coalesce(ratings.rating,0) rating,userInfo " +
-          "FROM account_state " +
-          "LEFT JOIN ratings ON ratings.id=account_state.id " +
+        "SELECT user_info.id,coalesce(ratings.rating,0) rating,userInfo " +
+          "FROM user_info " +
+          "LEFT JOIN ratings ON ratings.id=user_info.id " +
           "GROUP BY ratings.id " +
           "ORDER BY coalesce(ratings.rating,0) DESC " +
           "LIMIT 5;",
@@ -91,25 +96,20 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
       )
 
-    case Insert(accountId, accountState, rating) ⇒
+    case UpdateAccountState(accountId, accountState) ⇒
       val ref = sender
       write(
-        "INSERT INTO account_state (id,state) VALUES (?,?);",
+        "REPLACE INTO account_state (id,state) VALUES (?,?);",
         Seq(accountId.toByteArray, accountState.toByteArray),
-        () ⇒ send(ref, AccountStateResponse(accountId, accountState, Some(rating)))
+        () ⇒ send(ref, AccountStateResponse(accountId, accountState))
       )
 
-    case UpdateAccountState(accountId, accountState, rating) ⇒
+    case UpdateRating(accountId, rating) ⇒
       val ref = sender
       write(
-        "UPDATE account_state SET state=? WHERE id=?;",
-        Seq(accountState.toByteArray, accountId.toByteArray),
-        () ⇒
-          write(
-            "REPLACE INTO ratings (id,rating) VALUES (?,?);",
-            Seq(accountId.toByteArray, rating),
-            () ⇒ send(ref, AccountStateResponse(accountId, accountState, Some(rating)))
-          )
+        "REPLACE INTO ratings (id,rating) VALUES (?,?);",
+        Seq(accountId.toByteArray, rating),
+        () ⇒ send(ref, RatingResponse(accountId, Some(rating)))
       )
 
     case UpdateUserInfo(accountId, userInfo) ⇒
@@ -126,6 +126,20 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         () ⇒ {}
       )
 
+    case GetRating(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT rating FROM ratings WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 0)
+            send(ref, RatingResponse(accountId, None))
+          else if (resultSet.size == 1)
+            send(ref, RatingResponse(accountId, Some(rowDataToRating(resultSet.head))))
+          else
+            log.error("Get rating: invalid result rows count = " + resultSet.size)
+      )
+
     case GetAccountState(accountId) ⇒
       val ref = sender
       read(
@@ -134,20 +148,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         resultSet ⇒
           if (resultSet.size == 0)
             send(ref, AccountNoExists)
-          else if (resultSet.size == 1) {
-            val accountState = rowDataToAccountState(resultSet.head)
-            read(
-              "SELECT rating FROM ratings WHERE id=?;",
-              Seq(accountId.toByteArray),
-              resultSet ⇒
-                if (resultSet.size == 0)
-                  send(ref, AccountStateResponse(accountId, accountState, rating = None))
-                else if (resultSet.size == 1)
-                  send(ref, AccountStateResponse(accountId, accountState, rating = Some(rowDataToRating(resultSet.head))))
-                else
-                  log.error("Get rating: invalid result rows count = " + resultSet.size)
-            )
-          } else
+          else if (resultSet.size == 1)
+            send(ref, AccountStateResponse(accountId, rowDataToAccountState(resultSet.head)))
+          else
             log.error("Get account state: invalid result rows count = " + resultSet.size)
       )
 
