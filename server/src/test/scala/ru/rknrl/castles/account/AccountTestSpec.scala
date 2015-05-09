@@ -12,6 +12,7 @@ import akka.actor.{ActorRef, Props}
 import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, GetTutorState, TutorStateResponse}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
@@ -60,11 +61,12 @@ class AccountTestSpec extends ActorsTest {
     val tutorState = TutorStateDTO()
 
     database.expectMsg(GetAccountState(accountId))
+    database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
     database.send(account, AccountStateResponse(accountId, accountState.dto, Some(accountState.rating)))
 
     database.expectMsg(GetTutorState(accountId))
-    database.send(account, TutorStateResponse(accountId, tutorState))
+    database.send(account, TutorStateResponse(accountId, Some(tutorState)))
 
     matchmaking.expectMsg(Online(accountId))
     matchmaking.expectMsg(InGame(accountId))

@@ -355,26 +355,6 @@ class MatchmakingTest extends ActorsTest {
     client2.expectNoMsg()
   })
 
-  multi("DeleteAccount forward to Account", {
-    val matchmaking = newMatchmaking(database = self, graphite = self)
-
-    val accountId1 = AccountId(VKONTAKTE, "1")
-    val accountId2 = AccountId(VKONTAKTE, "2")
-
-    val client1 = new TestProbe(system)
-    val client2 = new TestProbe(system)
-
-    client1.send(matchmaking, Online(accountId1))
-    client2.send(matchmaking, Online(accountId2))
-
-    matchmaking ! Database.DeleteAccount(accountId1)
-
-    client1.expectMsg(DuplicateAccount)
-    client1.expectNoMsg()
-
-    client2.expectNoMsg()
-  })
-
   // todo supervision
   // todo playerLeaveGame
 }

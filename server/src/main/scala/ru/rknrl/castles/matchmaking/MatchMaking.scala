@@ -174,9 +174,6 @@ class MatchMaking(gameCreator: GameCreator,
     case msg: SetAccountState ⇒
       sendToAccount(msg.accountId, msg)
 
-    case Database.DeleteAccount(accountId) ⇒
-      sendToAccount(accountId, DuplicateAccount)
-
     case RegisterHealth ⇒
       send(graphite, Health(online = accountIdToAccount.size, games = gamesCount))
   }

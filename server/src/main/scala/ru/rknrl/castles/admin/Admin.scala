@@ -57,12 +57,6 @@ class Admin(database: ActorRef,
     case C2B.GetAccountState(dto) ⇒
       send(database, Database.GetAccountState(dto.accountId))
 
-    case C2B.DeleteAccount(accountId) ⇒
-      send(database, Database.DeleteAccount(accountId))
-
-    case msg: Database.AccountDeleted ⇒
-      forward(matchmaking, msg)
-
     case AddGold(dto) ⇒
       getState(dto.accountId,
         (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.amount))

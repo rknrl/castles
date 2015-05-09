@@ -32,7 +32,7 @@ class AccountAuthTest extends AccountTestSpec {
       val account = newAccount(secretChecker = secretChecker.ref, database = database.ref, graphite = graphite.ref)
 
       val authenticate = authenticateMock()
-      client.send(account,Authenticate(authenticate))
+      client.send(account, Authenticate(authenticate))
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = false))
@@ -66,18 +66,19 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.send(account, SecretChecked(valid = true))
 
       database.expectMsg(Database.GetAccountState(accountId))
+      database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, Database.AccountNoExists)
 
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
 
-      database.expectMsg(Database.Insert(accountId, initAccountState.dto, authenticate.userInfo, initTutorState, initAccountState.rating))
+      database.expectMsg(Database.Insert(accountId, initAccountState.dto, initAccountState.rating))
       database.send(account, AccountStateResponse(accountId, initAccountState.dto, Some(initAccountState.rating)))
 
       graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
       database.expectMsg(Database.GetTutorState(accountId))
-      database.send(account, TutorStateResponse(accountId, initTutorState))
+      database.send(account, TutorStateResponse(accountId, None))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
@@ -124,11 +125,12 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorStateDTO()
 
       database.expectMsg(Database.GetAccountState(accountId))
+      database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, AccountStateResponse(accountId, accountState.dto, Some(accountState.rating)))
 
       database.expectMsg(Database.GetTutorState(accountId))
-      database.send(account, TutorStateResponse(accountId, tutorState))
+      database.send(account, TutorStateResponse(accountId, Some(tutorState)))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))

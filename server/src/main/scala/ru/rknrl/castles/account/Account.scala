@@ -9,7 +9,6 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef}
-import ru.rknrl.Assertion
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
@@ -64,6 +63,7 @@ class Account(matchmaking: ActorRef,
     case SecretChecked(valid) ⇒
       if (valid) {
         send(database, GetAccountState(client.accountId))
+        send(database, UpdateUserInfo(client.accountId, client.userInfo))
         send(graphite, StatAction.AUTHENTICATED)
       } else {
         send(graphite, StatAction.NOT_AUTHENTICATED)
@@ -72,19 +72,16 @@ class Account(matchmaking: ActorRef,
 
     case AccountNoExists ⇒
       val initAccountState = config.account.initAccount
-      val initTutorState = TutorStateDTO()
-      send(database, Insert(client.accountId, initAccountState.dto, client.userInfo, initTutorState, initAccountState.rating))
+      send(database, Insert(client.accountId, initAccountState.dto, initAccountState.rating))
       send(graphite, StatAction.FIRST_AUTHENTICATED)
 
     case AccountStateResponse(accountId, stateDto, ratingOption) ⇒
-      Assertion.check(accountId == client.accountId)
       val rating = ratingOption.getOrElse(config.account.initRating)
       _state = Some(AccountState.fromDto(stateDto, rating))
       send(database, GetTutorState(client.accountId))
 
     case TutorStateResponse(accountId, tutorState) ⇒
-      Assertion.check(accountId == client.accountId)
-      _tutorState = Some(tutorState)
+      _tutorState = Some(tutorState.getOrElse(TutorStateDTO()))
       send(matchmaking, Online(client.accountId))
       send(matchmaking, InGame(client.accountId))
       become(enterAccount, "enterAccount")
