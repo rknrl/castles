@@ -17,6 +17,7 @@ import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.dto.AccountConfigDTO;
 import ru.rknrl.dto.AccountStateDTO;
 import ru.rknrl.dto.AuthenticatedDTO;
+import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.dto.ProductDTO;
 import ru.rknrl.dto.TopDTO;
 
@@ -37,6 +38,12 @@ public class MenuModel {
 
     public function get top():Top {
         return _top;
+    }
+
+    private var _place:Number;
+
+    public function get place():Number {
+        return _place;
     }
 
     private var _itemsCount:ItemsCount;
@@ -80,6 +87,7 @@ public class MenuModel {
         mergeConfigDto(authenticated.config);
         mergeProductsDto(authenticated.products);
         mergeTopDto(authenticated.top);
+        mergePlaceDto(authenticated.place);
     }
 
     public function mergeAccountStateDto(dto:AccountStateDTO):void {
@@ -91,6 +99,10 @@ public class MenuModel {
 
     public function mergeTopDto(dto:TopDTO):void {
         _top = new Top(dto.users);
+    }
+
+    public function mergePlaceDto(dto:PlaceDTO):void {
+        _place = dto.place.toNumber();
     }
 
     public function mergeConfigDto(dto:AccountConfigDTO):void {

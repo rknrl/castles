@@ -55,7 +55,8 @@ class Account(matchmaking: ActorRef,
 
   def receive = auth
 
-  var rating: Double = 0
+  var rating = 0.0
+  var place = 0L
 
   def auth: Receive = logged {
     case Authenticate(authenticate) ⇒
@@ -81,12 +82,20 @@ class Account(matchmaking: ActorRef,
         rating = config.account.initRating
         _tutorState = Some(TutorStateDTO())
         send(graphite, StatAction.FIRST_AUTHENTICATED)
-        enterAccount()
+        send(database, GetAccountPlace(client.accountId))
       }
 
     case RatingResponse(accountId, ratingOption) ⇒
       rating = ratingOption.getOrElse(config.account.initRating)
-      send(database, GetTutorState(client.accountId))
+      send(database, GetAccountPlace(client.accountId))
+
+    case AccountPlaceResponse(accountId, place) ⇒
+      if (_tutorState.isDefined)
+        enterAccount()
+      else {
+        this.place = place
+        send(database, GetTutorState(client.accountId))
+      }
 
     case TutorStateResponse(accountId, tutorState) ⇒
       _tutorState = tutorState.orElse(Some(TutorStateDTO()))
@@ -108,6 +117,7 @@ class Account(matchmaking: ActorRef,
         state.dto,
         config.account.dto,
         TopDTO(top),
+        PlaceDTO(place),
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
         searchOpponents || isTutor,
@@ -179,11 +189,12 @@ class Account(matchmaking: ActorRef,
 
   def persistent: Receive = logged {
     case AccountStateResponse(accountId, stateDto) ⇒
-      if(stateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
+      if (stateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
       send(client.ref, AccountStateUpdated(stateDto.get))
 
-    case SetRating(_, newRating, place) ⇒
+    case SetRating(_, newRating, newPlace) ⇒
       rating = newRating
+      place = newPlace
       send(client.ref, PlaceUpdated(PlaceDTO(place)))
 
     case SetAccountState(_, accountStateDto) ⇒

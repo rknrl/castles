@@ -65,7 +65,9 @@ public class ScreenNavigatorCanvas extends ScreenNavigator {
 
         holder.x = tweener.value;
 
-        screens[currentScreenIndex].transition = 1 - Math.abs(holder.x) / layout.screenCenterX;
+        const transition:Number = 1 - Math.abs(holder.x) / layout.screenCenterX;
+        screens[currentScreenIndex].transition = transition;
+        if (screens[currentScreenIndex].showBalance) balanceTextField.alpha = transition;
     }
 
 }

@@ -21,6 +21,10 @@ public class Screen extends Sprite {
         throw OverrideMe();
     }
 
+    public function get showBalance():Boolean {
+        return true;
+    }
+
     public function set transition(value:Number):void {
         if (titleContent) titleContent.alpha = value;
     }

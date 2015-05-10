@@ -69,6 +69,8 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, Database.AccountStateResponse(accountId, None))
+      database.expectMsg(Database.GetAccountPlace(accountId))
+      database.send(account, Database.AccountPlaceResponse(accountId, 999))
 
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
@@ -82,6 +84,7 @@ class AccountAuthTest extends AccountTestSpec {
         initAccountState.dto,
         config.account.dto,
         TopDTO(List.empty),
+        PlaceDTO(999),
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
         searchOpponents = true,
@@ -125,6 +128,8 @@ class AccountAuthTest extends AccountTestSpec {
       database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
       database.expectMsg(Database.GetRating(accountId))
       database.send(account, RatingResponse(accountId, Some(rating)))
+      database.expectMsg(Database.GetAccountPlace(accountId))
+      database.send(account, Database.AccountPlaceResponse(accountId, 666))
 
       database.expectMsg(Database.GetTutorState(accountId))
       database.send(account, TutorStateResponse(accountId, Some(tutorState)))
@@ -137,6 +142,7 @@ class AccountAuthTest extends AccountTestSpec {
         accountState.dto,
         config.account.dto,
         TopDTO(List.empty),
+        PlaceDTO(666),
         config.productsDto(CANVAS, VKONTAKTE),
         tutorState,
         searchOpponents = false,

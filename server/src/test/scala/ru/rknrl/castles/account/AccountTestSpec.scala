@@ -67,6 +67,8 @@ class AccountTestSpec extends ActorsTest {
     database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
     database.expectMsg(GetRating(accountId))
     database.send(account, RatingResponse(accountId, Some(rating)))
+    database.expectMsg(GetAccountPlace(accountId))
+    database.send(account, AccountPlaceResponse(accountId, 777))
 
     database.expectMsg(GetTutorState(accountId))
     database.send(account, TutorStateResponse(accountId, Some(tutorState)))
@@ -79,6 +81,7 @@ class AccountTestSpec extends ActorsTest {
       accountState.dto,
       config.account.dto,
       TopDTO(List.empty),
+      PlaceDTO(777),
       config.productsDto(CANVAS, VKONTAKTE),
       tutorState,
       searchOpponents = false,

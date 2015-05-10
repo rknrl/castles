@@ -28,15 +28,17 @@ message AuthenticatedDTO {
 
     required TopDTO top = 3;
 
-    repeated ProductDTO products = 4;
+    required PlaceDTO place = 4;
 
-    required TutorStateDTO tutor = 5;
+    repeated ProductDTO products = 5;
+
+    required TutorStateDTO tutor = 6;
 
     // Клиент находится в процессе поиска противников для игры
-    required bool searchOpponents = 6;
+    required bool searchOpponents = 7;
 
     // Клиент находится в игре
-    optional NodeLocator game = 7;
+    optional NodeLocator game = 8;
 }
 
 message TopDTO {

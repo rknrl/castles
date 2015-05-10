@@ -10,7 +10,6 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
 
-import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
@@ -109,7 +108,8 @@ public class MenuController {
     }
 
     private function onPlaceUpdated(e:PlaceUpdatedEvent):void {
-        // todo:
+        model.mergePlaceDto(e.place);
+        view.place = model.place;
     }
 
     private function onSlotClick(event:SlotClickEvent):void {

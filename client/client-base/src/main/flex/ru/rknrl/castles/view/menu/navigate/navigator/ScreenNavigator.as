@@ -11,13 +11,13 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.events.ScreenChangedEvent;
-import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.utils.OverrideMe;
 
 public class ScreenNavigator extends Sprite {

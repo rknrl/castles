@@ -33,6 +33,7 @@ import ru.rknrl.castles.view.popups.PopupEvent;
 import ru.rknrl.castles.view.popups.PopupManager;
 import ru.rknrl.dto.BuildingType;
 import ru.rknrl.dto.ItemType;
+import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.dto.SkillType;
 import ru.rknrl.dto.SlotId;
 import ru.rknrl.loaders.ILoadImageManager;
@@ -64,7 +65,7 @@ public class MenuView extends Sprite {
         this.locale = locale;
 
         mainScreen = new MainScreen(model.slots, layout, locale);
-        topScreen = new TopScreen(model.top, layout, locale, loadImageManager);
+        topScreen = new TopScreen(model.top, model.place, layout, locale, loadImageManager);
         shopScreen = new ShopScreen(model.itemsCount, model.itemPrice, layout, locale);
         skillScreen = new SkillsScreen(model.skillLevels, model.upgradePrices, layout, locale);
         bankScreen = new BankScreen(model.products, layout, locale);
@@ -139,6 +140,10 @@ public class MenuView extends Sprite {
 
     public function set top(value:Top):void {
         topScreen.top = value;
+    }
+
+    public function set place(value: Number):void {
+        topScreen.place = value;
     }
 
     public function set products(value:Products):void {
