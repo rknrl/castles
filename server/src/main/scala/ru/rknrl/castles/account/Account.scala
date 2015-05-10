@@ -90,12 +90,11 @@ class Account(matchmaking: ActorRef,
       send(database, GetAccountPlace(client.accountId))
 
     case AccountPlaceResponse(accountId, place) ⇒
+      this.place = place
       if (_tutorState.isDefined)
         enterAccount()
-      else {
-        this.place = place
+      else
         send(database, GetTutorState(client.accountId))
-      }
 
     case TutorStateResponse(accountId, tutorState) ⇒
       _tutorState = tutorState.orElse(Some(TutorStateDTO()))
