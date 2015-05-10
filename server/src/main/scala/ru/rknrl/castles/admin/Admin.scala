@@ -13,7 +13,7 @@ import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountNoExists, AccountStateResponse, GetAccountState, UpdateAccountState}
+import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, UpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.AuthenticatedAsAdmin
 import ru.rknrl.castles.rmi.C2B._
@@ -50,9 +50,8 @@ class Admin(database: ActorRef,
 
   def admin: Receive = logged {
     case AccountStateResponse(accountId, accountState) ⇒
-      sendToClient(accountId, accountState)
-
-    case AccountNoExists ⇒
+      if (accountState.isDefined)
+        sendToClient(accountId, accountState.get)
 
     case C2B.GetAccountState(dto) ⇒
       send(database, Database.GetAccountState(dto.accountId))
@@ -91,7 +90,8 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        f(accountId, AccountState(accountStateDto))
+        if (accountStateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
+        f(accountId, AccountState(accountStateDto.get))
 
       case invalid ⇒
         log.error("invalid result=" + invalid)
@@ -104,8 +104,9 @@ class Admin(database: ActorRef,
 
     result match {
       case AccountStateResponse(accountId, accountStateDto) ⇒
-        send(matchmaking, SetAccountState(accountId, accountStateDto))
-        sendToClient(accountId, accountStateDto)
+        if (accountStateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
+        send(matchmaking, SetAccountState(accountId, accountStateDto.get))
+        sendToClient(accountId, accountStateDto.get)
 
       case invalid ⇒
         log.error("invalid result=" + invalid)

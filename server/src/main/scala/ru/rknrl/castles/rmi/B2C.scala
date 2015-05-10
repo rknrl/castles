@@ -32,6 +32,8 @@ object B2C {
 
   case class TopUpdated(top: TopDTO) extends Msg(23)
 
+  case class PlaceUpdated(place: PlaceDTO) extends Msg(24)
+
   // enter game 30 - 39
 
   case class JoinedGame(gameState: GameStateDTO) extends Msg(30)

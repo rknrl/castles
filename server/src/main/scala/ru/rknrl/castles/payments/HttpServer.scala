@@ -9,7 +9,6 @@
 package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
-import java.util.regex.Pattern
 
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
@@ -116,29 +115,34 @@ class HttpServer(config: Config,
             val result = Await.result(future, 5 seconds)
             result match {
               case AccountStateResponse(_, accountStateDto) ⇒
-                val state = AccountState(accountStateDto)
-                val newState = state.applyProduct(product, productInfo.count)
+                if (accountStateDto.isDefined) {
+                  val state = AccountState(accountStateDto.get)
+                  val newState = state.applyProduct(product, productInfo.count)
 
-                val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto), 5 seconds)
-                val result = Await.result(future, 5 seconds)
+                  val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto), 5 seconds)
+                  val result = Await.result(future, 5 seconds)
 
-                result match {
-                  case msg@AccountStateResponse(_, newAccountStateDto) ⇒
-                    if (newAccountStateDto.gold == newState.gold) {
-                      matchmaking ! SetAccountState(accountId, newAccountStateDto)
-                      complete(httpResponse)
-                    } else {
-                      log.info("invalid gold=" + newAccountStateDto.gold + ", but expected " + newState.gold)
+                  result match {
+                    case msg@AccountStateResponse(_, newAccountStateDto) ⇒
+                      if (newAccountStateDto.isEmpty) {
+                        log.error("AccountState is empty")
+                        complete(callback.databaseError)
+                      }
+                      else if (newAccountStateDto.get.gold == newState.gold) {
+                        matchmaking ! SetAccountState(accountId, newAccountStateDto.get)
+                        complete(httpResponse)
+                      } else {
+                        log.info("invalid gold=" + newAccountStateDto.get.gold + ", but expected " + newState.gold)
+                        complete(callback.databaseError)
+                      }
+                    case invalid ⇒
+                      log.info("invalid update result=" + invalid)
                       complete(callback.databaseError)
-                    }
-                  case invalid ⇒
-                    log.info("invalid update result=" + invalid)
-                    complete(callback.databaseError)
+                  }
+                } else {
+                  log.error("account not found")
+                  complete(callback.accountNotFoundError)
                 }
-
-              case AccountNoExists ⇒
-                log.error("account not found")
-                complete(callback.accountNotFoundError)
 
               case invalid ⇒
                 log.error("invalid get result=" + invalid)

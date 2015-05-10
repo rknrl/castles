@@ -33,8 +33,6 @@ object C2B {
 
   case class SetSlot(dto: AdminSetSlotDTO) extends Msg(75)
 
-  case class DeleteAccount(accountId: AccountId) extends Msg(76)
-
   // account 80 - 89
 
   case class BuyBuilding(buy: BuyBuildingDTO) extends Msg(80)

@@ -64,7 +64,7 @@ class AccountTestSpec extends ActorsTest {
     database.expectMsg(GetAccountState(accountId))
     database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
-    database.send(account, AccountStateResponse(accountId, accountState.dto))
+    database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
     database.expectMsg(GetRating(accountId))
     database.send(account, RatingResponse(accountId, Some(rating)))
 

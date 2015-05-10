@@ -46,12 +46,10 @@ object Database {
   /** Ответом будет List[TopItem] */
   case object GetTop
 
-  /** Ответом будет AccountStateResponse или AccountNoExists */
+  /** Ответом будет AccountStateResponse */
   case class GetAccountState(accountId: AccountId)
 
-  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO)
-
-  case object AccountNoExists
+  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO])
 
   /** Ответом будет RatingResponse */
   case class GetRating(accountId: AccountId)
@@ -75,6 +73,11 @@ object Database {
   /** Без ответа */
   case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
 
+  /** Ответом будет AccountPlaceResponse */
+  case class GetAccountPlace(accountId: AccountId)
+
+  case class AccountPlaceResponse(accountId: AccountId, place: Long)
+
 }
 
 class Database(configuration: DbConfiguration) extends Actor with ActorLog {
@@ -96,12 +99,27 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
       )
 
+    case GetAccountPlace(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT COUNT(*)+1 `rank` " +
+          "FROM ratings " +
+          "WHERE rating > (SELECT rating" +
+          "                FROM ratings" +
+          "                WHERE id = ?)",
+        Seq(accountId.toByteArray),
+        resultSet ⇒ {
+          val place = resultSet.head("rank").asInstanceOf[Long]
+          send(ref, AccountPlaceResponse(accountId, place))
+        }
+      )
+
     case UpdateAccountState(accountId, accountState) ⇒
       val ref = sender
       write(
         "REPLACE INTO account_state (id,state) VALUES (?,?);",
         Seq(accountId.toByteArray, accountState.toByteArray),
-        () ⇒ send(ref, AccountStateResponse(accountId, accountState))
+        () ⇒ send(ref, AccountStateResponse(accountId, Some(accountState)))
       )
 
     case UpdateRating(accountId, rating) ⇒
@@ -147,9 +165,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         Seq(accountId.toByteArray),
         resultSet ⇒
           if (resultSet.size == 0)
-            send(ref, AccountNoExists)
+            send(ref, AccountStateResponse(accountId, None))
           else if (resultSet.size == 1)
-            send(ref, AccountStateResponse(accountId, rowDataToAccountState(resultSet.head)))
+            send(ref, AccountStateResponse(accountId, Some(rowDataToAccountState(resultSet.head))))
           else
             log.error("Get account state: invalid result rows count = " + resultSet.size)
       )
@@ -197,7 +215,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
   def write(query: String, values: Seq[Any], onWrite: () ⇒ Unit): Unit =
     pool.sendPreparedStatement(query, values).map(
       queryResult ⇒
-        if (queryResult.rowsAffected == 1)
+        if (queryResult.rowsAffected > 0)
           onWrite()
         else
           log.error("Invalid rows affected count " + queryResult)

@@ -10,6 +10,7 @@ package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
 
+import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
@@ -36,6 +37,7 @@ import ru.rknrl.dto.TutorStateDTO;
 import ru.rknrl.dto.UpgradeBuildingDTO;
 import ru.rknrl.dto.UpgradeSkillDTO;
 import ru.rknrl.rmi.AccountStateUpdatedEvent;
+import ru.rknrl.rmi.PlaceUpdatedEvent;
 import ru.rknrl.rmi.Server;
 import ru.rknrl.rmi.TopUpdatedEvent;
 
@@ -73,6 +75,7 @@ public class MenuController {
 
         server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
         server.addEventListener(TopUpdatedEvent.TOPUPDATED, onTopUpdated);
+        server.addEventListener(PlaceUpdatedEvent.PLACEUPDATED, onPlaceUpdated);
 
         social.addEventListener(PaymentDialogEvent.PAYMENT_DIALOG_CLOSED, onPaymentDialogClosed);
         social.addEventListener(PaymentDialogEvent.PAYMENT_SUCCESS, onPaymentSuccess);
@@ -103,6 +106,10 @@ public class MenuController {
     private function onTopUpdated(e:TopUpdatedEvent):void {
         model.mergeTopDto(e.top);
         view.top = model.top;
+    }
+
+    private function onPlaceUpdated(e:PlaceUpdatedEvent):void {
+        // todo:
     }
 
     private function onSlotClick(event:SlotClickEvent):void {

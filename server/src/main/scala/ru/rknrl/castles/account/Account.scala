@@ -16,7 +16,7 @@ import ru.rknrl.castles.database.Database.{GetAccountState, _}
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking._
-import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame}
+import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame, PlaceUpdated}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
@@ -72,16 +72,17 @@ class Account(matchmaking: ActorRef,
         send(client.ref, CloseConnection)
       }
 
-    case AccountNoExists ⇒
-      _state = Some(config.account.initAccount)
-      rating = config.account.initRating
-      _tutorState = Some(TutorStateDTO())
-      send(graphite, StatAction.FIRST_AUTHENTICATED)
-      enterAccount()
-
     case AccountStateResponse(accountId, stateDto) ⇒
-      _state = Some(AccountState(stateDto))
-      send(database, GetRating(client.accountId))
+      if (stateDto.isDefined) {
+        _state = Some(AccountState(stateDto.get))
+        send(database, GetRating(client.accountId))
+      } else {
+        _state = Some(config.account.initAccount)
+        rating = config.account.initRating
+        _tutorState = Some(TutorStateDTO())
+        send(graphite, StatAction.FIRST_AUTHENTICATED)
+        enterAccount()
+      }
 
     case RatingResponse(accountId, ratingOption) ⇒
       rating = ratingOption.getOrElse(config.account.initRating)
@@ -178,10 +179,12 @@ class Account(matchmaking: ActorRef,
 
   def persistent: Receive = logged {
     case AccountStateResponse(accountId, stateDto) ⇒
-      send(client.ref, AccountStateUpdated(stateDto))
+      if(stateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
+      send(client.ref, AccountStateUpdated(stateDto.get))
 
-    case SetRating(_, newRating) ⇒
+    case SetRating(_, newRating, place) ⇒
       rating = newRating
+      send(client.ref, PlaceUpdated(PlaceDTO(place)))
 
     case SetAccountState(_, accountStateDto) ⇒
       _state = Some(AccountState(accountStateDto))

@@ -68,7 +68,7 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountNoExists)
+      database.send(account, Database.AccountStateResponse(accountId, None))
 
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
@@ -122,7 +122,7 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, AccountStateResponse(accountId, accountState.dto))
+      database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
       database.expectMsg(Database.GetRating(accountId))
       database.send(account, RatingResponse(accountId, Some(rating)))
 

@@ -366,7 +366,7 @@ class MatchmakingTest extends ActorsTest {
     client1.send(matchmaking, Online(accountId1))
     client2.send(matchmaking, Online(accountId2))
 
-    val msg = SetRating(accountId1, 313373)
+    val msg = SetRating(accountId1, rating = 313373, place = 2)
     matchmaking ! msg
 
     client1.expectMsg(msg)

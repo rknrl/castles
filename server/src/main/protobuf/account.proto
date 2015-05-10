@@ -11,8 +11,12 @@ message AccountStateDTO {
     repeated SkillLevelDTO skills = 2;
     repeated ItemDTO items = 3;
     required int32 gold = 4;
-//    required double rating = 5;
+    //    required double rating = 5;
     required int32 gamesCount = 6;
+}
+
+message PlaceDTO {
+    required int64 place = 1;
 }
 
 message SlotDTO {
