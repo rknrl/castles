@@ -73,7 +73,7 @@ class Account(matchmaking: ActorRef,
         send(client.ref, CloseConnection)
       }
 
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(stateDto) ⇒
       if (stateDto.isDefined) {
         _state = Some(AccountState(stateDto.get))
         send(database, GetRating(client.accountId))
@@ -85,15 +85,15 @@ class Account(matchmaking: ActorRef,
         send(database, GetPlace(rating))
       }
 
-    case RatingResponse(accountId, ratingOption) ⇒
+    case RatingResponse(ratingOption) ⇒
       rating = ratingOption.getOrElse(config.account.initRating)
       send(database, GetTutorState(client.accountId))
 
-    case TutorStateResponse(accountId, tutorState) ⇒
+    case TutorStateResponse(tutorState) ⇒
       _tutorState = tutorState.orElse(Some(TutorStateDTO()))
       send(database, GetPlace(rating))
 
-    case PlaceResponse(accountId, place) ⇒
+    case PlaceResponse(place) ⇒
       this.place = place
       enterAccount()
   }
@@ -184,7 +184,7 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def persistent: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(stateDto) ⇒
       if (stateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
       send(client.ref, AccountStateUpdated(stateDto.get))
 

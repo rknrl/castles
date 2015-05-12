@@ -64,15 +64,15 @@ class AccountTestSpec extends ActorsTest {
     database.expectMsg(GetAccountState(accountId))
     database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
-    database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
+    database.send(account, AccountStateResponse(Some(accountState.dto)))
     database.expectMsg(GetRating(accountId))
-    database.send(account, RatingResponse(accountId, Some(rating)))
+    database.send(account, RatingResponse(Some(rating)))
 
     database.expectMsg(GetTutorState(accountId))
-    database.send(account, TutorStateResponse(accountId, Some(tutorState)))
+    database.send(account, TutorStateResponse(Some(tutorState)))
 
     database.expectMsg(GetPlace(rating))
-    database.send(account, PlaceResponse(rating, 777))
+    database.send(account, PlaceResponse(777))
 
     matchmaking.expectMsg(Online(accountId))
     matchmaking.expectMsg(InGame(accountId))

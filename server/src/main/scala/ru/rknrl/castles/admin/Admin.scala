@@ -9,38 +9,32 @@
 package ru.rknrl.castles.admin
 
 import akka.actor.{Actor, ActorRef}
-import akka.pattern.Patterns
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAccountState, UpdateAccountState}
+import ru.rknrl.castles.database.Database.AccountStateResponse
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
-import ru.rknrl.castles.rmi.B2C.AuthenticatedAsAdmin
+import ru.rknrl.castles.rmi.B2C.{AdminAccountState, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.castles.rmi._
 import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.{AccountId, AccountStateDTO, AdminAccountStateDTO}
+import ru.rknrl.dto.{AccountId, AdminAccountStateDTO}
 import ru.rknrl.logging.ActorLog
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
-// todo: ask logging
 
 class Admin(database: ActorRef,
             matchmaking: ActorRef,
             config: Config,
             name: String) extends Actor with ActorLog {
 
-  var client: ActorRef = null
+  var client: Option[ActorRef] = None
+
+  var accountId: Option[AccountId] = None
 
   override def receive = auth
 
   def auth: Receive = logged {
     case AuthenticateAsAdmin(authenticate) ⇒
       if (authenticate.login == config.adminLogin && authenticate.password == config.adminPassword) {
-        client = sender
-        send(client, AuthenticatedAsAdmin)
+        client = Some(sender)
+        send(client.get, AuthenticatedAsAdmin)
         become(admin, "admin")
       } else {
         log.debug("reject")
@@ -49,67 +43,27 @@ class Admin(database: ActorRef,
   }
 
   def admin: Receive = logged {
-    case AccountStateResponse(accountId, accountState) ⇒
-      if (accountState.isDefined)
-        sendToClient(accountId, accountState.get)
-
-    case C2B.GetAccountState(dto) ⇒
+    case AdminGetAccountState(dto) ⇒
+      accountId = Some(dto.accountId)
       send(database, Database.GetAccountState(dto.accountId))
+      become(waitForState, "waitForState")
 
-    case AddGold(dto) ⇒
-      getState(dto.accountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.addGold(dto.amount))
-      )
-
-    case AddItem(dto) ⇒
-      getState(dto.accountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.addItem(dto.itemType, dto.amount))
-      )
-
-    case SetSkill(dto) ⇒
-      getState(dto.accountId,
-        (accountId, accountState) ⇒ update(accountId, accountState.setSkill(dto.skilType, dto.skillLevel))
-      )
-
-    case SetSlot(dto) ⇒
-      getState(dto.accountId,
-        (accountId, accountState) ⇒
-          if (dto.slot.buildingPrototype.isDefined)
-            update(accountId, accountState.setBuilding(dto.slot.id, dto.slot.buildingPrototype.get))
-          else
-            update(accountId, accountState.removeBuilding(dto.slot.id))
-      )
+    case AdminSetAccountState(accountState) ⇒
+      send(database, Database.UpdateAccountState(accountId.get, accountState))
+      become(waitForUpdatedState, "waitForUpdatedState")
   }
 
-  def sendToClient(accountId: AccountId, accountState: AccountStateDTO) =
-    send(client, B2C.AccountState(AdminAccountStateDTO(accountId, accountState)))
-
-  def getState(accountId: AccountId, f: (AccountId, AccountState) ⇒ Unit) = {
-    val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
-    val result = Await.result(future, 5 seconds)
-
-    result match {
-      case AccountStateResponse(accountId, accountStateDto) ⇒
-        if (accountStateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
-        f(accountId, AccountState(accountStateDto.get))
-
-      case invalid ⇒
-        log.error("invalid result=" + invalid)
-    }
+  def waitForState = logged {
+    case AccountStateResponse(accountState) ⇒
+      if (accountState.isDefined)
+        send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
+      become(admin, "admin")
   }
 
-  def update(accountId: AccountId, newAccountState: AccountState): Unit = {
-    val future = Patterns.ask(database, UpdateAccountState(accountId, newAccountState.dto), 5 seconds)
-    val result = Await.result(future, 5 seconds)
-
-    result match {
-      case AccountStateResponse(accountId, accountStateDto) ⇒
-        if (accountStateDto.isEmpty) throw new IllegalStateException("AccountState is empty")
-        send(matchmaking, SetAccountState(accountId, accountStateDto.get))
-        sendToClient(accountId, accountStateDto.get)
-
-      case invalid ⇒
-        log.error("invalid result=" + invalid)
-    }
+  def waitForUpdatedState = logged {
+    case AccountStateResponse(accountState) ⇒
+      send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
+      send(matchmaking, SetAccountState(accountId.get, accountState.get))
+      become(admin, "admin")
   }
 }

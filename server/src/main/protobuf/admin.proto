@@ -21,26 +21,3 @@ message AdminAccountStateDTO {
     required AccountId accountId = 1;
     required AccountStateDTO accountState = 2;
 }
-
-message AdminAddGoldDTO {
-    required AccountId accountId = 1;
-    required int32 amount = 2;
-}
-
-message AdminAddItemDTO {
-    required AccountId accountId = 1;
-    required ItemType itemType = 2;
-    required int32 amount = 3;
-}
-
-message AdminSetSkillDTO {
-    required AccountId accountId = 1;
-    required SkillType skilType = 2;
-    required SkillLevel skillLevel = 3;
-}
-
-message AdminSetSlotDTO {
-    required AccountId accountId = 1;
-    required SlotDTO slot = 2;
-}
-

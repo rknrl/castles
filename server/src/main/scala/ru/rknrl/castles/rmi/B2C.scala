@@ -22,17 +22,17 @@ object B2C {
 
   case object AuthenticatedAsAdmin extends Msg(10)
 
+  case class AdminAccountState(adminAccountState: AdminAccountStateDTO) extends Msg(11)
+
   // account 20 - 29
 
   case class AccountStateUpdated(accountState: AccountStateDTO) extends Msg(20)
 
   case class EnteredGame(node: NodeLocator) extends Msg(21)
 
-  case class AccountState(adminAccountState: AdminAccountStateDTO) extends Msg(22)
+  case class TopUpdated(top: TopDTO) extends Msg(22)
 
-  case class TopUpdated(top: TopDTO) extends Msg(23)
-
-  case class PlaceUpdated(place: PlaceDTO) extends Msg(24)
+  case class PlaceUpdated(place: PlaceDTO) extends Msg(23)
 
   // enter game 30 - 39
 

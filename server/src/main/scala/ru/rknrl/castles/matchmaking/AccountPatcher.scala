@@ -31,22 +31,22 @@ class AccountPatcher(accountId: AccountId,
   def receive = waitForUpdatedRating
 
   def waitForUpdatedRating: Receive = logged {
-    case RatingResponse(accountId, rating) ⇒
-      if(rating.isEmpty) throw new IllegalStateException("updated rating is empty")
+    case RatingResponse(rating) ⇒
+      if (rating.isEmpty) throw new IllegalStateException("updated rating is empty")
 
       send(database, GetPlace(rating.get))
       become(waitForPlace, "waitForPlace")
   }
 
   def waitForPlace: Receive = logged {
-    case PlaceResponse(rating, place) ⇒
+    case PlaceResponse(place) ⇒
       this.place = place
       send(database, GetAccountState(accountId))
       become(waitForState, "waitForState")
   }
 
   def waitForState: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(stateDto) ⇒
       val state = if (stateDto.isDefined) AccountState(stateDto.get) else config.account.initAccount
 
       val newState = state.addGold(reward)
@@ -58,7 +58,7 @@ class AccountPatcher(accountId: AccountId,
   }
 
   def waitForUpdatedState: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
+    case AccountStateResponse(stateDto) ⇒
       if (stateDto.isEmpty) throw new IllegalStateException("AccountState is empty after update")
       send(matchmaking, SetRating(accountId, newRating, place))
       send(matchmaking, SetAccountState(accountId, stateDto.get))

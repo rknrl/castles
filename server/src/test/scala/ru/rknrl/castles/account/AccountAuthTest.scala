@@ -68,9 +68,9 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountStateResponse(accountId, None))
+      database.send(account, Database.AccountStateResponse(None))
       database.expectMsg(Database.GetPlace(config.account.initRating))
-      database.send(account, Database.PlaceResponse(config.account.initRating, 999))
+      database.send(account, Database.PlaceResponse(999))
 
       val initAccountState = config.account.initAccount
       val initTutorState = TutorStateDTO()
@@ -125,15 +125,15 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(Database.GetAccountState(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
+      database.send(account, AccountStateResponse(Some(accountState.dto)))
       database.expectMsg(Database.GetRating(accountId))
-      database.send(account, RatingResponse(accountId, Some(rating)))
+      database.send(account, RatingResponse(Some(rating)))
 
       database.expectMsg(Database.GetTutorState(accountId))
-      database.send(account, TutorStateResponse(accountId, Some(tutorState)))
+      database.send(account, TutorStateResponse(Some(tutorState)))
 
       database.expectMsg(Database.GetPlace(rating))
-      database.send(account, Database.PlaceResponse(rating, 666))
+      database.send(account, Database.PlaceResponse(666))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))

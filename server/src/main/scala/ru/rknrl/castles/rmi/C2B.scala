@@ -23,15 +23,9 @@ object C2B {
 
   // admin 70 - 79
 
-  case class GetAccountState(dto: AdminGetAccountStateDTO) extends Msg(70)
+  case class AdminGetAccountState(dto: AdminGetAccountStateDTO) extends Msg(70)
 
-  case class AddGold(dto: AdminAddGoldDTO) extends Msg(72)
-
-  case class AddItem(dto: AdminAddItemDTO) extends Msg(73)
-
-  case class SetSkill(dto: AdminSetSkillDTO) extends Msg(74)
-
-  case class SetSlot(dto: AdminSetSlotDTO) extends Msg(75)
+  case class AdminSetAccountState(dto: AccountStateDTO) extends Msg(71)
 
   // account 80 - 89
 

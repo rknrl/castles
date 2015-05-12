@@ -114,7 +114,7 @@ class HttpServer(config: Config,
             val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
             val result = Await.result(future, 5 seconds)
             result match {
-              case AccountStateResponse(_, accountStateDto) ⇒
+              case AccountStateResponse(accountStateDto) ⇒
                 if (accountStateDto.isDefined) {
                   val state = AccountState(accountStateDto.get)
                   val newState = state.applyProduct(product, productInfo.count)
@@ -123,7 +123,7 @@ class HttpServer(config: Config,
                   val result = Await.result(future, 5 seconds)
 
                   result match {
-                    case msg@AccountStateResponse(_, newAccountStateDto) ⇒
+                    case msg@AccountStateResponse(newAccountStateDto) ⇒
                       if (newAccountStateDto.isEmpty) {
                         log.error("AccountState is empty")
                         complete(callback.databaseError)
