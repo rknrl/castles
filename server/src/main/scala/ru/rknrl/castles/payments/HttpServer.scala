@@ -129,7 +129,7 @@ class HttpServer(config: Config,
                         complete(callback.databaseError)
                       }
                       else if (newAccountStateDto.get.gold == newState.gold) {
-                        matchmaking ! SetAccountState(accountId, newAccountStateDto.get)
+                        send(matchmaking, SetAccountState(accountId, newAccountStateDto.get))
                         complete(httpResponse)
                       } else {
                         log.info("invalid gold=" + newAccountStateDto.get.gold + ", but expected " + newState.gold)

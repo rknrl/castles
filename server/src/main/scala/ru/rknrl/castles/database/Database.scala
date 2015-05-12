@@ -73,10 +73,10 @@ object Database {
   /** Без ответа */
   case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
 
-  /** Ответом будет AccountPlaceResponse */
-  case class GetAccountPlace(accountId: AccountId)
+  /** Ответом будет PlaceResponse */
+  case class GetPlace(rating: Double)
 
-  case class AccountPlaceResponse(accountId: AccountId, place: Long)
+  case class PlaceResponse(rating: Double, place: Long)
 
 }
 
@@ -99,18 +99,16 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
       )
 
-    case GetAccountPlace(accountId) ⇒
+    case GetPlace(rating) ⇒
       val ref = sender
       read(
-        "SELECT COUNT(*)+1 `rank` " +
+        "SELECT COUNT(*) `place` " +
           "FROM ratings " +
-          "WHERE rating > (SELECT rating" +
-          "                FROM ratings" +
-          "                WHERE id = ?)",
-        Seq(accountId.toByteArray),
+          "WHERE rating > ?",
+        Seq(rating),
         resultSet ⇒ {
-          val place = resultSet.head("rank").asInstanceOf[Long]
-          send(ref, AccountPlaceResponse(accountId, place))
+          val place = resultSet.head("place").asInstanceOf[Long] + 1
+          send(ref, PlaceResponse(rating, place))
         }
       )
 

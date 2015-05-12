@@ -32,12 +32,14 @@ class AccountPatcher(accountId: AccountId,
 
   def waitForUpdatedRating: Receive = logged {
     case RatingResponse(accountId, rating) ⇒
-      send(database, GetAccountPlace(accountId))
+      if(rating.isEmpty) throw new IllegalStateException("updated rating is empty")
+
+      send(database, GetPlace(rating.get))
       become(waitForPlace, "waitForPlace")
   }
 
   def waitForPlace: Receive = logged {
-    case AccountPlaceResponse(accountId, place) ⇒
+    case PlaceResponse(rating, place) ⇒
       this.place = place
       send(database, GetAccountState(accountId))
       become(waitForState, "waitForState")

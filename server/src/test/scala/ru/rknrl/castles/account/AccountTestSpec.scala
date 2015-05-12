@@ -67,11 +67,12 @@ class AccountTestSpec extends ActorsTest {
     database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
     database.expectMsg(GetRating(accountId))
     database.send(account, RatingResponse(accountId, Some(rating)))
-    database.expectMsg(GetAccountPlace(accountId))
-    database.send(account, AccountPlaceResponse(accountId, 777))
 
     database.expectMsg(GetTutorState(accountId))
     database.send(account, TutorStateResponse(accountId, Some(tutorState)))
+
+    database.expectMsg(GetPlace(rating))
+    database.send(account, PlaceResponse(rating, 777))
 
     matchmaking.expectMsg(Online(accountId))
     matchmaking.expectMsg(InGame(accountId))

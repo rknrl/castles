@@ -53,10 +53,10 @@ class Account(matchmaking: ActorRef,
 
   def game = _game.get
 
-  def receive = auth
-
   var rating = 0.0
   var place = 0L
+
+  def receive = auth
 
   def auth: Receive = logged {
     case Authenticate(authenticate) ⇒
@@ -82,22 +82,19 @@ class Account(matchmaking: ActorRef,
         rating = config.account.initRating
         _tutorState = Some(TutorStateDTO())
         send(graphite, StatAction.FIRST_AUTHENTICATED)
-        send(database, GetAccountPlace(client.accountId))
+        send(database, GetPlace(rating))
       }
 
     case RatingResponse(accountId, ratingOption) ⇒
       rating = ratingOption.getOrElse(config.account.initRating)
-      send(database, GetAccountPlace(client.accountId))
-
-    case AccountPlaceResponse(accountId, place) ⇒
-      this.place = place
-      if (_tutorState.isDefined)
-        enterAccount()
-      else
-        send(database, GetTutorState(client.accountId))
+      send(database, GetTutorState(client.accountId))
 
     case TutorStateResponse(accountId, tutorState) ⇒
       _tutorState = tutorState.orElse(Some(TutorStateDTO()))
+      send(database, GetPlace(rating))
+
+    case PlaceResponse(accountId, place) ⇒
+      this.place = place
       enterAccount()
   }
 
