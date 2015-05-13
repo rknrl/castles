@@ -54,14 +54,14 @@ class Admin(database: ActorRef,
   }
 
   def waitForState = logged {
-    case AccountStateResponse(accountState) ⇒
+    case AccountStateResponse(_, accountState) ⇒
       if (accountState.isDefined)
         send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
       become(admin, "admin")
   }
 
   def waitForUpdatedState = logged {
-    case AccountStateResponse(accountState) ⇒
+    case AccountStateResponse(_, accountState) ⇒
       send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
       send(matchmaking, SetAccountState(accountId.get, accountState.get))
       become(admin, "admin")

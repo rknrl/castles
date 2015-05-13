@@ -98,7 +98,7 @@ class AccountTest extends AccountTestSpec {
 
     database.expectMsg(UpdateAccountState(accountId, expectedAccountState.dto))
     graphite.expectMsg(statMessage)
-    database.send(account, AccountStateResponse(Some(expectedAccountState.dto)))
+    database.send(account, AccountStateResponse(accountId, Some(expectedAccountState.dto)))
 
     client.expectMsg(AccountStateUpdated(expectedAccountState.dto))
   }

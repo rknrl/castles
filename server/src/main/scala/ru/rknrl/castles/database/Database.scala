@@ -49,17 +49,17 @@ object Database {
   /** Ответом будет AccountStateResponse */
   case class GetAccountState(accountId: AccountId)
 
-  case class AccountStateResponse(state: Option[AccountStateDTO])
+  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO])
 
   /** Ответом будет RatingResponse */
   case class GetRating(accountId: AccountId)
 
-  case class RatingResponse(rating: Option[Double])
+  case class RatingResponse(accountId: AccountId, rating: Option[Double])
 
   /** Ответом будет TutorStateResponse */
   case class GetTutorState(accountId: AccountId)
 
-  case class TutorStateResponse(tutorState: Option[TutorStateDTO])
+  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO])
 
   /** Ответом будет PlaceResponse */
   case class GetPlace(rating: Double)
@@ -117,7 +117,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
       write(
         "REPLACE INTO account_state (id,state) VALUES (?,?);",
         Seq(accountId.toByteArray, accountState.toByteArray),
-        () ⇒ send(ref, AccountStateResponse(Some(accountState)))
+        () ⇒ send(ref, AccountStateResponse(accountId, Some(accountState)))
       )
 
     case UpdateRating(accountId, rating) ⇒
@@ -125,7 +125,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
       write(
         "REPLACE INTO ratings (id,rating) VALUES (?,?);",
         Seq(accountId.toByteArray, rating),
-        () ⇒ send(ref, RatingResponse(Some(rating)))
+        () ⇒ send(ref, RatingResponse(accountId, Some(rating)))
       )
 
     case UpdateUserInfo(accountId, userInfo) ⇒
@@ -149,9 +149,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         Seq(accountId.toByteArray),
         resultSet ⇒
           if (resultSet.size == 0)
-            send(ref, RatingResponse(None))
+            send(ref, RatingResponse(accountId, None))
           else if (resultSet.size == 1)
-            send(ref, RatingResponse(Some(rowDataToRating(resultSet.head))))
+            send(ref, RatingResponse(accountId, Some(rowDataToRating(resultSet.head))))
           else
             log.error("Get rating: invalid result rows count = " + resultSet.size)
       )
@@ -163,9 +163,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         Seq(accountId.toByteArray),
         resultSet ⇒
           if (resultSet.size == 0)
-            send(ref, AccountStateResponse(None))
+            send(ref, AccountStateResponse(accountId, None))
           else if (resultSet.size == 1)
-            send(ref, AccountStateResponse(Some(rowDataToAccountState(resultSet.head))))
+            send(ref, AccountStateResponse(accountId, Some(rowDataToAccountState(resultSet.head))))
           else
             log.error("Get account state: invalid result rows count = " + resultSet.size)
       )
@@ -177,9 +177,9 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         Seq(accountId.toByteArray),
         resultSet ⇒
           if (resultSet.size == 0)
-            send(ref, TutorStateResponse(None))
+            send(ref, TutorStateResponse(accountId, None))
           else if (resultSet.size == 1)
-            send(ref, TutorStateResponse(Some(rowDataToTutorState(resultSet.head))))
+            send(ref, TutorStateResponse(accountId, Some(rowDataToTutorState(resultSet.head))))
           else
             log.error("Get tutor state: invalid result rows count = " + resultSet.size)
       )
