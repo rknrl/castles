@@ -43,40 +43,46 @@ class DbConfiguration(username: String,
 
 object Database {
 
+  trait AccountMsg {
+    val accountId: AccountId
+  }
+
   /** Ответом будет List[TopItem] */
   case object GetTop
 
   /** Ответом будет AccountStateResponse */
-  case class GetAccountState(accountId: AccountId)
+  case class GetAccountState(accountId: AccountId) extends AccountMsg
 
-  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO])
+  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO]) extends AccountMsg
 
   /** Ответом будет RatingResponse */
-  case class GetRating(accountId: AccountId)
+  case class GetRating(accountId: AccountId) extends AccountMsg
 
-  case class RatingResponse(accountId: AccountId, rating: Option[Double])
+  case class RatingResponse(accountId: AccountId, rating: Option[Double]) extends AccountMsg
 
   /** Ответом будет TutorStateResponse */
-  case class GetTutorState(accountId: AccountId)
+  case class GetTutorState(accountId: AccountId) extends AccountMsg
 
-  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO])
+  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO]) extends AccountMsg
 
   /** Ответом будет PlaceResponse */
   case class GetPlace(rating: Double)
 
   case class PlaceResponse(place: Long)
 
-  /** Ответом будет AccountStateResponse */
-  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO)
+  /** Ответом будет AccountStateUpdated */
+  case class UpdateAccountState(accountId: AccountId, accountState: AccountStateDTO) extends AccountMsg
+
+  case class AccountStateUpdated(accountId: AccountId, state: Option[AccountStateDTO]) extends AccountMsg
 
   /** Ответом будет RatingResponse */
-  case class UpdateRating(accountId: AccountId, rating: Double)
+  case class UpdateRating(accountId: AccountId, rating: Double) extends AccountMsg
 
   /** Без ответа */
-  case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO)
+  case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO) extends AccountMsg
 
   /** Без ответа */
-  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
+  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO) extends AccountMsg
 
 }
 
@@ -117,7 +123,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
       write(
         "REPLACE INTO account_state (id,state) VALUES (?,?);",
         Seq(accountId.toByteArray, accountState.toByteArray),
-        () ⇒ send(ref, AccountStateResponse(accountId, Some(accountState)))
+        () ⇒ send(ref, AccountStateUpdated(accountId, Some(accountState)))
       )
 
     case UpdateRating(accountId, rating) ⇒
