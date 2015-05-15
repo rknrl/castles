@@ -11,7 +11,7 @@ package ru.rknrl.castles.matchmaking
 import akka.actor.{Actor, ActorRef}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.matchmaking.MatchMaking.{SetAccountState, SetRating}
 import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType}
 import ru.rknrl.logging.ActorLog

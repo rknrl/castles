@@ -16,7 +16,7 @@ import ru.rknrl.PolicyServer
 import ru.rknrl.castles.account.SecretChecker
 import ru.rknrl.castles.admin.AdminTcpServer
 import ru.rknrl.castles.database.Database.GetTop
-import ru.rknrl.castles.database.{Database, DatabaseQueue}
+import ru.rknrl.castles.database.{Database, DatabaseCache, DatabaseQueue, DatabaseTransaction}
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking, Top}
 import ru.rknrl.castles.payments.HttpServer
@@ -50,10 +50,12 @@ object Main {
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
     val database = system.actorOf(Props(classOf[Database], config.db), "database")
+    val databaseCache = system.actorOf(Props(classOf[DatabaseCache], database), "database-cache")
+    val databaseTransaction = system.actorOf(Props(classOf[DatabaseTransaction], databaseCache), "database-transaction")
+    val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], databaseTransaction), "database-queue")
+
     val future = Patterns.ask(database, GetTop, 5 seconds)
     val top = Await.result(future, 5 seconds)
-
-    val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], database), "databse-queue")
 
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(
@@ -63,7 +65,7 @@ object Main {
         interval = 7 seconds,
         top = top.asInstanceOf[Top],
         config = config,
-        database = database,
+        databaseQueue = databaseQueue,
         graphite = graphite
       ),
       "matchmaking"

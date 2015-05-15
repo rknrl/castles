@@ -10,8 +10,8 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.Database.{GetAccount, AccountStateResponse}
-import ru.rknrl.castles.database.{Database, Statistics}
+import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.{DatabaseTransaction, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
@@ -23,6 +23,7 @@ import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_1
 import ru.rknrl.dto.SkillType.ATTACK
 import ru.rknrl.dto.SlotId.{SLOT_1, SLOT_3}
 import ru.rknrl.dto._
+
 import scala.concurrent.duration._
 
 class AccountTest extends AccountTestSpec {
@@ -100,12 +101,12 @@ class AccountTest extends AccountTestSpec {
     client.send(account, clientMessage)
 
     database.expectMsgPF(TIMEOUT) {
-      case Database.GetAndUpdateAccountState(accountId, transform) ⇒
+      case DatabaseTransaction.GetAndUpdateAccountState(accountId, transform) ⇒
         val newState = transform(Some(accountState))
         newState shouldBe expectedAccountState
     }
     graphite.expectMsg(statMessage)
-    database.send(account, AccountStateResponse(accountId, expectedAccountState))
+    database.send(account, DatabaseTransaction.AccountStateResponse(accountId, expectedAccountState))
 
     client.expectMsg(AccountStateUpdated(expectedAccountState))
   }
@@ -138,7 +139,7 @@ class AccountTest extends AccountTestSpec {
     client.send(account, EnterGame)
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, Database.AccountResponse(accountId, state = Some(accountState), rating = Some(config.account.initRating), tutorState = None, place = 999))
+    database.send(account, DatabaseTransaction.AccountResponse(accountId, state = Some(accountState), rating = Some(config.account.initRating), tutorState = None, place = 999))
 
     matchmaking.expectMsg(
       GameOrder(

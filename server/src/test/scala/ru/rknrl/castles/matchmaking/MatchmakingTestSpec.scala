@@ -55,7 +55,7 @@ class MatchmakingTestSpec extends ActorsTest {
         interval = interval,
         top = top,
         config = config,
-        database = database,
+        databaseQueue = database,
         graphite = graphite
       ),
       "matchmaking-" + matchmakingIterator

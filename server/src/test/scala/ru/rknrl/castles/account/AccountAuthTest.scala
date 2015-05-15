@@ -10,8 +10,8 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{GetAccount, AccountResponse}
+import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
@@ -65,10 +65,10 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
-      database.expectMsg(Database.GetAccount(accountId))
+      database.expectMsg(DatabaseTransaction.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
+      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
 
       val initAccountState = config.account.initState
       val initTutorState = TutorStateDTO()
@@ -91,7 +91,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       graphite.expectMsg(StatAction.START_TUTOR)
       database.expectMsg(GetAccount(accountId))
-      database.send(account, Database.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
+      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
       matchmaking.expectMsgClass(classOf[GameOrder])
     })
 
@@ -122,10 +122,10 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorStateDTO()
       val rating = config.account.initRating
 
-      database.expectMsg(Database.GetAccount(accountId))
+      database.expectMsg(DatabaseTransaction.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, AccountResponse(accountId, state = Some(accountState), rating = Some(rating), tutorState = Some(tutorState), place = 666))
+      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = Some(accountState), rating = Some(rating), tutorState = Some(tutorState), place = 666))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))

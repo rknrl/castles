@@ -12,7 +12,8 @@ import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.Database.UpdateUserInfo
+import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking._

@@ -10,8 +10,7 @@ package ru.rknrl.castles.admin
 
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountResponse, AccountStateResponse}
+import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.{AdminAccountState, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
@@ -51,11 +50,11 @@ class Admin(databaseQueue: ActorRef,
   def admin: Receive = logged {
     case AdminGetAccountState(dto) ⇒
       accountId = Some(dto.accountId)
-      send(databaseQueue, Database.GetAccount(dto.accountId))
+      send(databaseQueue, GetAccount(dto.accountId))
       become(waitForState, "waitForState")
 
     case AdminSetAccountState(accountState) ⇒
-      send(databaseQueue, Database.GetAndUpdateAccountState(accountId.get, oldState ⇒ accountState)) // todo checkAndUpdate
+      send(databaseQueue, GetAndUpdateAccountState(accountId.get, oldState ⇒ accountState)) // todo checkAndUpdate
       become(waitForUpdatedState, "waitForUpdatedState")
   }
 

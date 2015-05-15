@@ -14,7 +14,7 @@ import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAndUpdateAccountState}
+import ru.rknrl.castles.database.DatabaseTransaction.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig

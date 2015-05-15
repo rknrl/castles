@@ -14,6 +14,7 @@ import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.DatabaseTransaction.{Request, Response}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto._
 import ru.rknrl.logging.ActorLog
@@ -43,38 +44,37 @@ class DbConfiguration(username: String,
 
 object Database {
 
-  trait Request {
-    val accountId: AccountId
-  }
-
-  trait Response {
-    val accountId: AccountId
-  }
-
-  trait NoResponse
-
   /** Ответом будет List[TopItem] */
   case object GetTop
 
-  case class GetAccount(accountId: AccountId) extends Request
 
-  case class AccountResponse(accountId: AccountId,
-                             state: Option[AccountStateDTO],
-                             rating: Option[Double],
-                             tutorState: Option[TutorStateDTO],
-                             place: Long) extends Response
+  case class GetAccountState(accountId: AccountId) extends Request
 
-  case class GetAndUpdateAccountState(accountId: AccountId, transform: Option[AccountStateDTO] ⇒ AccountStateDTO) extends Request
+  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO]) extends Response
 
-  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO) extends Response
+  case class UpdateAccountState(accountId: AccountId, newState: AccountStateDTO) extends Request
 
-  case class GetAndUpdateAccountStateAndRating(accountId: AccountId, transform: (Option[AccountStateDTO], Option[Double]) ⇒ (AccountStateDTO, Double)) extends Request
 
-  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountStateDTO, rating: Double, place: Long) extends Response
+  case class GetRating(accountId: AccountId) extends Request
 
-  case class UpdateTutorState(accountId: AccountId, tutorState: TutorStateDTO) extends NoResponse
+  case class RatingResponse(accountId: AccountId, rating: Option[Double]) extends Response
 
-  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO) extends NoResponse
+  case class UpdateRating(accountId: AccountId, newRating: Double) extends Request
+
+
+  case class GetTutorState(accountId: AccountId) extends Request
+
+  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO]) extends Response
+
+  case class UpdateTutorState(accountId: AccountId, newTutorState: TutorStateDTO) extends Request
+
+
+  case class GetPlace(rating: Double)
+
+  case class PlaceResponse(rating: Double, place: Long)
+
+
+  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
 
 }
 
@@ -97,47 +97,83 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
       )
 
-    case GetAccount(accountId) ⇒
+    case GetPlace(rating) ⇒
       val ref = sender
-      getAccountState(accountId, state ⇒
-        getTutorState(accountId, tutorState ⇒
-          getRating(accountId, rating ⇒
-            getPlace(rating.getOrElse(1400), place ⇒
-              send(ref, AccountResponse(accountId, state, rating, tutorState, place))
-            )
-          )
-        )
+      read(
+        "SELECT COUNT(*) `place` " +
+          "FROM ratings " +
+          "WHERE rating > ?",
+        Seq(rating),
+        resultSet ⇒ {
+          val place = resultSet.head("place").asInstanceOf[Long] + 1
+          send(ref, PlaceResponse(rating, place))
+        }
       )
 
-    case GetAndUpdateAccountState(accountId, transform) ⇒
+    case GetRating(accountId) ⇒
       val ref = sender
-      getAccountState(accountId, state ⇒ {
-        val newState = transform(state)
-        updateAccountState(accountId, newState, () ⇒
-          send(ref, AccountStateResponse(accountId, newState))
-        )
-      })
+      read(
+        "SELECT rating FROM ratings WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 0)
+            send(ref, RatingResponse(accountId, None))
+          else if (resultSet.size == 1)
+            send(ref, RatingResponse(accountId, Some(rowDataToRating(resultSet.head))))
+          else
+            log.error("Get rating: invalid result rows count = " + resultSet.size)
+      )
 
-    case GetAndUpdateAccountStateAndRating(accountId, transform) ⇒
+    case UpdateRating(accountId, newRating) ⇒
       val ref = sender
-      getAccountState(accountId, state ⇒ {
-        getRating(accountId, rating ⇒ {
-          val (newState, newRating) = transform(state, rating)
-          updateAccountState(accountId, newState, () ⇒
-            updateRating(accountId, newRating, () ⇒
-              getPlace(newRating, place ⇒
-                send(ref, AccountStateAndRatingResponse(accountId, newState, newRating, place))
-              )
-            )
-          )
-        })
-      })
+      write(
+        "REPLACE INTO ratings (id,rating) VALUES (?,?);",
+        Seq(accountId.toByteArray, newRating),
+        () ⇒ send(ref, RatingResponse(accountId, Some(newRating)))
+      )
+
+    case UpdateAccountState(accountId, newState) ⇒
+      val ref = sender
+      write(
+        "REPLACE INTO account_state (id,state) VALUES (?,?);",
+        Seq(accountId.toByteArray, newState.toByteArray),
+        () ⇒ send(ref, AccountStateResponse(accountId, Some(newState)))
+      )
+
+    case GetAccountState(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT state FROM account_state WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 0)
+            send(ref, AccountStateResponse(accountId, None))
+          else if (resultSet.size == 1)
+            send(ref, AccountStateResponse(accountId, Some(rowDataToAccountState(resultSet.head))))
+          else
+            log.error("Get account state: invalid result rows count = " + resultSet.size)
+      )
+
+    case GetTutorState(accountId) ⇒
+      val ref = sender
+      read(
+        "SELECT state FROM tutor_state WHERE id=?;",
+        Seq(accountId.toByteArray),
+        resultSet ⇒
+          if (resultSet.size == 0)
+            send(ref, TutorStateResponse(accountId, None))
+          else if (resultSet.size == 1)
+            send(ref, TutorStateResponse(accountId, Some(rowDataToTutorState(resultSet.head))))
+          else
+            log.error("Get tutor state: invalid result rows count = " + resultSet.size)
+      )
 
     case UpdateTutorState(accountId, tutorState) ⇒
+      val ref = sender
       write(
         "REPLACE INTO tutor_state (id,state) VALUES (?,?);",
         Seq(accountId.toByteArray, tutorState.toByteArray),
-        () ⇒ {}
+        () ⇒ send(ref, TutorStateResponse(accountId, Some(tutorState)))
       )
 
     case UpdateUserInfo(accountId, userInfo) ⇒
@@ -147,72 +183,6 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         () ⇒ {}
       )
   }
-
-  def getPlace(rating: Double, callback: Long ⇒ Unit): Unit =
-    read(
-      "SELECT COUNT(*) `place` " +
-        "FROM ratings " +
-        "WHERE rating > ?",
-      Seq(rating),
-      resultSet ⇒ {
-        val place = resultSet.head("place").asInstanceOf[Long] + 1
-        callback(place)
-      }
-    )
-
-  def getRating(accountId: AccountId, callback: Option[Double] ⇒ Unit): Unit =
-    read(
-      "SELECT rating FROM ratings WHERE id=?;",
-      Seq(accountId.toByteArray),
-      resultSet ⇒
-        if (resultSet.size == 0)
-          callback(None)
-        else if (resultSet.size == 1)
-          callback(Some(rowDataToRating(resultSet.head)))
-        else
-          log.error("Get rating: invalid result rows count = " + resultSet.size)
-    )
-
-  def updateRating(accountId: AccountId, newRating: Double, callback: () ⇒ Unit): Unit =
-    write(
-      "REPLACE INTO ratings (id,rating) VALUES (?,?);",
-      Seq(accountId.toByteArray, newRating),
-      () ⇒ callback()
-    )
-
-  def updateAccountState(accountId: AccountId, newState: AccountStateDTO, callback: () ⇒ Unit): Unit =
-    write(
-      "REPLACE INTO account_state (id,state) VALUES (?,?);",
-      Seq(accountId.toByteArray, newState.toByteArray),
-      () ⇒ callback()
-    )
-
-  def getAccountState(accountId: AccountId, callback: Option[AccountStateDTO] ⇒ Unit): Unit =
-    read(
-      "SELECT state FROM account_state WHERE id=?;",
-      Seq(accountId.toByteArray),
-      resultSet ⇒
-        if (resultSet.size == 0)
-          callback(None)
-        else if (resultSet.size == 1)
-          callback(Some(rowDataToAccountState(resultSet.head)))
-        else
-          log.error("Get account state: invalid result rows count = " + resultSet.size)
-    )
-
-  def getTutorState(accountId: AccountId, callback: Option[TutorStateDTO] ⇒ Unit): Unit =
-    read(
-      "SELECT state FROM tutor_state WHERE id=?;",
-      Seq(accountId.toByteArray),
-      resultSet ⇒
-        if (resultSet.size == 0)
-          callback(None)
-        else if (resultSet.size == 1)
-          callback(Some(rowDataToTutorState(resultSet.head)))
-        else
-          log.error("Get tutor state: invalid result rows count = " + resultSet.size)
-    )
-
 
   def rowDataToAccountState(row: RowData) = {
     val byteArray = row("state").asInstanceOf[Array[Byte]]

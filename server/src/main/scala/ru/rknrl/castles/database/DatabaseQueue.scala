@@ -14,14 +14,14 @@ import ru.rknrl.logging.ActorLog
 
 class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
 
-  case class QueueRequest(msg: Database.Request, sender: ActorRef)
+  case class QueueRequest(msg: DatabaseTransaction.Request, sender: ActorRef)
 
   var queues = Map.empty[AccountId, List[QueueRequest]]
 
   def receive = logged {
-    case msg: Database.NoResponse ⇒ send(database, msg)
+    case msg: DatabaseTransaction.NoResponse ⇒ send(database, msg)
 
-    case msg: Database.Request ⇒
+    case msg: DatabaseTransaction.Request ⇒
       val accountId = msg.accountId
       val request = QueueRequest(msg, sender)
       if (queues contains accountId) {
@@ -32,7 +32,7 @@ class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
         send(database, msg)
       }
 
-    case msg: Database.Response ⇒
+    case msg: DatabaseTransaction.Response ⇒
       val accountId = msg.accountId
       val requests = queues(accountId)
       val request = requests.head
