@@ -127,7 +127,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
           }
 
         case UPGRADE_SKILL ⇒
-          val totalLevel = getTotalLevel(accountState.skills)
+          val totalLevel = AccountConfig.getTotalLevel(accountState.skills)
           if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel + 1)) {
             val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
             val skillType = random(upgradableSkills).skillType
@@ -166,12 +166,6 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
   }
 
   def send(msg: Any): Unit = send(server, msg)
-
-  def getTotalLevel(skillLevels: Seq[SkillLevelDTO]) = {
-    var total = 0
-    for (skillLevel ← skillLevels) total += skillLevel.level.id
-    total
-  }
 
   def skillUpgradePrice(totalLevel: Int) =
     config.skillUpgradePrices.find(_.totalLevel == totalLevel).get.price

@@ -14,10 +14,9 @@ import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B.{Authenticate, BuyItem, UpdateStatistics}
+import ru.rknrl.castles.rmi.C2B.{Authenticate, UpdateStatistics}
 import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.ItemType.FIREBALL
-import ru.rknrl.dto.{BuyItemDTO, StatAction, StatDTO, TutorStateDTO}
+import ru.rknrl.dto.{StatAction, StatDTO, TutorStateDTO}
 
 class AccountPersistentTest extends AccountTestSpec {
 
@@ -169,12 +168,8 @@ class AccountPersistentTest extends AccountTestSpec {
       config = config
     )
     val newState = accountStateMock(gold = 777)
-    matchmaking.send(account, SetAccountState(accountId, newState.dto))
-    client.expectMsg(AccountStateUpdated(newState.dto))
-
-    client.send(account, BuyItem(BuyItemDTO(FIREBALL)))
-    val expectedState = newState.buyItem(FIREBALL, config.account)
-    database.expectMsg(Database.UpdateAccountState(accountId, expectedState.dto))
+    matchmaking.send(account, SetAccountState(accountId, newState))
+    client.expectMsg(AccountStateUpdated(newState))
   })
 
 }

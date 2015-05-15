@@ -9,140 +9,100 @@
 package ru.rknrl.castles.account
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.AccountState.{Items, Skills, Slots}
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto._
 
-case class AccountState(slots: Slots,
-                        skills: Skills,
-                        items: Items,
-                        gold: Int,
-                        gamesCount: Int) {
-
-  def buyBuilding(id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
+object AccountState {
+  def buyBuilding(state: AccountStateDTO, id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
     val price = config.buildingPrices(LEVEL_1)
-    Assertion.check(price <= gold)
-    Assertion.check(slots(id).isEmpty)
+    Assertion.check(price <= state.gold)
 
-    setBuilding(id, BuildingPrototype(buildingType, LEVEL_1))
-      .addGold(-price)
+    val oldSlot = state.slots.find(_.id == id).get
+    Assertion.check(oldSlot.buildingPrototype.isEmpty)
+    val newSlot = oldSlot.copy(buildingPrototype = Some(BuildingPrototype(buildingType, LEVEL_1)))
+
+    state.copy(
+      slots = replace(state.slots, oldSlot, newSlot),
+      gold = state.gold - price
+    )
   }
 
-  def upgradeBuilding(id: SlotId, config: AccountConfig) = {
-    val oldPrototype = slots(id).get
-    val nextLevel = AccountConfig.nextBuildingLevel(oldPrototype.buildingLevel)
+  def upgradeBuilding(state: AccountStateDTO, id: SlotId, config: AccountConfig) = {
+    val oldSlot = state.slots.find(_.id == id).get
+    val nextLevel = AccountConfig.nextBuildingLevel(oldSlot.buildingPrototype.get.buildingLevel)
     val price = config.buildingPrices(nextLevel)
-    Assertion.check(price <= gold)
+    Assertion.check(price <= state.gold)
 
-    setBuilding(id, BuildingPrototype(oldPrototype.buildingType, nextLevel))
-      .addGold(-price)
+    val newSlot = oldSlot.copy(buildingPrototype = Some(BuildingPrototype(oldSlot.buildingPrototype.get.buildingType, nextLevel)))
+
+    state.copy(
+      slots = replace(state.slots, oldSlot, newSlot),
+      gold = state.gold - price
+    )
   }
 
-  def removeBuilding(id: SlotId): AccountState = {
-    Assertion.check(slots(id).isDefined)
-    val buildingsCount = slots.values.count(_.isDefined)
+  def removeBuilding(state: AccountStateDTO, id: SlotId) = {
+    val buildingsCount = state.slots.count(_.buildingPrototype.isDefined)
     Assertion.check(buildingsCount > 1)
 
-    setBuilding(id, None)
+    val oldSlot = state.slots.find(_.id == id).get
+    Assertion.check(oldSlot.buildingPrototype.isDefined)
+    val newSlot = oldSlot.copy(buildingPrototype = None)
+
+    state.copy(slots = replace(state.slots, oldSlot, newSlot))
   }
 
-  def setBuilding(id: SlotId, buildingPrototype: BuildingPrototype): AccountState =
-    setBuilding(id, Some(buildingPrototype))
+  def upgradeSkill(state: AccountStateDTO, skillType: SkillType, config: AccountConfig) = {
+    val price = config.skillUpgradePrices(AccountConfig.getTotalLevel(state.skills) + 1)
+    Assertion.check(price <= state.gold)
 
-  private def setBuilding(id: SlotId, buildingPrototype: Option[BuildingPrototype]): AccountState =
-    copy(newSlots = slots.updated(id, buildingPrototype))
+    val oldSkill = state.skills.find(_.skillType == skillType).get
+    val newLevel = AccountConfig.nextSkillLevel(oldSkill.level)
+    val newSkill = oldSkill.copy(level = newLevel)
 
-  def upgradeSkill(skillType: SkillType, config: AccountConfig) = {
-    val price = config.skillUpgradePrices(AccountConfig.nextTotalLevel(skills))
-    Assertion.check(price <= gold)
-
-    val nextLevel = AccountConfig.nextSkillLevel(skills(skillType))
-
-    setSkill(skillType, nextLevel)
-      .addGold(-price)
+    state.copy(
+      skills = replace(state.skills, oldSkill, newSkill),
+      gold = state.gold - price
+    )
   }
 
-  def setSkill(skillType: SkillType, skillLevel: SkillLevel) =
-    copy(newSkills = skills.updated(skillType, skillLevel))
+  def buyItem(state: AccountStateDTO, itemType: ItemType, config: AccountConfig) = {
+    Assertion.check(config.itemPrice <= state.gold)
 
-  def buyItem(itemType: ItemType, config: AccountConfig) = {
-    val price = config.itemPrice
-    Assertion.check(price <= gold)
-
-    addItem(itemType, 1)
-      .addGold(-price)
+    addGold(
+      addItem(state, itemType, 1),
+      -config.itemPrice
+    )
   }
 
-  def addItem(itemType: ItemType, count: Int) = {
-    val newCount = Math.max(0, items(itemType) + count)
-    copy(newItems = items.updated(itemType, newCount))
+  def addItem(state: AccountStateDTO, itemType: ItemType, count: Int) = {
+    val oldItem = state.items.find(_.itemType == itemType).get
+    val newCount = Math.max(0, oldItem.count + count)
+    val newItem = oldItem.copy(count = newCount)
+    state.copy(items = replace(state.items, oldItem, newItem))
   }
 
-  def addGold(value: Int) =
-    copy(newGold = Math.max(0, gold + value))
+  def addGold(state: AccountStateDTO, amount: Int) =
+    state.copy(gold = Math.max(0, state.gold + amount))
 
-  def incGamesCount = copy(newGamesCount = gamesCount + 1)
+  def incGamesCount(state: AccountStateDTO) =
+    state.copy(gamesCount = state.gamesCount + 1)
 
-  def applyUsedItems(usedItems: Map[ItemType, Int]) = {
-    var state = this
+  def applyUsedItems(state: AccountStateDTO, usedItems: Map[ItemType, Int]) = {
+    var s = state
     for ((itemType, count) ← usedItems)
-      state = state.addItem(itemType, -count)
-    state
+      s = addItem(s, itemType, -count)
+    s
   }
 
-  private def copy(newSlots: Slots = slots,
-                   newSkills: Skills = skills,
-                   newItems: Items = items,
-                   newGold: Int = gold,
-                   newGamesCount: Int = gamesCount) =
-    new AccountState(newSlots, newSkills, newItems, newGold, newGamesCount)
-
-  def applyProduct(product: Product, count: Int) =
+  def applyProduct(state: AccountStateDTO, product: Product, count: Int) =
     product.id match {
-      case ProductId.STARS.id ⇒ addGold(count)
+      case ProductId.STARS.id ⇒ addGold(state, count)
     }
 
-  private def itemsDto =
-    for ((itemType, count) ← items)
-      yield ItemDTO(itemType, count)
-
-  private def slotsDto =
-    for ((slotId, buildingPrototype) ← slots)
-      yield SlotDTO(slotId, buildingPrototype)
-
-  private def skillsDto =
-    for ((skillType, level) ← skills)
-      yield SkillLevelDTO(skillType, level)
-
-  def dto = AccountStateDTO(
-    slotsDto.toSeq,
-    skillsDto.toSeq,
-    itemsDto.toSeq,
-    gold = gold,
-    gamesCount = gamesCount
-  )
-}
-
-object AccountState {
-  type Items = Map[ItemType, Int]
-  type Slots = Map[SlotId, Option[BuildingPrototype]]
-  type Skills = Map[SkillType, SkillLevel]
-
-  private def slots(dto: Seq[SlotDTO]) =
-    dto.map(s ⇒ s.id → s.buildingPrototype).toMap
-
-  private def items(dto: Seq[ItemDTO]) =
-    dto.map(i ⇒ i.itemType → i.count).toMap
-
-  private def skills(dto: Seq[SkillLevelDTO]) =
-    dto.map(s ⇒ s.skillType → s.level).toMap
-
-  def apply(dto: AccountStateDTO) = new AccountState(
-    slots = slots(dto.slots),
-    skills = skills(dto.skills),
-    items = items(dto.items),
-    gold = dto.gold,
-    gamesCount = dto.gamesCount
-  )
+  private def replace[T](xs: Seq[T], oldValue: T, newValue: T) = {
+    val index = xs.indexOf(oldValue)
+    xs.updated(index, newValue)
+  }
 }

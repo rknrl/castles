@@ -14,10 +14,11 @@ import akka.actor.{Actor, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
+import ru.rknrl.dto.AccountStateDTO
 import ru.rknrl.logging.ActorLog
 import ru.rknrl.logging.Bugs.Bug
 import spray.http.MediaTypes._
@@ -29,7 +30,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class HttpServer(config: Config,
-                 database: ActorRef,
+                 databaseQueue: ActorRef,
                  matchmaking: ActorRef,
                  bugs: ActorRef) extends Actor with ActorLog with HttpService {
 
@@ -109,43 +110,21 @@ class HttpServer(config: Config,
             log.info("price=" + price + ",expect " + productInfo.price)
             complete(callback.accountNotFoundError)
           } else {
-            log.info("AddProduct")
+            log.info("ApplyProduct")
 
-            val future = Patterns.ask(database, GetAccountState(accountId), 5 seconds)
+            val transform = (stateOption: Option[AccountStateDTO]) ⇒ {
+              val state = stateOption.getOrElse(config.account.initState)
+              AccountState.applyProduct(state, product, productInfo.count)
+            }
+
+            val future = Patterns.ask(databaseQueue, GetAndUpdateAccountState(accountId, transform), 5 seconds)
             val result = Await.result(future, 5 seconds)
             result match {
               case AccountStateResponse(accountId, accountStateDto) ⇒
-                if (accountStateDto.isDefined) {
-                  val state = AccountState(accountStateDto.get)
-                  val newState = state.applyProduct(product, productInfo.count)
-
-                  val future = Patterns.ask(database, UpdateAccountState(accountId, newState.dto), 5 seconds)
-                  val result = Await.result(future, 5 seconds)
-
-                  result match {
-                    case msg@AccountStateResponse(accountId, newAccountStateDto) ⇒
-                      if (newAccountStateDto.isEmpty) {
-                        log.error("AccountState is empty")
-                        complete(callback.databaseError)
-                      }
-                      else if (newAccountStateDto.get.gold == newState.gold) {
-                        send(matchmaking, SetAccountState(accountId, newAccountStateDto.get))
-                        complete(httpResponse)
-                      } else {
-                        log.info("invalid gold=" + newAccountStateDto.get.gold + ", but expected " + newState.gold)
-                        complete(callback.databaseError)
-                      }
-                    case invalid ⇒
-                      log.info("invalid update result=" + invalid)
-                      complete(callback.databaseError)
-                  }
-                } else {
-                  log.error("account not found")
-                  complete(callback.accountNotFoundError)
-                }
-
+                send(matchmaking, SetAccountState(accountId, accountStateDto))
+                complete(httpResponse)
               case invalid ⇒
-                log.error("invalid get result=" + invalid)
+                log.info("invalid update result=" + invalid)
                 complete(callback.databaseError)
             }
           }

@@ -19,7 +19,7 @@ import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
 import ru.rknrl.core.Stat
 import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, PlayerId}
+import ru.rknrl.dto.{AccountStateDTO, ItemDTO, AccountId, PlayerId}
 
 object GameCreator {
 
@@ -80,16 +80,12 @@ class GameCreator(gameMaps: GameMaps,
     }
 
   def botAccountState(humanOrder: GameOrder) =
-    new AccountState(
-      slots = humanOrder.accountState.slots,
-      skills = humanOrder.accountState.skills,
-      items = botItems(humanOrder.accountState.items),
-      gold = humanOrder.accountState.gold,
-      gamesCount = humanOrder.accountState.gamesCount
+    humanOrder.accountState.copy(
+      items = botItems(humanOrder.accountState.items)
     )
 
-  def botItems(humanItems: Items) =
-    humanItems.mapValues(count ⇒ count * 2)
+  def botItems(humanItems: Seq[ItemDTO]) =
+    humanItems.map(item ⇒ item.copy(count = item.count * 2))
 
   val tutorHumanStat = new Stat(attack = 3, defence = 3, speed = 1)
   val tutorBotStat = new Stat(attack = 0.3, defence = 0.3, speed = 1)

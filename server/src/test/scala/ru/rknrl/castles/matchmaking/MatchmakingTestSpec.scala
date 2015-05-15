@@ -49,15 +49,14 @@ class MatchmakingTestSpec extends ActorsTest {
                      graphite: ActorRef) = {
     matchmakingIterator += 1
     system.actorOf(
-      Props(
-        classOf[MatchMaking],
-        gameCreator,
-        gameFactory,
-        interval,
-        top,
-        config,
-        database,
-        graphite
+      MatchMaking.props(
+        gameCreator = gameCreator,
+        gameFactory = gameFactory,
+        interval = interval,
+        top = top,
+        config = config,
+        database = database,
+        graphite = graphite
       ),
       "matchmaking-" + matchmakingIterator
     )

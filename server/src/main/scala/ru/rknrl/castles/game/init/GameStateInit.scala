@@ -18,10 +18,11 @@ import ru.rknrl.dto.{SlotsOrientation, SlotsPosDTO}
 object GameStateInit {
   def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
     for (player ← players;
-         (slotId, buildingPrototype) ← player.slots
+         slot ← player.slots;
+         buildingPrototype = slot.buildingPrototype
          if buildingPrototype.isDefined)
       yield {
-        val ij = playersSlotsPositions(player.id.id)(slotId)
+        val ij = playersSlotsPositions(player.id.id)(slot.id)
         val xy = ij.centerXY
 
         val stat = config.units(buildingPrototype.get) * player.stat

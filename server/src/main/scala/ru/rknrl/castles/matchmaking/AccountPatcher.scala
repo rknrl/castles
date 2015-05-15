@@ -13,7 +13,7 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.matchmaking.MatchMaking.{SetAccountState, SetRating}
-import ru.rknrl.dto.{AccountId, ItemType}
+import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType}
 import ru.rknrl.logging.ActorLog
 
 class AccountPatcher(accountId: AccountId,
@@ -22,46 +22,30 @@ class AccountPatcher(accountId: AccountId,
                      newRating: Double,
                      config: Config,
                      matchmaking: ActorRef,
-                     database: ActorRef) extends Actor with ActorLog {
+                     databaseQueue: ActorRef) extends Actor with ActorLog {
 
-  send(database, UpdateRating(accountId, newRating))
+  val transform = (stateDto: Option[AccountStateDTO], ratingDto: Option[Double]) ⇒ {
+    val state = stateDto.getOrElse(config.account.initState)
 
-  var place = 0L
+    val newState = AccountState.addGold(
+      AccountState.incGamesCount(
+        AccountState.applyUsedItems(
+          state,
+          usedItems
+        )
+      ),
+      reward
+    )
 
-  def receive = waitForUpdatedRating
-
-  def waitForUpdatedRating: Receive = logged {
-    case RatingResponse(accountId, rating) ⇒
-      if (rating.isEmpty) throw new IllegalStateException("updated rating is empty")
-
-      send(database, GetPlace(rating.get))
-      become(waitForPlace, "waitForPlace")
+    (newState, newRating)
   }
 
-  def waitForPlace: Receive = logged {
-    case PlaceResponse(place) ⇒
-      this.place = place
-      send(database, GetAccountState(accountId))
-      become(waitForState, "waitForState")
-  }
+  send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform))
 
-  def waitForState: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
-      val state = if (stateDto.isDefined) AccountState(stateDto.get) else config.account.initAccount
-
-      val newState = state.addGold(reward)
-        .incGamesCount
-        .applyUsedItems(usedItems)
-
-      send(database, UpdateAccountState(accountId, newState.dto))
-      become(waitForUpdatedState, "waitForUpdatedState")
-  }
-
-  def waitForUpdatedState: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
-      if (stateDto.isEmpty) throw new IllegalStateException("AccountState is empty after update")
+  def receive = logged {
+    case AccountStateAndRatingResponse(accountId, stateDto, newRating, place) ⇒
       send(matchmaking, SetRating(accountId, newRating, place))
-      send(matchmaking, SetAccountState(accountId, stateDto.get))
+      send(matchmaking, SetAccountState(accountId, stateDto))
       context stop self
   }
 }

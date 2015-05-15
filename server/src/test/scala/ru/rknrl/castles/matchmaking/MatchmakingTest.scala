@@ -298,7 +298,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client1.send(matchmaking, Online(accountId1))
     client2.send(matchmaking, Online(accountId2))
 
-    val msg = SetAccountState(accountId1, accountStateMock().dto)
+    val msg = SetAccountState(accountId1, accountStateMock())
     matchmaking ! msg
 
     client1.expectMsg(msg)

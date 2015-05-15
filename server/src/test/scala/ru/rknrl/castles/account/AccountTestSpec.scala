@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.account
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
@@ -33,7 +33,16 @@ class AccountTestSpec extends ActorsTest {
                  graphite: ActorRef = self,
                  config: Config = configMock()) = {
     accountIterator += 1
-    system.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account-" + accountIterator)
+    system.actorOf(
+      Account.props(
+        matchmaking = matchmaking,
+        secretChecker = secretChecker,
+        databaseQueue = database,
+        graphite = graphite,
+        config = config
+      ),
+      "account-" + accountIterator
+    )
   }
 
   def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),
@@ -49,7 +58,7 @@ class AccountTestSpec extends ActorsTest {
                 matchmaking: TestProbe,
                 client: TestProbe,
                 account: ActorRef,
-                accountState: AccountState = accountStateMock()) = {
+                accountState: AccountStateDTO = accountStateMock()) = {
 
     val authenticate = authenticateMock(platformType = CANVAS)
     val accountId = authenticate.userInfo.accountId
@@ -61,25 +70,17 @@ class AccountTestSpec extends ActorsTest {
     val tutorState = TutorStateDTO()
     val rating = config.account.initRating
 
-    database.expectMsg(GetAccountState(accountId))
+    database.expectMsg(GetAccount(accountId))
     database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
-    database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
-    database.expectMsg(GetRating(accountId))
-    database.send(account, RatingResponse(accountId, Some(rating)))
-
-    database.expectMsg(GetTutorState(accountId))
-    database.send(account, TutorStateResponse(accountId, Some(tutorState)))
-
-    database.expectMsg(GetPlace(rating))
-    database.send(account, PlaceResponse(777))
+    database.send(account, AccountResponse(accountId, state = Some(accountState), rating = Some(rating), tutorState = Some(tutorState), place = 777))
 
     matchmaking.expectMsg(Online(accountId))
     matchmaking.expectMsg(InGame(accountId))
     matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
 
     client.expectMsg(Authenticated(AuthenticatedDTO(
-      accountState.dto,
+      accountState,
       config.account.dto,
       TopDTO(List.empty),
       PlaceDTO(777),

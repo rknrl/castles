@@ -11,7 +11,6 @@ package ru.rknrl.castles.matchmaking
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
@@ -26,7 +25,7 @@ object MatchMaking {
   case class GameOrder(accountId: AccountId,
                        deviceType: DeviceType,
                        userInfo: UserInfoDTO,
-                       accountState: AccountState,
+                       accountState: AccountStateDTO,
                        rating: Double,
                        isBot: Boolean)
 
@@ -62,6 +61,14 @@ object MatchMaking {
 
   case class SetRating(accountId: AccountId, rating: Double, place: Long)
 
+  def props(gameCreator: GameCreator,
+            gameFactory: IGameFactory,
+            interval: FiniteDuration,
+            top: Top,
+            config: Config,
+            database: ActorRef,
+            graphite: ActorRef) =
+    Props(classOf[MatchMaking], gameCreator, gameFactory, interval, top, config, database, graphite)
 }
 
 class MatchMaking(gameCreator: GameCreator,

@@ -25,6 +25,13 @@ object Game {
 
   case class UpdateGameState(newTime: Long)
 
+  def props(gameState: GameState,
+            isDev: Boolean,
+            isTutor: Boolean,
+            botFactory: IBotFactory,
+            schedulerClass: Class[_],
+            matchmaking: ActorRef) =
+    Props(classOf[Game], gameState, isDev, isTutor, botFactory, schedulerClass, matchmaking)
 }
 
 class Game(var gameState: GameState,

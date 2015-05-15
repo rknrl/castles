@@ -9,7 +9,6 @@
 package ru.rknrl.castles.game.state
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.AccountState.Items
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.dto._
 
@@ -62,12 +61,12 @@ class ItemStates(val items: Map[ItemType, ItemState]) {
 }
 
 object GameItems {
-  private def initMap(items: Items) =
-    for ((itemType, count) ← items)
-      yield itemType → new ItemState(itemType, count, lastUseTime = 0, useCount = 0)
+  private def initMap(items: Seq[ItemDTO]) =
+    for (item ← items)
+      yield item.itemType → new ItemState(item.itemType, item.count, lastUseTime = 0, useCount = 0)
 
-  def init(items: Items) =
-    new ItemStates(initMap(items))
+  def init(items: Seq[ItemDTO]) =
+    new ItemStates(initMap(items).toMap)
 }
 
 class GameItems(val states: Map[PlayerId, ItemStates]) {

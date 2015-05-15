@@ -17,7 +17,7 @@ import ru.rknrl.logging.ActorLog
 
 class AdminTcpServer(tcp: ActorRef,
                      config: Config,
-                     database: ActorRef,
+                     databaseQueue: ActorRef,
                      matchmaking: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
@@ -38,7 +38,7 @@ class AdminTcpServer(tcp: ActorRef,
 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
-      val client = context.actorOf(Props(classOf[AdminClientSession], sender, database, matchmaking, config, name), "admin-client" + name.replace('.', '-'))
+      val client = context.actorOf(Props(classOf[AdminClientSession], sender, databaseQueue, matchmaking, config, name), "admin-client" + name.replace('.', '-'))
       sender ! Register(client)
   }
 }

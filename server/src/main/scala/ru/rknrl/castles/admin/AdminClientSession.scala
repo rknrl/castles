@@ -8,14 +8,21 @@
 
 package ru.rknrl.castles.admin
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.ActorRef
 import ru.rknrl.castles.Config
 import ru.rknrl.rmi.Client
 
 class AdminClientSession(tcpSender: ActorRef,
-                         database: ActorRef,
+                         databaseQueue: ActorRef,
                          matchmaking: ActorRef,
                          config: Config,
                          name: String) extends Client(tcpSender, name) {
-  val handler = context.actorOf(Props(classOf[Admin], database, matchmaking, config, name), "admin" + name.replace('.', '-'))
+  val handler = context.actorOf(
+    Admin.props(
+      databaseQueue = databaseQueue,
+      matchmaking = matchmaking,
+      config = config
+    ),
+    "admin" + name.replace('.', '-')
+  )
 }

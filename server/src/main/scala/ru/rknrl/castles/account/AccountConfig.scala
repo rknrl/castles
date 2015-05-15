@@ -9,7 +9,6 @@
 package ru.rknrl.castles.account
 
 import ru.rknrl.Assertion
-import ru.rknrl.castles.account.AccountState.{Items, Slots, Skills}
 import ru.rknrl.core.Stat
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
@@ -56,35 +55,36 @@ class AccountConfig(val buildingPrices: BuildingPrices,
    * При SKILL_LEVEL_0 возвращает 1.0
    * При SKILL_LEVEL_3 возвращает maxAttack, maxDefence, maxSpeed
    */
-  def skillsToStat(levels: Skills) =
+  def skillsToStat(levels: Seq[SkillLevelDTO]) =
     new Stat(
-      1 + levels(ATTACK).id * (maxAttack - 1) / levelsCount,
-      1 + levels(DEFENCE).id * (maxDefence - 1) / levelsCount,
-      1 + levels(SPEED).id * (maxSpeed - 1) / levelsCount
+      1 + levels.find(_.skillType == ATTACK).get.level.id * (maxAttack - 1) / levelsCount,
+      1 + levels.find(_.skillType == DEFENCE).get.level.id * (maxDefence - 1) / levelsCount,
+      1 + levels.find(_.skillType == SPEED).get.level.id * (maxSpeed - 1) / levelsCount
     )
 
-  private def initSlots: Slots =
-    Map(
-      SLOT_1 → None,
-      SLOT_2 → None,
-      SLOT_3 → Some(BuildingPrototype(HOUSE, LEVEL_1)),
-      SLOT_4 → Some(BuildingPrototype(TOWER, LEVEL_1)),
-      SLOT_5 → Some(BuildingPrototype(CHURCH, LEVEL_1))
+  private def initSlots =
+    List(
+      SlotDTO(SLOT_1, None),
+      SlotDTO(SLOT_2, None),
+      SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
+      SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+      SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
     )
 
-  private def initSkills: Skills =
-    SkillType.values.map(_ → SKILL_LEVEL_0).toMap
+  private def initSkills =
+    SkillType.values.map(SkillLevelDTO(_, SKILL_LEVEL_0))
 
-  private def initItems: Items =
-    ItemType.values.map(_ → initItemCount).toMap
+  private def initItems =
+    ItemType.values.map(ItemDTO(_, initItemCount))
 
-  def initAccount = new AccountState(
-    slots = initSlots,
-    skills = initSkills,
-    items = initItems,
-    gold = initGold,
-    gamesCount = 0
-  )
+  def initState =
+    AccountStateDTO(
+      slots = initSlots,
+      skills = initSkills,
+      items = initItems,
+      gold = initGold,
+      gamesCount = 0
+    )
 }
 
 object AccountConfig {
@@ -101,16 +101,17 @@ object AccountConfig {
       case SkillLevel.SKILL_LEVEL_2 ⇒ SkillLevel.SKILL_LEVEL_3
     }
 
-  private def totalLevel(levels: Skills) = {
-    var total = 0
-    for ((skillType, level) ← levels) total += level.id
-    total
+
+  private def isLastTotalLevel(levels: Seq[SkillLevelDTO]) = getTotalLevel(levels) == 9
+
+  def nextTotalLevel(levels: Seq[SkillLevelDTO]) = {
+    Assertion.check(!isLastTotalLevel(levels))
+    getTotalLevel(levels) + 1
   }
 
-  private def isLastTotalLevel(levels: Skills) = totalLevel(levels) == 9
-
-  def nextTotalLevel(levels: Skills) = {
-    Assertion.check(!isLastTotalLevel(levels))
-    totalLevel(levels) + 1
+  def getTotalLevel(skillLevels: Seq[SkillLevelDTO]) = {
+    var total = 0
+    for (skillLevel ← skillLevels) total += skillLevel.level.id
+    total
   }
 }

@@ -10,8 +10,7 @@ package ru.rknrl.castles.kit
 
 import org.scalatest.Matchers
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.account.{AccountConfig, AccountState, BuildingPrices, SkillUpgradePrices}
+import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMap, GameMaps}
@@ -97,27 +96,27 @@ object Mocks extends Matchers {
     )
 
 
-  def slotsMock: Slots =
-    Map(
-      SLOT_1 → None,
-      SLOT_2 → None,
-      SLOT_3 → Some(BuildingPrototype(HOUSE, LEVEL_1)),
-      SLOT_4 → Some(BuildingPrototype(TOWER, LEVEL_1)),
-      SLOT_5 → Some(BuildingPrototype(CHURCH, LEVEL_1))
+  def slotsMock =
+    List(
+      SlotDTO(SLOT_1, None),
+      SlotDTO(SLOT_2, None),
+      SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
+      SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+      SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
     )
 
-  def skillsMock: Skills =
-    SkillType.values.map(_ → SKILL_LEVEL_0).toMap
+  def skillsMock =
+    SkillType.values.map(SkillLevelDTO(_, SKILL_LEVEL_0))
 
-  def itemsMock: Items =
-    ItemType.values.map(_ → 4).toMap
+  def itemsMock =
+    ItemType.values.map(ItemDTO(_, 4))
 
-  def accountStateMock(slots: Slots = slotsMock,
-                       skills: Skills = skillsMock,
-                       items: Items = itemsMock,
+  def accountStateMock(slots: Seq[SlotDTO] = slotsMock,
+                       skills: Seq[SkillLevelDTO] = skillsMock,
+                       items: Seq[ItemDTO] = itemsMock,
                        gold: Int = 10,
                        gamesCount: Int = 1) =
-    new AccountState(
+    AccountStateDTO(
       slots = slots,
       skills = skills,
       items = items,
@@ -291,9 +290,9 @@ object Mocks extends Matchers {
   def playerMock(id: PlayerId = PlayerId(1),
                  accountId: AccountId = AccountId(AccountType.DEV, "0"),
                  userInfo: UserInfoDTO = UserInfoDTO(AccountId(AccountType.DEV, "0")),
-                 slots: Slots = Map.empty,
+                 slots: Seq[SlotDTO] = List.empty,
                  stat: Stat = Stat(1, 1, 1),
-                 items: Items = Map.empty,
+                 items: Seq[ItemDTO] = List.empty,
                  isBot: Boolean = false) =
     new Player(
       id = id,
@@ -537,7 +536,7 @@ object Mocks extends Matchers {
 
   def newGameOrder(accountId: AccountId,
                    deviceType: DeviceType = DeviceType.PC,
-                   accountState: AccountState = accountStateMock(),
+                   accountState: AccountStateDTO = accountStateMock(),
                    rating: Double = 1400,
                    isBot: Boolean = false) =
     GameOrder(

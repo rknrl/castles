@@ -8,17 +8,26 @@
 
 package ru.rknrl.castles.account
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.ActorRef
 import ru.rknrl.castles.Config
 import ru.rknrl.rmi.Client
 
 class AccountClientSession(tcpSender: ActorRef,
                            matchmaking: ActorRef,
                            secretChecker: ActorRef,
-                           database: ActorRef,
+                           databaseQueue: ActorRef,
                            graphite: ActorRef,
                            config: Config,
                            name: String) extends Client(tcpSender, name) {
 
-  val handler = context.actorOf(Props(classOf[Account], matchmaking, secretChecker, database, graphite, config), "account-" + name.replace('.', '-'))
+  val handler = context.actorOf(
+    Account.props(
+      matchmaking = matchmaking,
+      secretChecker = secretChecker,
+      databaseQueue = databaseQueue,
+      graphite = graphite,
+      config = config
+    ),
+    "account-" + name.replace('.', '-')
+  )
 }

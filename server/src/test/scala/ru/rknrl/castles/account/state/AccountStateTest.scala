@@ -9,32 +9,31 @@
 package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.account.AccountState.{Skills, Slots}
+import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel._
-import ru.rknrl.dto.BuildingPrototype
 import ru.rknrl.dto.BuildingType._
 import ru.rknrl.dto.ItemType._
 import ru.rknrl.dto.SkillLevel._
 import ru.rknrl.dto.SkillType._
 import ru.rknrl.dto.SlotId._
+import ru.rknrl.dto.{AccountStateDTO, BuildingPrototype, SkillLevelDTO, SlotDTO}
 
 class AccountStateTest extends WordSpec with Matchers {
 
   val GOLD = "gold"
   val GAMES_COUNT = "gamesCount"
 
-  def checkEquals(a: AccountState, b: AccountState, without: Set[Any]) = {
-    for ((slotId, buildingPrototype) ← a.slots if !(without contains slotId))
-      a.slots(slotId) shouldBe b.slots(slotId)
+  def checkEquals(a: AccountStateDTO, b: AccountStateDTO, without: Set[Any]) = {
+    for (slot ← a.slots if !(without contains slot.id))
+      slot shouldBe b.slots.find(_.id == slot.id).get
 
-    for ((skillType, skillLevel) ← a.skills if !(without contains skillType))
-      a.skills(skillType) shouldBe b.skills(skillType)
+    for (skill ← a.skills if !(without contains skill.skillType))
+      skill shouldBe b.skills.find(_.skillType == skill.skillType).get
 
-    for ((itemType, count) ← a.items if !(without contains itemType))
-      a.items(itemType) shouldBe b.items(itemType)
+    for (item ← a.items if !(without contains item.itemType))
+      item shouldBe b.items.find(_.itemType == item.itemType).get
 
     if (!(without contains GOLD)) a.gold shouldBe b.gold
     if (!(without contains GAMES_COUNT)) a.gamesCount shouldBe b.gamesCount
@@ -47,9 +46,9 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 4)
-      val state = oldState.buyBuilding(SLOT_1, TOWER, accountConfigMock())
+      val state = buyBuilding(oldState, SLOT_1, TOWER, accountConfigMock())
       state.gold shouldBe 0
-      state.slots(SLOT_1) shouldBe Some(BuildingPrototype(TOWER, LEVEL_1))
+      state.slots.find(_.id == SLOT_1).get.buildingPrototype shouldBe Some(BuildingPrototype(TOWER, LEVEL_1))
       checkEquals(oldState, state, Set(SLOT_1, GOLD))
 
     }
@@ -57,7 +56,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот не пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 4).buyBuilding(SLOT_3, TOWER, accountConfigMock())
+        buyBuilding(accountStateMock(gold = 4), SLOT_3, TOWER, accountConfigMock())
       }
 
     }
@@ -65,7 +64,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 3).buyBuilding(SLOT_1, TOWER, accountConfigMock())
+        buyBuilding(accountStateMock(gold = 3), SLOT_1, TOWER, accountConfigMock())
       }
 
     }
@@ -78,9 +77,9 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 16)
-      val state = oldState.upgradeBuilding(SLOT_3, accountConfigMock())
+      val state = upgradeBuilding(oldState, SLOT_3, accountConfigMock())
       state.gold shouldBe 0
-      state.slots(SLOT_3) shouldBe Some(BuildingPrototype(HOUSE, LEVEL_2))
+      state.slots.find(_.id == SLOT_3).get.buildingPrototype shouldBe Some(BuildingPrototype(HOUSE, LEVEL_2))
       checkEquals(oldState, state, Set(SLOT_3, GOLD))
 
     }
@@ -88,24 +87,24 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 16).upgradeBuilding(SLOT_1, accountConfigMock())
+        upgradeBuilding(accountStateMock(gold = 16), SLOT_1, accountConfigMock())
       }
 
     }
 
     "Если слот последнего уровня - кидаем эксепшн" in {
 
-      val slots: Slots =
-        Map(
-          SLOT_1 → None,
-          SLOT_2 → None,
-          SLOT_3 → Some(BuildingPrototype(HOUSE, LEVEL_3)),
-          SLOT_4 → Some(BuildingPrototype(TOWER, LEVEL_1)),
-          SLOT_5 → Some(BuildingPrototype(CHURCH, LEVEL_1))
+      val slots =
+        List(
+          SlotDTO(SLOT_1, None),
+          SlotDTO(SLOT_2, None),
+          SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_3))),
+          SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+          SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
         )
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 16, slots = slots).upgradeBuilding(SLOT_3, accountConfigMock())
+        upgradeBuilding(accountStateMock(gold = 16, slots = slots), SLOT_3, accountConfigMock())
       }
 
     }
@@ -113,28 +112,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 14).upgradeBuilding(SLOT_3, accountConfigMock())
+        upgradeBuilding(accountStateMock(gold = 14), SLOT_3, accountConfigMock())
       }
-
-    }
-  }
-
-  "setBuilding" should {
-    "Изменяем нужный домик и не меняем ничего другого" in {
-
-      val slots: Slots =
-        Map(
-          SLOT_1 → None,
-          SLOT_2 → None,
-          SLOT_3 → Some(BuildingPrototype(HOUSE, LEVEL_3)),
-          SLOT_4 → Some(BuildingPrototype(TOWER, LEVEL_1)),
-          SLOT_5 → Some(BuildingPrototype(CHURCH, LEVEL_1))
-        )
-
-      val oldState = accountStateMock(slots = slots, gold = 0)
-      val state = oldState.setBuilding(SLOT_3, BuildingPrototype(TOWER, LEVEL_1))
-      state.slots(SLOT_3) shouldBe Some(BuildingPrototype(TOWER, LEVEL_1))
-      checkEquals(oldState, state, Set(SLOT_3))
 
     }
   }
@@ -143,8 +122,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот не пустой - удаляем нужный домик и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 0)
-      val state = oldState.removeBuilding(SLOT_3)
-      state.slots(SLOT_3) shouldBe empty
+      val state = removeBuilding(oldState, SLOT_3)
+      state.slots.find(_.id == SLOT_3).get.buildingPrototype shouldBe empty
       checkEquals(oldState, state, Set(SLOT_3))
 
     }
@@ -152,7 +131,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 0).removeBuilding(SLOT_1)
+        removeBuilding(accountStateMock(gold = 0), SLOT_1)
       }
 
     }
@@ -165,8 +144,8 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 1)
-      val state = oldState.upgradeSkill(ATTACK, accountConfigMock())
-      state.skills(ATTACK) shouldBe SKILL_LEVEL_1
+      val state = upgradeSkill(oldState, ATTACK, accountConfigMock())
+      state.skills.find(_.skillType == ATTACK).get.level shouldBe SKILL_LEVEL_1
       state.gold shouldBe 0
       checkEquals(oldState, state, Set(ATTACK, GOLD))
 
@@ -174,14 +153,14 @@ class AccountStateTest extends WordSpec with Matchers {
 
     "Если слот последнего уровня - кидаем эксепшн" in {
 
-      val skills: Skills = Map(
-        ATTACK → SKILL_LEVEL_3,
-        DEFENCE → SKILL_LEVEL_1,
-        SPEED → SKILL_LEVEL_1
+      val skills = List(
+        SkillLevelDTO(ATTACK, SKILL_LEVEL_3),
+        SkillLevelDTO(DEFENCE, SKILL_LEVEL_1),
+        SkillLevelDTO(SPEED, SKILL_LEVEL_1)
       )
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 1, skills = skills).upgradeSkill(ATTACK, accountConfigMock())
+        upgradeSkill(accountStateMock(gold = 1, skills = skills), ATTACK, accountConfigMock())
       }
 
     }
@@ -189,25 +168,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 0).upgradeSkill(ATTACK, accountConfigMock())
+        upgradeSkill(accountStateMock(gold = 0), ATTACK, accountConfigMock())
       }
-
-    }
-  }
-
-  "setSkill" should {
-    "Изменяем нужный скилл и не меняем ничего другого" in {
-
-      val skills: Skills = Map(
-        ATTACK → SKILL_LEVEL_3,
-        DEFENCE → SKILL_LEVEL_1,
-        SPEED → SKILL_LEVEL_1
-      )
-
-      val oldState = accountStateMock(gold = 1, skills = skills)
-      val state = oldState.setSkill(ATTACK, SKILL_LEVEL_2)
-      state.skills(ATTACK) shouldBe SKILL_LEVEL_2
-      checkEquals(oldState, state, Set(ATTACK))
 
     }
   }
@@ -219,8 +181,8 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 1)
-      val state = oldState.buyItem(FIREBALL, accountConfigMock())
-      state.items(FIREBALL) shouldBe 5
+      val state = buyItem(oldState, FIREBALL, accountConfigMock())
+      state.items.find(_.itemType == FIREBALL).get.count shouldBe 5
       state.gold shouldBe 0
       checkEquals(oldState, state, Set(FIREBALL, GOLD))
 
@@ -229,7 +191,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock(gold = 0).buyItem(FIREBALL, accountConfigMock())
+        buyItem(accountStateMock(gold = 0), FIREBALL, accountConfigMock())
       }
 
     }
@@ -239,8 +201,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Увеличиваем нужный предмет и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 0)
-      val state = oldState.addItem(VOLCANO, 3)
-      state.items(VOLCANO) shouldBe 7
+      val state = addItem(oldState, VOLCANO, 3)
+      state.items.find(_.itemType == VOLCANO).get.count shouldBe 7
       checkEquals(oldState, state, Set(VOLCANO))
 
     }
@@ -248,8 +210,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Уменьшаем нужый предмет и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 0)
-      val state = oldState.addItem(VOLCANO, -3)
-      state.items(VOLCANO) shouldBe 1
+      val state = addItem(oldState, VOLCANO, -3)
+      state.items.find(_.itemType == VOLCANO).get.count shouldBe 1
       checkEquals(oldState, state, Set(VOLCANO))
 
     }
@@ -257,8 +219,8 @@ class AccountStateTest extends WordSpec with Matchers {
     "Не можем уйти в минус" in {
 
       val oldState = accountStateMock(gold = 0)
-      val state = oldState.addItem(TORNADO, -999)
-      state.items(TORNADO) shouldBe 0
+      val state = addItem(oldState, TORNADO, -999)
+      state.items.find(_.itemType == TORNADO).get.count shouldBe 0
       checkEquals(oldState, state, Set(TORNADO))
 
     }
@@ -268,7 +230,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Увеличиваем деньги на нужную сумму и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 2)
-      val state = oldState.addGold(3)
+      val state = addGold(oldState, 3)
       state.gold shouldBe 5
       checkEquals(oldState, state, Set(GOLD))
 
@@ -277,7 +239,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Уменьшаем деньги на нужную сумму и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 9)
-      val state = oldState.addGold(-4)
+      val state = addGold(oldState, -4)
       state.gold shouldBe 5
       checkEquals(oldState, state, Set(GOLD))
 
@@ -286,7 +248,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Не можем уйти в минус" in {
 
       val oldState = accountStateMock(gold = 9)
-      val state = oldState.addGold(-99)
+      val state = addGold(oldState, -99)
       state.gold shouldBe 0
       checkEquals(oldState, state, Set(GOLD))
 
@@ -297,7 +259,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Увеличиваем gamesCount на 1 и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gamesCount = 0)
-      val state = oldState.incGamesCount
+      val state = incGamesCount(oldState)
       state.gamesCount shouldBe 1
       checkEquals(oldState, state, Set(GAMES_COUNT))
 
@@ -308,11 +270,11 @@ class AccountStateTest extends WordSpec with Matchers {
     "если STARS увеличиваем деньги на нужную сумму и не меняем ничего другого" in {
 
       val oldState = accountStateMock()
-      val state = oldState.applyProduct(new Product(id = 1, title = "", description = "", photoUrl = ""), 1)
+      val state = applyProduct(oldState, new Product(id = 1, title = "", description = "", photoUrl = ""), 1)
       state.gold shouldBe 11
 
       val oldState2 = accountStateMock()
-      val state2 = oldState2.applyProduct(new Product(id = 1, title = "", description = "", photoUrl = ""), 100)
+      val state2 = applyProduct(oldState2, new Product(id = 1, title = "", description = "", photoUrl = ""), 100)
       state2.gold shouldBe 110
 
       checkEquals(oldState, state, Set(GOLD))
@@ -322,7 +284,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "если не STARS - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        accountStateMock().applyProduct(new Product(id = 3, title = "", description = "", photoUrl = ""), 1)
+        applyProduct(accountStateMock(), new Product(id = 3, title = "", description = "", photoUrl = ""), 1)
       }
 
     }
@@ -330,19 +292,17 @@ class AccountStateTest extends WordSpec with Matchers {
 
   "applyUsedItems" in {
     val oldState = accountStateMock()
-    val state = oldState.applyUsedItems(Map(
+    val state = applyUsedItems(oldState, Map(
       FIREBALL → 1,
       TORNADO → 2,
       STRENGTHENING → 3
     ))
 
-    state.items shouldBe Map(
-      FIREBALL → 3,
-      STRENGTHENING → 1,
-      VOLCANO → 4,
-      TORNADO → 2,
-      ASSISTANCE → 4
-    )
+    state.items.find(_.itemType == FIREBALL).get.count shouldBe 3
+    state.items.find(_.itemType == STRENGTHENING).get.count shouldBe 1
+    state.items.find(_.itemType == VOLCANO).get.count shouldBe 4
+    state.items.find(_.itemType == TORNADO).get.count shouldBe 2
+    state.items.find(_.itemType == ASSISTANCE).get.count shouldBe 4
 
     checkEquals(oldState, state, Set(FIREBALL, TORNADO, STRENGTHENING))
   }

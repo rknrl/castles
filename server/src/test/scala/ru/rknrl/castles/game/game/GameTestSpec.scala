@@ -10,9 +10,8 @@ package ru.rknrl.castles.game.game
 
 import akka.actor.{Actor, ActorRef, Props}
 import org.scalatest.{Matchers, WordSpecLike}
-import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.game.{BotFactory, IBotFactory, Game}
 import ru.rknrl.castles.game.state.{GameItems, GameState}
+import ru.rknrl.castles.game.{BotFactory, Game, IBotFactory}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
 import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
@@ -40,7 +39,7 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
               schedulerClass: Class[_] = classOf[FakeScheduler],
               matchmaking: ActorRef = self) = {
     gameIterator += 1
-    system.actorOf(Props(classOf[Game], gameState, isDev, isTutor, botFactory, schedulerClass, matchmaking), "game" + gameIterator)
+    system.actorOf(Game.props(gameState, isDev, isTutor, botFactory, schedulerClass, matchmaking), "game" + gameIterator)
   }
 
   def updateGameState(gameState: GameState,
@@ -61,12 +60,12 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
       assistanceCasts = assistanceCasts
     )
 
-  def initItems: Items = Map(
-    FIREBALL → 4,
-    TORNADO → 4,
-    VOLCANO → 4,
-    STRENGTHENING → 4,
-    ASSISTANCE → 4
+  def initItems = List(
+    ItemDTO(FIREBALL, 4),
+    ItemDTO(TORNADO, 4),
+    ItemDTO(VOLCANO, 4),
+    ItemDTO(STRENGTHENING, 4),
+    ItemDTO(ASSISTANCE, 4)
   )
 
   val player0 = playerMock(

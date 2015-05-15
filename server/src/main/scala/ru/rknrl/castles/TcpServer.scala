@@ -15,7 +15,7 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountClientSession
 import ru.rknrl.logging.ActorLog
 
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: ActorRef, graphite: ActorRef, secretChecker: ActorRef) extends Actor with ActorLog {
+class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, databaseQueue: ActorRef, graphite: ActorRef, secretChecker: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
@@ -36,7 +36,7 @@ class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, database: 
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       log.debug("connected " + name)
-      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, database, graphite, config, name), "client-" + name.replace('.', '-'))
+      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, databaseQueue, graphite, config, name), "client-" + name.replace('.', '-'))
       sender ! Register(client)
   }
 }

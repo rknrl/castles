@@ -9,8 +9,9 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.database.Database.{AccountStateResponse, UpdateAccountState}
-import ru.rknrl.castles.database.Statistics
+import ru.rknrl.castles.account.AccountState._
+import ru.rknrl.castles.database.Database.{GetAccount, AccountStateResponse}
+import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
@@ -22,14 +23,16 @@ import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_1
 import ru.rknrl.dto.SkillType.ATTACK
 import ru.rknrl.dto.SlotId.{SLOT_1, SLOT_3}
 import ru.rknrl.dto._
+import scala.concurrent.duration._
 
 class AccountTest extends AccountTestSpec {
+  val TIMEOUT = 100 millis
   val config = configMock()
   val accountState = accountStateMock(gold = 1000)
 
   multi("BuyBuilding", {
     check(
-      expectedAccountState = accountState.buyBuilding(SLOT_1, TOWER, config.account),
+      expectedAccountState = buyBuilding(accountState, SLOT_1, TOWER, config.account),
       clientMessage = BuyBuilding(BuyBuildingDTO(SLOT_1, TOWER)),
       statMessage = Statistics.buyBuilding(TOWER, LEVEL_1)
     )
@@ -37,7 +40,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("UpgradeBuilding", {
     check(
-      expectedAccountState = accountState.upgradeBuilding(SLOT_3, config.account),
+      expectedAccountState = upgradeBuilding(accountState, SLOT_3, config.account),
       clientMessage = UpgradeBuilding(UpgradeBuildingDTO(SLOT_3)),
       statMessage = Statistics.buyBuilding(HOUSE, LEVEL_2)
     )
@@ -45,7 +48,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("RemoveBuilding", {
     check(
-      expectedAccountState = accountState.removeBuilding(SLOT_3),
+      expectedAccountState = removeBuilding(accountState, SLOT_3),
       clientMessage = RemoveBuilding(RemoveBuildingDTO(SLOT_3)),
       statMessage = StatAction.REMOVE_BUILDING
     )
@@ -53,7 +56,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("UpgradeSkill", {
     check(
-      expectedAccountState = accountState.upgradeSkill(ATTACK, config.account),
+      expectedAccountState = upgradeSkill(accountState, ATTACK, config.account),
       clientMessage = UpgradeSkill(UpgradeSkillDTO(ATTACK)),
       statMessage = Statistics.buySkill(ATTACK, SKILL_LEVEL_1)
     )
@@ -61,13 +64,13 @@ class AccountTest extends AccountTestSpec {
 
   multi("BuyItem", {
     check(
-      expectedAccountState = accountState.buyItem(FIREBALL, config.account),
+      expectedAccountState = buyItem(accountState, FIREBALL, config.account),
       clientMessage = BuyItem(BuyItemDTO(FIREBALL)),
       statMessage = Statistics.buyItem(FIREBALL)
     )
   })
 
-  def check(expectedAccountState: AccountState,
+  def check(expectedAccountState: AccountStateDTO,
             clientMessage: Any,
             statMessage: Any) = {
     val secretChecker = new TestProbe(system)
@@ -96,11 +99,15 @@ class AccountTest extends AccountTestSpec {
 
     client.send(account, clientMessage)
 
-    database.expectMsg(UpdateAccountState(accountId, expectedAccountState.dto))
+    database.expectMsgPF(TIMEOUT) {
+      case Database.GetAndUpdateAccountState(accountId, transform) ⇒
+        val newState = transform(Some(accountState))
+        newState shouldBe expectedAccountState
+    }
     graphite.expectMsg(statMessage)
-    database.send(account, AccountStateResponse(accountId, Some(expectedAccountState.dto)))
+    database.send(account, AccountStateResponse(accountId, expectedAccountState))
 
-    client.expectMsg(AccountStateUpdated(expectedAccountState.dto))
+    client.expectMsg(AccountStateUpdated(expectedAccountState))
   }
 
   multi("EnterGame", {
@@ -129,6 +136,9 @@ class AccountTest extends AccountTestSpec {
     )
 
     client.send(account, EnterGame)
+
+    database.expectMsg(GetAccount(accountId))
+    database.send(account, Database.AccountResponse(accountId, state = Some(accountState), rating = Some(config.account.initRating), tutorState = None, place = 999))
 
     matchmaking.expectMsg(
       GameOrder(

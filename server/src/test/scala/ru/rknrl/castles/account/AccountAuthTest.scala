@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.testkit.TestProbe
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.{AccountStateResponse, RatingResponse, TutorStateResponse}
+import ru.rknrl.castles.database.Database.{GetAccount, AccountResponse}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.Authenticated
@@ -65,14 +65,12 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
-      database.expectMsg(Database.GetAccountState(accountId))
+      database.expectMsg(Database.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountStateResponse(accountId, None))
-      database.expectMsg(Database.GetPlace(config.account.initRating))
-      database.send(account, Database.PlaceResponse(999))
+      database.send(account, Database.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
 
-      val initAccountState = config.account.initAccount
+      val initAccountState = config.account.initState
       val initTutorState = TutorStateDTO()
 
       graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
@@ -81,7 +79,7 @@ class AccountAuthTest extends AccountTestSpec {
       matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
 
       client.expectMsg(Authenticated(AuthenticatedDTO(
-        initAccountState.dto,
+        initAccountState,
         config.account.dto,
         TopDTO(List.empty),
         PlaceDTO(999),
@@ -92,6 +90,8 @@ class AccountAuthTest extends AccountTestSpec {
       )))
 
       graphite.expectMsg(StatAction.START_TUTOR)
+      database.expectMsg(GetAccount(accountId))
+      database.send(account, Database.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
       matchmaking.expectMsgClass(classOf[GameOrder])
     })
 
@@ -122,25 +122,17 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorStateDTO()
       val rating = config.account.initRating
 
-      database.expectMsg(Database.GetAccountState(accountId))
+      database.expectMsg(Database.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, AccountStateResponse(accountId, Some(accountState.dto)))
-      database.expectMsg(Database.GetRating(accountId))
-      database.send(account, RatingResponse(accountId, Some(rating)))
-
-      database.expectMsg(Database.GetTutorState(accountId))
-      database.send(account, TutorStateResponse(accountId, Some(tutorState)))
-
-      database.expectMsg(Database.GetPlace(rating))
-      database.send(account, Database.PlaceResponse(666))
+      database.send(account, AccountResponse(accountId, state = Some(accountState), rating = Some(rating), tutorState = Some(tutorState), place = 666))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
       matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
 
       client.expectMsg(Authenticated(AuthenticatedDTO(
-        accountState.dto,
+        accountState,
         config.account.dto,
         TopDTO(List.empty),
         PlaceDTO(666),

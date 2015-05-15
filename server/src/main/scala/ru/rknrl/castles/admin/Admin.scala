@@ -8,10 +8,10 @@
 
 package ru.rknrl.castles.admin
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.AccountStateResponse
+import ru.rknrl.castles.database.Database.{AccountResponse, AccountStateResponse}
 import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.{AdminAccountState, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
@@ -19,10 +19,16 @@ import ru.rknrl.core.rmi.CloseConnection
 import ru.rknrl.dto.{AccountId, AdminAccountStateDTO}
 import ru.rknrl.logging.ActorLog
 
-class Admin(database: ActorRef,
+object Admin {
+  def props(databaseQueue: ActorRef,
             matchmaking: ActorRef,
-            config: Config,
-            name: String) extends Actor with ActorLog {
+            config: Config) =
+    Props(classOf[Admin], databaseQueue, matchmaking, config)
+}
+
+class Admin(databaseQueue: ActorRef,
+            matchmaking: ActorRef,
+            config: Config) extends Actor with ActorLog {
 
   var client: Option[ActorRef] = None
 
@@ -45,25 +51,25 @@ class Admin(database: ActorRef,
   def admin: Receive = logged {
     case AdminGetAccountState(dto) ⇒
       accountId = Some(dto.accountId)
-      send(database, Database.GetAccountState(dto.accountId))
+      send(databaseQueue, Database.GetAccount(dto.accountId))
       become(waitForState, "waitForState")
 
     case AdminSetAccountState(accountState) ⇒
-      send(database, Database.UpdateAccountState(accountId.get, accountState))
+      send(databaseQueue, Database.GetAndUpdateAccountState(accountId.get, oldState ⇒ accountState)) // todo checkAndUpdate
       become(waitForUpdatedState, "waitForUpdatedState")
   }
 
   def waitForState = logged {
-    case AccountStateResponse(_, accountState) ⇒
-      if (accountState.isDefined)
-        send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
+    case msg: AccountResponse ⇒
+      if (msg.state.isDefined)
+        send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, msg.state.get)))
       become(admin, "admin")
   }
 
   def waitForUpdatedState = logged {
     case AccountStateResponse(_, accountState) ⇒
-      send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState.get)))
-      send(matchmaking, SetAccountState(accountId.get, accountState.get))
+      send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState)))
+      send(matchmaking, SetAccountState(accountId.get, accountState))
       become(admin, "admin")
   }
 }

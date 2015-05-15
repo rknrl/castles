@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.matchmaking
 
-import akka.actor.{ActorContext, ActorRef, Props}
+import akka.actor.{ActorContext, ActorRef}
 import ru.rknrl.castles.game.state.GameState
 import ru.rknrl.castles.game.{BotFactory, Game, GameScheduler}
 
@@ -27,7 +27,7 @@ class GameFactory extends IGameFactory {
              isDev: Boolean,
              isTutor: Boolean,
              matchmaking: ActorRef)(implicit context: ActorContext) = {
-    val game = context.actorOf(Props(classOf[Game], gameState, isDev, isTutor, new BotFactory(), classOf[GameScheduler], matchmaking), "game-" + gameIterator)
+    val game = context.actorOf(Game.props(gameState, isDev, isTutor, new BotFactory(), classOf[GameScheduler], matchmaking), "game-" + gameIterator)
     gameIterator += 1
     game
   }

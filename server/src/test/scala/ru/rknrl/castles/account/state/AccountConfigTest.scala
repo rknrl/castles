@@ -9,17 +9,17 @@
 package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.castles.account.AccountState.Skills
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.dto.SkillLevel._
+import ru.rknrl.dto.SkillLevelDTO
 import ru.rknrl.dto.SkillType._
 
 class AccountConfigTest extends WordSpec with Matchers {
   "skillsToStat" in {
-    val skills: Skills = Map(
-      ATTACK → SKILL_LEVEL_0,
-      DEFENCE → SKILL_LEVEL_2,
-      SPEED → SKILL_LEVEL_3
+    val skills = List(
+      SkillLevelDTO(ATTACK, SKILL_LEVEL_0),
+      SkillLevelDTO(DEFENCE, SKILL_LEVEL_2),
+      SkillLevelDTO(SPEED, SKILL_LEVEL_3)
     )
 
     val config = Mocks.accountConfigMock(

@@ -8,14 +8,13 @@
 
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.castles.account.AccountState.{Slots, Items}
 import ru.rknrl.core.Stat
-import ru.rknrl.dto.{AccountId, PlayerId, UserInfoDTO}
+import ru.rknrl.dto._
 
 case class Player(id: PlayerId,
                   accountId: AccountId,
                   userInfo: UserInfoDTO,
-                  slots: Slots,
+                  slots: Seq[SlotDTO],
                   stat: Stat,
-                  items: Items,
+                  items: Seq[ItemDTO],
                   isBot: Boolean)
