@@ -7,6 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.menu.top {
+import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
@@ -18,16 +19,16 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
-import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.utils.Align;
 import ru.rknrl.utils.createTextField;
 
-public class LastWeekTopScreen extends Screen {
+public class LastWeekTopScreen extends Sprite {
     private static const topSize:int = 5;
     private var loadImageManager:ILoadImageManager;
 
+    private var mouseHolder:Bitmap;
     private var avatarsHolder:Sprite;
     private const avatars:Vector.<FlyAvatar> = new <FlyAvatar>[];
 
@@ -38,19 +39,23 @@ public class LastWeekTopScreen extends Screen {
 
     public function LastWeekTopScreen(top:Top, place:Number, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.loadImageManager = loadImageManager;
+        _layout = layout;
+
+        addChild(mouseHolder = new Bitmap(Colors.transparent));
+        alignMouseHolder();
+
         addChild(avatarsHolder = new Sprite());
 
-        _layout = layout;
         this.top = top;
 
-        title = new Sprite();
+        addChild(title = new Sprite());
 
         placeTextField = createTextField(Fonts.title);
         title.addChild(placeTextField);
         this.place = place;
 
         titleTextField = createTextField(Fonts.title);
-        titleTextField.text = locale.topTitle;
+        titleTextField.text = "Лучшие на прошлой неделе";
         title.addChild(titleTextField);
         alignTitle();
 
@@ -58,7 +63,7 @@ public class LastWeekTopScreen extends Screen {
     }
 
     public function set place(value:Number):void {
-        placeTextField.text = "У вас " + value + " место";
+        placeTextField.text = "Вы заняли " + value + " место";
         alignPlace();
     }
 
@@ -83,11 +88,17 @@ public class LastWeekTopScreen extends Screen {
 
     private var _layout:Layout;
 
-    override public function set layout(value:Layout):void {
+    public function set layout(value:Layout):void {
         _layout = value;
+        alignMouseHolder();
         alignAvatars();
         alignPlace();
         alignTitle();
+    }
+
+    private function alignMouseHolder():void {
+        mouseHolder.width = _layout.screenWidth;
+        mouseHolder.height = _layout.screenHeight;
     }
 
     private function alignAvatars():void {
@@ -111,14 +122,6 @@ public class LastWeekTopScreen extends Screen {
         const pos:Point = _layout.title(titleTextField.width, titleTextField.height);
         titleTextField.x = pos.x;
         titleTextField.y = pos.y;
-    }
-
-    override public function get titleContent():DisplayObject {
-        return title;
-    }
-
-    override public function get showBalance():Boolean {
-        return false;
     }
 
     private function onClick(event:MouseEvent):void {

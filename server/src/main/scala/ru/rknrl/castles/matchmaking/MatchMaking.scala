@@ -166,9 +166,9 @@ class MatchMaking(gameCreator: GameCreator,
       accountIdToGameInfo = accountIdToGameInfo - accountId
 
       val order = gameInfo.order(accountId)
-      val newRating = ELO.newRating(gameInfo.orders, order, place)
+      val ratingAmount = ELO.ratingAmount(gameInfo.orders, order, place)
 
-      context.actorOf(AccountPatcher.props(accountId, reward, usedItems, newRating, order.userInfo, config, self, databaseQueue), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
+      context.actorOf(AccountPatcher.props(accountId, reward, usedItems, ratingAmount, order.userInfo, config, self, databaseQueue), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
 
       sendToAccount(accountId, AccountLeaveGame)
 

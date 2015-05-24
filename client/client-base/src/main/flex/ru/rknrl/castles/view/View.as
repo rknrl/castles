@@ -43,6 +43,8 @@ public class View extends Sprite {
         if (menu) menu.layout = _layout;
         if (loadingScreen) loadingScreen.layout = _layout;
         if (game) game.layout = _layout;
+        if (gameSplash) gameSplash.layout = _layout;
+        if (lastWeekTopScreen) lastWeekTopScreen.layout = _layout;
     }
 
     private var menu:MenuView;

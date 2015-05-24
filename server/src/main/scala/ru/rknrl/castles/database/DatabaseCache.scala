@@ -82,6 +82,7 @@ class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
       send(client.get, top)
 
     case msg@UpdateRating(accountId, weekNumber, newRating, userInfo) ⇒
+      client = Some(sender)
       if (tops containsKey weekNumber) {
         val top = tops(weekNumber)
         tops.put(weekNumber, top.insert(TopUser(accountId, newRating, userInfo)))

@@ -20,7 +20,7 @@ object AccountPatcher {
   def props(accountId: AccountId,
             reward: Int,
             usedItems: Map[ItemType, Int],
-            newRating: Double,
+            ratingAmount: Double,
             userInfo: UserInfoDTO,
             config: Config,
             matchmaking: ActorRef,
@@ -30,7 +30,7 @@ object AccountPatcher {
       accountId,
       reward,
       usedItems,
-      newRating,
+      ratingAmount,
       userInfo,
       config,
       matchmaking,
@@ -41,7 +41,7 @@ object AccountPatcher {
 class AccountPatcher(accountId: AccountId,
                      reward: Int,
                      usedItems: Map[ItemType, Int],
-                     newRating: Double,
+                     ratingAmount: Double,
                      userInfo: UserInfoDTO,
                      config: Config,
                      matchmaking: ActorRef,
@@ -60,7 +60,7 @@ class AccountPatcher(accountId: AccountId,
       reward
     )
 
-    (newState, newRating)
+    (newState, ratingDto.getOrElse(1400.0) + ratingAmount)
   }
 
   send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))

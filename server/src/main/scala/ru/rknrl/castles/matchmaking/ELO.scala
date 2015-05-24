@@ -23,17 +23,17 @@ object ELO {
     if (place == 1) 1.0 else 0.0
 
   /** http://en.wikipedia.org/wiki/Elo_rating_system */
-  def getNewRating(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {
+  def getRatingAmount(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {
     val eA: Double = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400))
 
     val k: Double = if (ratingA > 2400) 10 else if (gamesCountA <= 30) 30 else 15
 
-    ratingA + k * (sA - eA)
+    k * (sA - eA)
   }
 
-  def newRating(orders: Iterable[GameOrder], order: GameOrder, place: Int) = {
+  def ratingAmount(orders: Iterable[GameOrder], order: GameOrder, place: Int) = {
     val averageEnemyRating = orders.filter(_ != order).map(_.rating).sum / (orders.size - 1)
     val sA = ELO.getSA(orders.size, place)
-    getNewRating(order.rating, averageEnemyRating, order.accountState.gamesCount, sA)
+    getRatingAmount(order.rating, averageEnemyRating, order.accountState.gamesCount, sA)
   }
 }
