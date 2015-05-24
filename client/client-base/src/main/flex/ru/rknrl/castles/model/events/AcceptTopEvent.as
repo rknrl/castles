@@ -7,9 +7,22 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.events {
-public class ViewEvents {
-    public static const PLAY:String = "play";
-    public static const BUY:String = "buy";
-    public static const TRY_CONNECT:String = "tryConnect";
+import flash.events.Event;
+
+import ru.rknrl.castles.model.menu.top.Top;
+
+public class AcceptTopEvent extends Event {
+    public static const ACCEPT_TOP:String = "acceptTop";
+
+    private var _top:Top;
+
+    public function get top():Top {
+        return _top;
+    }
+
+    public function AcceptTopEvent(top:Top) {
+        super(ACCEPT_TOP, true);
+        _top = top;
+    }
 }
 }

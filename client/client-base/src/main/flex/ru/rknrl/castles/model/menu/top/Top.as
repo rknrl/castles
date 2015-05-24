@@ -10,17 +10,22 @@ package ru.rknrl.castles.model.menu.top {
 import ru.rknrl.castles.model.userInfo.CastlesUserInfo;
 import ru.rknrl.castles.model.userInfo.TopUserInfo;
 import ru.rknrl.dto.AccountType;
+import ru.rknrl.dto.TopDTO;
 import ru.rknrl.dto.TopUserInfoDTO;
 
 public class Top {
-    private var dto:Vector.<TopUserInfoDTO>;
+    private var dto:TopDTO;
 
-    public function Top(dto:Vector.<TopUserInfoDTO>) {
+    public function Top(dto:TopDTO) {
         this.dto = dto;
     }
 
+    public function get weekNumber():int {
+        return dto.weekNumber;
+    }
+
     public function getPlace(place:int):TopUserInfo {
-        for each(var userInfo:TopUserInfoDTO in dto) {
+        for each(var userInfo:TopUserInfoDTO in dto.users) {
             if (userInfo.place == place) return TopUserInfo.fromDto(userInfo);
         }
         return new TopUserInfo(place, new CastlesUserInfo(place.toString(), AccountType.DEV, "Somebody", null, null, null));

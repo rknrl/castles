@@ -9,12 +9,10 @@
 package ru.rknrl.castles.view.menu.top {
 import flash.display.DisplayObject;
 import flash.display.Sprite;
-import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 
-import ru.rknrl.castles.model.events.ViewEvents;
-
+import ru.rknrl.castles.model.events.AcceptTopEvent;
 import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
@@ -64,7 +62,11 @@ public class LastWeekTopScreen extends Screen {
         alignPlace();
     }
 
+    private var _top:Top;
+
     public function set top(value:Top):void {
+        _top = value;
+
         while (avatarsHolder.numChildren) avatarsHolder.removeChildAt(0);
         avatars.length = 0;
 
@@ -120,7 +122,7 @@ public class LastWeekTopScreen extends Screen {
     }
 
     private function onClick(event:MouseEvent):void {
-        dispatchEvent(new Event(ViewEvents.ACCEPT_LAST_WEEK_TOP))
+        dispatchEvent(new AcceptTopEvent(_top))
     }
 }
 }

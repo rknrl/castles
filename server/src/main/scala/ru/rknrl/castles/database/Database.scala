@@ -87,8 +87,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
       read(
         "SELECT user_info.id,coalesce(ratings.rating,0) ratings,userInfo " +
           "FROM user_info " +
-          "WHERE ratings.weekNumber = ?" +
-          "LEFT JOIN ratings ON ratings.id=user_info.id " +
+          "LEFT JOIN ratings ON ratings.id=user_info.id AND ratings.weekNumber=? " +
           "GROUP BY ratings.id " +
           "ORDER BY coalesce(ratings.rating,0) DESC " +
           "LIMIT 5;",

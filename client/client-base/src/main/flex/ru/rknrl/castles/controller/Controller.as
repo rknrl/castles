@@ -13,6 +13,7 @@ import ru.rknrl.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.controller.game.GameSplash;
+import ru.rknrl.castles.model.events.AcceptTopEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.model.menu.top.Top;
@@ -41,7 +42,6 @@ public class Controller {
     private var menu:MenuController;
     private var isFirstGame:Boolean;
     private var deviceType:DeviceType;
-    private var lastWeekNumber:int;
 
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
@@ -71,20 +71,19 @@ public class Controller {
             joinGame(authenticated.game);
         } else if (authenticated.hasLastWeekTop) {
             view.hideMenu();
-            lastWeekNumber = authenticated.lastWeekTop.weekNumber;
             addLastWeekTop(authenticated.lastWeekTop, authenticated.lastWeekPlace);
         }
     }
 
     private function addLastWeekTop(lastWeekTop:TopDTO, lastWeekPlace:PlaceDTO):void {
-        view.addEventListener(ViewEvents.ACCEPT_LAST_WEEK_TOP, onAcceptLastWeekTop);
-        view.addLastWeekTop(new Top(lastWeekTop.users), lastWeekPlace.place.toNumber());
+        view.addEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
+        view.addLastWeekTop(new Top(lastWeekTop), lastWeekPlace.place.toNumber());
     }
 
-    private function onAcceptLastWeekTop(e:Event):void {
-        view.removeEventListener(ViewEvents.ACCEPT_LAST_WEEK_TOP, onAcceptLastWeekTop);
+    private function onAcceptLastWeekTop(e:AcceptTopEvent):void {
+        view.removeEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
         const dto:WeekNumberDTO = new WeekNumberDTO();
-        dto.weekNumber = lastWeekNumber;
+        dto.weekNumber = e.top.weekNumber;
 //        server.acceptWeekTop(dto);
         view.removeLastWeekTop();
         view.showMenu();

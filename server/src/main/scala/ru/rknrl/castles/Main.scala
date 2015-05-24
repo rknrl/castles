@@ -54,9 +54,6 @@ object Main {
     val databaseTransaction = system.actorOf(Props(classOf[DatabaseTransaction], databaseCache), "database-transaction")
     val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], databaseTransaction), "database-queue")
 
-    val future = Patterns.ask(database, GetTop, 5 seconds)
-    val top = Await.result(future, 5 seconds)
-
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(
       MatchMaking.props(

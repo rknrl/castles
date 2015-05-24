@@ -98,7 +98,7 @@ public class MenuModel {
     }
 
     public function mergeTopDto(dto:TopDTO):void {
-        _top = new Top(dto.users);
+        _top = new Top(dto);
     }
 
     public function mergePlaceDto(dto:PlaceDTO):void {

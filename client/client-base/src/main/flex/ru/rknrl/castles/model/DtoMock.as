@@ -205,6 +205,7 @@ public class DtoMock {
     public static function top():TopDTO {
         const dto:TopDTO = new TopDTO();
         dto.users = topUsers();
+        dto.weekNumber = 1;
         return dto;
     }
 
