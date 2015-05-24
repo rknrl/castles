@@ -39,10 +39,19 @@ message AuthenticatedDTO {
 
     // Клиент находится в игре
     optional NodeLocator game = 8;
+
+    optional TopDTO lastWeekTop = 9;
+
+    optional PlaceDTO lastWeekPlace = 10;
 }
 
 message TopDTO {
+    required int32 weekNumber = 1;
     repeated TopUserInfoDTO users = 3;
+}
+
+message WeekNumberDTO {
+    required int32 weekNumber = 1;
 }
 
 message TopUserInfoDTO {

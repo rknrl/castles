@@ -10,6 +10,7 @@ package ru.rknrl.castles.view {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.menu.MenuModel;
+import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameSplashView;
 import ru.rknrl.castles.view.game.GameView;
@@ -20,6 +21,7 @@ import ru.rknrl.castles.view.loading.NoConnectionScreen;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
+import ru.rknrl.castles.view.menu.top.LastWeekTopScreen;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
@@ -54,6 +56,10 @@ public class View extends Sprite {
     public function showMenuAndLock():void {
         menu.visible = true;
         menu.lock = true;
+    }
+
+    public function showMenu():void {
+        menu.visible = true;
     }
 
     public function hideMenu():void {
@@ -147,6 +153,19 @@ public class View extends Sprite {
 
     public function addErrorScreen():void {
         addChild(new ErrorScreen(_layout));
+    }
+
+    private var lastWeekTopScreen:LastWeekTopScreen;
+
+    public function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:Number):void {
+        if (lastWeekTopScreen) throw new Error("lastWeekTopScreen already exists");
+        addChild(lastWeekTopScreen = new LastWeekTopScreen(lastWeekTop, lastWeekPlace, _layout, locale, loadImageManager));
+    }
+
+    public function removeLastWeekTop():void {
+        if (!lastWeekTopScreen) throw new Error("lastWeekTopScreen don't exists");
+        removeChild(lastWeekTopScreen);
+        lastWeekTopScreen = null;
     }
 }
 }

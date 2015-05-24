@@ -14,6 +14,7 @@ import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
 import ru.rknrl.castles.database.{DatabaseTransaction, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
+import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2}
@@ -139,7 +140,16 @@ class AccountTest extends AccountTestSpec {
     client.send(account, EnterGame)
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, DatabaseTransaction.AccountResponse(accountId, state = Some(accountState), rating = Some(config.account.initRating), tutorState = None, place = 999))
+    database.send(account, DatabaseTransaction.AccountResponse(
+      accountId,
+      state = Some(accountState),
+      rating = Some(config.account.initRating),
+      tutorState = None,
+      place = 999,
+      top = new Top(List.empty, 5),
+      lastWeekPlace = 666,
+      lastWeekTop = new Top(List.empty, 5)
+    ))
 
     matchmaking.expectMsg(
       GameOrder(

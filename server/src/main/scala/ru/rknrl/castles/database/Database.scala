@@ -44,9 +44,7 @@ class DbConfiguration(username: String,
 
 object Database {
 
-  /** Ответом будет List[TopItem] */
-  case object GetTop
-
+  case class GetTop(weekNumber: Int)
 
   case class GetAccountState(accountId: AccountId) extends Request
 
@@ -55,11 +53,11 @@ object Database {
   case class UpdateAccountState(accountId: AccountId, newState: AccountStateDTO) extends Request
 
 
-  case class GetRating(accountId: AccountId) extends Request
+  case class GetRating(accountId: AccountId, weekNumber: Int) extends Request
 
-  case class RatingResponse(accountId: AccountId, rating: Option[Double]) extends Response
+  case class RatingResponse(accountId: AccountId, weekNumber: Int, rating: Option[Double]) extends Response
 
-  case class UpdateRating(accountId: AccountId, newRating: Double) extends Request
+  case class UpdateRating(accountId: AccountId, weekNumber: Int, newRating: Double, userInfoDTO: UserInfoDTO) extends Request
 
 
   case class GetTutorState(accountId: AccountId) extends Request
@@ -69,9 +67,9 @@ object Database {
   case class UpdateTutorState(accountId: AccountId, newTutorState: TutorStateDTO) extends Request
 
 
-  case class GetPlace(rating: Double)
+  case class GetPlace(rating: Double, weekNumber: Int)
 
-  case class PlaceResponse(rating: Double, place: Long)
+  case class PlaceResponse(rating: Double, weekNumber: Int, place: Long)
 
 
   case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
@@ -84,52 +82,53 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
   override def receive = logged {
-    case GetTop ⇒
+    case GetTop(weekNumber) ⇒
       val ref = sender
       read(
-        "SELECT user_info.id,coalesce(ratings.rating,0) rating,userInfo " +
+        "SELECT user_info.id,coalesce(ratings.rating,0) ratings,userInfo " +
           "FROM user_info " +
+          "WHERE ratings.weekNumber = ?" +
           "LEFT JOIN ratings ON ratings.id=user_info.id " +
           "GROUP BY ratings.id " +
           "ORDER BY coalesce(ratings.rating,0) DESC " +
           "LIMIT 5;",
-        Seq.empty,
-        resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList))
+        Seq(weekNumber),
+        resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList, weekNumber))
       )
 
-    case GetPlace(rating) ⇒
+    case GetPlace(rating, weekNumber) ⇒
       val ref = sender
       read(
         "SELECT COUNT(*) `place` " +
           "FROM ratings " +
-          "WHERE rating > ?",
-        Seq(rating),
+          "WHERE weekNumber = ? AND rating > ?",
+        Seq(weekNumber, rating),
         resultSet ⇒ {
           val place = resultSet.head("place").asInstanceOf[Long] + 1
-          send(ref, PlaceResponse(rating, place))
+          send(ref, PlaceResponse(rating, weekNumber, place))
         }
       )
 
-    case GetRating(accountId) ⇒
+    case GetRating(accountId, weekNumber) ⇒
       val ref = sender
       read(
-        "SELECT rating FROM ratings WHERE id=?;",
-        Seq(accountId.toByteArray),
+        "SELECT rating FROM ratings WHERE weekNumber = ? AND id=?;",
+        Seq(weekNumber, accountId.toByteArray),
         resultSet ⇒
           if (resultSet.size == 0)
-            send(ref, RatingResponse(accountId, None))
+            send(ref, RatingResponse(accountId, weekNumber, None))
           else if (resultSet.size == 1)
-            send(ref, RatingResponse(accountId, Some(rowDataToRating(resultSet.head))))
+            send(ref, RatingResponse(accountId, weekNumber, Some(rowDataToRating(resultSet.head))))
           else
             log.error("Get rating: invalid result rows count = " + resultSet.size)
       )
 
-    case UpdateRating(accountId, newRating) ⇒
+    case UpdateRating(accountId, weekNumber, newRating, userInfo) ⇒
       val ref = sender
       write(
-        "REPLACE INTO ratings (id,rating) VALUES (?,?);",
-        Seq(accountId.toByteArray, newRating),
-        () ⇒ send(ref, RatingResponse(accountId, Some(newRating)))
+        "REPLACE INTO ratings (id,weekNumber,rating) VALUES (?,?,?);",
+        Seq(accountId.toByteArray, weekNumber, newRating),
+        () ⇒ send(ref, RatingResponse(accountId, weekNumber, Some(newRating)))
       )
 
     case UpdateAccountState(accountId, newState) ⇒

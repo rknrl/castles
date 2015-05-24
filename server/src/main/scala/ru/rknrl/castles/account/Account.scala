@@ -17,6 +17,7 @@ import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountSt
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking._
+import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame, PlaceUpdated}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -72,7 +73,7 @@ class Account(matchmaking: ActorRef,
         send(client.ref, CloseConnection)
       }
 
-    case AccountResponse(accountId, stateDto, ratingDto, tutorStateDto, place) ⇒
+    case AccountResponse(accountId, stateDto, ratingDto, tutorStateDto, top, place, placeLastWeek, lastWeekTop) ⇒
       val state = stateDto.getOrElse(config.account.initState)
       val rating = ratingDto.getOrElse(config.account.initRating)
       val tutorState = tutorStateDto.getOrElse(TutorStateDTO())
@@ -81,26 +82,35 @@ class Account(matchmaking: ActorRef,
 
       send(matchmaking, Online(client.accountId))
       send(matchmaking, InGame(client.accountId))
-      become(enterAccount(state, rating, tutorState, place), "enterAccount")
+      become(enterAccount(state, rating, tutorState, top, place, placeLastWeek, lastWeekTop), "enterAccount")
   }
 
   def enterAccount(state: AccountStateDTO,
                    rating: Double,
                    tutorState: TutorStateDTO,
-                   place: Long): Receive = logged {
-    case InGameResponse(gameRef, searchOpponents, top) ⇒
+                   top: Top,
+                   place: Long,
+                   placeLastWeek: Long,
+                   lastWeekTop: Top): Receive = logged {
+    case InGameResponse(gameRef, searchOpponents) ⇒
 
       val isTutor = state.gamesCount == 0
+
+      val needSendLastWeek = !isTutor && (state.weekNumberAccepted.isEmpty || state.weekNumberAccepted.get < lastWeekTop.weekNumber)
+      val lastWeekTopDto = if (needSendLastWeek) Some(lastWeekTop.dto) else None
+      val placeLastWeekDto = if (needSendLastWeek) Some(PlaceDTO(placeLastWeek)) else None
 
       send(client.ref, Authenticated(AuthenticatedDTO(
         state,
         config.account.dto,
-        TopDTO(top),
+        top.dto,
         PlaceDTO(place),
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
         searchOpponents || isTutor,
-        game = if (gameRef.isDefined) Some(nodeLocator) else None
+        game = if (gameRef.isDefined) Some(nodeLocator) else None,
+        lastWeekTopDto,
+        placeLastWeekDto
       )))
 
       if (searchOpponents)
@@ -117,6 +127,18 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def account: Receive = logged {
+    case AcceptWeekTop(weekNumber) ⇒
+      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
+        val state = stateDto.getOrElse(config.account.initState)
+        state.copy(
+          weekNumberAccepted = if (state.weekNumberAccepted.getOrElse(0) < weekNumber.weekNumber)
+            Some(weekNumber.weekNumber)
+          else
+            state.weekNumberAccepted
+        )
+      }
+      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+
     case BuyBuilding(dto) ⇒
       val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
         val state = stateDto.getOrElse(config.account.initState)
@@ -186,9 +208,8 @@ class Account(matchmaking: ActorRef,
       forward(game, msg.stat.action)
       forward(graphite, msg.stat.action)
 
-    case AccountLeaveGame(top) ⇒
+    case AccountLeaveGame ⇒
       send(client.ref, B2C.LeavedGame)
-      send(client.ref, B2C.TopUpdated(TopDTO(top)))
       become(account, "account")
 
   }.orElse(persistent)
@@ -202,6 +223,9 @@ class Account(matchmaking: ActorRef,
 
     case SetAccountState(_, accountStateDto) ⇒
       send(client.ref, AccountStateUpdated(accountStateDto))
+
+    case top: Top ⇒
+      send(client.ref, B2C.TopUpdated(top.dto))
 
     case msg: UpdateStatistics ⇒ send(graphite, msg.stat.action)
 

@@ -14,6 +14,7 @@ import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
 import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
+import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.castles.rmi.B2C.Authenticated
 import ru.rknrl.castles.rmi.C2B.Authenticate
 import ru.rknrl.core.rmi.CloseConnection
@@ -68,7 +69,16 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(DatabaseTransaction.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
+      database.send(account, DatabaseTransaction.AccountResponse(
+        accountId,
+        state = None,
+        rating = None,
+        tutorState = None,
+        place = 999,
+        top = new Top(List.empty, 5),
+        lastWeekPlace = 666,
+        lastWeekTop = new Top(List.empty, 5)
+      ))
 
       val initAccountState = config.account.initState
       val initTutorState = TutorStateDTO()
@@ -76,12 +86,12 @@ class AccountAuthTest extends AccountTestSpec {
       graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
-      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
+      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false))
 
       client.expectMsg(Authenticated(AuthenticatedDTO(
         initAccountState,
         config.account.dto,
-        TopDTO(List.empty),
+        TopDTO(5, List.empty),
         PlaceDTO(999),
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
@@ -91,7 +101,16 @@ class AccountAuthTest extends AccountTestSpec {
 
       graphite.expectMsg(StatAction.START_TUTOR)
       database.expectMsg(GetAccount(accountId))
-      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = None, rating = None, tutorState = None, place = 999))
+      database.send(account, DatabaseTransaction.AccountResponse(
+        accountId,
+        state = None,
+        rating = None,
+        tutorState = None,
+        place = 999,
+        top = new Top(List.empty, 5),
+        lastWeekPlace = 666,
+        lastWeekTop = new Top(List.empty, 5)
+      ))
       matchmaking.expectMsgClass(classOf[GameOrder])
     })
 
@@ -125,21 +144,32 @@ class AccountAuthTest extends AccountTestSpec {
       database.expectMsg(DatabaseTransaction.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, DatabaseTransaction.AccountResponse(accountId, state = Some(accountState), rating = Some(rating), tutorState = Some(tutorState), place = 666))
+      database.send(account, DatabaseTransaction.AccountResponse(
+        accountId,
+        state = Some(accountState),
+        rating = Some(rating),
+        tutorState = Some(tutorState),
+        place = 666,
+        top = new Top(List.empty, 5),
+        lastWeekPlace = 667,
+        lastWeekTop = new Top(List.empty, 4)
+      ))
 
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
-      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false, top = List.empty))
+      matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false))
 
       client.expectMsg(Authenticated(AuthenticatedDTO(
         accountState,
         config.account.dto,
-        TopDTO(List.empty),
+        TopDTO(5, List.empty),
         PlaceDTO(666),
         config.productsDto(CANVAS, VKONTAKTE),
         tutorState,
         searchOpponents = false,
-        game = None
+        game = None,
+        lastWeekPlace = Some(PlaceDTO(667)),
+        lastWeekTop = Some(TopDTO(4, List.empty))
       )))
     })
 

@@ -123,7 +123,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
 
     client2.send(matchmaking, AllPlayersLeaveGame(game1.get))
     client2.send(matchmaking, InGame(accountId2))
-    client2.expectMsg(InGameResponse(gameRef = game2, searchOpponents = false, top = top5.dto))
+    client2.expectMsg(InGameResponse(gameRef = game2, searchOpponents = false))
     client2.expectNoMsg()
   })
 
@@ -145,9 +145,9 @@ class MatchmakingTest extends MatchmakingTestSpec {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
     client.send(matchmaking, PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap))
-    client.expectMsgClass(classOf[AccountLeaveGame])
+    client.expectMsg(AccountLeaveGame)
     client.send(matchmaking, InGame(accountId))
-    client.expectMsg(InGameResponse(gameRef = None, searchOpponents = false, top = top5.dto))
+    client.expectMsg(InGameResponse(gameRef = None, searchOpponents = false))
   })
 
 
@@ -164,13 +164,13 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, InGame(accountId))
     client.expectMsgPF(timeout.duration) {
-      case InGameResponse(None, false, top) ⇒ true
+      case InGameResponse(None, false) ⇒ true
     }
 
     client.send(matchmaking, newGameOrder(accountId))
     client.send(matchmaking, InGame(accountId))
     client.expectMsgPF(timeout.duration) {
-      case InGameResponse(None, true, top) ⇒ true
+      case InGameResponse(None, true) ⇒ true
     }
 
     client.send(matchmaking, TryCreateGames)
@@ -181,14 +181,14 @@ class MatchmakingTest extends MatchmakingTestSpec {
 
     client.send(matchmaking, InGame(accountId))
     client.expectMsgPF(timeout.duration) {
-      case InGameResponse(game, false, top) ⇒ true
+      case InGameResponse(game, false) ⇒ true
     }
 
     client.send(matchmaking, PlayerLeaveGame(accountId, place = 1, reward = 2, usedItems = ItemType.values.map(_ → 0).toMap))
-    client.expectMsgClass(classOf[AccountLeaveGame])
+    client.expectMsg(AccountLeaveGame)
     client.send(matchmaking, InGame(accountId))
     client.expectMsgPF(timeout.duration) {
-      case InGameResponse(None, false, top) ⇒ true
+      case InGameResponse(None, false) ⇒ true
     }
     client.expectNoMsg()
   })

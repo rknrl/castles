@@ -4,7 +4,7 @@ use castles;
 
 create table account_state(id VARBINARY(128) NOT NULL, state VARBINARY(256) NOT NULL, PRIMARY KEY (id)) engine=InnoDb;
 
-create table ratings(id VARBINARY(128) NOT NULL, rating DOUBLE, PRIMARY KEY (id)) engine=InnoDb;
+create table ratings(id VARBINARY(128) NOT NULL, weekNumber INT, rating DOUBLE, PRIMARY KEY (id)) engine=InnoDb;
 
 CREATE INDEX rating ON ratings(rating);
 

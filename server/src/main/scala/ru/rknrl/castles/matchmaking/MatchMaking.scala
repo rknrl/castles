@@ -43,7 +43,7 @@ object MatchMaking {
 
   case class InGame(accountId: AccountId)
 
-  case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean, top: Seq[TopUserInfoDTO])
+  case class InGameResponse(gameRef: Option[ActorRef], searchOpponents: Boolean)
 
   case class PlayerLeaveGame(accountId: AccountId, place: Int, reward: Int, usedItems: Map[ItemType, Int])
 
@@ -55,7 +55,7 @@ object MatchMaking {
 
   case object RegisterHealth
 
-  case class AccountLeaveGame(top: Seq[TopUserInfoDTO])
+  case object AccountLeaveGame
 
   case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
 
@@ -64,17 +64,15 @@ object MatchMaking {
   def props(gameCreator: GameCreator,
             gameFactory: IGameFactory,
             interval: FiniteDuration,
-            top: Top,
             config: Config,
             databaseQueue: ActorRef,
             graphite: ActorRef) =
-    Props(classOf[MatchMaking], gameCreator, gameFactory, interval, top, config, databaseQueue, graphite)
+    Props(classOf[MatchMaking], gameCreator, gameFactory, interval, config, databaseQueue, graphite)
 }
 
 class MatchMaking(gameCreator: GameCreator,
                   gameFactory: IGameFactory,
                   interval: FiniteDuration,
-                  var top: Top,
                   config: Config,
                   databaseQueue: ActorRef,
                   graphite: ActorRef) extends Actor with ActorLog {
@@ -87,7 +85,7 @@ class MatchMaking(gameCreator: GameCreator,
 
         for (order ← gameInfo.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo - order.accountId
-          sendToAccount(order.accountId, AccountLeaveGame(top.dto))
+          sendToAccount(order.accountId, AccountLeaveGame)
         }
       }
       Stop
@@ -134,8 +132,7 @@ class MatchMaking(gameCreator: GameCreator,
     case InGame(accountId) ⇒
       send(sender, InGameResponse(
         gameRef = if (accountIdToGameInfo contains accountId) Some(accountIdToGameInfo(accountId).gameRef) else None,
-        searchOpponents = accountIdToGameOrder contains accountId,
-        top = top.dto
+        searchOpponents = accountIdToGameOrder contains accountId
       ))
 
     case order: GameOrder ⇒
@@ -170,11 +167,10 @@ class MatchMaking(gameCreator: GameCreator,
 
       val order = gameInfo.order(accountId)
       val newRating = ELO.newRating(gameInfo.orders, order, place)
-      top = top.insert(TopUser(accountId, newRating, order.userInfo))
 
-      context.actorOf(Props(classOf[AccountPatcher], accountId, reward, usedItems, newRating, config, self, databaseQueue), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
+      context.actorOf(AccountPatcher.props(accountId, reward, usedItems, newRating, order.userInfo, config, self, databaseQueue), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
 
-      sendToAccount(accountId, AccountLeaveGame(top.dto))
+      sendToAccount(accountId, AccountLeaveGame)
 
       sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, graphite)
 

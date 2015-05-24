@@ -8,18 +8,41 @@
 
 package ru.rknrl.castles.matchmaking
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.matchmaking.MatchMaking.{SetAccountState, SetRating}
-import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType}
+import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType, UserInfoDTO}
 import ru.rknrl.logging.ActorLog
+
+object AccountPatcher {
+  def props(accountId: AccountId,
+            reward: Int,
+            usedItems: Map[ItemType, Int],
+            newRating: Double,
+            userInfo: UserInfoDTO,
+            config: Config,
+            matchmaking: ActorRef,
+            databaseQueue: ActorRef) =
+    Props(
+      classOf[AccountPatcher],
+      accountId,
+      reward,
+      usedItems,
+      newRating,
+      userInfo,
+      config,
+      matchmaking,
+      databaseQueue
+    )
+}
 
 class AccountPatcher(accountId: AccountId,
                      reward: Int,
                      usedItems: Map[ItemType, Int],
                      newRating: Double,
+                     userInfo: UserInfoDTO,
                      config: Config,
                      matchmaking: ActorRef,
                      databaseQueue: ActorRef) extends Actor with ActorLog {
@@ -40,7 +63,7 @@ class AccountPatcher(accountId: AccountId,
     (newState, newRating)
   }
 
-  send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform))
+  send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
 
   def receive = logged {
     case AccountStateAndRatingResponse(accountId, stateDto, newRating, place) ⇒

@@ -14,6 +14,7 @@ import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
+import ru.rknrl.castles.matchmaking.Top
 import ru.rknrl.castles.rmi.B2C.EnteredGame
 import ru.rknrl.castles.rmi.C2B.{CastFireball, EnterGame, UpdateStatistics}
 import ru.rknrl.castles.rmi.{B2C, C2B}
@@ -51,7 +52,16 @@ class AccountEnterGameTest extends AccountTestSpec {
     client.send(account, EnterGame)
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, DatabaseTransaction.AccountResponse(accountId, state = Some(accountState), rating = Some(config.account.initRating), tutorState = None, place = 999))
+    database.send(account, DatabaseTransaction.AccountResponse(
+      accountId,
+      state = Some(accountState),
+      rating = Some(config.account.initRating),
+      tutorState = None,
+      place = 999,
+      top = new Top(List.empty, 5),
+      lastWeekPlace = 666,
+      lastWeekTop = new Top(List.empty, 4)
+    ))
 
     matchmaking.expectMsg(
       GameOrder(
@@ -80,9 +90,8 @@ class AccountEnterGameTest extends AccountTestSpec {
     game.expectMsg(StatAction.TUTOR_BIG_TOWER)
     graphite.expectMsg(StatAction.TUTOR_BIG_TOWER)
 
-    matchmaking.send(account, AccountLeaveGame(List.empty))
+    matchmaking.send(account, AccountLeaveGame)
     client.expectMsg(B2C.LeavedGame)
-    client.expectMsg(B2C.TopUpdated(TopDTO(List.empty)))
   })
 
 }

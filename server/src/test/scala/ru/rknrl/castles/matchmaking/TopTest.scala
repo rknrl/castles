@@ -25,32 +25,40 @@ class TopTest extends WordSpec with Matchers {
   val info4 = UserInfoDTO(id4)
   val info5 = UserInfoDTO(id5)
 
-  val top5 = new Top(List(
-    TopUser(id1, 1512.2, info1),
-    TopUser(id2, 1400, info2),
-    TopUser(id3, 1399, info3),
-    TopUser(id4, 1300, info4),
-    TopUser(id5, 1200, info5)
-  ))
+  val top5 = new Top(
+    List(
+      TopUser(id1, 1512.2, info1),
+      TopUser(id2, 1400, info2),
+      TopUser(id3, 1399, info3),
+      TopUser(id4, 1300, info4),
+      TopUser(id5, 1200, info5)
+    ),
+    weekNumber = 1
+  )
 
-  val top3 = new Top(List(
-    TopUser(id1, 1512.2, info1),
-    TopUser(id2, 1400, info2),
-    TopUser(id3, 1399, info3)
-  ))
+  val top3 = new Top(
+    List(
+      TopUser(id1, 1512.2, info1),
+      TopUser(id2, 1400, info2),
+      TopUser(id3, 1399, info3)
+    ),
+    weekNumber = 2
+  )
 
   "dto" in {
-    top5.dto.size shouldBe 5
-    top5.dto(0) shouldBe TopUserInfoDTO(place = 1, info1)
-    top5.dto(1) shouldBe TopUserInfoDTO(place = 2, info2)
-    top5.dto(2) shouldBe TopUserInfoDTO(place = 3, info3)
-    top5.dto(3) shouldBe TopUserInfoDTO(place = 4, info4)
-    top5.dto(4) shouldBe TopUserInfoDTO(place = 5, info5)
+    top5.dto.weekNumber shouldBe 1
+    top5.dto.users.size shouldBe 5
+    top5.dto.users(0) shouldBe TopUserInfoDTO(place = 1, info1)
+    top5.dto.users(1) shouldBe TopUserInfoDTO(place = 2, info2)
+    top5.dto.users(2) shouldBe TopUserInfoDTO(place = 3, info3)
+    top5.dto.users(3) shouldBe TopUserInfoDTO(place = 4, info4)
+    top5.dto.users(4) shouldBe TopUserInfoDTO(place = 5, info5)
 
-    top3.dto.size shouldBe 3
-    top3.dto(0) shouldBe TopUserInfoDTO(place = 1, info1)
-    top3.dto(1) shouldBe TopUserInfoDTO(place = 2, info2)
-    top3.dto(2) shouldBe TopUserInfoDTO(place = 3, info3)
+    top3.dto.weekNumber shouldBe 2
+    top3.dto.users.size shouldBe 3
+    top3.dto.users(0) shouldBe TopUserInfoDTO(place = 1, info1)
+    top3.dto.users(1) shouldBe TopUserInfoDTO(place = 2, info2)
+    top3.dto.users(2) shouldBe TopUserInfoDTO(place = 3, info3)
   }
 
   "insert" should {

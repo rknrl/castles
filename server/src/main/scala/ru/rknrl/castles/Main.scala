@@ -63,7 +63,6 @@ object Main {
         gameCreator = gameCreator,
         gameFactory = new GameFactory(),
         interval = 7 seconds,
-        top = top.asInstanceOf[Top],
         config = config,
         databaseQueue = databaseQueue,
         graphite = graphite

@@ -45,6 +45,8 @@ object C2B {
 
   case class UpdateStatistics(stat: StatDTO) extends Msg(87)
 
+  case class AcceptWeekTop(weekNumber: WeekNumberDTO) extends Msg(88)
+
   // enter game 90 - 99
 
   case object JoinGame extends GameMsg(90)

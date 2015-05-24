@@ -115,13 +115,15 @@ object Mocks extends Matchers {
                        skills: Seq[SkillLevelDTO] = skillsMock,
                        items: Seq[ItemDTO] = itemsMock,
                        gold: Int = 10,
-                       gamesCount: Int = 1) =
+                       gamesCount: Int = 1,
+                       weekNumberAccepted: Option[Int] = None) =
     AccountStateDTO(
       slots = slots,
       skills = skills,
       items = items,
       gold = gold,
-      gamesCount = gamesCount
+      gamesCount = gamesCount,
+      weekNumberAccepted = weekNumberAccepted
     )
 
   def socialConfigMock(appId: String = "",

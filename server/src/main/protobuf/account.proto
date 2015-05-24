@@ -13,6 +13,7 @@ message AccountStateDTO {
     required int32 gold = 4;
     //    required double rating = 5;
     required int32 gamesCount = 6;
+    optional int32 weekNumberAccepted = 7;
 }
 
 message PlaceDTO {

@@ -15,6 +15,7 @@ import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.controller.game.GameSplash;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
+import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
@@ -24,6 +25,9 @@ import ru.rknrl.dto.CellSize;
 import ru.rknrl.dto.DeviceType;
 import ru.rknrl.dto.GameStateDTO;
 import ru.rknrl.dto.NodeLocator;
+import ru.rknrl.dto.PlaceDTO;
+import ru.rknrl.dto.TopDTO;
+import ru.rknrl.dto.WeekNumberDTO;
 import ru.rknrl.rmi.EnteredGameEvent;
 import ru.rknrl.rmi.JoinedGameEvent;
 import ru.rknrl.rmi.LeavedGameEvent;
@@ -37,6 +41,7 @@ public class Controller {
     private var menu:MenuController;
     private var isFirstGame:Boolean;
     private var deviceType:DeviceType;
+    private var lastWeekNumber:int;
 
     public function Controller(view:View,
                                authenticated:AuthenticatedDTO,
@@ -64,7 +69,25 @@ public class Controller {
             view.hideMenu();
             if (!addGameSplash()) view.addLoadingScreen();
             joinGame(authenticated.game);
+        } else if (authenticated.hasLastWeekTop) {
+            view.hideMenu();
+            lastWeekNumber = authenticated.lastWeekTop.weekNumber;
+            addLastWeekTop(authenticated.lastWeekTop, authenticated.lastWeekPlace);
         }
+    }
+
+    private function addLastWeekTop(lastWeekTop:TopDTO, lastWeekPlace:PlaceDTO):void {
+        view.addEventListener(ViewEvents.ACCEPT_LAST_WEEK_TOP, onAcceptLastWeekTop);
+        view.addLastWeekTop(new Top(lastWeekTop.users), lastWeekPlace.place.toNumber());
+    }
+
+    private function onAcceptLastWeekTop(e:Event):void {
+        view.removeEventListener(ViewEvents.ACCEPT_LAST_WEEK_TOP, onAcceptLastWeekTop);
+        const dto:WeekNumberDTO = new WeekNumberDTO();
+        dto.weekNumber = lastWeekNumber;
+//        server.acceptWeekTop(dto);
+        view.removeLastWeekTop();
+        view.showMenu();
     }
 
     private function addGameSplash():Boolean {
