@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
@@ -44,6 +44,8 @@ class DbConfiguration(username: String,
 
 object Database {
 
+  def props(config: DbConfiguration) = Props(classOf[Database], config)
+
   case class GetTop(weekNumber: Int)
 
   case class GetAccountState(accountId: AccountId) extends Request
@@ -74,6 +76,8 @@ object Database {
 
   case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
 
+  case class UserInfoResponse(accountId: AccountId, userInfo: Option[UserInfoDTO])
+
 }
 
 class Database(configuration: DbConfiguration) extends Actor with ActorLog {
@@ -81,15 +85,16 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
-  override def receive = logged {
+  override def receive: Receive = logged {
     case GetTop(weekNumber) ⇒
       val ref = sender
       read(
-        "SELECT user_info.id,coalesce(ratings.rating,0) ratings,userInfo " +
-          "FROM user_info " +
-          "LEFT JOIN ratings ON ratings.id=user_info.id AND ratings.weekNumber=? " +
+        "SELECT ratings.id, ratings.rating, userInfo " +
+          "FROM ratings " +
+          "LEFT JOIN user_info ON user_info.id=ratings.id " +
+          "WHERE ratings.weekNumber=? " +
           "GROUP BY ratings.id " +
-          "ORDER BY coalesce(ratings.rating,0) DESC " +
+          "ORDER BY ratings.rating DESC " +
           "LIMIT 5;",
         Seq(weekNumber),
         resultSet ⇒ send(ref, Top(resultSet.map(rowDataToTopUser).toList, weekNumber))
@@ -114,7 +119,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         "SELECT rating FROM ratings WHERE weekNumber = ? AND id=?;",
         Seq(weekNumber, accountId.toByteArray),
         resultSet ⇒
-          if (resultSet.size == 0)
+          if (resultSet.isEmpty)
             send(ref, RatingResponse(accountId, weekNumber, None))
           else if (resultSet.size == 1)
             send(ref, RatingResponse(accountId, weekNumber, Some(rowDataToRating(resultSet.head))))
@@ -144,7 +149,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         "SELECT state FROM account_state WHERE id=?;",
         Seq(accountId.toByteArray),
         resultSet ⇒
-          if (resultSet.size == 0)
+          if (resultSet.isEmpty)
             send(ref, AccountStateResponse(accountId, None))
           else if (resultSet.size == 1)
             send(ref, AccountStateResponse(accountId, Some(rowDataToAccountState(resultSet.head))))
@@ -158,7 +163,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         "SELECT state FROM tutor_state WHERE id=?;",
         Seq(accountId.toByteArray),
         resultSet ⇒
-          if (resultSet.size == 0)
+          if (resultSet.isEmpty)
             send(ref, TutorStateResponse(accountId, None))
           else if (resultSet.size == 1)
             send(ref, TutorStateResponse(accountId, Some(rowDataToTutorState(resultSet.head))))
@@ -175,10 +180,11 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
       )
 
     case UpdateUserInfo(accountId, userInfo) ⇒
+      val ref = sender
       write(
-        "REPLACE INTO user_info (id,info) VALUES (?,?);",
+        "REPLACE INTO user_info (id,userInfo) VALUES (?,?);",
         Seq(accountId.toByteArray, userInfo.toByteArray),
-        () ⇒ {}
+        () ⇒ send(ref, UserInfoResponse(accountId, Some(userInfo)))
       )
   }
 
@@ -201,8 +207,12 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
 
     val rating = rowData(1).asInstanceOf[Double]
 
-    val userInfoByteArray = rowData(2).asInstanceOf[Array[Byte]]
-    val userInfo = UserInfoDTO.parseFrom(userInfoByteArray)
+    val userInfo = if (rowData(2) == null)
+      UserInfoDTO(id)
+    else {
+      val userInfoByteArray = rowData(2).asInstanceOf[Array[Byte]]
+      UserInfoDTO.parseFrom(userInfoByteArray)
+    }
 
     TopUser(id, rating, userInfo)
   }

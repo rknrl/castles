@@ -41,6 +41,8 @@ libraryDependencies ++= Seq(
   "ru.rknrl" %% "social-server" % "1.0"
 )
 
+parallelExecution in Test := false
+
 test in assembly := {}
 assemblyJarName in assembly := "castles.jar"
 mainClass in assembly := Some("ru.rknrl.castles.Main")

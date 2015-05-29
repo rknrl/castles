@@ -10,21 +10,18 @@ package ru.rknrl.castles
 
 import akka.actor.{ActorSystem, Props}
 import akka.io.{IO, Tcp}
-import akka.pattern._
 import net.liftweb.json._
 import ru.rknrl.PolicyServer
 import ru.rknrl.castles.account.SecretChecker
 import ru.rknrl.castles.admin.AdminTcpServer
-import ru.rknrl.castles.database.Database.GetTop
 import ru.rknrl.castles.database.{Database, DatabaseCache, DatabaseQueue, DatabaseTransaction}
 import ru.rknrl.castles.game.init.GameMaps
-import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking, Top}
+import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
 import ru.rknrl.logging.Bugs
 import spray.can.Http
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.Source
 
@@ -49,7 +46,7 @@ object Main {
     val graphite = system.actorOf(Props(classOf[Graphite], config.graphite, config.isDev), "graphite")
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
-    val database = system.actorOf(Props(classOf[Database], config.db), "database")
+    val database = system.actorOf(Database.props(config.db), "database")
     val databaseCache = system.actorOf(Props(classOf[DatabaseCache], database), "database-cache")
     val databaseTransaction = system.actorOf(Props(classOf[DatabaseTransaction], databaseCache), "database-transaction")
     val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], databaseTransaction), "database-queue")
