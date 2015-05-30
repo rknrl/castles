@@ -43,13 +43,13 @@ object Main {
 
     implicit val system = ActorSystem("main-actor-system")
 
-    val graphite = system.actorOf(Props(classOf[Graphite], config.graphite, config.isDev), "graphite")
-    val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
+    val graphite = system.actorOf(Graphite.props(config.graphite, config.isDev), "graphite")
+    val secretChecker = system.actorOf(SecretChecker.props(config), "secret-checker")
 
     val database = system.actorOf(Database.props(config.db), "database")
     val databaseCache = system.actorOf(DatabaseCache.props(database), "database-cache")
-    val databaseTransaction = system.actorOf(Props(classOf[DatabaseTransaction], databaseCache), "database-transaction")
-    val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], databaseTransaction), "database-queue")
+    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache), "database-transaction")
+    val databaseQueue = system.actorOf(DatabaseQueue.props(databaseTransaction), "database-queue")
 
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(
@@ -64,13 +64,13 @@ object Main {
       "matchmaking"
     )
 
-    val bugs = system.actorOf(Props(classOf[Bugs], config.clientBugsDir), "bugs")
-    val httpServer = system.actorOf(Props(classOf[HttpServer], config, databaseQueue, matchmaking, bugs), "http-server")
+    val bugs = system.actorOf(Bugs.props(config.clientBugsDir), "bugs")
+    val httpServer = system.actorOf(HttpServer.props(config, databaseQueue, matchmaking, bugs), "http-server")
     IO(Http) ! Http.Bind(httpServer, config.host, config.httpPort)
 
     val tcp = IO(Tcp)
-    system.actorOf(Props(classOf[PolicyServer], tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(Props(classOf[AdminTcpServer], tcp, config, databaseQueue, matchmaking), "admin-server")
-    system.actorOf(Props(classOf[TcpServer], tcp, config, matchmaking, databaseQueue, graphite, secretChecker), "tcp-server")
+    system.actorOf(PolicyServer.props(tcp, config.host, config.policyPort), "policy-server")
+    system.actorOf(AdminTcpServer.props(tcp, config, databaseQueue, matchmaking), "admin-server")
+    system.actorOf(TcpServer.props(tcp, config, matchmaking, databaseQueue, graphite, secretChecker), "tcp-server")
   }
 }

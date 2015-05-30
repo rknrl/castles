@@ -10,7 +10,7 @@ package ru.rknrl.castles.payments
 
 import java.net.URLDecoder
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
@@ -28,6 +28,14 @@ import spray.routing.HttpService
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+
+object HttpServer {
+  def props(config: Config,
+            databaseQueue: ActorRef,
+            matchmaking: ActorRef,
+            bugs: ActorRef) =
+    Props(classOf[HttpServer], config, databaseQueue, matchmaking, bugs)
+}
 
 class HttpServer(config: Config,
                  databaseQueue: ActorRef,

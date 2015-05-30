@@ -20,6 +20,8 @@ import ru.rknrl.logging.ActorLog
 
 object Graphite {
 
+  def props(config: GraphiteConfig, isDev: Boolean) = Props(classOf[Graphite], config, isDev)
+
   case class Health(online: Int, games: Int)
 
   case class GraphiteConfig(host: String,

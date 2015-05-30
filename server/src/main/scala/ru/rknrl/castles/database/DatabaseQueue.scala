@@ -8,9 +8,13 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
 import ru.rknrl.dto.AccountId
 import ru.rknrl.logging.ActorLog
+
+object DatabaseQueue {
+  def props(database: ActorRef) = Props(classOf[DatabaseQueue], database)
+}
 
 class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
 

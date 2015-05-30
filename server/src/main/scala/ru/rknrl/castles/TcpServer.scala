@@ -15,7 +15,29 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountClientSession
 import ru.rknrl.logging.ActorLog
 
-class TcpServer(tcp: ActorRef, config: Config, matchmaking: ActorRef, databaseQueue: ActorRef, graphite: ActorRef, secretChecker: ActorRef) extends Actor with ActorLog {
+object TcpServer {
+  def props(tcp: ActorRef,
+            config: Config,
+            matchmaking: ActorRef,
+            databaseQueue: ActorRef,
+            graphite: ActorRef,
+            secretChecker: ActorRef) =
+    Props(
+      classOf[TcpServer],
+      config,
+      matchmaking,
+      databaseQueue,
+      graphite,
+      secretChecker
+    )
+}
+
+class TcpServer(tcp: ActorRef,
+                config: Config,
+                matchmaking: ActorRef,
+                databaseQueue: ActorRef,
+                graphite: ActorRef,
+                secretChecker: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 

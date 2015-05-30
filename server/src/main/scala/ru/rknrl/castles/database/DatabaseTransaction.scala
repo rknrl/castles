@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
 import akka.pattern.Patterns
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
@@ -19,6 +19,8 @@ import ru.rknrl.logging.ActorLog
 import scala.concurrent.duration._
 
 object DatabaseTransaction {
+
+  def props(database: ActorRef) = Props(classOf[DatabaseTransaction], database)
 
   trait Request {
     val accountId: AccountId

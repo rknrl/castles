@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-import akka.actor.Actor
+import akka.actor.{Actor, Props}
 import akka.util.Crypt
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
@@ -23,6 +23,7 @@ import ru.rknrl.dto.AuthenticateDTO
 import ru.rknrl.logging.ActorLog
 
 object SecretChecker {
+  def props(config: Config) = Props(classOf[SecretChecker], config)
 
   case class SecretChecked(valid: Boolean)
 

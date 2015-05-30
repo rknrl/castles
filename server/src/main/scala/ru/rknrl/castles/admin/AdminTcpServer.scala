@@ -15,6 +15,20 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.Config
 import ru.rknrl.logging.ActorLog
 
+object AdminTcpServer {
+  def props(tcp: ActorRef,
+            config: Config,
+            databaseQueue: ActorRef,
+            matchmaking: ActorRef) =
+    Props(
+      classOf[AdminTcpServer],
+      tcp,
+      config,
+      databaseQueue,
+      matchmaking
+    )
+}
+
 class AdminTcpServer(tcp: ActorRef,
                      config: Config,
                      databaseQueue: ActorRef,
