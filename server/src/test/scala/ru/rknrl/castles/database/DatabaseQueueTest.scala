@@ -48,6 +48,13 @@ class DatabaseQueueTest extends ActorsTest {
 
     database.send(queue, TutorStateResponse(accountId2, Some(TutorStateDTO())))
     client1.expectMsg(TutorStateResponse(accountId2, Some(TutorStateDTO())))
+
+    // accountId again
+
+    client1.send(queue, GetTutorState(accountId1))
+    database.expectMsg(GetTutorState(accountId1))
+    database.send(queue, TutorStateResponse(accountId1, None))
+    client1.expectMsg(TutorStateResponse(accountId1, None))
   }
 
 }

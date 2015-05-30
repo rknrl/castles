@@ -11,6 +11,7 @@ package ru.rknrl.castles.database
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.database.TestDatabase.GetUserInfo
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto.AccountType.DEV
@@ -189,4 +190,29 @@ class DatabaseCacheTest extends ActorsTest {
     test(weekNumber = 1)
   }
 
+  "GetPlace" in {
+    val client = new TestProbe(system)
+    val database = new TestProbe(system)
+
+    val databaseCache = newDatabaseCache(database.ref)
+
+    client.send(databaseCache, GetPlace(rating = 1200, weekNumber = 1))
+    database.expectMsg(GetPlace(rating = 1200, weekNumber = 1))
+    database.reply(PlaceResponse(rating = 1200, weekNumber = 1, place = 3))
+    client.expectMsg(PlaceResponse(rating = 1200, weekNumber = 1, place = 3))
+  }
+
+  "UpdateUserInfo" in {
+    val client = new TestProbe(system)
+    val database = new TestProbe(system)
+
+    val databaseCache = newDatabaseCache(database.ref)
+    val accountId = AccountId(DEV, "1")
+
+    val userInfo = UserInfoDTO(accountId)
+    client.send(databaseCache, UpdateUserInfo(accountId, userInfo))
+    database.expectMsg(UpdateUserInfo(accountId, userInfo))
+    database.reply(UserInfoResponse(accountId, Some(userInfo)))
+    client.expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+  }
 }

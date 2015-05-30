@@ -74,9 +74,9 @@ object Database {
   case class PlaceResponse(rating: Double, weekNumber: Int, place: Long)
 
 
-  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO)
+  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO) extends Request
 
-  case class UserInfoResponse(accountId: AccountId, userInfo: Option[UserInfoDTO])
+  case class UserInfoResponse(accountId: AccountId, userInfo: Option[UserInfoDTO]) extends Response
 
 }
 

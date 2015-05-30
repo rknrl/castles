@@ -93,10 +93,6 @@ class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
       }
       send(database, msg)
 
-    case msg: Request ⇒
-      client = Some(sender)
-      send(database, msg)
-
     case msg ⇒
       forward(database, msg)
   }

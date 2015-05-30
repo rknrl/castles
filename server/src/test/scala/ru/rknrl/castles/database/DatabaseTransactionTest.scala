@@ -202,4 +202,32 @@ class DatabaseTransactionTest extends ActorsTest {
 
     client.expectMsg(DatabaseTransaction.AccountStateAndRatingResponse(accountId, newState, newRating, place))
   }
+
+  "UpdateTutorState" in {
+    val client = new TestProbe(system)
+    val database = new TestProbe(system)
+
+    val transaction = newDatabaseTransaction(database.ref)
+    val accountId = AccountId(DEV, "1")
+
+    val tutorState = TutorStateDTO()
+    client.send(transaction, UpdateTutorState(accountId, tutorState))
+    database.expectMsg(UpdateTutorState(accountId, tutorState))
+    database.reply(TutorStateResponse(accountId, Some(tutorState)))
+    client.expectMsg(TutorStateResponse(accountId, Some(tutorState)))
+  }
+
+  "UpdateUserInfo" in {
+    val client = new TestProbe(system)
+    val database = new TestProbe(system)
+
+    val transaction = newDatabaseTransaction(database.ref)
+    val accountId = AccountId(DEV, "1")
+
+    val userInfo = UserInfoDTO(accountId)
+    client.send(transaction, UpdateUserInfo(accountId, userInfo))
+    database.expectMsg(UpdateUserInfo(accountId, userInfo))
+    database.reply(UserInfoResponse(accountId, Some(userInfo)))
+    client.expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+  }
 }

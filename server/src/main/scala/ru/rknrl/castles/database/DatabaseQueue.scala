@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Props, Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.dto.AccountId
 import ru.rknrl.logging.ActorLog
 
@@ -23,8 +23,6 @@ class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
   var queues = Map.empty[AccountId, List[QueueRequest]]
 
   def receive = logged {
-    case msg: DatabaseTransaction.NoResponse ⇒ send(database, msg)
-
     case msg: DatabaseTransaction.Request ⇒
       val accountId = msg.accountId
       val request = QueueRequest(msg, sender)
@@ -47,5 +45,7 @@ class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
       } else
         queues = queues - accountId
       send(request.sender, msg)
+
+    case msg ⇒ forward(database, msg)
   }
 }

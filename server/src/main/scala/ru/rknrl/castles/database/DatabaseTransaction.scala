@@ -31,8 +31,6 @@ object DatabaseTransaction {
     val accountId: AccountId
   }
 
-  trait NoResponse
-
   case class GetAccount(accountId: AccountId) extends Request
 
   case class AccountResponse(accountId: AccountId,
@@ -120,7 +118,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
         })
       })
 
-    case msg: NoResponse ⇒ send(database, msg)
+    case msg ⇒ forward(database, msg)
   }
 
   val timeout = 5 seconds
