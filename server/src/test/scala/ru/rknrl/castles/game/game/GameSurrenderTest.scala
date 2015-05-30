@@ -49,9 +49,9 @@ class GameSurrenderTest extends GameTestSpec {
 
      val client3 = new TestProbe(system)
      client3.send(game, Surrender)
-     client0.expectNoMsg()
-     client1.expectNoMsg()
-     expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
+     client1.expectNoMsg(noMsgTimeout)
+     expectNoMsg(noMsgTimeout)
 
      // Первый игрок посылает Surrender
 
@@ -95,19 +95,19 @@ class GameSurrenderTest extends GameTestSpec {
        case GameStateUpdated(dto) ⇒ true
      }
 
-     client0.expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
 
      client1.expectMsgPF(TIMEOUT) {
        case GameStateUpdated(dto) ⇒ true
      }
 
-     client1.expectNoMsg()
+     client1.expectNoMsg(noMsgTimeout)
 
      // Если еще раз отправить Surrender - они будут игнорироваться
 
      client0.send(game, Surrender)
      client1.send(game, Surrender)
-     client0.expectNoMsg()
-     client1.expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
+     client1.expectNoMsg(noMsgTimeout)
    })
  }

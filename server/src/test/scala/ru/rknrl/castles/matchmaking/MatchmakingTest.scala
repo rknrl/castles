@@ -41,16 +41,16 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client1.expectMsgPF(10 seconds) {
       case ConnectToGame(gameRef) ⇒ true
     }
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
 
     client2.expectMsgPF(10 seconds) {
       case ConnectToGame(gameRef) ⇒ true
     }
-    client2.expectNoMsg()
+    client2.expectNoMsg(noMsgTimeout)
 
     matchmaking ! TryCreateGames
-    client1.expectNoMsg()
-    client2.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
+    client2.expectNoMsg(noMsgTimeout)
   })
 
   multi("Уже находимся в игре и отправляем еще PlaceGameOrder - получаем ConnectToGame", {
@@ -124,7 +124,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client2.send(matchmaking, AllPlayersLeaveGame(game1.get))
     client2.send(matchmaking, InGame(accountId2))
     client2.expectMsg(InGameResponse(gameRef = game2, searchOpponents = false))
-    client2.expectNoMsg()
+    client2.expectNoMsg(noMsgTimeout)
   })
 
   multi("PlayerLeaveGame", {
@@ -190,7 +190,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client.expectMsgPF(timeout.duration) {
       case InGameResponse(None, false) ⇒ true
     }
-    client.expectNoMsg()
+    client.expectNoMsg(noMsgTimeout)
   })
 
   multi("2 раза Online с одного актора", {
@@ -200,7 +200,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
 
     matchmaking ! Online(accountId)
     matchmaking ! Online(accountId)
-    expectNoMsg()
+    expectNoMsg(noMsgTimeout)
   })
 
   multi("Offline без Online", {
@@ -209,7 +209,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     val accountId = AccountId(VKONTAKTE, "1")
 
     matchmaking ! Offline(accountId, self)
-    expectNoMsg()
+    expectNoMsg(noMsgTimeout)
   })
 
   multi("Offline", {
@@ -223,7 +223,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client.send(matchmaking, Offline(accountId, self))
     matchmaking ! TryCreateGames
     graphite.expectMsg(START_GAME_4_WITH_BOTS)
-    client.expectNoMsg()
+    client.expectNoMsg(noMsgTimeout)
   })
 
   multi("Matchmaking форвадит Offline to Game если не тутор", {
@@ -243,7 +243,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     expectMsgPF(timeout.duration) {
       case Offline(id, client) ⇒ id shouldBe accountId
     }
-    expectNoMsg()
+    expectNoMsg(noMsgTimeout)
   })
 
   multi("Matchmaking получает Offline и убивает игру если тутор", {
@@ -279,11 +279,11 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client2.send(matchmaking, newGameOrder(accountId))
 
     client1.expectMsg(DuplicateAccount)
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
 
     client2.send(matchmaking, TryCreateGames)
     client2.expectMsgClass(classOf[ConnectToGame])
-    client2.expectNoMsg()
+    client2.expectNoMsg(noMsgTimeout)
   })
 
   multi("SetAccountState forward to Account", {
@@ -302,9 +302,9 @@ class MatchmakingTest extends MatchmakingTestSpec {
     matchmaking ! msg
 
     client1.expectMsg(msg)
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
 
-    client2.expectNoMsg()
+    client2.expectNoMsg(noMsgTimeout)
   })
 
   multi("SetRating forward to Account", {
@@ -323,9 +323,9 @@ class MatchmakingTest extends MatchmakingTestSpec {
     matchmaking ! msg
 
     client1.expectMsg(msg)
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
 
-    client2.expectNoMsg()
+    client2.expectNoMsg(noMsgTimeout)
   })
 
   // todo supervision

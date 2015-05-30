@@ -49,7 +49,7 @@ class AccountPersistentTest extends AccountTestSpec {
       val account = newAccount()
       account ! DuplicateAccount
       watch(account)
-      expectNoMsg()
+      expectNoMsg(noMsgTimeout)
     })
   }
 
@@ -81,7 +81,7 @@ class AccountPersistentTest extends AccountTestSpec {
     multi("Если клиент НЕ авторизовался - игнорируется", {
       val account = newAccount()
       account ! UpdateStatistics(StatDTO(StatAction.TUTOR_BIG_TOWER))
-      expectNoMsg()
+      expectNoMsg(noMsgTimeout)
     })
   }
 
@@ -116,7 +116,7 @@ class AccountPersistentTest extends AccountTestSpec {
       val account = newAccount()
       val newTutorState = TutorStateDTO(emptySlot = Some(true))
       account ! C2B.UpdateTutorState(newTutorState)
-      expectNoMsg()
+      expectNoMsg(noMsgTimeout)
     })
   }
 
@@ -138,7 +138,7 @@ class AccountPersistentTest extends AccountTestSpec {
     multi("Если клиент НЕ авторизовался - Offline НЕ отправляется перед остановкой", {
       val account = newAccount()
       system stop account
-      expectNoMsg()
+      expectNoMsg(noMsgTimeout)
     })
 
   }

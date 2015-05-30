@@ -89,7 +89,7 @@ class GameLeaveBotTest extends GameTestSpec {
     // Матчмайкинг получает PlayerLeaveGame про живого игрока, но не получает про бота
 
     client0.send(game, C2B.LeaveGame)
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
 
     expectMsgPF(TIMEOUT) {
       case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒

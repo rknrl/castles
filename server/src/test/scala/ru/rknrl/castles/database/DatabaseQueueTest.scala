@@ -34,7 +34,7 @@ class DatabaseQueueTest extends ActorsTest {
     database.expectMsg(GetTutorState(accountId1))
 
     client2.send(queue, GetTutorState(accountId1))
-    database.expectNoMsg(60 millis)
+    database.expectNoMsg(noMsgTimeout)
 
     client1.send(queue, GetTutorState(accountId2))
     database.expectMsg(GetTutorState(accountId2))

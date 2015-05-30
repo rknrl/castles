@@ -29,8 +29,8 @@ class GameJoinTest extends GameTestSpec {
 
     game ! UpdateGameState(newTime = 7)
 
-    client0.expectNoMsg()
-    client1.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
+    client1.expectNoMsg(noMsgTimeout)
 
     // Игроки посылают Join
 
@@ -75,7 +75,7 @@ class GameJoinTest extends GameTestSpec {
 
     newClient0.send(game, Join(AccountId(VKONTAKTE, "1"), newClient0.ref))
 
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
 
     newClient0.expectMsgPF(TIMEOUT) {
       case JoinedGame(gameStateDto) ⇒ gameStateDto.selfId shouldBe PlayerId(0)
@@ -87,7 +87,7 @@ class GameJoinTest extends GameTestSpec {
 
     val gameStateUpdate2 = GameStateDiff.diff(newGameState, updateGameState(newGameState, newTime = 20))
 
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
 
     newClient0.expectMsgPF(TIMEOUT) {
       case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2

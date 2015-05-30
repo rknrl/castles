@@ -73,7 +73,7 @@ class GameSendStatToBotsTest extends GameTestSpec {
 
     game ! StatAction.TUTOR_BIG_TOWER
 
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
 
     client1.expectMsg(StatAction.TUTOR_BIG_TOWER)
 

@@ -46,9 +46,9 @@ class GameLeaveTest extends GameTestSpec {
 
     client0.send(game, C2B.LeaveGame)
     client1.send(game, C2B.LeaveGame)
-    client0.expectNoMsg()
-    client1.expectNoMsg()
-    expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
+    client1.expectNoMsg(noMsgTimeout)
+    expectNoMsg(noMsgTimeout)
 
     // Игроки отправляют Surrender и получают в ответ GameOver
 
@@ -64,15 +64,15 @@ class GameLeaveTest extends GameTestSpec {
 
     val client3 = new TestProbe(system)
     client3.send(game, C2B.LeaveGame)
-    client0.expectNoMsg()
-    client1.expectNoMsg()
-    expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
+    client1.expectNoMsg(noMsgTimeout)
+    expectNoMsg(noMsgTimeout)
 
     // Игроки отправляют LeaveGame
     // Матчмайкинг получает PlayerLeaveGame
 
     client0.send(game, C2B.LeaveGame)
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
     expectMsgPF(TIMEOUT) {
       case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
         accountId shouldBe AccountId(VKONTAKTE, "1")
@@ -81,10 +81,10 @@ class GameLeaveTest extends GameTestSpec {
         usedItems shouldBe ItemType.values.map(_ → 0).toMap
     }
 
-    expectNoMsg() // Матчмайкинг НЕ получает AllPlayersLeaveGame раньше чем надо
+    expectNoMsg(noMsgTimeout) // Матчмайкинг НЕ получает AllPlayersLeaveGame раньше чем надо
 
     client1.send(game, C2B.LeaveGame)
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
     expectMsgPF(TIMEOUT) {
       case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
         accountId shouldBe AccountId(FACEBOOK, "1")
@@ -100,15 +100,15 @@ class GameLeaveTest extends GameTestSpec {
     // Если еще раз отправить LeaveGame они будут игнорироваться
     client0.send(game, C2B.LeaveGame)
     client1.send(game, C2B.LeaveGame)
-    client0.expectNoMsg()
-    client1.expectNoMsg()
-    expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
+    client1.expectNoMsg(noMsgTimeout)
+    expectNoMsg(noMsgTimeout)
 
     // GameStateUpdated не приходит вышедшим клиентам
     game ! UpdateGameState(newTime = 100)
-    client0.expectNoMsg()
-    client1.expectNoMsg()
-    expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
+    client1.expectNoMsg(noMsgTimeout)
+    expectNoMsg(noMsgTimeout)
   })
 }
 

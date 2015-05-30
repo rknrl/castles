@@ -65,7 +65,7 @@ class GameOfflineTest extends GameTestSpec {
 
      game ! UpdateGameState(newTime = 10)
 
-     client0.expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
 
      client1.expectMsgPF(TIMEOUT) {
        case GameStateUpdated(dto) ⇒ true
@@ -77,7 +77,7 @@ class GameOfflineTest extends GameTestSpec {
 
      newClient0.send(game, Join(AccountId(VKONTAKTE, "1"), newClient0.ref))
 
-     client0.expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
 
      newClient0.expectMsgPF(TIMEOUT) {
        case JoinedGame(gameStateDto) ⇒ gameStateDto.selfId shouldBe PlayerId(0)
@@ -89,7 +89,7 @@ class GameOfflineTest extends GameTestSpec {
 
      val gameStateUpdate2 = GameStateDiff.diff(initGameState, updateGameState(initGameState, newTime = 20))
 
-     client0.expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
 
      newClient0.expectMsgPF(TIMEOUT) {
        case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2

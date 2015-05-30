@@ -101,12 +101,12 @@ class GameOverTest extends GameTestSpec {
       case GameStateUpdated(dto) ⇒ true
     }
 
-    client0.expectNoMsg()
+    client0.expectNoMsg(noMsgTimeout)
 
     client1.expectMsgPF(TIMEOUT) {
       case GameStateUpdated(dto) ⇒ true
     }
 
-    client1.expectNoMsg()
+    client1.expectNoMsg(noMsgTimeout)
   })
 }

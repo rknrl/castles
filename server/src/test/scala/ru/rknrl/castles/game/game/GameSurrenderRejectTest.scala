@@ -44,8 +44,8 @@ class GameSurrenderRejectTest extends GameTestSpec {
      // Если отправить Surrender - он игнорируется
 
      client0.send(game, Surrender)
-     client0.expectNoMsg()
-     client1.expectNoMsg()
-     expectNoMsg()
+     client0.expectNoMsg(noMsgTimeout)
+     client1.expectNoMsg(noMsgTimeout)
+     expectNoMsg(noMsgTimeout)
    })
  }
