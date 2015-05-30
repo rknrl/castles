@@ -95,7 +95,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
         case BUY_BUILDING ⇒
           if (accountState.gold >= buildingPrice(LEVEL_1)) {
             val emptySlots = accountState.slots.filter(_.buildingPrototype.isEmpty)
-            if (emptySlots.size > 0) {
+            if (emptySlots.nonEmpty) {
               val slotId = random(emptySlots).id
               val buildingType = random(BuildingType.values)
               send(BuyBuilding(BuyBuildingDTO(slotId, buildingType)))
@@ -108,7 +108,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
               s.buildingPrototype.get.buildingLevel != LEVEL_3 &&
               accountState.gold >= buildingPrice(AccountConfig.nextBuildingLevel(s.buildingPrototype.get.buildingLevel))
           )
-          if (upgradableSlots.size > 0) {
+          if (upgradableSlots.nonEmpty) {
             val slotId = random(upgradableSlots).id
             send(UpgradeBuilding(UpgradeBuildingDTO(slotId)))
           }

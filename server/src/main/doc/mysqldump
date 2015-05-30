@@ -1,0 +1,3 @@
+mysqldump -u root -p castles > /path/to/file/dump.sql
+
+mysql -u root -p castles < /path/to/dump.sql
