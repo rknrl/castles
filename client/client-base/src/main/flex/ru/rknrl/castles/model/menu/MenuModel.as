@@ -40,9 +40,9 @@ public class MenuModel {
         return _top;
     }
 
-    private var _place:Number;
+    private var _place:PlaceDTO;
 
-    public function get place():Number {
+    public function get place():PlaceDTO {
         return _place;
     }
 
@@ -102,7 +102,7 @@ public class MenuModel {
     }
 
     public function mergePlaceDto(dto:PlaceDTO):void {
-        _place = dto.place.toNumber();
+        _place = dto;
     }
 
     public function mergeConfigDto(dto:AccountConfigDTO):void {

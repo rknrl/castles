@@ -22,6 +22,7 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.menu.top.LastWeekTopScreen;
+import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
@@ -159,7 +160,7 @@ public class View extends Sprite {
 
     private var lastWeekTopScreen:LastWeekTopScreen;
 
-    public function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:Number):void {
+    public function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:PlaceDTO):void {
         if (lastWeekTopScreen) throw new Error("lastWeekTopScreen already exists");
         addChild(lastWeekTopScreen = new LastWeekTopScreen(lastWeekTop, lastWeekPlace, _layout, locale, loadImageManager));
     }

@@ -142,7 +142,7 @@ public class MenuView extends Sprite {
         topScreen.top = value;
     }
 
-    public function set place(value: Number):void {
+    public function set place(value: PlaceDTO):void {
         topScreen.place = value;
     }
 

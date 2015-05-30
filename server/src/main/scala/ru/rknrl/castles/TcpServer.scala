@@ -24,6 +24,7 @@ object TcpServer {
             secretChecker: ActorRef) =
     Props(
       classOf[TcpServer],
+      tcp,
       config,
       matchmaking,
       databaseQueue,

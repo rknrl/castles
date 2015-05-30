@@ -77,7 +77,7 @@ public class Controller {
 
     private function addLastWeekTop(lastWeekTop:TopDTO, lastWeekPlace:PlaceDTO):void {
         view.addEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
-        view.addLastWeekTop(new Top(lastWeekTop), lastWeekPlace.place.toNumber());
+        view.addLastWeekTop(new Top(lastWeekTop), lastWeekPlace);
     }
 
     private function onAcceptLastWeekTop(e:AcceptTopEvent):void {

@@ -18,6 +18,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.core.points.Point;
+import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.utils.Align;
 import ru.rknrl.utils.createTextField;
@@ -34,7 +35,7 @@ public class TopScreen extends Screen {
 
     private var title:Sprite;
 
-    public function TopScreen(top:Top, place:Number, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function TopScreen(top:Top, place:PlaceDTO, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.loadImageManager = loadImageManager;
         addChild(avatarsHolder = new Sprite());
 
@@ -53,8 +54,8 @@ public class TopScreen extends Screen {
         alignTitle();
     }
 
-    public function set place(value:Number):void {
-        placeTextField.text = "Вы занимаете " + value + " место";
+    public function set place(value:PlaceDTO):void {
+        placeTextField.text = value ? "Вы занимаете " + value.place.toNumber() + " место" : "Вы еще не играли на этой неделе";
         alignPlace();
     }
 

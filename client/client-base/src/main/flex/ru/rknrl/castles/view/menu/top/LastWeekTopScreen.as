@@ -20,6 +20,7 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.core.points.Point;
+import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.utils.Align;
 import ru.rknrl.utils.createTextField;
@@ -37,7 +38,7 @@ public class LastWeekTopScreen extends Sprite {
 
     private var title:Sprite;
 
-    public function LastWeekTopScreen(top:Top, place:Number, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function LastWeekTopScreen(top:Top, place:PlaceDTO, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.loadImageManager = loadImageManager;
         _layout = layout;
 
@@ -62,8 +63,8 @@ public class LastWeekTopScreen extends Sprite {
         addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
-    public function set place(value:Number):void {
-        placeTextField.text = "Вы заняли " + value + " место";
+    public function set place(value:PlaceDTO):void {
+        placeTextField.text = value ? "Вы заняли " + value.place.toNumber() + " место" : "Вы не играли на прошлой неделе";
         alignPlace();
     }
 
