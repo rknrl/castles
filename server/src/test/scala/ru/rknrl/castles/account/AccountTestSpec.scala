@@ -80,8 +80,8 @@ class AccountTestSpec extends ActorsTest {
       rating = Some(rating),
       tutorState = Some(tutorState),
       top = new Top(List.empty, 5),
-      place = 777,
-      lastWeekPlace = 666,
+      place = Some(777),
+      lastWeekPlace = Some(666),
       lastWeekTop = new Top(List.empty, 4)
     ))
 
@@ -93,7 +93,7 @@ class AccountTestSpec extends ActorsTest {
       accountState,
       config.account.dto,
       TopDTO(5, List.empty),
-      PlaceDTO(777),
+      Some(PlaceDTO(777)),
       config.productsDto(CANVAS, VKONTAKTE),
       tutorState,
       searchOpponents = false,

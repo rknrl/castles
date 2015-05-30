@@ -14,6 +14,7 @@ import net.liftweb.json._
 import ru.rknrl.PolicyServer
 import ru.rknrl.castles.account.SecretChecker
 import ru.rknrl.castles.admin.AdminTcpServer
+import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
 import ru.rknrl.castles.database.{Database, DatabaseCache, DatabaseQueue, DatabaseTransaction}
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
@@ -48,7 +49,7 @@ object Main {
 
     val database = system.actorOf(Database.props(config.db), "database")
     val databaseCache = system.actorOf(DatabaseCache.props(database), "database-cache")
-    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache), "database-transaction")
+    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache, new RealCalendar), "database-transaction")
     val databaseQueue = system.actorOf(DatabaseQueue.props(databaseTransaction), "database-queue")
 
     val gameCreator = new GameCreator(gameMaps, config)

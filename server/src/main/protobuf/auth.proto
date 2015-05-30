@@ -28,7 +28,7 @@ message AuthenticatedDTO {
 
     required TopDTO top = 3;
 
-    required PlaceDTO place = 4;
+    optional PlaceDTO place = 4;
 
     repeated ProductDTO products = 5;
 

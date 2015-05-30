@@ -89,8 +89,8 @@ class Account(matchmaking: ActorRef,
                    rating: Double,
                    tutorState: TutorStateDTO,
                    top: Top,
-                   place: Long,
-                   placeLastWeek: Long,
+                   place: Option[Long],
+                   placeLastWeek: Option[Long],
                    lastWeekTop: Top): Receive = logged {
     case InGameResponse(gameRef, searchOpponents) ⇒
 
@@ -98,13 +98,14 @@ class Account(matchmaking: ActorRef,
 
       val needSendLastWeek = !isTutor && (state.weekNumberAccepted.isEmpty || state.weekNumberAccepted.get < lastWeekTop.weekNumber)
       val lastWeekTopDto = if (needSendLastWeek) Some(lastWeekTop.dto) else None
-      val placeLastWeekDto = if (needSendLastWeek) Some(PlaceDTO(placeLastWeek)) else None
+      val placeDto = if (place.isDefined) Some(PlaceDTO(place.get)) else None
+      val placeLastWeekDto = if (needSendLastWeek && placeLastWeek.isDefined) Some(PlaceDTO(placeLastWeek.get)) else None
 
       send(client.ref, Authenticated(AuthenticatedDTO(
         state,
         config.account.dto,
         top.dto,
-        PlaceDTO(place),
+        placeDto,
         config.productsDto(client.platformType, client.accountId.accountType),
         tutorState,
         searchOpponents || isTutor,

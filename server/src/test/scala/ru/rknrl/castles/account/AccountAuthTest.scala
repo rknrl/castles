@@ -74,9 +74,9 @@ class AccountAuthTest extends AccountTestSpec {
         state = None,
         rating = None,
         tutorState = None,
-        place = 999,
+        place = Some(999),
         top = new Top(List.empty, 5),
-        lastWeekPlace = 666,
+        lastWeekPlace = Some(666),
         lastWeekTop = new Top(List.empty, 5)
       ))
 
@@ -92,7 +92,7 @@ class AccountAuthTest extends AccountTestSpec {
         initAccountState,
         config.account.dto,
         TopDTO(5, List.empty),
-        PlaceDTO(999),
+        Some(PlaceDTO(999)),
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
         searchOpponents = true,
@@ -106,9 +106,9 @@ class AccountAuthTest extends AccountTestSpec {
         state = None,
         rating = None,
         tutorState = None,
-        place = 999,
+        place = Some(999),
         top = new Top(List.empty, 5),
-        lastWeekPlace = 666,
+        lastWeekPlace = Some(666),
         lastWeekTop = new Top(List.empty, 5)
       ))
       matchmaking.expectMsgClass(classOf[GameOrder])
@@ -149,9 +149,9 @@ class AccountAuthTest extends AccountTestSpec {
         state = Some(accountState),
         rating = Some(rating),
         tutorState = Some(tutorState),
-        place = 666,
+        place = Some(666),
         top = new Top(List.empty, 5),
-        lastWeekPlace = 667,
+        lastWeekPlace = Some(667),
         lastWeekTop = new Top(List.empty, 4)
       ))
 
@@ -163,7 +163,7 @@ class AccountAuthTest extends AccountTestSpec {
         accountState,
         config.account.dto,
         TopDTO(5, List.empty),
-        PlaceDTO(666),
+        Some(PlaceDTO(666)),
         config.productsDto(CANVAS, VKONTAKTE),
         tutorState,
         searchOpponents = false,

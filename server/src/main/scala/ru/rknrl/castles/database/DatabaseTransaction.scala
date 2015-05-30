@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Props, Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
@@ -20,7 +20,8 @@ import scala.concurrent.duration._
 
 object DatabaseTransaction {
 
-  def props(database: ActorRef) = Props(classOf[DatabaseTransaction], database)
+  def props(database: ActorRef, calendar: Calendar) =
+    Props(classOf[DatabaseTransaction], database, calendar)
 
   trait Request {
     val accountId: AccountId
@@ -39,8 +40,8 @@ object DatabaseTransaction {
                              rating: Option[Double],
                              tutorState: Option[TutorStateDTO],
                              top: Top,
-                             place: Long,
-                             lastWeekPlace: Long,
+                             place: Option[Long],
+                             lastWeekPlace: Option[Long],
                              lastWeekTop: Top) extends Response
 
   case class GetAndUpdateAccountState(accountId: AccountId, transform: Option[AccountStateDTO] ⇒ AccountStateDTO) extends Request
@@ -51,24 +52,38 @@ object DatabaseTransaction {
 
   case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountStateDTO, rating: Double, place: Long) extends Response
 
+
+  trait Calendar {
+    def getCurrentWeek: Int
+  }
+
+  class RealCalendar extends Calendar {
+    val week = 7 * 24 * 60 * 60 * 1000
+
+    def getCurrentWeek: Int = (System.currentTimeMillis / week).toInt
+  }
+
+  class FakeCalendar(week: Int) extends Calendar {
+    def getCurrentWeek: Int = week
+  }
+
 }
 
-class DatabaseTransaction(database: ActorRef) extends Actor with ActorLog {
-  val week = 7 * 24 * 60 * 60 * 1000
+class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor with ActorLog {
 
   def receive = logged {
     case GetAccount(accountId) ⇒
       val ref = sender
-      val currentWeek = (System.currentTimeMillis / week).toInt
+      val currentWeek = calendar.getCurrentWeek
       val lastWeek = currentWeek - 1
 
       getAccountState(accountId, state ⇒
         getTutorState(accountId, tutorState ⇒
           getRating(currentWeek, accountId, rating ⇒
-            getTop(currentWeek, top ⇒
-              getPlace(currentWeek, rating.getOrElse(1400), place ⇒
+            getOptionPlace(currentWeek, rating, place ⇒
+              getTop(currentWeek, top ⇒
                 getRating(lastWeek, accountId, lastWeekRating ⇒
-                  getPlace(lastWeek, lastWeekRating.getOrElse(1400), lastWeekPlace ⇒
+                  getOptionPlace(lastWeek, lastWeekRating, lastWeekPlace ⇒
                     getTop(lastWeek, lastWeekTop ⇒
                       send(ref, AccountResponse(accountId, state, rating, tutorState, top, place, lastWeekPlace, lastWeekTop))
                     )
@@ -91,7 +106,7 @@ class DatabaseTransaction(database: ActorRef) extends Actor with ActorLog {
 
     case GetAndUpdateAccountStateAndRating(accountId, transform, userInfo) ⇒
       val ref = sender
-      val currentWeek = (System.currentTimeMillis / week).toInt
+      val currentWeek = calendar.getCurrentWeek
       getAccountState(accountId, state ⇒ {
         getRating(currentWeek, accountId, rating ⇒ {
           val (newState, newRating) = transform(state, rating)
@@ -121,6 +136,12 @@ class DatabaseTransaction(database: ActorRef) extends Actor with ActorLog {
     Patterns.ask(database, GetRating(accountId, weekNumber), timeout).map {
       case RatingResponse(accountId, weekNumber, rating) ⇒ callback(rating)
     }
+
+  def getOptionPlace(weekNumber: Int, rating: Option[Double], callback: Option[Long] ⇒ Unit): Unit =
+    if (rating.isDefined)
+      getPlace(weekNumber, rating.get, place ⇒ callback(Some(place)))
+    else
+      callback(None)
 
   def getPlace(weekNumber: Int, rating: Double, callback: Long ⇒ Unit): Unit =
     Patterns.ask(database, GetPlace(rating, weekNumber), timeout).map {

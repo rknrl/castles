@@ -57,9 +57,9 @@ class AccountEnterGameTest extends AccountTestSpec {
       state = Some(accountState),
       rating = Some(config.account.initRating),
       tutorState = None,
-      place = 999,
+      place = Some(999),
       top = new Top(List.empty, 5),
-      lastWeekPlace = 666,
+      lastWeekPlace = Some(666),
       lastWeekTop = new Top(List.empty, 4)
     ))
 
