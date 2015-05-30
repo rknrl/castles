@@ -12,7 +12,6 @@ import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction._
-import ru.rknrl.castles.matchmaking.MatchMaking.{SetAccountState, SetRating}
 import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType, UserInfoDTO}
 import ru.rknrl.logging.ActorLog
 
@@ -66,9 +65,8 @@ class AccountPatcher(accountId: AccountId,
   send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
 
   def receive = logged {
-    case AccountStateAndRatingResponse(accountId, stateDto, newRating, place) ⇒
-      send(matchmaking, SetRating(accountId, newRating, place))
-      send(matchmaking, SetAccountState(accountId, stateDto))
+    case msg: AccountStateAndRatingResponse ⇒
+      send(matchmaking, msg)
       context stop self
   }
 }

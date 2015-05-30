@@ -129,11 +129,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 0))
     val lastWeekTop = Top(
       Seq(
-        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "10"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "20"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "30"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "40"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "50"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
       ),
       weekNumber = 0
     )
@@ -200,7 +200,20 @@ class DatabaseTransactionTest extends ActorsTest {
     val place = 120
     database.reply(PlaceResponse(weekNumber = 1, rating = newRating, place = place))
 
-    client.expectMsg(DatabaseTransaction.AccountStateAndRatingResponse(accountId, newState, newRating, place))
+    database.expectMsg(GetTop(weekNumber = 1))
+    val top = Top(
+      Seq(
+        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+      ),
+      weekNumber = 1
+    )
+    database.reply(top)
+
+    client.expectMsg(DatabaseTransaction.AccountStateAndRatingResponse(accountId, newState, newRating, place, top))
   }
 
   "UpdateTutorState" in {

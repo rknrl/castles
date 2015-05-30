@@ -9,7 +9,7 @@
 package ru.rknrl.castles.database
 
 import akka.actor.{Actor, ActorRef, Props}
-import ru.rknrl.castles.database.Database.UpdateRating
+import ru.rknrl.castles.database.Database.{UpdateTutorState, UpdateAccountState, UpdateRating}
 import ru.rknrl.castles.database.DatabaseTransaction.Request
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO}
@@ -91,6 +91,14 @@ class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
         val top = tops(weekNumber)
         tops.put(weekNumber, top.insert(TopUser(accountId, newRating, userInfo)))
       }
+      send(database, msg)
+
+    case msg:UpdateTutorState ⇒
+      client = Some(sender)
+      send(database, msg)
+
+    case msg:UpdateAccountState ⇒
+      client = Some(sender)
       send(database, msg)
 
     case msg ⇒

@@ -15,7 +15,6 @@ import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountStateResponse, GetAndUpdateAccountState}
-import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.dto.AccountStateDTO
@@ -129,7 +128,7 @@ class HttpServer(config: Config,
             val result = Await.result(future, 5 seconds)
             result match {
               case AccountStateResponse(accountId, accountStateDto) ⇒
-                send(matchmaking, SetAccountState(accountId, accountStateDto))
+                send(matchmaking, AccountStateResponse(accountId, accountStateDto))
                 complete(httpResponse)
               case invalid ⇒
                 log.info("invalid update result=" + invalid)

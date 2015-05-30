@@ -29,12 +29,14 @@ class DatabaseCacheTest extends ActorsTest {
     val databaseCache = newDatabaseCache(database.ref)
     val accountId = AccountId(DEV, "1")
 
+    val accountState = Mocks.accountStateMock()
+    val newAccountState = Mocks.accountStateMock().copy(gold = 100)
+
     // при первом запросе запрашиваем у бд
 
     client.send(databaseCache, GetAccountState(accountId))
     database.expectMsg(GetAccountState(accountId))
-    val accountState = Mocks.accountStateMock()
-    database.send(databaseCache, AccountStateResponse(accountId, Some(accountState)))
+    database.reply(AccountStateResponse(accountId, Some(accountState)))
     client.expectMsg(AccountStateResponse(accountId, Some(accountState)))
 
     // при втором запросе отвечаем из кеша
@@ -44,10 +46,9 @@ class DatabaseCacheTest extends ActorsTest {
 
     // update
 
-    val newAccountState = Mocks.accountStateMock().copy(gold = 100)
     client.send(databaseCache, UpdateAccountState(accountId, newAccountState))
     database.expectMsg(UpdateAccountState(accountId, newAccountState))
-    database.send(databaseCache, AccountStateResponse(accountId, Some(newAccountState)))
+    database.reply(AccountStateResponse(accountId, Some(newAccountState)))
     client.expectMsg(AccountStateResponse(accountId, Some(newAccountState)))
 
     // при запросе отвечаем из кеша новым значением
@@ -64,12 +65,14 @@ class DatabaseCacheTest extends ActorsTest {
     val databaseCache = newDatabaseCache(database.ref)
     val accountId = AccountId(DEV, "1")
 
+    val tutorState = TutorStateDTO()
+    val newTutorState = TutorStateDTO(navigate = Some(true))
+
     // при первом запросе запрашиваем у бд
 
     client.send(databaseCache, GetTutorState(accountId))
     database.expectMsg(GetTutorState(accountId))
-    val tutorState = TutorStateDTO()
-    database.send(databaseCache, TutorStateResponse(accountId, Some(tutorState)))
+    database.reply(TutorStateResponse(accountId, Some(tutorState)))
     client.expectMsg(TutorStateResponse(accountId, Some(tutorState)))
 
     // при втором запросе отвечаем из кеша
@@ -79,10 +82,9 @@ class DatabaseCacheTest extends ActorsTest {
 
     // update
 
-    val newTutorState = TutorStateDTO(navigate = Some(true))
     client.send(databaseCache, UpdateTutorState(accountId, newTutorState))
     database.expectMsg(UpdateTutorState(accountId, newTutorState))
-    database.send(databaseCache, TutorStateResponse(accountId, Some(newTutorState)))
+    database.reply(TutorStateResponse(accountId, Some(newTutorState)))
     client.expectMsg(TutorStateResponse(accountId, Some(newTutorState)))
 
     // при запросе отвечаем из кеша новым значением
@@ -101,12 +103,14 @@ class DatabaseCacheTest extends ActorsTest {
 
     def test(weekNumber: Int, initRating: Double): Unit = {
 
+      val rating = initRating
+      val newRating = initRating + 100
+
       // при первом запросе запрашиваем у бд
 
       client.send(databaseCache, GetRating(accountId, weekNumber = weekNumber))
       database.expectMsg(GetRating(accountId, weekNumber = weekNumber))
-      val rating = initRating
-      database.send(databaseCache, RatingResponse(accountId, weekNumber = weekNumber, rating = Some(rating)))
+      database.reply(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(rating)))
       client.expectMsg(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(rating)))
 
       // при втором запросе отвечаем из кеша
@@ -116,10 +120,9 @@ class DatabaseCacheTest extends ActorsTest {
 
       // update
 
-      val newRating = initRating + 100
       client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfoDTO(accountId)))
       database.expectMsg(UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfoDTO(accountId)))
-      database.send(databaseCache, RatingResponse(accountId, weekNumber = weekNumber, rating = Some(newRating)))
+      database.reply(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(newRating)))
       client.expectMsg(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(newRating)))
 
       // при запросе отвечаем из кеша новым значением
@@ -154,7 +157,7 @@ class DatabaseCacheTest extends ActorsTest {
 
       client.send(databaseCache, GetTop(weekNumber = weekNumber))
       database.expectMsg(GetTop(weekNumber = weekNumber))
-      database.send(databaseCache, top)
+      database.reply(top)
       client.expectMsg(top)
 
       // при втором запросе отвечаем из кеша
@@ -167,9 +170,9 @@ class DatabaseCacheTest extends ActorsTest {
       val accountId = AccountId(DEV, "2")
 
       client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating = 2000, UserInfoDTO(accountId)))
-      database.expectMsg(UpdateRating(accountId, weekNumber = weekNumber, 2000, UserInfoDTO(accountId)))
-      database.send(databaseCache, RatingResponse(accountId, weekNumber = weekNumber, rating = Some(2000)))
-      client.expectMsg(RatingResponse(AccountId(DEV, "2"), weekNumber = weekNumber, rating = Some(2000)))
+      database expectMsg UpdateRating(accountId, weekNumber = weekNumber, 2000, UserInfoDTO(accountId))
+      database reply RatingResponse(accountId, weekNumber = weekNumber, rating = Some(2000))
+      client expectMsg RatingResponse(accountId, weekNumber = weekNumber, rating = Some(2000))
 
       // get updated top
 

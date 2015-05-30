@@ -11,6 +11,7 @@ package ru.rknrl.castles.matchmaking
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
 import ru.rknrl.castles.Config
+import ru.rknrl.castles.database.DatabaseTransaction
 import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
@@ -56,10 +57,6 @@ object MatchMaking {
   case object RegisterHealth
 
   case object AccountLeaveGame
-
-  case class SetAccountState(accountId: AccountId, accountState: AccountStateDTO)
-
-  case class SetRating(accountId: AccountId, rating: Double, place: Long)
 
   def props(gameCreator: GameCreator,
             gameFactory: IGameFactory,
@@ -176,10 +173,10 @@ class MatchMaking(gameCreator: GameCreator,
 
     case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 
-    case msg: SetAccountState ⇒
+    case msg: DatabaseTransaction.AccountStateResponse ⇒
       sendToAccount(msg.accountId, msg)
 
-    case msg: SetRating ⇒
+    case msg: DatabaseTransaction.AccountStateAndRatingResponse ⇒
       sendToAccount(msg.accountId, msg)
 
     case RegisterHealth ⇒

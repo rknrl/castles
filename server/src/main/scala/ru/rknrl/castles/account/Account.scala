@@ -13,12 +13,12 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.UpdateUserInfo
-import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
+import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, Authenticated, EnteredGame, PlaceUpdated}
+import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.castles.rmi.{B2C, C2B}
 import ru.rknrl.core.rmi.CloseConnection
@@ -216,17 +216,13 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def persistent: Receive = logged {
-    case AccountStateResponse(accountId, stateDto) ⇒
-      send(client.ref, AccountStateUpdated(stateDto))
+    case AccountStateResponse(accountId, state) ⇒
+      send(client.ref, AccountStateUpdated(state))
 
-    case SetRating(_, newRating, newPlace) ⇒
+    case AccountStateAndRatingResponse(accountId, state, newRating, newPlace, top) ⇒
+      send(client.ref, AccountStateUpdated(state))
       send(client.ref, PlaceUpdated(PlaceDTO(newPlace)))
-
-    case SetAccountState(_, accountStateDto) ⇒
-      send(client.ref, AccountStateUpdated(accountStateDto))
-
-    case top: Top ⇒
-      send(client.ref, B2C.TopUpdated(top.dto))
+      send(client.ref, TopUpdated(top.dto))
 
     case msg: UpdateStatistics ⇒ send(graphite, msg.stat.action)
 

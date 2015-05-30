@@ -10,6 +10,7 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor._
 import akka.testkit.TestProbe
+import ru.rknrl.castles.database.DatabaseTransaction.AccountStateResponse
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.dto.AccountType.VKONTAKTE
@@ -286,7 +287,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client2.expectNoMsg(noMsgTimeout)
   })
 
-  multi("SetAccountState forward to Account", {
+  multi("AccountStateResponse forward to Account", {
     val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId1 = AccountId(VKONTAKTE, "1")
@@ -298,28 +299,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client1.send(matchmaking, Online(accountId1))
     client2.send(matchmaking, Online(accountId2))
 
-    val msg = SetAccountState(accountId1, accountStateMock())
-    matchmaking ! msg
-
-    client1.expectMsg(msg)
-    client1.expectNoMsg(noMsgTimeout)
-
-    client2.expectNoMsg(noMsgTimeout)
-  })
-
-  multi("SetRating forward to Account", {
-    val matchmaking = newMatchmaking(database = self, graphite = self)
-
-    val accountId1 = AccountId(VKONTAKTE, "1")
-    val accountId2 = AccountId(VKONTAKTE, "2")
-
-    val client1 = new TestProbe(system)
-    val client2 = new TestProbe(system)
-
-    client1.send(matchmaking, Online(accountId1))
-    client2.send(matchmaking, Online(accountId2))
-
-    val msg = SetRating(accountId1, rating = 313373, place = 2)
+    val msg = AccountStateResponse(accountId1, accountStateMock())
     matchmaking ! msg
 
     client1.expectMsg(msg)

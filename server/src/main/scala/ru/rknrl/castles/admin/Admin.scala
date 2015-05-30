@@ -11,7 +11,6 @@ package ru.rknrl.castles.admin
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
-import ru.rknrl.castles.matchmaking.MatchMaking.SetAccountState
 import ru.rknrl.castles.rmi.B2C.{AdminAccountState, AuthenticatedAsAdmin}
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.core.rmi.CloseConnection
@@ -66,9 +65,9 @@ class Admin(databaseQueue: ActorRef,
   }
 
   def waitForUpdatedState = logged {
-    case AccountStateResponse(_, accountState) ⇒
+    case msg@AccountStateResponse(_, accountState) ⇒
       send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState)))
-      send(matchmaking, SetAccountState(accountId.get, accountState))
+      send(matchmaking, msg)
       become(admin, "admin")
   }
 }

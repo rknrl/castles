@@ -48,7 +48,7 @@ object DatabaseTransaction {
 
   case class GetAndUpdateAccountStateAndRating(accountId: AccountId, transform: (Option[AccountStateDTO], Option[Double]) ⇒ (AccountStateDTO, Double), userInfo: UserInfoDTO) extends Request
 
-  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountStateDTO, rating: Double, place: Long) extends Response
+  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountStateDTO, rating: Double, place: Long, top: Top) extends Response
 
 
   trait Calendar {
@@ -111,7 +111,9 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
           updateAccountState(accountId, newState, () ⇒
             updateRating(currentWeek, accountId, newRating, userInfo, () ⇒
               getPlace(currentWeek, newRating, place ⇒
-                send(ref, AccountStateAndRatingResponse(accountId, newState, newRating, place))
+                getTop(currentWeek, top ⇒
+                  send(ref, AccountStateAndRatingResponse(accountId, newState, newRating, place, top))
+                )
               )
             )
           )

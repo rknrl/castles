@@ -9,7 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.{DatabaseTransaction, Database}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
@@ -143,7 +143,7 @@ class AccountPersistentTest extends AccountTestSpec {
 
   }
 
-  multi("SetAccountState", {
+  multi("AccountStateResponse", {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
     val graphite = new TestProbe(system)
@@ -168,7 +168,7 @@ class AccountPersistentTest extends AccountTestSpec {
       config = config
     )
     val newState = accountStateMock(gold = 777)
-    matchmaking.send(account, SetAccountState(accountId, newState))
+    matchmaking.send(account, DatabaseTransaction.AccountStateResponse(accountId, newState))
     client.expectMsg(AccountStateUpdated(newState))
   })
 
