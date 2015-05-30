@@ -287,7 +287,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client2.expectNoMsg(noMsgTimeout)
   })
 
-  multi("AccountStateResponse forward to Account", {
+  multi("Database.Response forward to Account", {
     val matchmaking = newMatchmaking(database = self, graphite = self)
 
     val accountId1 = AccountId(VKONTAKTE, "1")

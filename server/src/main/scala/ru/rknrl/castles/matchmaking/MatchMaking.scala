@@ -101,7 +101,6 @@ class MatchMaking(gameCreator: GameCreator,
 
   override val logFilter: Any ⇒ Boolean = {
     case TryCreateGames ⇒ false
-    case RegisterHealth ⇒ false
     case _ ⇒ true
   }
 
@@ -173,10 +172,7 @@ class MatchMaking(gameCreator: GameCreator,
 
     case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 
-    case msg: DatabaseTransaction.AccountStateResponse ⇒
-      sendToAccount(msg.accountId, msg)
-
-    case msg: DatabaseTransaction.AccountStateAndRatingResponse ⇒
+    case msg: DatabaseTransaction.Response ⇒
       sendToAccount(msg.accountId, msg)
 
     case RegisterHealth ⇒
