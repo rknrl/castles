@@ -9,14 +9,15 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.database.{DatabaseTransaction, Database}
+import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
-import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
+import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.rmi.B2C.{AccountStateUpdated, PlaceUpdated, TopUpdated}
 import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B.{Authenticate, UpdateStatistics}
 import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.{StatAction, StatDTO, TutorStateDTO}
+import ru.rknrl.dto.{PlaceDTO, StatAction, StatDTO, TutorStateDTO}
 
 class AccountPersistentTest extends AccountTestSpec {
 
@@ -170,6 +171,38 @@ class AccountPersistentTest extends AccountTestSpec {
     val newState = accountStateMock(gold = 777)
     matchmaking.send(account, DatabaseTransaction.AccountStateResponse(accountId, newState))
     client.expectMsg(AccountStateUpdated(newState))
+  })
+
+  multi("AccountStateAndRatingResponse", {
+    val secretChecker = new TestProbe(system)
+    val database = new TestProbe(system)
+    val graphite = new TestProbe(system)
+    val client = new TestProbe(system)
+    val matchmaking = new TestProbe(system)
+    val config = configMock()
+    val account = newAccount(
+      secretChecker = secretChecker.ref,
+      database = database.ref,
+      graphite = graphite.ref,
+      matchmaking = matchmaking.ref,
+      config = config
+    )
+    val accountId = authenticateMock().userInfo.accountId
+    authorize(
+      secretChecker = secretChecker,
+      matchmaking = matchmaking,
+      database = database,
+      graphite = graphite,
+      client = client,
+      account = account,
+      config = config
+    )
+    val newState = accountStateMock(gold = 777)
+    val top = Top(List.empty, 1)
+    matchmaking.send(account, DatabaseTransaction.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
+    client.expectMsg(AccountStateUpdated(newState))
+    client.expectMsg(PlaceUpdated(PlaceDTO(3)))
+    client.expectMsg(TopUpdated(top.dto))
   })
 
 }

@@ -73,7 +73,7 @@ class Account(matchmaking: ActorRef,
         send(client.ref, CloseConnection)
       }
 
-    case AccountResponse(accountId, stateDto, ratingDto, tutorStateDto, top, place, placeLastWeek, lastWeekTop) ⇒
+    case AccountResponse(accountId, stateDto, ratingDto, tutorStateDto, top, place, lastWeekPlace, lastWeekTop) ⇒
       val state = stateDto.getOrElse(config.account.initState)
       val rating = ratingDto.getOrElse(config.account.initRating)
       val tutorState = tutorStateDto.getOrElse(TutorStateDTO())
@@ -82,7 +82,7 @@ class Account(matchmaking: ActorRef,
 
       send(matchmaking, Online(client.accountId))
       send(matchmaking, InGame(client.accountId))
-      become(enterAccount(state, rating, tutorState, top, place, placeLastWeek, lastWeekTop), "enterAccount")
+      become(enterAccount(state, rating, tutorState, top, place, lastWeekPlace, lastWeekTop), "enterAccount")
   }
 
   def enterAccount(state: AccountStateDTO,
@@ -90,16 +90,16 @@ class Account(matchmaking: ActorRef,
                    tutorState: TutorStateDTO,
                    top: Top,
                    place: Option[Long],
-                   placeLastWeek: Option[Long],
+                   lastWeekPlace: Option[Long],
                    lastWeekTop: Top): Receive = logged {
     case InGameResponse(gameRef, searchOpponents) ⇒
 
       val isTutor = state.gamesCount == 0
 
-      val needSendLastWeek = !isTutor && (state.weekNumberAccepted.isEmpty || state.weekNumberAccepted.get < lastWeekTop.weekNumber)
+      val needSendLastWeek = state.weekNumberAccepted.isEmpty || state.weekNumberAccepted.get < lastWeekTop.weekNumber
       val lastWeekTopDto = if (needSendLastWeek) Some(lastWeekTop.dto) else None
       val placeDto = if (place.isDefined) Some(PlaceDTO(place.get)) else None
-      val placeLastWeekDto = if (needSendLastWeek && placeLastWeek.isDefined) Some(PlaceDTO(placeLastWeek.get)) else None
+      val placeLastWeekDto = if (needSendLastWeek && lastWeekPlace.isDefined) Some(PlaceDTO(lastWeekPlace.get)) else None
 
       send(client.ref, Authenticated(AuthenticatedDTO(
         state,
@@ -233,7 +233,7 @@ class Account(matchmaking: ActorRef,
   }
 
   def sendGameOrder(): Unit = {
-    send(databaseQueue, GetAccount(client.accountId))
+    send(databaseQueue, GetAccount(client.accountId)) // todo нужно только accountState и rating, не надо запрашивать весь accoujt
     become(enterGame, "enterGame")
   }
 

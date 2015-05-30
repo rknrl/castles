@@ -74,10 +74,10 @@ class AccountAuthTest extends AccountTestSpec {
         state = None,
         rating = None,
         tutorState = None,
-        place = Some(999),
+        place = None,
         top = new Top(List.empty, 5),
-        lastWeekPlace = Some(666),
-        lastWeekTop = new Top(List.empty, 5)
+        lastWeekPlace = None,
+        lastWeekTop = new Top(List.empty, 4)
       ))
 
       val initAccountState = config.account.initState
@@ -92,11 +92,13 @@ class AccountAuthTest extends AccountTestSpec {
         initAccountState,
         config.account.dto,
         TopDTO(5, List.empty),
-        Some(PlaceDTO(999)),
+        None,
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
         searchOpponents = true,
-        game = None
+        game = None,
+        lastWeekPlace = None,
+        lastWeekTop = Some(TopDTO(4, List.empty))
       )))
 
       graphite.expectMsg(StatAction.START_TUTOR)
@@ -137,7 +139,7 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
-      val accountState = accountStateMock()
+      val accountState = accountStateMock(weekNumberAccepted = Some(4))
       val tutorState = TutorStateDTO()
       val rating = config.account.initRating
 
@@ -167,9 +169,8 @@ class AccountAuthTest extends AccountTestSpec {
         config.productsDto(CANVAS, VKONTAKTE),
         tutorState,
         searchOpponents = false,
-        game = None,
-        lastWeekPlace = Some(PlaceDTO(667)),
-        lastWeekTop = Some(TopDTO(4, List.empty))
+        game = None
+        // lastWeekPlace & lastWeekTop не отправляем, потому что игрок их уже видел
       )))
     })
 
