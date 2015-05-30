@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.database.Database.UpdateRating
 import ru.rknrl.castles.database.DatabaseTransaction.Request
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
@@ -23,9 +23,13 @@ class LRU[K, V](capacity: Int) extends java.util.LinkedHashMap[K, V](capacity, 0
   def apply(key: K): V = get(key)
 }
 
+object DatabaseCache {
+  def props(database: ActorRef) = Props(classOf[DatabaseCache], database)
+}
+
 class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
 
-  case class RatingKey(weekNumer: Int, accountId: AccountId)
+  case class RatingKey(weekNumber: Int, accountId: AccountId)
 
   val capacity = 100
   val accountStates = new LRU[AccountId, Option[AccountStateDTO]](capacity)

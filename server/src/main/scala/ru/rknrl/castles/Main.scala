@@ -47,7 +47,7 @@ object Main {
     val secretChecker = system.actorOf(Props(classOf[SecretChecker], config), "secret-checker")
 
     val database = system.actorOf(Database.props(config.db), "database")
-    val databaseCache = system.actorOf(Props(classOf[DatabaseCache], database), "database-cache")
+    val databaseCache = system.actorOf(DatabaseCache.props(database), "database-cache")
     val databaseTransaction = system.actorOf(Props(classOf[DatabaseTransaction], databaseCache), "database-transaction")
     val databaseQueue = system.actorOf(Props(classOf[DatabaseQueue], databaseTransaction), "database-queue")
 
