@@ -16,6 +16,7 @@ import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.GameBot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.castles.rmi.B2C._
+import ru.rknrl.castles.rmi.C2B
 import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_3}
 import ru.rknrl.dto.DeviceType.PC
@@ -78,6 +79,8 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       } else if (dto.searchOpponents) {
         context become enterGame
       } else {
+        if(dto.lastWeekTop.isDefined)
+          send(C2B.AcceptWeekTop(WeekNumberDTO(dto.lastWeekTop.get.weekNumber)))
         context become inMenu
       }
   }

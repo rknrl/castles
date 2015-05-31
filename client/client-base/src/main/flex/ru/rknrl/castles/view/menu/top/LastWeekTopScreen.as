@@ -113,14 +113,14 @@ public class LastWeekTopScreen extends Sprite {
 
     private function alignPlace():void {
         placeTextField.scaleX = placeTextField.scaleY = _layout.scale;
-        const pos:Point = _layout.balance(placeTextField.width);
+        const pos:Point = _layout.title(placeTextField.width, placeTextField.height);
         placeTextField.x = pos.x;
         placeTextField.y = pos.y;
     }
 
     private function alignTitle():void {
         titleTextField.scaleX = titleTextField.scaleY = _layout.scale;
-        const pos:Point = _layout.title(titleTextField.width, titleTextField.height);
+        const pos:Point = _layout.balance(titleTextField.width);
         titleTextField.x = pos.x;
         titleTextField.y = pos.y;
     }

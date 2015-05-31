@@ -84,7 +84,7 @@ public class Controller {
         view.removeEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
         const dto:WeekNumberDTO = new WeekNumberDTO();
         dto.weekNumber = e.top.weekNumber;
-//        server.acceptWeekTop(dto);
+        server.acceptWeekTop(dto);
         view.removeLastWeekTop();
         view.showMenu();
     }
