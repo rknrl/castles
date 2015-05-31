@@ -218,7 +218,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
   }
 
   def write(query: String, values: Seq[Any], onWrite: () ⇒ Unit): Unit =
-    pool.sendPreparedStatement(query, values).map(
+    pool.sendPreparedStatement(query, values) map (
       queryResult ⇒
         if (queryResult.rowsAffected > 0)
           onWrite()
@@ -229,7 +229,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
     }
 
   def read(query: String, values: Seq[Any], onRead: ResultSet ⇒ Unit): Unit =
-    pool.sendPreparedStatement(query, values).map(
+    pool.sendPreparedStatement(query, values) map (
       queryResult ⇒ queryResult.rows match {
         case Some(resultSet) ⇒ onRead(resultSet)
         case None ⇒ log.error("Get none " + queryResult)

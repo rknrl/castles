@@ -123,7 +123,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     case msg ⇒ forward(database, msg)
   }
 
-  val timeout = 5 seconds
+  val timeout = 10 seconds
 
   import context.dispatcher
 

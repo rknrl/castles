@@ -65,6 +65,8 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
   val interval = 3 second
   val scheduler = context.system.scheduler.schedule(interval, interval, self, DoMenuAction)
 
+  var waitForAccountStateUpdate = false
+
   def receive = logged {
     case _: Connected ⇒
       send(Authenticate(AuthenticateDTO(UserInfoDTO(accountId), CANVAS, PC, AuthenticationSecretDTO(""))))
@@ -79,71 +81,82 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       } else if (dto.searchOpponents) {
         context become enterGame
       } else {
-        if(dto.lastWeekTop.isDefined)
+        if (dto.lastWeekTop.isDefined) {
+          waitForAccountStateUpdate = true
           send(C2B.AcceptWeekTop(WeekNumberDTO(dto.lastWeekTop.get.weekNumber)))
+        }
         context become inMenu
       }
   }
 
-  def inMenu: Receive = logged {
+  def persistent: Receive = logged {
     case AccountStateUpdated(newAccountState) ⇒
       _accountState = Some(newAccountState)
+      waitForAccountStateUpdate = false
 
     case TopUpdated(top) ⇒
+  }
 
+  def inMenu: Receive = logged {
     case DoMenuAction ⇒
       val action = random(MenuAction.values.toSeq)
 
-      action match {
-        case BUY_BUILDING ⇒
-          if (accountState.gold >= buildingPrice(LEVEL_1)) {
-            val emptySlots = accountState.slots.filter(_.buildingPrototype.isEmpty)
-            if (emptySlots.nonEmpty) {
-              val slotId = random(emptySlots).id
-              val buildingType = random(BuildingType.values)
-              send(BuyBuilding(BuyBuildingDTO(slotId, buildingType)))
+      if (!waitForAccountStateUpdate)
+        action match {
+          case BUY_BUILDING ⇒
+            if (accountState.gold >= buildingPrice(LEVEL_1)) {
+              val emptySlots = accountState.slots.filter(_.buildingPrototype.isEmpty)
+              if (emptySlots.nonEmpty) {
+                val slotId = random(emptySlots).id
+                val buildingType = random(BuildingType.values)
+                waitForAccountStateUpdate = true
+                send(BuyBuilding(BuyBuildingDTO(slotId, buildingType)))
+              }
             }
-          }
 
-        case UPGRADE_BUILDING ⇒
-          val upgradableSlots = accountState.slots.filter(s ⇒
-            s.buildingPrototype.isDefined &&
-              s.buildingPrototype.get.buildingLevel != LEVEL_3 &&
-              accountState.gold >= buildingPrice(AccountConfig.nextBuildingLevel(s.buildingPrototype.get.buildingLevel))
-          )
-          if (upgradableSlots.nonEmpty) {
-            val slotId = random(upgradableSlots).id
-            send(UpgradeBuilding(UpgradeBuildingDTO(slotId)))
-          }
+          case UPGRADE_BUILDING ⇒
+            val upgradableSlots = accountState.slots.filter(s ⇒
+              s.buildingPrototype.isDefined &&
+                s.buildingPrototype.get.buildingLevel != LEVEL_3 &&
+                accountState.gold >= buildingPrice(AccountConfig.nextBuildingLevel(s.buildingPrototype.get.buildingLevel))
+            )
+            if (upgradableSlots.nonEmpty) {
+              val slotId = random(upgradableSlots).id
+              waitForAccountStateUpdate = true
+              send(UpgradeBuilding(UpgradeBuildingDTO(slotId)))
+            }
 
-        case REMOVE_BUILDING ⇒
-          val notEmptySlots = accountState.slots.filter(_.buildingPrototype.isDefined)
-          if (notEmptySlots.size > 1) {
-            val slotId = random(notEmptySlots).id
-            send(RemoveBuilding(RemoveBuildingDTO(slotId)))
-          }
+          case REMOVE_BUILDING ⇒
+            val notEmptySlots = accountState.slots.filter(_.buildingPrototype.isDefined)
+            if (notEmptySlots.size > 1) {
+              val slotId = random(notEmptySlots).id
+              waitForAccountStateUpdate = true
+              send(RemoveBuilding(RemoveBuildingDTO(slotId)))
+            }
 
-        case BUY_ITEM ⇒
-          if (accountState.gold >= config.itemPrice) {
-            val itemType = random(ItemType.values)
-            send(BuyItem(BuyItemDTO(itemType)))
-          }
+          case BUY_ITEM ⇒
+            if (accountState.gold >= config.itemPrice) {
+              val itemType = random(ItemType.values)
+              waitForAccountStateUpdate = true
+              send(BuyItem(BuyItemDTO(itemType)))
+            }
 
-        case UPGRADE_SKILL ⇒
-          val totalLevel = AccountConfig.getTotalLevel(accountState.skills)
-          if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel + 1)) {
-            val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
-            val skillType = random(upgradableSkills).skillType
-            send(UpgradeSkill(UpgradeSkillDTO(skillType)))
-          }
+          case UPGRADE_SKILL ⇒
+            val totalLevel = AccountConfig.getTotalLevel(accountState.skills)
+            if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel + 1)) {
+              val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
+              val skillType = random(upgradableSkills).skillType
+              waitForAccountStateUpdate = true
+              send(UpgradeSkill(UpgradeSkillDTO(skillType)))
+            }
 
-        case BUY_STARS ⇒ // todo
+          case BUY_STARS ⇒ // todo
 
-        case ENTER_GAME ⇒
-          send(EnterGame)
-          context become enterGame
-      }
-  }
+          case ENTER_GAME ⇒
+            send(EnterGame)
+            context become enterGame
+        }
+  } orElse persistent
 
   def enterGame: Receive = logged {
     case EnteredGame(node) ⇒
@@ -154,7 +167,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
       context become inGame
-  }
+  } orElse persistent
 
   def inGame: Receive = logged {
     case msg: GameStateUpdated ⇒
@@ -165,8 +178,9 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
 
     case LeavedGame ⇒
       context stop gameBot.get
+      waitForAccountStateUpdate = true
       context become inMenu
-  }
+  } orElse persistent
 
   def send(msg: Any): Unit = send(server, msg)
 
