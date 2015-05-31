@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SWF_NAME="game5.swf"
+SWF_NAME="game6.swf"
 
 # build client-web.swf via ant
 cd client/ &&

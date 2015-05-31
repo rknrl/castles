@@ -29,7 +29,7 @@ object MigrateDatabase1 {
       "castles",
       8,
       60000,
-      1000
+      8000
     )
     val migrate = system.actorOf(Props(classOf[MigrateDatabase1], config), "migrate-database")
     migrate ! Migrate
@@ -47,7 +47,7 @@ class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ActorL
 
   def receive = logged {
     case Migrate ⇒
-      val weekNumber = new RealCalendar().getCurrentWeek
+      val weekNumber = new RealCalendar().getCurrentWeek - 1
 
       pool.sendPreparedStatement("SELECT * FROM account_state").map(
         queryResult ⇒ queryResult.rows match {
