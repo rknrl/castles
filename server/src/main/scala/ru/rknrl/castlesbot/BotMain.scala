@@ -13,8 +13,8 @@ import ru.rknrl.dto.AccountId
 import ru.rknrl.dto.AccountType.DEV
 
 object BotMain {
-//  val host = "localhost"
-  val host = "dev.rknrl.ru"
+  val host = "localhost"
+//  val host = "dev.rknrl.ru"
   val port = 2335
   val count = 100
 

@@ -9,8 +9,7 @@
 package ru.rknrl.castles.database
 
 import akka.actor.{Actor, ActorRef, Props}
-import ru.rknrl.castles.database.Database.{UpdateTutorState, UpdateAccountState, UpdateRating}
-import ru.rknrl.castles.database.DatabaseTransaction.Request
+import ru.rknrl.castles.database.Database.{UpdateAccountState, UpdateRating, UpdateTutorState}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO}
 import ru.rknrl.logging.ActorLog
@@ -37,68 +36,77 @@ class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
   val ratings = new LRU[RatingKey, Option[Double]](capacity)
   var tops = new LRU[Int, Top](2)
 
-  var client: Option[ActorRef] = None
+  var accountIdToSender = Map.empty[AccountId, ActorRef]
+  var topSenders = List.empty[ActorRef]
 
   def receive = logged {
-    case msg@Database.GetAccountState(accountId) ⇒
-      client = Some(sender)
-      if (accountStates containsKey accountId)
-        send(sender, Database.AccountStateResponse(accountId, accountStates(accountId)))
-      else
-        send(database, msg)
-
-    case msg@Database.GetTutorState(accountId) ⇒
-      client = Some(sender)
-      if (tutorStates containsKey accountId)
-        send(sender, Database.TutorStateResponse(accountId, tutorStates(accountId)))
-      else
-        send(database, msg)
-
-    case msg@Database.GetRating(accountId, weekNumber) ⇒
-      client = Some(sender)
-      val key = RatingKey(weekNumber, accountId)
-      if (ratings containsKey key)
-        send(sender, Database.RatingResponse(accountId, weekNumber, ratings(key)))
-      else
-        send(database, msg)
-
     case msg@Database.GetTop(weekNumber) ⇒
-      client = Some(sender)
       if (tops containsKey weekNumber)
         send(sender, tops(weekNumber))
-      else
-        send(database, msg)
-
-    case msg@Database.AccountStateResponse(accountId, state) ⇒
-      accountStates.put(accountId, state)
-      send(client.get, msg)
-
-    case msg@Database.TutorStateResponse(accountId, state) ⇒
-      tutorStates.put(accountId, state)
-      send(client.get, msg)
-
-    case msg@Database.RatingResponse(accountId, weekNumber, rating) ⇒
-      ratings.put(RatingKey(weekNumber, accountId), rating)
-      send(client.get, msg)
+      else {
+        topSenders = topSenders :+ sender
+        if (topSenders.size == 1) send(database, msg)
+      }
 
     case top: Top ⇒
       tops.put(top.weekNumber, top)
-      send(client.get, top)
+      topSenders.foreach(send(_, top))
+      topSenders = List.empty
+
+    case msg@Database.GetAccountState(accountId) ⇒
+      if (accountStates containsKey accountId)
+        send(sender, Database.AccountStateResponse(accountId, accountStates(accountId)))
+      else {
+        accountIdToSender = accountIdToSender + (accountId → sender)
+        send(database, msg)
+      }
+
+    case msg@Database.GetTutorState(accountId) ⇒
+      if (tutorStates containsKey accountId)
+        send(sender, Database.TutorStateResponse(accountId, tutorStates(accountId)))
+      else {
+        accountIdToSender = accountIdToSender + (accountId → sender)
+        send(database, msg)
+      }
+
+    case msg@Database.GetRating(accountId, weekNumber) ⇒
+      val key = RatingKey(weekNumber, accountId)
+      if (ratings containsKey key)
+        send(sender, Database.RatingResponse(accountId, weekNumber, ratings(key)))
+      else {
+        accountIdToSender = accountIdToSender + (accountId → sender)
+        send(database, msg)
+      }
+
+    case msg@Database.AccountStateResponse(accountId, state) ⇒
+      accountStates.put(accountId, state)
+      send(accountIdToSender(accountId), msg)
+      accountIdToSender = accountIdToSender - accountId
+
+    case msg@Database.TutorStateResponse(accountId, state) ⇒
+      tutorStates.put(accountId, state)
+      send(accountIdToSender(accountId), msg)
+      accountIdToSender = accountIdToSender - accountId
+
+    case msg@Database.RatingResponse(accountId, weekNumber, rating) ⇒
+      ratings.put(RatingKey(weekNumber, accountId), rating)
+      send(accountIdToSender(accountId), msg)
+      accountIdToSender = accountIdToSender - accountId
 
     case msg@UpdateRating(accountId, weekNumber, newRating, userInfo) ⇒
-      client = Some(sender)
       if (tops containsKey weekNumber) {
         val top = tops(weekNumber)
         tops.put(weekNumber, top.insert(TopUser(accountId, newRating, userInfo)))
       }
+      accountIdToSender = accountIdToSender + (accountId → sender)
       send(database, msg)
 
-    case msg:UpdateTutorState ⇒
-      client = Some(sender)
+    case msg: UpdateTutorState ⇒
+      accountIdToSender = accountIdToSender + (msg.accountId → sender)
       send(database, msg)
 
-    case msg:UpdateAccountState ⇒
-      client = Some(sender)
+    case msg: UpdateAccountState ⇒
+      accountIdToSender = accountIdToSender + (msg.accountId → sender)
       send(database, msg)
 
     case msg ⇒

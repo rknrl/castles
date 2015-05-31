@@ -127,15 +127,23 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
 
   import context.dispatcher
 
-  def getTop(weekNumber: Int, callback: Top ⇒ Unit): Unit =
-    Patterns.ask(database, GetTop(weekNumber), timeout).map {
+  def getTop(weekNumber: Int, callback: Top ⇒ Unit): Unit = {
+    val msg = GetTop(weekNumber)
+    Patterns.ask(database, msg, timeout) map {
       case top: Top ⇒ callback(top)
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
-  def getRating(weekNumber: Int, accountId: AccountId, callback: Option[Double] ⇒ Unit): Unit =
-    Patterns.ask(database, GetRating(accountId, weekNumber), timeout).map {
+  def getRating(weekNumber: Int, accountId: AccountId, callback: Option[Double] ⇒ Unit): Unit = {
+    val msg = GetRating(accountId, weekNumber)
+    Patterns.ask(database, msg, timeout) map {
       case RatingResponse(accountId, weekNumber, rating) ⇒ callback(rating)
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
   def getOptionPlace(weekNumber: Int, rating: Option[Double], callback: Option[Long] ⇒ Unit): Unit =
     if (rating.isDefined)
@@ -143,28 +151,48 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     else
       callback(None)
 
-  def getPlace(weekNumber: Int, rating: Double, callback: Long ⇒ Unit): Unit =
-    Patterns.ask(database, GetPlace(rating, weekNumber), timeout).map {
+  def getPlace(weekNumber: Int, rating: Double, callback: Long ⇒ Unit): Unit = {
+    val msg = GetPlace(rating, weekNumber)
+    Patterns.ask(database, msg, timeout) map {
       case PlaceResponse(rating, weekNumber, place) ⇒ callback(place)
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
-  def updateRating(weekNumber: Int, accountId: AccountId, newRating: Double, userInfo: UserInfoDTO, callback: () ⇒ Unit): Unit =
-    Patterns.ask(database, UpdateRating(accountId, weekNumber, newRating, userInfo), timeout).map {
+  def updateRating(weekNumber: Int, accountId: AccountId, newRating: Double, userInfo: UserInfoDTO, callback: () ⇒ Unit): Unit = {
+    val msg = UpdateRating(accountId, weekNumber, newRating, userInfo)
+    Patterns.ask(database, msg, timeout) map {
       case RatingResponse(accountId, weekNumber, rating) ⇒ callback()
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
-  def getAccountState(accountId: AccountId, callback: Option[AccountStateDTO] ⇒ Unit): Unit =
-    Patterns.ask(database, GetAccountState(accountId), timeout).map {
+  def getAccountState(accountId: AccountId, callback: Option[AccountStateDTO] ⇒ Unit): Unit = {
+    val msg = GetAccountState(accountId)
+    Patterns.ask(database, msg, timeout) map {
       case Database.AccountStateResponse(accountId, state) ⇒ callback(state)
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
-  def updateAccountState(accountId: AccountId, newState: AccountStateDTO, callback: () ⇒ Unit): Unit =
-    Patterns.ask(database, UpdateAccountState(accountId, newState), timeout).map {
+  def updateAccountState(accountId: AccountId, newState: AccountStateDTO, callback: () ⇒ Unit): Unit = {
+    val msg = UpdateAccountState(accountId, newState)
+    Patterns.ask(database, msg, timeout) map {
       case Database.AccountStateResponse(accountId, state) ⇒ callback()
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 
-  def getTutorState(accountId: AccountId, callback: Option[TutorStateDTO] ⇒ Unit): Unit =
-    Patterns.ask(database, GetTutorState(accountId), timeout).map {
+  def getTutorState(accountId: AccountId, callback: Option[TutorStateDTO] ⇒ Unit): Unit = {
+    val msg = GetTutorState(accountId)
+    Patterns.ask(database, msg, timeout) map {
       case Database.TutorStateResponse(accountId, state) ⇒ callback(state)
+    } onFailure {
+      case t: Throwable ⇒ log.error(msg.toString, t)
     }
+  }
 }
