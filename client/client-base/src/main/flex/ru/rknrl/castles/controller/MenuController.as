@@ -91,6 +91,12 @@ public class MenuController {
 
         view.addEventListener(ViewEvents.BUY, onBuy);
         view.addEventListener(ScreenChangedEvent.SCREEN_CHANGED, onScreenChanged);
+
+        view.addEventListener(ViewEvents.SHOW_ADVERT, onShowAdvert);
+    }
+
+    private function onShowAdvert(event:Event):void {
+        social.ui.showVideoAdvert();
     }
 
     private function onAccountStateUpdated(event:AccountStateUpdatedEvent):void {

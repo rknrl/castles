@@ -20,6 +20,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
+import ru.rknrl.castles.view.menu.bank.Button;
 import ru.rknrl.castles.view.menu.navigate.Screen;
 import ru.rknrl.utils.centerize;
 import ru.rknrl.utils.createTextField;
@@ -28,12 +29,19 @@ public class MainScreen extends Screen {
     private static const mouseHolderW:Number = 200;
     private static const mouseHolderH:Number = 64;
 
+    private var advertButton:Button;
+    private var presentIcon:Sprite;
     private var slotsView:SlotsView;
 
     private var playHolder:Sprite;
 
     public function MainScreen(slots:Slots, layout:Layout, locale:CastlesLocale) {
         addChild(slotsView = new SlotsView(slots));
+        slotsView.visible = false;
+
+        addChild(advertButton = new Button(layout));
+        advertButton.text = "Заработать ★";
+        advertButton.addEventListener(MouseEvent.MOUSE_DOWN, onAdvertClick);
 
         addChild(playHolder = new Sprite());
         playHolder.addEventListener(MouseEvent.MOUSE_DOWN, onClick);
@@ -53,6 +61,11 @@ public class MainScreen extends Screen {
         this.layout = layout;
     }
 
+    private function onAdvertClick(event:MouseEvent):void {
+        event.stopImmediatePropagation();
+        dispatchEvent(new Event(ViewEvents.SHOW_ADVERT, true));
+    }
+
     public function set slots(value:Slots):void {
         slotsView.slots = value;
     }
@@ -65,6 +78,10 @@ public class MainScreen extends Screen {
         playHolder.scaleX = playHolder.scaleY = value.scale;
         playHolder.x = value.screenCenterX;
         playHolder.y = value.footerCenterY;
+
+        advertButton.layout = value;
+        advertButton.x = value.buttonX;
+        advertButton.y = value.buttonY;
     }
 
     override public function get titleContent():DisplayObject {

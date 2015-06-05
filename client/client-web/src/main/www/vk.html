@@ -14,6 +14,10 @@
 
     <script type="text/javascript" src="getflashvars.js"></script>
 
+    <script src="https://ad.mail.ru/static/vkadman.min.js"></script>
+
+    <script src="https://js.appscentrum.com/scr/preroll.js"></script>
+
     <style>
         .invisible {
             display: none;
@@ -28,6 +32,28 @@
     <script type="text/javascript">
         function flash() {
             return document.getElementById("flashContent");
+        }
+
+        /** https://appscentrum.com/instructions/#flash-preroll */
+        function showVideoAdvert(params) {
+            var a = new VKAdman();
+            a.onNoAds(function () {
+                flash().onNoAds();
+            });
+            a.onStarted(function () {
+                flash().onAdStarted();
+            });
+            a.onCompleted(function () {
+                flash().onAdCompleted();
+            });
+            a.onSkipped(function () {
+                flash().onAdSkipped();
+            });
+            a.onClicked(function () {
+                flash().onAdClicked();
+            });
+            a.setupPreroll(params.appId);
+            admanStat(params.appId, params.userId);
         }
 
         VK.init(function () {
