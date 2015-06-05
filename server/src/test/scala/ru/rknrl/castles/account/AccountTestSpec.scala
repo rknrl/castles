@@ -12,7 +12,7 @@ import akka.actor.ActorRef
 import akka.testkit.TestProbe
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.DatabaseTransaction.{Calendar, FakeCalendar, GetAccount}
 import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
@@ -32,7 +32,8 @@ class AccountTestSpec extends ActorsTest {
                  secretChecker: ActorRef = self,
                  database: ActorRef = self,
                  graphite: ActorRef = self,
-                 config: Config = configMock()) = {
+                 config: Config = configMock(),
+                 calendar: Calendar = new FakeCalendar(week = 3)) = {
     accountIterator += 1
     system.actorOf(
       Account.props(
@@ -40,7 +41,8 @@ class AccountTestSpec extends ActorsTest {
         secretChecker = secretChecker,
         databaseQueue = database,
         graphite = graphite,
-        config = config
+        config = config,
+        calendar = calendar
       ),
       "account-" + accountIterator
     )

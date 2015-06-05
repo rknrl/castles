@@ -10,7 +10,7 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.DatabaseTransaction.{FakeCalendar, GetAccount}
 import ru.rknrl.castles.database.{DatabaseTransaction, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
@@ -32,9 +32,33 @@ class AccountTest extends AccountTestSpec {
   val config = configMock()
   val accountState = accountStateMock(gold = 1000)
 
+  multi("AcceptPresent", {
+    check(
+      expectedAccountState = acceptPresent(Some(accountState), config.account, new FakeCalendar(week = 3)),
+      clientMessage = AcceptPresent,
+      statMessage = None
+    )
+  })
+
+  multi("AcceptAdvert", {
+    check(
+      expectedAccountState = acceptAdvert(Some(accountState), config.account),
+      clientMessage = AcceptAdvert,
+      statMessage = None
+    )
+  })
+
+  multi("AcceptWeekTop", {
+    check(
+      expectedAccountState = acceptWeekTop(Some(accountState), config.account, 3),
+      clientMessage = AcceptWeekTop(WeekNumberDTO(3)),
+      statMessage = None
+    )
+  })
+
   multi("BuyBuilding", {
     check(
-      expectedAccountState = buyBuilding(accountState, SLOT_1, TOWER, config.account),
+      expectedAccountState = buyBuilding(Some(accountState), SLOT_1, TOWER, config.account),
       clientMessage = BuyBuilding(BuyBuildingDTO(SLOT_1, TOWER)),
       statMessage = Statistics.buyBuilding(TOWER, LEVEL_1)
     )
@@ -42,7 +66,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("UpgradeBuilding", {
     check(
-      expectedAccountState = upgradeBuilding(accountState, SLOT_3, config.account),
+      expectedAccountState = upgradeBuilding(Some(accountState), SLOT_3, config.account),
       clientMessage = UpgradeBuilding(UpgradeBuildingDTO(SLOT_3)),
       statMessage = Statistics.buyBuilding(HOUSE, LEVEL_2)
     )
@@ -50,7 +74,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("RemoveBuilding", {
     check(
-      expectedAccountState = removeBuilding(accountState, SLOT_3),
+      expectedAccountState = removeBuilding(Some(accountState), SLOT_3, config.account),
       clientMessage = RemoveBuilding(RemoveBuildingDTO(SLOT_3)),
       statMessage = StatAction.REMOVE_BUILDING
     )
@@ -58,7 +82,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("UpgradeSkill", {
     check(
-      expectedAccountState = upgradeSkill(accountState, ATTACK, config.account),
+      expectedAccountState = upgradeSkill(Some(accountState), ATTACK, config.account),
       clientMessage = UpgradeSkill(UpgradeSkillDTO(ATTACK)),
       statMessage = Statistics.buySkill(ATTACK, SKILL_LEVEL_1)
     )
@@ -66,7 +90,7 @@ class AccountTest extends AccountTestSpec {
 
   multi("BuyItem", {
     check(
-      expectedAccountState = buyItem(accountState, FIREBALL, config.account),
+      expectedAccountState = buyItem(Some(accountState), FIREBALL, config.account),
       clientMessage = BuyItem(BuyItemDTO(FIREBALL)),
       statMessage = Statistics.buyItem(FIREBALL)
     )
@@ -74,7 +98,12 @@ class AccountTest extends AccountTestSpec {
 
   def check(expectedAccountState: AccountStateDTO,
             clientMessage: Any,
-            statMessage: Any) = {
+            statMessage: StatAction): Unit =
+    check(expectedAccountState, clientMessage, Some(statMessage))
+
+  def check(expectedAccountState: AccountStateDTO,
+            clientMessage: Any,
+            statMessage: Option[StatAction]): Unit = {
     val secretChecker = new TestProbe(system)
     val database = new TestProbe(system)
     val graphite = new TestProbe(system)
@@ -106,7 +135,7 @@ class AccountTest extends AccountTestSpec {
         val newState = transform(Some(accountState))
         newState shouldBe expectedAccountState
     }
-    graphite.expectMsg(statMessage)
+    if (statMessage.isDefined) graphite.expectMsg(statMessage.get)
     database.send(account, DatabaseTransaction.AccountStateResponse(accountId, expectedAccountState))
 
     client.expectMsg(AccountStateUpdated(expectedAccountState))

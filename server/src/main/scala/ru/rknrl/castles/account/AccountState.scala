@@ -9,12 +9,14 @@
 package ru.rknrl.castles.account
 
 import ru.rknrl.Assertion
+import ru.rknrl.castles.database.DatabaseTransaction.Calendar
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel.LEVEL_1
 import ru.rknrl.dto._
 
 object AccountState {
-  def buyBuilding(state: AccountStateDTO, id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
+  def buyBuilding(stateOption: Option[AccountStateDTO], id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
     val price = config.buildingPrices(LEVEL_1)
     Assertion.check(price <= state.gold)
 
@@ -28,7 +30,8 @@ object AccountState {
     )
   }
 
-  def upgradeBuilding(state: AccountStateDTO, id: SlotId, config: AccountConfig) = {
+  def upgradeBuilding(stateOption: Option[AccountStateDTO], id: SlotId, config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
     val oldSlot = state.slots.find(_.id == id).get
     val nextLevel = AccountConfig.nextBuildingLevel(oldSlot.buildingPrototype.get.buildingLevel)
     val price = config.buildingPrices(nextLevel)
@@ -42,7 +45,8 @@ object AccountState {
     )
   }
 
-  def removeBuilding(state: AccountStateDTO, id: SlotId) = {
+  def removeBuilding(stateOption: Option[AccountStateDTO], id: SlotId, config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
     val buildingsCount = state.slots.count(_.buildingPrototype.isDefined)
     Assertion.check(buildingsCount > 1)
 
@@ -53,7 +57,8 @@ object AccountState {
     state.copy(slots = replace(state.slots, oldSlot, newSlot))
   }
 
-  def upgradeSkill(state: AccountStateDTO, skillType: SkillType, config: AccountConfig) = {
+  def upgradeSkill(stateOption: Option[AccountStateDTO], skillType: SkillType, config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
     val price = config.skillUpgradePrices(AccountConfig.getTotalLevel(state.skills) + 1)
     Assertion.check(price <= state.gold)
 
@@ -67,7 +72,8 @@ object AccountState {
     )
   }
 
-  def buyItem(state: AccountStateDTO, itemType: ItemType, config: AccountConfig) = {
+  def buyItem(stateOption: Option[AccountStateDTO], itemType: ItemType, config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
     Assertion.check(config.itemPrice <= state.gold)
 
     addGold(
@@ -104,5 +110,38 @@ object AccountState {
   private def replace[T](xs: Seq[T], oldValue: T, newValue: T) = {
     val index = xs.indexOf(oldValue)
     xs.updated(index, newValue)
+  }
+
+  def acceptPresent(stateOption: Option[AccountStateDTO], config: AccountConfig, calendar: Calendar) = {
+    val state = stateOption.getOrElse(config.initState)
+    val time = calendar.getCurrentMillis
+    if (time - state.lastPresentTime.getOrElse(0L) > config.presentInterval)
+      state.copy(
+        lastPresentTime = Some(time),
+        gold = state.gold + config.presentGold
+      )
+    else
+      state
+  }
+
+  def acceptAdvert(stateOption: Option[AccountStateDTO], config: AccountConfig) = {
+    val state = stateOption.getOrElse(config.initState)
+    if (state.gamesCount - state.lastGamesCountAdvert.getOrElse(0) >= config.advertGamesInterval)
+      state.copy(
+        lastGamesCountAdvert = Some(state.gamesCount),
+        gold = state.gold + config.advertGold
+      )
+    else
+      state
+  }
+
+  def acceptWeekTop(stateOption: Option[AccountStateDTO], config: AccountConfig, weekNumber: Int) = {
+    val state = stateOption.getOrElse(config.initState)
+    if (state.weekNumberAccepted.getOrElse(0) < weekNumber)
+      state.copy(
+        weekNumberAccepted = Some(weekNumber)
+      )
+    else
+      state
   }
 }

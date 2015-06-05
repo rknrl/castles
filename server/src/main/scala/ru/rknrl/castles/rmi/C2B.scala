@@ -47,13 +47,17 @@ object C2B {
 
   case class AcceptWeekTop(weekNumber: WeekNumberDTO) extends Msg(88)
 
-  // enter game 90 - 99
+  case object AcceptPresent extends Msg(89)
 
-  case object JoinGame extends GameMsg(90)
+  case object AcceptAdvert extends Msg(90)
 
-  case object Surrender extends GameMsg(91)
+  // enter game 95 - 99
 
-  case object LeaveGame extends GameMsg(92)
+  case object JoinGame extends GameMsg(95)
+
+  case object Surrender extends GameMsg(96)
+
+  case object LeaveGame extends GameMsg(97)
 
   // game 100 - 119
 

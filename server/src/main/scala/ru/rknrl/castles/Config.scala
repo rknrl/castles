@@ -114,4 +114,6 @@ class Config(val host: String,
           Some("http://" + staticHost + "/avatars/Babka256.png")
         )
     }
+
+
 }

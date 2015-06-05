@@ -49,7 +49,8 @@ object Main {
 
     val database = system.actorOf(Database.props(config.db), "database")
     val databaseCache = system.actorOf(DatabaseCache.props(database), "database-cache")
-    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache, new RealCalendar), "database-transaction")
+    val calendar = new RealCalendar
+    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache, calendar), "database-transaction")
     val databaseQueue = system.actorOf(DatabaseQueue.props(databaseTransaction), "database-queue")
 
     val gameCreator = new GameCreator(gameMaps, config)
@@ -72,6 +73,6 @@ object Main {
     val tcp = IO(Tcp)
     system.actorOf(PolicyServer.props(tcp, config.host, config.policyPort), "policy-server")
     system.actorOf(AdminTcpServer.props(tcp, config, databaseQueue, matchmaking), "admin-server")
-    system.actorOf(TcpServer.props(tcp, config, matchmaking, databaseQueue, graphite, secretChecker), "tcp-server")
+    system.actorOf(TcpServer.props(tcp, config, matchmaking, databaseQueue, graphite, secretChecker, calendar), "tcp-server")
   }
 }

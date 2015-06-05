@@ -116,14 +116,18 @@ object Mocks extends Matchers {
                        items: Seq[ItemDTO] = itemsMock,
                        gold: Int = 10,
                        gamesCount: Int = 1,
-                       weekNumberAccepted: Option[Int] = None) =
+                       weekNumberAccepted: Option[Int] = None,
+                       lastPresentTime: Option[Long] = None,
+                       lastGamesCountAdvert: Option[Int] = None) =
     AccountStateDTO(
       slots = slots,
       skills = skills,
       items = items,
       gold = gold,
       gamesCount = gamesCount,
-      weekNumberAccepted = weekNumberAccepted
+      weekNumberAccepted = weekNumberAccepted,
+      lastPresentTime = lastPresentTime,
+      lastGamesCountAdvert = lastGamesCountAdvert
     )
 
   def socialConfigMock(appId: String = "",
@@ -181,6 +185,10 @@ object Mocks extends Matchers {
                         skillUpgradePrices: SkillUpgradePrices = skillUpgradePricesMock(),
                         itemPrice: Int = 1,
                         initGold: Int = 1000,
+                        presentGold: Int = 10,
+                        presentInterval: Long = 60000,
+                        advertGold: Int = 20,
+                        advertGamesInterval: Int = 3,
                         initRating: Double = 1400,
                         initItemCount: Int = 4,
                         maxAttack: Double = 3,
@@ -191,6 +199,10 @@ object Mocks extends Matchers {
       skillUpgradePrices = skillUpgradePrices,
       itemPrice = itemPrice,
       initGold = initGold,
+      presentGold = presentGold,
+      presentInterval = presentInterval,
+      advertGold = advertGold,
+      advertGamesInterval = advertGamesInterval,
       initRating = initRating,
       initItemCount = initItemCount,
       maxAttack = maxAttack,

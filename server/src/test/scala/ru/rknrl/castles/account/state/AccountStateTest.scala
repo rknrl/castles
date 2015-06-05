@@ -10,6 +10,7 @@ package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
 import ru.rknrl.castles.account.AccountState._
+import ru.rknrl.castles.database.DatabaseTransaction.FakeCalendar
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.social.Product
 import ru.rknrl.dto.BuildingLevel._
@@ -46,7 +47,7 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 4)
-      val state = buyBuilding(oldState, SLOT_1, TOWER, accountConfigMock())
+      val state = buyBuilding(Some(oldState), SLOT_1, TOWER, accountConfigMock())
       state.gold shouldBe 0
       state.slots.find(_.id == SLOT_1).get.buildingPrototype shouldBe Some(BuildingPrototype(TOWER, LEVEL_1))
       checkEquals(oldState, state, Set(SLOT_1, GOLD))
@@ -56,7 +57,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот не пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        buyBuilding(accountStateMock(gold = 4), SLOT_3, TOWER, accountConfigMock())
+        buyBuilding(Some(accountStateMock(gold = 4)), SLOT_3, TOWER, accountConfigMock())
       }
 
     }
@@ -64,7 +65,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        buyBuilding(accountStateMock(gold = 3), SLOT_1, TOWER, accountConfigMock())
+        buyBuilding(Some(accountStateMock(gold = 3)), SLOT_1, TOWER, accountConfigMock())
       }
 
     }
@@ -77,7 +78,7 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 16)
-      val state = upgradeBuilding(oldState, SLOT_3, accountConfigMock())
+      val state = upgradeBuilding(Some(oldState), SLOT_3, accountConfigMock())
       state.gold shouldBe 0
       state.slots.find(_.id == SLOT_3).get.buildingPrototype shouldBe Some(BuildingPrototype(HOUSE, LEVEL_2))
       checkEquals(oldState, state, Set(SLOT_3, GOLD))
@@ -87,7 +88,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        upgradeBuilding(accountStateMock(gold = 16), SLOT_1, accountConfigMock())
+        upgradeBuilding(Some(accountStateMock(gold = 16)), SLOT_1, accountConfigMock())
       }
 
     }
@@ -104,7 +105,7 @@ class AccountStateTest extends WordSpec with Matchers {
         )
 
       a[Exception] shouldBe thrownBy {
-        upgradeBuilding(accountStateMock(gold = 16, slots = slots), SLOT_3, accountConfigMock())
+        upgradeBuilding(Some(accountStateMock(gold = 16, slots = slots)), SLOT_3, accountConfigMock())
       }
 
     }
@@ -112,7 +113,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        upgradeBuilding(accountStateMock(gold = 14), SLOT_3, accountConfigMock())
+        upgradeBuilding(Some(accountStateMock(gold = 14)), SLOT_3, accountConfigMock())
       }
 
     }
@@ -122,7 +123,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот не пустой - удаляем нужный домик и не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 0)
-      val state = removeBuilding(oldState, SLOT_3)
+      val state = removeBuilding(Some(oldState), SLOT_3, accountConfigMock())
       state.slots.find(_.id == SLOT_3).get.buildingPrototype shouldBe empty
       checkEquals(oldState, state, Set(SLOT_3))
 
@@ -131,7 +132,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот пустой - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        removeBuilding(accountStateMock(gold = 0), SLOT_1)
+        removeBuilding(Some(accountStateMock(gold = 0)), SLOT_1, accountConfigMock())
       }
 
     }
@@ -144,7 +145,7 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 1)
-      val state = upgradeSkill(oldState, ATTACK, accountConfigMock())
+      val state = upgradeSkill(Some(oldState), ATTACK, accountConfigMock())
       state.skills.find(_.skillType == ATTACK).get.level shouldBe SKILL_LEVEL_1
       state.gold shouldBe 0
       checkEquals(oldState, state, Set(ATTACK, GOLD))
@@ -160,7 +161,7 @@ class AccountStateTest extends WordSpec with Matchers {
       )
 
       a[Exception] shouldBe thrownBy {
-        upgradeSkill(accountStateMock(gold = 1, skills = skills), ATTACK, accountConfigMock())
+        upgradeSkill(Some(accountStateMock(gold = 1, skills = skills)), ATTACK, accountConfigMock())
       }
 
     }
@@ -168,7 +169,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        upgradeSkill(accountStateMock(gold = 0), ATTACK, accountConfigMock())
+        upgradeSkill(Some(accountStateMock(gold = 0)), ATTACK, accountConfigMock())
       }
 
     }
@@ -181,7 +182,7 @@ class AccountStateTest extends WordSpec with Matchers {
       "не меняем ничего другого" in {
 
       val oldState = accountStateMock(gold = 1)
-      val state = buyItem(oldState, FIREBALL, accountConfigMock())
+      val state = buyItem(Some(oldState), FIREBALL, accountConfigMock())
       state.items.find(_.itemType == FIREBALL).get.count shouldBe 5
       state.gold shouldBe 0
       checkEquals(oldState, state, Set(FIREBALL, GOLD))
@@ -191,7 +192,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если не хватает денег - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        buyItem(accountStateMock(gold = 0), FIREBALL, accountConfigMock())
+        buyItem(Some(accountStateMock(gold = 0)), FIREBALL, accountConfigMock())
       }
 
     }
@@ -305,5 +306,84 @@ class AccountStateTest extends WordSpec with Matchers {
     state.items.find(_.itemType == ASSISTANCE).get.count shouldBe 4
 
     checkEquals(oldState, state, Set(FIREBALL, TORNADO, STRENGTHENING))
+  }
+
+  "acceptPresent" should {
+    "Если прошло достаточное время то " +
+      "начисляем деньги и " +
+      "изменяем lastPresentTime" in {
+      val state = accountStateMock(
+        gold = 11,
+        lastPresentTime = Some(1000)
+      )
+      val config = accountConfigMock(
+        presentGold = 20,
+        presentInterval = 2000
+      )
+      val newState = acceptPresent(Some(state), config, new FakeCalendar(week = 3, millis = 4000))
+      newState shouldBe state.copy(gold = 31, lastPresentTime = Some(4000))
+    }
+
+    "Если времени НЕ достаточно то ничего не делаем" in {
+      val state = accountStateMock(
+        lastPresentTime = Some(3000)
+      )
+      val config = accountConfigMock(
+        presentInterval = 2000
+      )
+      val newState = acceptPresent(Some(state), config, new FakeCalendar(week = 3, millis = 4000))
+      newState shouldBe state
+    }
+  }
+
+  "acceptAdvert" should {
+    "Если прошло достаточное кол-во игр " +
+      "начисляем деньги и " +
+      "изменяем lastGamesCountAdvert" in {
+      val state = accountStateMock(
+        gold = 11,
+        gamesCount = 5,
+        lastGamesCountAdvert = Some(3)
+      )
+      val config = accountConfigMock(
+        advertGold = 20,
+        advertGamesInterval = 2
+      )
+      val newState = acceptAdvert(Some(state), config)
+      newState shouldBe state.copy(gold = 31, lastGamesCountAdvert = Some(5))
+    }
+
+    "Если прошло кол-во игр НЕ достаточно то ничего не делаем" in {
+      val state = accountStateMock(
+        gamesCount = 5,
+        lastGamesCountAdvert = Some(4)
+      )
+      val config = accountConfigMock(
+        advertGamesInterval = 2
+      )
+      val newState = acceptAdvert(Some(state), config)
+      newState shouldBe state
+    }
+  }
+
+  "acceptWeekTop" should {
+    "Если номер недели больше предыдущего " +
+      "то изменяем его" in {
+      val state = accountStateMock(
+        weekNumberAccepted = Some(1)
+      )
+      val config = accountConfigMock()
+      val newState = acceptWeekTop(Some(state), config, 2)
+      newState shouldBe state.copy(weekNumberAccepted = Some(2))
+    }
+
+    "Если номер неделе НЕ больше предудущего - ничего не делаем" in {
+      val state = accountStateMock(
+        weekNumberAccepted = Some(10)
+      )
+      val config = accountConfigMock()
+      val newState = acceptWeekTop(Some(state), config, 9)
+      newState shouldBe state
+    }
   }
 }

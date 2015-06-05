@@ -14,6 +14,8 @@ message AccountStateDTO {
     //    required double rating = 5;
     required int32 gamesCount = 6;
     optional int32 weekNumberAccepted = 7;
+    optional int64 lastPresentTime = 8;
+    optional int32 lastGamesCountAdvert = 9;
 }
 
 message PlaceDTO {

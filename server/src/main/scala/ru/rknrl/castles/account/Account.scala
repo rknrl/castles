@@ -11,6 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
+import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.UpdateUserInfo
 import ru.rknrl.castles.database.DatabaseTransaction._
@@ -38,8 +39,9 @@ object Account {
             secretChecker: ActorRef,
             databaseQueue: ActorRef,
             graphite: ActorRef,
-            config: Config) =
-    Props(classOf[Account], matchmaking, secretChecker, databaseQueue, graphite, config)
+            config: Config,
+            calendar: Calendar) =
+    Props(classOf[Account], matchmaking, secretChecker, databaseQueue, graphite, config, calendar)
 
 }
 
@@ -47,7 +49,8 @@ class Account(matchmaking: ActorRef,
               secretChecker: ActorRef,
               databaseQueue: ActorRef,
               graphite: ActorRef,
-              config: Config) extends Actor with ActorLog {
+              config: Config,
+              calendar: Calendar) extends Actor with ActorLog {
 
   var _client: Option[ClientInfo] = None
   var _game: Option[ActorRef] = None
@@ -128,58 +131,41 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def account: Receive = logged {
+    case AcceptPresent ⇒
+      getAndUpdate(state ⇒ acceptPresent(state, config.account, calendar))
+
+    case AcceptAdvert ⇒
+      getAndUpdate(state ⇒ acceptAdvert(state, config.account))
+
     case AcceptWeekTop(weekNumber) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
-        state.copy(
-          weekNumberAccepted = if (state.weekNumberAccepted.getOrElse(0) < weekNumber.weekNumber)
-            Some(weekNumber.weekNumber)
-          else
-            state.weekNumberAccepted
-        )
-      }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(state ⇒ acceptWeekTop(state, config.account, weekNumber.weekNumber))
 
     case BuyBuilding(dto) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
-        AccountState.buyBuilding(state, dto.id, dto.buildingType, config.account)
-      }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(state ⇒ AccountState.buyBuilding(state, dto.id, dto.buildingType, config.account))
       send(graphite, Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1))
 
     case UpgradeBuilding(dto) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
+      val transform = (state: Option[AccountStateDTO]) ⇒ {
         val newState = AccountState.upgradeBuilding(state, dto.id, config.account)
         send(graphite, Statistics.buyBuilding(newState.slots.find(_.id == dto.id).get.buildingPrototype.get)) // todo
         newState
       }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(transform)
 
     case RemoveBuilding(dto) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
-        AccountState.removeBuilding(state, dto.id)
-      }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(state ⇒ removeBuilding(state, dto.id, config.account))
       send(graphite, StatAction.REMOVE_BUILDING)
 
     case UpgradeSkill(dto) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
+      val transform = (state: Option[AccountStateDTO]) ⇒ {
         val newState = AccountState.upgradeSkill(state, dto.skillType, config.account)
         send(graphite, Statistics.buySkill(dto.skillType, newState.skills.find(_.skillType == dto.skillType).get.level)) // todo
         newState
       }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(transform)
 
     case BuyItem(dto) ⇒
-      val transform = (stateDto: Option[AccountStateDTO]) ⇒ {
-        val state = stateDto.getOrElse(config.account.initState)
-        AccountState.buyItem(state, dto.itemType, config.account)
-      }
-      send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+      getAndUpdate(state ⇒ AccountState.buyItem(state, dto.itemType, config.account))
       send(graphite, Statistics.buyItem(dto.itemType))
 
     case EnterGame ⇒ sendGameOrder()
@@ -232,8 +218,11 @@ class Account(matchmaking: ActorRef,
     case DuplicateAccount ⇒ send(client.ref, CloseConnection)
   }
 
+  def getAndUpdate(transform: Option[AccountStateDTO] ⇒ AccountStateDTO): Unit =
+    send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+
   def sendGameOrder(): Unit = {
-    send(databaseQueue, GetAccount(client.accountId)) // todo нужно только accountState и rating, не надо запрашивать весь accoujt
+    send(databaseQueue, GetAccount(client.accountId)) // todo нужно только accountState и rating, не надо запрашивать весь account
     become(enterGame, "enterGame")
   }
 

@@ -13,6 +13,7 @@ import java.net.InetSocketAddress
 import akka.actor.{Actor, ActorRef, Props}
 import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountClientSession
+import ru.rknrl.castles.database.DatabaseTransaction.Calendar
 import ru.rknrl.logging.ActorLog
 
 object TcpServer {
@@ -21,7 +22,8 @@ object TcpServer {
             matchmaking: ActorRef,
             databaseQueue: ActorRef,
             graphite: ActorRef,
-            secretChecker: ActorRef) =
+            secretChecker: ActorRef,
+            calendar: Calendar) =
     Props(
       classOf[TcpServer],
       tcp,
@@ -29,7 +31,8 @@ object TcpServer {
       matchmaking,
       databaseQueue,
       graphite,
-      secretChecker
+      secretChecker,
+      calendar
     )
 }
 
@@ -38,7 +41,8 @@ class TcpServer(tcp: ActorRef,
                 matchmaking: ActorRef,
                 databaseQueue: ActorRef,
                 graphite: ActorRef,
-                secretChecker: ActorRef) extends Actor with ActorLog {
+                secretChecker: ActorRef,
+                calendar: Calendar) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
@@ -59,7 +63,19 @@ class TcpServer(tcp: ActorRef,
     case Connected(remote, local) ⇒
       val name = remote.getAddress.getHostAddress + ":" + remote.getPort
       log.debug("connected " + name)
-      val client = context.actorOf(Props(classOf[AccountClientSession], sender, matchmaking, secretChecker, databaseQueue, graphite, config, name), "client-" + name.replace('.', '-'))
+      val client = context.actorOf(
+        AccountClientSession.props(
+          tcpSender = sender,
+          matchmaking = matchmaking,
+          secretChecker = secretChecker,
+          databaseQueue = databaseQueue,
+          graphite = graphite,
+          config = config,
+          calendar = calendar,
+          name = name
+        ),
+        "client-" + name.replace('.', '-')
+      )
       sender ! Register(client)
   }
 }
