@@ -101,6 +101,14 @@ public class MenuView extends Sprite {
         screenNavigator.lock = value;
     }
 
+    public function get advertVisible():Boolean {
+        return mainScreen.advertVisible;
+    }
+
+    public function set advertVisible(value:Boolean):void {
+        mainScreen.advertVisible = value;
+    }
+
     public function set gold(value:int):void {
         screenNavigator.gold = value;
     }

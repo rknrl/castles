@@ -48,9 +48,10 @@ class AccountConfig(val buildingPrices: BuildingPrices,
                     maxSpeed: Double) {
 
   def dto = AccountConfigDTO(
-    buildingPrices.dto.toSeq,
-    skillUpgradePrices.dto.toSeq,
-    itemPrice
+    buildings = buildingPrices.dto.toSeq,
+    skillUpgradePrices = skillUpgradePrices.dto.toSeq,
+    itemPrice = itemPrice,
+    advertGamesInterval = advertGamesInterval
   )
 
   private val levelsCount = SkillLevel.values.size - 1

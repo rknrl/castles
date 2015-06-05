@@ -9,10 +9,12 @@
 package ru.rknrl.castles.controller {
 import flash.events.Event;
 import flash.utils.Dictionary;
+import flash.utils.setTimeout;
 
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
+import ru.rknrl.asocial.VideoAdvertEvent;
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
@@ -24,6 +26,7 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.view.menu.MenuView;
+import ru.rknrl.dto.AcceptAdvertDTO;
 import ru.rknrl.dto.BuildingLevel;
 import ru.rknrl.dto.BuyBuildingDTO;
 import ru.rknrl.dto.BuyItemDTO;
@@ -92,20 +95,34 @@ public class MenuController {
         view.addEventListener(ViewEvents.BUY, onBuy);
         view.addEventListener(ScreenChangedEvent.SCREEN_CHANGED, onScreenChanged);
 
+        social.ui.addEventListener(VideoAdvertEvent.AD_COMPLETED, onAdvertComplete);
+        social.ui.addEventListener(VideoAdvertEvent.AD_SKIPPED, onAdvertComplete);
         view.addEventListener(ViewEvents.SHOW_ADVERT, onShowAdvert);
     }
 
     private function onShowAdvert(event:Event):void {
         social.ui.showVideoAdvert();
+        view.advertVisible = false;
+    }
+
+    private function onAdvertComplete(event:VideoAdvertEvent):void {
+        setTimeout(function ():void {
+            const dto:AcceptAdvertDTO = new AcceptAdvertDTO();
+            dto.accepted = true;
+            server.acceptAdvert(dto)
+        }, 2000); // таймаут, чтобы игрок увидел анимацию
     }
 
     private function onAccountStateUpdated(event:AccountStateUpdatedEvent):void {
+        const afterGame:Boolean = event.accountState.gamesCount >= model.gamesCount;
         model.mergeAccountStateDto(event.accountState);
         view.slots = model.slots;
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;
         view.skillLevels = model.skillLevels;
         view.lock = false;
+
+        if (afterGame && model.canShowAdvert) view.advertVisible = true;
     }
 
     private function onTopUpdated(e:TopUpdatedEvent):void {
@@ -262,8 +279,22 @@ public class MenuController {
         view.lock = false;
     }
 
+    public function cancelAdvert():void {
+        if (view.advertVisible) {
+            const dto:AcceptAdvertDTO = new AcceptAdvertDTO();
+            dto.accepted = false;
+            server.acceptAdvert(dto);
+            view.advertVisible = false;
+        }
+    }
+
     private function onScreenChanged(event:ScreenChangedEvent):void {
         const screenIndex:int = event.screenIndex;
+
+        if (screenIndex != ScreenChangedEvent.SCREEN_MAIN) {
+            cancelAdvert();
+        }
+
         if (screenIndex > 0) {
             if (!tutorState.navigate) {
                 tutorState.navigate = true;

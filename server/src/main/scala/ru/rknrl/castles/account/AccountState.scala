@@ -124,9 +124,13 @@ object AccountState {
       state
   }
 
-  def acceptAdvert(stateOption: Option[AccountStateDTO], config: AccountConfig) = {
+  def acceptAdvert(stateOption: Option[AccountStateDTO], accepted: Boolean, config: AccountConfig) = {
     val state = stateOption.getOrElse(config.initState)
-    if (state.gamesCount - state.lastGamesCountAdvert.getOrElse(0) >= config.advertGamesInterval)
+    if (!accepted)
+      state.copy(
+        lastGamesCountAdvert = Some(state.gamesCount)
+      )
+    else if (state.gamesCount - state.lastGamesCountAdvert.getOrElse(0) >= config.advertGamesInterval)
       state.copy(
         lastGamesCountAdvert = Some(state.gamesCount),
         gold = state.gold + config.advertGold

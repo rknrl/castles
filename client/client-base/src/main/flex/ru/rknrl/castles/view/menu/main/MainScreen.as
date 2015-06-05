@@ -37,7 +37,6 @@ public class MainScreen extends Screen {
 
     public function MainScreen(slots:Slots, layout:Layout, locale:CastlesLocale) {
         addChild(slotsView = new SlotsView(slots));
-        slotsView.visible = false;
 
         addChild(advertButton = new Button(layout));
         advertButton.text = "Заработать ★";
@@ -59,6 +58,16 @@ public class MainScreen extends Screen {
         playHolder.addChild(playTextField);
 
         this.layout = layout;
+        advertVisible = false;
+    }
+
+    public function get advertVisible():Boolean {
+        return advertButton.visible;
+    }
+
+    public function set advertVisible(value:Boolean):void {
+        advertButton.visible = value;
+        slotsView.visible = !value;
     }
 
     private function onAdvertClick(event:MouseEvent):void {

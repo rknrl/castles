@@ -18,6 +18,10 @@ message AccountStateDTO {
     optional int32 lastGamesCountAdvert = 9;
 }
 
+message AcceptAdvertDTO {
+    required bool accepted = 1;
+}
+
 message PlaceDTO {
     required int64 place = 1;
 }
@@ -43,6 +47,7 @@ message AccountConfigDTO {
     repeated BuildingPriceDTO buildings = 1;
     repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
     required int32 itemPrice = 3;
+    required int32 advertGamesInterval = 4;
 }
 
 message SkillUpgradePriceDTO {

@@ -134,8 +134,8 @@ class Account(matchmaking: ActorRef,
     case AcceptPresent ⇒
       getAndUpdate(state ⇒ acceptPresent(state, config.account, calendar))
 
-    case AcceptAdvert ⇒
-      getAndUpdate(state ⇒ acceptAdvert(state, config.account))
+    case AcceptAdvert(accept) ⇒
+      getAndUpdate(state ⇒ acceptAdvert(state, accept.accepted, config.account))
 
     case AcceptWeekTop(weekNumber) ⇒
       getAndUpdate(state ⇒ acceptWeekTop(state, config.account, weekNumber.weekNumber))

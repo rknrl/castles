@@ -82,6 +82,28 @@ public class MenuModel {
         return _products;
     }
 
+    private var _gamesCount:int;
+
+    public function get gamesCount():int {
+        return _gamesCount;
+    }
+
+    private var _lastGamesCountAdvert:int;
+
+    public function get lastGamesCountAdvert():int {
+        return _lastGamesCountAdvert;
+    }
+
+    private var _advertGamesInterval:int;
+
+    public function get advertGamesInterval():int {
+        return _advertGamesInterval;
+    }
+
+    public function get canShowAdvert():Boolean {
+        return gamesCount - lastGamesCountAdvert >= advertGamesInterval;
+    }
+
     public function MenuModel(authenticated:AuthenticatedDTO) {
         mergeAccountStateDto(authenticated.accountState);
         mergeConfigDto(authenticated.config);
@@ -95,6 +117,8 @@ public class MenuModel {
         _gold = dto.gold;
         _itemsCount = new ItemsCount(dto.items);
         _skillLevels = new SkillLevels(dto.skills);
+        _gamesCount = dto.gamesCount;
+        _lastGamesCountAdvert = dto.lastGamesCountAdvert;
     }
 
     public function mergeTopDto(dto:TopDTO):void {
@@ -109,6 +133,7 @@ public class MenuModel {
         _itemPrice = dto.itemPrice;
         _upgradePrices = new SkillUpgradePrices(dto.skillUpgradePrices);
         _buildingPrices = new BuildingPrices(dto.buildings);
+        _advertGamesInterval = dto.advertGamesInterval;
     }
 
     public function mergeProductsDto(dto:Vector.<ProductDTO>):void {

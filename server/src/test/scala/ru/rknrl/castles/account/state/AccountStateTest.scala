@@ -337,7 +337,22 @@ class AccountStateTest extends WordSpec with Matchers {
   }
 
   "acceptAdvert" should {
-    "Если прошло достаточное кол-во игр " +
+    "Если не приняли " +
+      "изменяем lastGamesCountAdvert" in {
+      val state = accountStateMock(
+        gold = 11,
+        gamesCount = 5,
+        lastGamesCountAdvert = Some(3)
+      )
+      val config = accountConfigMock(
+        advertGold = 20,
+        advertGamesInterval = 2
+      )
+      val newState = acceptAdvert(Some(state), false, config)
+      newState shouldBe state.copy(lastGamesCountAdvert = Some(5))
+    }
+
+    "Если приняли и прошло достаточное кол-во игр " +
       "начисляем деньги и " +
       "изменяем lastGamesCountAdvert" in {
       val state = accountStateMock(
@@ -349,7 +364,7 @@ class AccountStateTest extends WordSpec with Matchers {
         advertGold = 20,
         advertGamesInterval = 2
       )
-      val newState = acceptAdvert(Some(state), config)
+      val newState = acceptAdvert(Some(state), true, config)
       newState shouldBe state.copy(gold = 31, lastGamesCountAdvert = Some(5))
     }
 
@@ -361,7 +376,7 @@ class AccountStateTest extends WordSpec with Matchers {
       val config = accountConfigMock(
         advertGamesInterval = 2
       )
-      val newState = acceptAdvert(Some(state), config)
+      val newState = acceptAdvert(Some(state), true, config)
       newState shouldBe state
     }
   }

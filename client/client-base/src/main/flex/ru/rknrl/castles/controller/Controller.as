@@ -101,6 +101,7 @@ public class Controller {
     private function onPlay(event:Event):void {
         view.hideMenu();
         if (!addGameSplash()) view.addSearchOpponentScreen();
+        menu.cancelAdvert();
         server.enterGame();
     }
 

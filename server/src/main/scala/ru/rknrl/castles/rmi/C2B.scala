@@ -49,7 +49,7 @@ object C2B {
 
   case object AcceptPresent extends Msg(89)
 
-  case object AcceptAdvert extends Msg(90)
+  case class AcceptAdvert(accept: AcceptAdvertDTO) extends Msg(90)
 
   // enter game 95 - 99
 

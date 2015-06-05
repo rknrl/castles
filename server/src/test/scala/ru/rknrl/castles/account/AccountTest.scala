@@ -42,8 +42,8 @@ class AccountTest extends AccountTestSpec {
 
   multi("AcceptAdvert", {
     check(
-      expectedAccountState = acceptAdvert(Some(accountState), config.account),
-      clientMessage = AcceptAdvert,
+      expectedAccountState = acceptAdvert(Some(accountState), true, config.account),
+      clientMessage = AcceptAdvert(AcceptAdvertDTO(true)),
       statMessage = None
     )
   })
