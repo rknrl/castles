@@ -124,16 +124,18 @@ class HttpServer(config: Config,
               AccountState.applyProduct(state, product, productInfo.count)
             }
 
-            val future = Patterns.ask(databaseQueue, GetAndUpdateAccountState(accountId, transform), 5 seconds)
-            val result = Await.result(future, 5 seconds)
-            result match {
+            import context.dispatcher
+
+            val result = Patterns.ask(databaseQueue, GetAndUpdateAccountState(accountId, transform), 5 seconds) map {
               case AccountStateResponse(accountId, accountStateDto) ⇒
                 send(matchmaking, AccountStateResponse(accountId, accountStateDto))
-                complete(httpResponse)
+                httpResponse
               case invalid ⇒
                 log.info("invalid update result=" + invalid)
-                complete(callback.databaseError)
+                callback.databaseError
             }
+
+            complete(result)
           }
         }
 
