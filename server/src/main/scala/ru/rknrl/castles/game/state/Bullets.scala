@@ -33,7 +33,7 @@ object Bullets {
     )
 
   def heads[T](xs: Iterable[Iterable[T]]): Iterable[T] =
-    xs.filter(_.size > 0).map(_.head)
+    xs.filter(_.nonEmpty).map(_.head)
 
   def canCreateBullet(b: Building, u: GameUnit, time: Long, config: GameConfig) =
     if (b.owner.isDefined && b.owner.get.id == u.owner.id)

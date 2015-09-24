@@ -24,7 +24,7 @@ case class Top(users: Seq[TopUser], weekNumber: Int) {
     )
 
   private def usersDto =
-    for (i ← 0 until users.size)
+    for (i ← users.indices)
       yield TopUserInfoDTO(
         place = i + 1,
         info = users(i).info

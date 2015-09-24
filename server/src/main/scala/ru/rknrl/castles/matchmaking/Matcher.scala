@@ -36,7 +36,7 @@ object Matcher {
       sorted = sorted.drop(playersCount)
     }
 
-    if (sorted.size > 0)
+    if (sorted.nonEmpty)
       matched = matched :+ MatchedGameOrders(playersCount, sorted, isTutor = false)
 
     matched

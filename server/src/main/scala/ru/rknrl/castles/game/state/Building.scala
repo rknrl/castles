@@ -39,7 +39,7 @@ class Building(val id: BuildingId,
 
   def applyStrengthening(strengthenings: Iterable[Strengthening]) = {
     val myStrengthenings = strengthenings.filter(_.buildingId == id)
-    if (myStrengthenings.size >= 1)
+    if (myStrengthenings.nonEmpty)
       copy(newStrengthening = Some(myStrengthenings.head))
     else
       this
