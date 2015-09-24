@@ -42,7 +42,7 @@ class AccountClientSession(tcpSender: ActorRef,
                            graphite: ActorRef,
                            config: Config,
                            calendar: Calendar,
-                           name: String) extends Client(tcpSender, name) {
+                           name: String) extends Client(tcpSender) {
 
   val handler = context.actorOf(
     Account.props(

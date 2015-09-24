@@ -8,110 +8,26 @@
 
 package ru.rknrl.core.rmi
 
-import java.io.{DataOutputStream, InputStream}
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.ActorRef
 import akka.io.{IO, Tcp}
-import akka.util.ByteString
-import ru.rknrl.Supervisor._
-import ru.rknrl.logging.ActorLog
 
-import scala.annotation.tailrec
-
-abstract class TcpClientConnection(host: String, port: Int) extends Actor with ActorLog {
+abstract class TcpClientConnection(host: String, port: Int) extends TcpClientSession(null) {
 
   import Tcp._
   import context.system
 
-  override def supervisorStrategy = EscalateStrategy
-
-  val headerSize = 4
-  val commandIdSize = 1
-  val maxSize = 512 * 1024
-  implicit val byteOrder = java.nio.ByteOrder.LITTLE_ENDIAN
-
-  protected def writeCommand(msg: Any, os: DataOutputStream)
-
-  protected def parseCommand(commandId: Byte, is: InputStream): Unit
-
-  private var buffer: ByteString = ByteString.empty
-
-  private var connection: Option[ActorRef] = None
-
-  IO(Tcp) ! Connect(new InetSocketAddress(host, port))
   val handler: ActorRef
 
-  def receive = catched {
-    case CommandFailed(_: Connect) ⇒
-      throw new Exception("connect failed")
+  IO(Tcp) ! Connect(new InetSocketAddress(host, port))
 
+  override def receive = {
     case c@Connected(remote, local) ⇒
-      connection = Some(sender)
-      connection.get ! Register(self)
+      sender ! Register(self)
       handler ! c
-      context become catched {
 
-        case CommandFailed(w: Write) ⇒
-          throw new Exception("write failed")
-
-        case Received(receivedData) ⇒
-          val data = buffer ++ receivedData
-          val (newBuffer, frames) = extractFrames(data, Nil)
-          for (frame ← frames) processFrame(frame)
-          buffer = newBuffer
-
-        case CloseConnection ⇒
-          connection.get ! Close
-
-        case _: ConnectionClosed ⇒
-          throw new Exception("connection closed")
-
-        case msg: Msg ⇒ sendMessages(List(msg))
-
-        case messages: Iterable[Msg] ⇒ sendMessages(messages)
-      }
+      tcpSender = sender
+      context become super.receive
   }
-
-  @tailrec
-  private def extractFrames(data: ByteString, frames: List[ByteString]): (ByteString, Seq[ByteString]) =
-    if (data.length < headerSize)
-      (data.compact, frames)
-    else {
-      val length = data.iterator.getInt
-
-      if (length < 0 || length > maxSize)
-        throw new IllegalArgumentException(s"received too large frame of size $length (max = $maxSize)")
-
-      if (data.length >= length)
-        extractFrames(data drop length, data.slice(headerSize, length) :: frames)
-      else
-        (data.compact, frames)
-    }
-
-  private def processFrame(frame: ByteString) = {
-    val commandId = frame.iterator.getByte
-    val byteString = frame.drop(commandIdSize)
-    val is = byteString.iterator.asInputStream
-    parseCommand(commandId, is)
-  }
-
-  private def sendMessages(messages: Iterable[Msg]): Unit = {
-    val builder = ByteString.newBuilder
-    val os = new DataOutputStream(builder.asOutputStream)
-    for (msg ← messages) writeCommand(msg, os)
-    send(builder.result)
-  }
-
-  private def send(byteString: ByteString) = {
-    val length = byteString.size + headerSize
-    if (length > maxSize) throw new IllegalArgumentException(s"send too large frame of size $length")
-    connection.get ! Write(
-      ByteString.newBuilder
-        .putInt(length)
-        .append(byteString)
-        .result
-    )
-  }
-
 }

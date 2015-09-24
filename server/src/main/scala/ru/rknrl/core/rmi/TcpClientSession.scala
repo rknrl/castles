@@ -24,7 +24,7 @@ case object Ack extends Event
 
 abstract class Msg(id: Byte)
 
-abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor with ActorLog {
+abstract class TcpClientSession(var tcpSender: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
@@ -45,7 +45,7 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
 
   private var waitForAck = false
 
-  override final def receive: Receive = {
+  def receive: Receive = {
     case Received(receivedData) ⇒
       val data = receiveBuffer ++ receivedData
       val (newBuffer, frames) = extractFrames(data, Nil)
@@ -53,11 +53,11 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
       receiveBuffer = newBuffer
 
     case _: ConnectionClosed ⇒
-      log.debug("connection closed " + name)
+      log.debug("connection closed")
       context stop self
 
     case CloseConnection ⇒
-      log.debug("close connection command " + name)
+      log.debug("close connection command")
       context stop self
 
     case msg: Msg ⇒ sendMessages(List(msg))
@@ -89,7 +89,7 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
         (data.compact, frames)
     }
 
-  private def processFrame(frame: ByteString) = {
+  private def processFrame(frame: ByteString): Unit = {
     val commandId = frame.iterator.getByte
     val byteString = frame.drop(commandIdSize)
     val is = byteString.iterator.asInputStream
@@ -103,7 +103,7 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
     send(builder.result)
   }
 
-  private def send(byteString: ByteString) = {
+  private def send(byteString: ByteString): Unit = {
     val length = byteString.size + headerSize
     if (length > maxSize) throw new IllegalArgumentException(s"send too large frame of size $length")
     sendBuffer.putInt(length)
@@ -111,7 +111,7 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
     flush()
   }
 
-  private def flush() =
+  private def flush(): Unit =
     if (!waitForAck && sendBuffer.length > 0) {
       waitForAck = true
       tcpSender ! Write(sendBuffer.result.compact, Ack)

@@ -16,7 +16,7 @@ class AdminClientSession(tcpSender: ActorRef,
                          databaseQueue: ActorRef,
                          matchmaking: ActorRef,
                          config: Config,
-                         name: String) extends Client(tcpSender, name) {
+                         name: String) extends Client(tcpSender) {
   val handler = context.actorOf(
     Admin.props(
       databaseQueue = databaseQueue,
