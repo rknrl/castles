@@ -11,15 +11,16 @@ package ru.rknrl.core.rmi
 import java.io.{DataOutputStream, InputStream}
 
 import akka.actor.{Actor, ActorRef}
+import akka.io.Tcp.Event
 import akka.util.ByteString
 import ru.rknrl.Supervisor._
 import ru.rknrl.logging.ActorLog
 
 import scala.annotation.tailrec
 
-case class ReceivedCommand(commandId: Byte, byteString: ByteString)
-
 case object CloseConnection
+
+case object Ack extends Event
 
 abstract class Msg(id: Byte)
 
@@ -34,18 +35,22 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
   val maxSize = 512 * 1024
   implicit val byteOrder = java.nio.ByteOrder.LITTLE_ENDIAN
 
-  protected def writeCommand(msg: Any, os: DataOutputStream)
+  protected def writeCommand(msg: Any, os: DataOutputStream): Unit
 
   protected def parseCommand(commandId: Byte, is: InputStream): Unit
 
-  private var buffer: ByteString = ByteString.empty
+  private var receiveBuffer = ByteString.empty
+
+  private val sendBuffer = ByteString.newBuilder
+
+  private var waitForAck = false
 
   override final def receive: Receive = {
     case Received(receivedData) ⇒
-      val data = buffer ++ receivedData
+      val data = receiveBuffer ++ receivedData
       val (newBuffer, frames) = extractFrames(data, Nil)
       for (frame ← frames) processFrame(frame)
-      buffer = newBuffer
+      receiveBuffer = newBuffer
 
     case _: ConnectionClosed ⇒
       log.debug("connection closed " + name)
@@ -58,6 +63,14 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
     case msg: Msg ⇒ sendMessages(List(msg))
 
     case messages: Iterable[Msg] ⇒ sendMessages(messages)
+
+    case CommandFailed(e) ⇒
+      log.error("command failed " + e)
+      context stop self
+
+    case Ack ⇒
+      waitForAck = false
+      flush()
   }
 
   @tailrec
@@ -93,12 +106,17 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
   private def send(byteString: ByteString) = {
     val length = byteString.size + headerSize
     if (length > maxSize) throw new IllegalArgumentException(s"send too large frame of size $length")
-    tcpSender ! Write(
-      ByteString.newBuilder
-        .putInt(length)
-        .append(byteString)
-        .result
-    )
+    sendBuffer.putInt(length)
+    sendBuffer.append(byteString)
+    flush()
   }
+
+  private def flush() =
+    if (!waitForAck && sendBuffer.length > 0) {
+      waitForAck = true
+      tcpSender ! Write(sendBuffer.result.compact, Ack)
+      sendBuffer.clear()
+    }
 }
+
 
