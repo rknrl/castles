@@ -47,8 +47,8 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
       for (frame ← frames) processFrame(frame)
       buffer = newBuffer
 
-    case PeerClosed ⇒
-      log.debug("peer closed " + name)
+    case _: ConnectionClosed ⇒
+      log.debug("connection closed " + name)
       context stop self
 
     case CloseConnection ⇒
@@ -100,6 +100,5 @@ abstract class TcpClientSession(tcpSender: ActorRef, name: String) extends Actor
         .result
     )
   }
-
 }
 
