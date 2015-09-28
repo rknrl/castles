@@ -14,7 +14,7 @@ import ru.rknrl.castles.database.DatabaseTransaction.Calendar
 import ru.rknrl.rmi.Client
 
 object AccountClientSession {
-  def props(tcpSender: ActorRef,
+  def props(tcp: ActorRef,
             matchmaking: ActorRef,
             secretChecker: ActorRef,
             databaseQueue: ActorRef,
@@ -24,7 +24,7 @@ object AccountClientSession {
             name: String) =
     Props(
       classOf[AccountClientSession],
-      tcpSender,
+      tcp,
       matchmaking,
       secretChecker,
       databaseQueue,
@@ -35,14 +35,14 @@ object AccountClientSession {
     )
 }
 
-class AccountClientSession(tcpSender: ActorRef,
+class AccountClientSession(tcp: ActorRef,
                            matchmaking: ActorRef,
                            secretChecker: ActorRef,
                            databaseQueue: ActorRef,
                            graphite: ActorRef,
                            config: Config,
                            calendar: Calendar,
-                           name: String) extends Client(tcpSender) {
+                           name: String) extends Client(tcp) {
 
   val handler = context.actorOf(
     Account.props(

@@ -65,7 +65,7 @@ class TcpServer(tcp: ActorRef,
       log.debug("connected " + name)
       val client = context.actorOf(
         AccountClientSession.props(
-          tcpSender = sender,
+          tcp = sender,
           matchmaking = matchmaking,
           secretChecker = secretChecker,
           databaseQueue = databaseQueue,

@@ -27,7 +27,7 @@ abstract class TcpClientConnection(host: String, port: Int) extends TcpClientSes
       sender ! Register(self)
       handler ! c
 
-      tcpSender = sender
+      tcp = sender
       context become super.receive
   }
 }

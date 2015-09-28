@@ -24,7 +24,7 @@ case object Ack extends Event
 
 abstract class Msg(id: Byte)
 
-abstract class TcpClientSession(var tcpSender: ActorRef) extends Actor with ActorLog {
+abstract class TcpClientSession(var tcp: ActorRef) extends Actor with ActorLog {
 
   import akka.io.Tcp._
 
@@ -114,7 +114,7 @@ abstract class TcpClientSession(var tcpSender: ActorRef) extends Actor with Acto
   private def flush(): Unit =
     if (!waitForAck && sendBuffer.length > 0) {
       waitForAck = true
-      tcpSender ! Write(sendBuffer.result.compact, Ack)
+      tcp ! Write(sendBuffer.result.compact, Ack)
       sendBuffer.clear()
     }
 }
