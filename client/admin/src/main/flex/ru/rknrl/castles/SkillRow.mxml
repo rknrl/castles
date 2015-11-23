@@ -15,8 +15,8 @@
 
     <fx:Script><![CDATA[
         import ru.rknrl.castles.events.SetSkillEvent;
-        import ru.rknrl.dto.SkillLevel;
-        import ru.rknrl.dto.SkillType;
+        import protos.SkillLevel;
+        import protos.SkillType;
 
         private var skillType:SkillType;
 

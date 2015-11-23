@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles.database
 
+import protos.AccountType.DEV
+import protos._
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO, UserInfoDTO}
 import ru.rknrl.test.ActorsTest
 
 class DatabaseTest extends ActorsTest {
@@ -39,7 +39,7 @@ class DatabaseTest extends ActorsTest {
     database ! GetAccountState(accountId)
     expectMsg(AccountStateResponse(accountId, None))
 
-    def updateAccountState(accountState: AccountStateDTO): Unit = {
+    def updateAccountState(accountState: AccountState): Unit = {
       database ! UpdateAccountState(accountId, accountState)
       expectMsg(AccountStateResponse(accountId, Some(accountState)))
 
@@ -60,7 +60,7 @@ class DatabaseTest extends ActorsTest {
     database ! GetTutorState(accountId)
     expectMsg(TutorStateResponse(accountId, None))
 
-    def updateTutorState(tutorState: TutorStateDTO): Unit = {
+    def updateTutorState(tutorState: TutorState): Unit = {
       database ! UpdateTutorState(accountId, tutorState)
       expectMsg(TutorStateResponse(accountId, Some(tutorState)))
 
@@ -68,8 +68,8 @@ class DatabaseTest extends ActorsTest {
       expectMsg(TutorStateResponse(accountId, Some(tutorState)))
     }
 
-    updateTutorState(TutorStateDTO())
-    updateTutorState(TutorStateDTO(navigate = Some(true)))
+    updateTutorState(TutorState())
+    updateTutorState(TutorState(navigate = Some(true)))
   }
 
   "Rating" in {
@@ -86,7 +86,7 @@ class DatabaseTest extends ActorsTest {
 
     // weekNumber = 1
 
-    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1567, UserInfoDTO(accountId))
+    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1567, UserInfo(accountId))
     expectMsg(RatingResponse(accountId, 1, Some(1567)))
 
     database ! GetRating(accountId, weekNumber = 1)
@@ -97,7 +97,7 @@ class DatabaseTest extends ActorsTest {
 
     // weekNumber = 2
 
-    database ! UpdateRating(accountId, weekNumber = 2, newRating = 1400, UserInfoDTO(accountId))
+    database ! UpdateRating(accountId, weekNumber = 2, newRating = 1400, UserInfo(accountId))
     expectMsg(RatingResponse(accountId, 2, Some(1400)))
 
     database ! GetRating(accountId, weekNumber = 1)
@@ -108,7 +108,7 @@ class DatabaseTest extends ActorsTest {
 
     // weekNumber = 1 again
 
-    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1600, UserInfoDTO(accountId))
+    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1600, UserInfo(accountId))
     expectMsg(RatingResponse(accountId, 1, Some(1600)))
 
     database ! GetRating(accountId, weekNumber = 1)
@@ -127,7 +127,7 @@ class DatabaseTest extends ActorsTest {
     database ! GetUserInfo(accountId)
     expectMsg(UserInfoResponse(accountId, None))
 
-    def updateUserInfo(userInfo: UserInfoDTO): Unit = {
+    def updateUserInfo(userInfo: UserInfo): Unit = {
       database ! UpdateUserInfo(accountId, userInfo)
       expectMsg(UserInfoResponse(accountId, Some(userInfo)))
 
@@ -135,8 +135,8 @@ class DatabaseTest extends ActorsTest {
       expectMsg(UserInfoResponse(accountId, Some(userInfo)))
     }
 
-    updateUserInfo(UserInfoDTO(accountId, firstName = Some("tolya"), lastName = Some("yanot")))
-    updateUserInfo(UserInfoDTO(accountId, firstName = Some("kurt"), lastName = Some("cobain")))
+    updateUserInfo(UserInfo(accountId, firstName = Some("tolya"), lastName = Some("yanot")))
+    updateUserInfo(UserInfo(accountId, firstName = Some("kurt"), lastName = Some("cobain")))
   }
 
   "GetPlace" in {
@@ -145,7 +145,7 @@ class DatabaseTest extends ActorsTest {
 
     def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
       val accountId = AccountId(DEV, id)
-      database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfoDTO(accountId))
+      database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
       expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
     }
 
@@ -199,7 +199,7 @@ class DatabaseTest extends ActorsTest {
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfoDTO(accountId))
+        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
         expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
       }
 
@@ -211,11 +211,11 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfoDTO(AccountId(DEV, "50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfoDTO(AccountId(DEV, "48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfoDTO(AccountId(DEV, "46"))),
-            TopUser(AccountId(DEV, "44"), 44, UserInfoDTO(AccountId(DEV, "44"))),
-            TopUser(AccountId(DEV, "42"), 42, UserInfoDTO(AccountId(DEV, "42")))
+            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"))),
+            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"))),
+            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"))),
+            TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"))),
+            TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42")))
           ),
           weekNumber = 0
         )
@@ -225,11 +225,11 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfoDTO(AccountId(DEV, "49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfoDTO(AccountId(DEV, "47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfoDTO(AccountId(DEV, "45"))),
-            TopUser(AccountId(DEV, "43"), 43, UserInfoDTO(AccountId(DEV, "43"))),
-            TopUser(AccountId(DEV, "41"), 41, UserInfoDTO(AccountId(DEV, "41")))
+            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"))),
+            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"))),
+            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"))),
+            TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"))),
+            TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41")))
           ),
           weekNumber = 1
         )
@@ -245,9 +245,9 @@ class DatabaseTest extends ActorsTest {
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfoDTO(accountId))
+        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
         expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
-        val userInfo = UserInfoDTO(accountId, firstName = Some(id))
+        val userInfo = UserInfo(accountId, firstName = Some(id))
         database ! UpdateUserInfo(accountId, userInfo)
         expectMsg(UserInfoResponse(accountId, Some(userInfo)))
       }
@@ -260,11 +260,11 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfoDTO(AccountId(DEV, "50"), Some("50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfoDTO(AccountId(DEV, "48"), Some("48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfoDTO(AccountId(DEV, "46"), Some("46"))),
-            TopUser(AccountId(DEV, "44"), 44, UserInfoDTO(AccountId(DEV, "44"), Some("44"))),
-            TopUser(AccountId(DEV, "42"), 42, UserInfoDTO(AccountId(DEV, "42"), Some("42")))
+            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
+            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
+            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46"))),
+            TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"), Some("44"))),
+            TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42"), Some("42")))
           ),
           weekNumber = 0
         )
@@ -274,11 +274,11 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfoDTO(AccountId(DEV, "49"), Some("49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfoDTO(AccountId(DEV, "47"), Some("47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfoDTO(AccountId(DEV, "45"), Some("45"))),
-            TopUser(AccountId(DEV, "43"), 43, UserInfoDTO(AccountId(DEV, "43"), Some("43"))),
-            TopUser(AccountId(DEV, "41"), 41, UserInfoDTO(AccountId(DEV, "41"), Some("41")))
+            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
+            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
+            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45"))),
+            TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"), Some("43"))),
+            TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41"), Some("41")))
           ),
           weekNumber = 1
         )
@@ -293,7 +293,7 @@ class DatabaseTest extends ActorsTest {
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        val userInfo = UserInfoDTO(accountId, firstName = Some(id))
+        val userInfo = UserInfo(accountId, firstName = Some(id))
         database ! UpdateUserInfo(accountId, userInfo)
         expectMsg(UserInfoResponse(accountId, Some(userInfo)))
       }
@@ -314,9 +314,9 @@ class DatabaseTest extends ActorsTest {
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfoDTO(accountId))
+        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
         expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
-        val userInfo = UserInfoDTO(accountId, firstName = Some(id))
+        val userInfo = UserInfo(accountId, firstName = Some(id))
         database ! UpdateUserInfo(accountId, userInfo)
         expectMsg(UserInfoResponse(accountId, Some(userInfo)))
       }
@@ -329,9 +329,9 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfoDTO(AccountId(DEV, "50"), Some("50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfoDTO(AccountId(DEV, "48"), Some("48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfoDTO(AccountId(DEV, "46"), Some("46")))
+            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
+            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
+            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46")))
           ),
           weekNumber = 0
         )
@@ -341,9 +341,9 @@ class DatabaseTest extends ActorsTest {
       expectMsg(
         Top(
           Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfoDTO(AccountId(DEV, "49"), Some("49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfoDTO(AccountId(DEV, "47"), Some("47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfoDTO(AccountId(DEV, "45"), Some("45")))
+            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
+            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
+            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45")))
           ),
           weekNumber = 1
         )

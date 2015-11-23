@@ -10,12 +10,12 @@ package ru.rknrl.castles.database
 
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
+import protos.AccountType.DEV
+import protos._
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO, UserInfoDTO}
 import ru.rknrl.test.ActorsTest
 
 class DatabaseTransactionTest extends ActorsTest {
@@ -34,7 +34,7 @@ class DatabaseTransactionTest extends ActorsTest {
     database.reply(Database.AccountStateResponse(accountId, Some(accountState)))
 
     database.expectMsg(GetTutorState(accountId))
-    val tutorState = TutorStateDTO()
+    val tutorState = TutorState()
     database.reply(TutorStateResponse(accountId, Some(tutorState)))
 
     database.expectMsg(GetRating(accountId, weekNumber = 1))
@@ -48,11 +48,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 1))
     val top = Top(
       Seq(
-        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
       ),
       weekNumber = 1
     )
@@ -70,11 +70,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 0))
     val lastWeekTop = Top(
       Seq(
-        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
       ),
       weekNumber = 0
     )
@@ -112,11 +112,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 1))
     val top = Top(
       Seq(
-        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
       ),
       weekNumber = 1
     )
@@ -129,11 +129,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 0))
     val lastWeekTop = Top(
       Seq(
-        TopUser(AccountId(DEV, "10"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "20"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "30"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "40"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "50"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "10"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "20"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "30"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "40"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "50"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
       ),
       weekNumber = 0
     )
@@ -176,8 +176,8 @@ class DatabaseTransactionTest extends ActorsTest {
     val transaction = newDatabaseTransaction(database.ref)
 
     val accountId = AccountId(DEV, "1")
-    val transform = (state: Option[AccountStateDTO], rating: Option[Double]) ⇒ (state.get.copy(gold = state.get.gold + 100), rating.get + 200)
-    val userInfo = UserInfoDTO(accountId)
+    val transform = (state: Option[AccountState], rating: Option[Double]) ⇒ (state.get.copy(gold = state.get.gold + 100), rating.get + 200)
+    val userInfo = UserInfo(accountId)
     client.send(transaction, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
 
     database.expectMsg(GetAccountState(accountId))
@@ -203,11 +203,11 @@ class DatabaseTransactionTest extends ActorsTest {
     database.expectMsg(GetTop(weekNumber = 1))
     val top = Top(
       Seq(
-        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+        TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+        TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+        TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+        TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+        TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
       ),
       weekNumber = 1
     )
@@ -223,7 +223,7 @@ class DatabaseTransactionTest extends ActorsTest {
     val transaction = newDatabaseTransaction(database.ref)
     val accountId = AccountId(DEV, "1")
 
-    val tutorState = TutorStateDTO()
+    val tutorState = TutorState()
     client.send(transaction, UpdateTutorState(accountId, tutorState))
     database.expectMsg(UpdateTutorState(accountId, tutorState))
     database.reply(TutorStateResponse(accountId, Some(tutorState)))
@@ -237,7 +237,7 @@ class DatabaseTransactionTest extends ActorsTest {
     val transaction = newDatabaseTransaction(database.ref)
     val accountId = AccountId(DEV, "1")
 
-    val userInfo = UserInfoDTO(accountId)
+    val userInfo = UserInfo(accountId)
     client.send(transaction, UpdateUserInfo(accountId, userInfo))
     database.expectMsg(UpdateUserInfo(accountId, userInfo))
     database.reply(UserInfoResponse(accountId, Some(userInfo)))

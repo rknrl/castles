@@ -7,13 +7,13 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu.main {
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingPriceDTO;
+import protos.BuildingLevel;
+import protos.BuildingPrice;
 
 public class BuildingPrices {
-    private var prices:Vector.<BuildingPriceDTO>;
+    private var prices:Vector.<BuildingPrice>;
 
-    function BuildingPrices(prices:Vector.<BuildingPriceDTO>) {
+    function BuildingPrices(prices:Vector.<BuildingPrice>) {
         this.prices = prices;
     }
 
@@ -22,7 +22,7 @@ public class BuildingPrices {
     }
 
     public function getPrice(level:BuildingLevel):int {
-        for each(var price:BuildingPriceDTO in prices) {
+        for each(var price:BuildingPrice in prices) {
             if (price.level == level) return price.price;
         }
         throw new Error("can't find building price for level " + level)

@@ -9,8 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.PlayerId
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.PlayerId
 
 class GameStateIsPlayerLoseTest extends WordSpec with Matchers {
 

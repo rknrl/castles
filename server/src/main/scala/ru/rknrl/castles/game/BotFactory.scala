@@ -9,8 +9,8 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{ActorContext, ActorRef, Props}
+import protos.AccountId
 import ru.rknrl.castles.bot.{GameBot, TutorBot}
-import ru.rknrl.dto.AccountId
 
 trait IBotFactory {
   def create(accountId: AccountId, isTutor: Boolean)

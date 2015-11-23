@@ -9,17 +9,17 @@
 package ru.rknrl.castles.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.SlotDTO;
+import protos.Slot;
 
 public class SetSlotEvent extends Event {
     public static const SET_SLOT:String = "setSlot";
-    private var _slotDto:SlotDTO;
+    private var _slotDto:Slot;
 
-    public function get slotDto():SlotDTO {
+    public function get slotDto():Slot {
         return _slotDto;
     }
 
-    public function SetSlotEvent(slotDto:SlotDTO) {
+    public function SetSlotEvent(slotDto:Slot) {
         super(SET_SLOT, true);
         _slotDto = slotDto;
     }

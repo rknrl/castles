@@ -7,6 +7,14 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.game.area {
+import protos.BuildingId;
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.CellSize;
+import protos.SlotId;
+import protos.SlotsOrientation;
+import protos.SlotsPos;
+
 import flash.display.Sprite;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
@@ -21,13 +29,6 @@ import ru.rknrl.castles.view.game.area.factories.VolcanoViewFactory;
 import ru.rknrl.castles.view.game.area.units.BloodView;
 import ru.rknrl.core.GameObjectViewFactory;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.SlotsOrientation;
-import ru.rknrl.dto.SlotsPosDTO;
 
 public class GameArea extends Sprite {
     private var _h:int;
@@ -86,7 +87,7 @@ public class GameArea extends Sprite {
         ground.updateGroundColor(buildings.byId(id).pos, owner);
     }
 
-    public function addSlots(dto:SlotsPosDTO):void {
+    public function addSlots(dto:SlotsPos):void {
         const cellSize:int = CellSize.SIZE.id();
         for each(var slotId:SlotId in SlotId.values) {
             const pos:Point = getSlotPos(slotId);

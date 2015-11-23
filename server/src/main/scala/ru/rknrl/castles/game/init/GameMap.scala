@@ -10,10 +10,10 @@ package ru.rknrl.castles.game.init
 
 import java.io.File
 
+import protos.{BuildingLevel, BuildingPrototype, BuildingType}
 import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.{Building, BuildingIdIterator}
-import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
 import ru.rknrl.{Assertion, RandomUtil}
 
 import scala.io.Source

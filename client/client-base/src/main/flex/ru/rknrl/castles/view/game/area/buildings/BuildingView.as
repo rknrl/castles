@@ -19,9 +19,9 @@ import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.castles.view.utils.Shadow;
 import ru.rknrl.castles.view.utils.dust.FireDust;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingId;
+import protos.BuildingLevel;
+import protos.BuildingType;
 
 public class BuildingView extends Sprite {
     private static const textFieldHeight:int = 24;

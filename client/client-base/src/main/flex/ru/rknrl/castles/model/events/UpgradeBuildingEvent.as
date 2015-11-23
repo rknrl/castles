@@ -9,7 +9,7 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.SlotId;
+import protos.SlotId;
 
 public class UpgradeBuildingEvent extends Event {
     public static const UPGRADE_BUILDING:String = "upgradeBuilding";

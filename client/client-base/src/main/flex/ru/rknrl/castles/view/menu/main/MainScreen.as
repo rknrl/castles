@@ -22,8 +22,8 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.bank.Button;
 import ru.rknrl.castles.view.menu.navigate.Screen;
-import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.centerize;
+import ru.rknrl.display.createTextField;
 
 public class MainScreen extends Screen {
     private static const mouseHolderW:Number = 200;

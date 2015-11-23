@@ -9,12 +9,13 @@
 package ru.rknrl.castles.model.menu.shop {
 import org.flexunit.asserts.assertEquals;
 
+import protos.Item;
+import protos.ItemType;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.ItemDTO;
-import ru.rknrl.dto.ItemType;
 
 public class ItemsCountTest {
-    private const itemsCount:ItemsCount = new ItemsCount(new <ItemDTO>[
+    private const itemsCount:ItemsCount = new ItemsCount(new <Item>[
         DtoMock.item(ItemType.ASSISTANCE, 7)
     ]);
 

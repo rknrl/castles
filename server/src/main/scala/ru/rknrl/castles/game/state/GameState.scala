@@ -8,6 +8,8 @@
 
 package ru.rknrl.castles.game.state
 
+import protos.ItemType._
+import protos._
 import ru.rknrl.IdIterator
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Assistance.castToUnit
@@ -20,8 +22,6 @@ import ru.rknrl.castles.game.state.Strengthening._
 import ru.rknrl.castles.game.state.Tornadoes._
 import ru.rknrl.castles.game.state.Volcanoes._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.ItemType._
-import ru.rknrl.dto._
 
 class BuildingIdIterator extends IdIterator {
   def next = BuildingId(nextInt)
@@ -33,7 +33,7 @@ class UnitIdIterator extends IdIterator {
 
 case class GameState(width: Int,
                      height: Int,
-                     slotsPos: Iterable[SlotsPosDTO],
+                     slotsPos: Iterable[SlotsPos],
                      time: Long,
                      players: Map[PlayerId, Player],
                      buildings: Seq[Building],
@@ -48,10 +48,10 @@ case class GameState(width: Int,
                      assistancePositions: Map[PlayerId, Point]) {
 
   def update(newTime: Long,
-             moveActions: Map[PlayerId, MoveDTO],
+             moveActions: Map[PlayerId, protos.Move],
              fireballCasts: Map[PlayerId, PointDTO],
              volcanoCasts: Map[PlayerId, PointDTO],
-             tornadoCasts: Map[PlayerId, CastTornadoDTO],
+             tornadoCasts: Map[PlayerId, CastTornado],
              strengtheningCasts: Map[PlayerId, BuildingId],
              assistanceCasts: Map[PlayerId, BuildingId]) = {
 
@@ -70,9 +70,9 @@ case class GameState(width: Int,
 
     val validStrengtheningCasts = items.checkCasts(strengtheningCasts, STRENGTHENING, config, newTime)
       .filter { case (playerId, buildingId) ⇒
-      val owner = buildings.find(_.id == buildingId).get.owner
-      owner.isDefined && owner.get.id == playerId
-    }
+        val owner = buildings.find(_.id == buildingId).get.owner
+        owner.isDefined && owner.get.id == playerId
+      }
     val strengthenings = validStrengtheningCasts.map(castToStrengthening(_, newTime, churchesProportion, config))
 
     val validAssistanceCasts = items.checkCasts(assistanceCasts, ASSISTANCE, config, newTime)
@@ -151,10 +151,10 @@ case class GameState(width: Int,
 
   def playersDto =
     for ((id, player) ← players)
-      yield PlayerDTO(id, player.userInfo)
+      yield protos.Player(id, player.userInfo)
 
-  def dto(id: PlayerId, gameOvers: Seq[GameOverDTO]) =
-    GameStateDTO(
+  def dto(id: PlayerId, gameOvers: Seq[GameOver]) =
+    protos.GameState(
       width = width,
       height = height,
       selfId = id,

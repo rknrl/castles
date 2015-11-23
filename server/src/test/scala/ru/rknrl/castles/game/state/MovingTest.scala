@@ -9,11 +9,11 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.{BuildingId, PlayerId, UnitId}
 import ru.rknrl.castles.game.state.Moving._
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.Stat
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.{BuildingId, MoveDTO, PlayerId, UnitId}
 
 class MovingTest extends WordSpec with Matchers {
   "unitsToExit" in {
@@ -45,11 +45,11 @@ class MovingTest extends WordSpec with Matchers {
 
   "convert" in {
     val moveActions = Map(
-      PlayerId(0) → MoveDTO(
+      PlayerId(0) → protos.Move(
         fromBuildings = List(BuildingId(1)),
         toBuilding = BuildingId(2)
       ),
-      PlayerId(1) → MoveDTO(
+      PlayerId(1) → protos.Move(
         fromBuildings = List(BuildingId(3), BuildingId(4)),
         toBuilding = BuildingId(2)
       )
@@ -73,7 +73,7 @@ class MovingTest extends WordSpec with Matchers {
   "moveActionsToExitUnits" should {
     "same id" in {
       val moveActions = Map(
-        PlayerId(0) → MoveDTO(
+        PlayerId(0) → protos.Move(
           fromBuildings = List(BuildingId(1)),
           toBuilding = BuildingId(1)
         )
@@ -93,7 +93,7 @@ class MovingTest extends WordSpec with Matchers {
 
     "not owner" in {
       val moveActions = Map(
-        PlayerId(0) → MoveDTO(
+        PlayerId(0) → protos.Move(
           fromBuildings = List(BuildingId(1)),
           toBuilding = BuildingId(2)
         )
@@ -114,7 +114,7 @@ class MovingTest extends WordSpec with Matchers {
 
     "not count" in {
       val moveActions = Map(
-        PlayerId(0) → MoveDTO(
+        PlayerId(0) → protos.Move(
           fromBuildings = List(BuildingId(1)),
           toBuilding = BuildingId(2)
         )
@@ -135,11 +135,11 @@ class MovingTest extends WordSpec with Matchers {
 
     "ok" in {
       val moveActions = Map(
-        PlayerId(0) → MoveDTO(
+        PlayerId(0) → protos.Move(
           fromBuildings = List(BuildingId(1), BuildingId(3)),
           toBuilding = BuildingId(2)
         ),
-        PlayerId(1) → MoveDTO(
+        PlayerId(1) → protos.Move(
           fromBuildings = List(BuildingId(3), BuildingId(4)),
           toBuilding = BuildingId(2)
         )

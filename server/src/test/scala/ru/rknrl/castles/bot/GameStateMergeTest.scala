@@ -9,11 +9,11 @@
 package ru.rknrl.castles.bot
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.ItemType.{FIREBALL, VOLCANO}
+import protos._
 import ru.rknrl.castles.bot.GameStateMerge.merge
 import ru.rknrl.castles.game.state.{GameItems, ItemStates}
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.ItemType.{FIREBALL, VOLCANO}
-import ru.rknrl.dto._
 
 class GameStateMergeTest extends WordSpec with Matchers {
   val players = Map(
@@ -55,19 +55,19 @@ class GameStateMergeTest extends WordSpec with Matchers {
   ).dto(PlayerId(0), List.empty)
 
   "empty" in {
-    merge(gameState, GameStateUpdateDTO()) shouldBe gameState
+    merge(gameState, GameStateUpdate()) shouldBe gameState
   }
 
   "buildingUpdated" in {
-    val merged = merge(gameState, GameStateUpdateDTO(
+    val merged = merge(gameState, GameStateUpdate(
       buildingUpdates = List(
-        BuildingUpdateDTO(
+        BuildingUpdate(
           id = BuildingId(0),
           population = 5,
           owner = Some(PlayerId(0)),
           strengthened = true
         ),
-        BuildingUpdateDTO(
+        BuildingUpdate(
           id = BuildingId(1),
           population = 30,
           owner = Some(PlayerId(1)),
@@ -93,7 +93,7 @@ class GameStateMergeTest extends WordSpec with Matchers {
   }
 
   "itemStatesUpdates" in {
-    val merged = merge(gameState, GameStateUpdateDTO(
+    val merged = merge(gameState, GameStateUpdate(
       itemStatesUpdates = List(
         ItemStatesDTO(
           playerId = PlayerId(0),

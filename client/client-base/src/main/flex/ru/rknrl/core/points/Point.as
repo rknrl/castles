@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.core.points {
-import ru.rknrl.dto.PointDTO;
+import protos.PointDTO;
 
 public class Point {
     private var _x:Number;
@@ -43,10 +43,7 @@ public class Point {
     }
 
     public function dto():PointDTO {
-        const dto:PointDTO = new PointDTO();
-        dto.x = x;
-        dto.y = y;
-        return dto;
+        return new PointDTO(x, y);
     }
 
     public function toString():String {

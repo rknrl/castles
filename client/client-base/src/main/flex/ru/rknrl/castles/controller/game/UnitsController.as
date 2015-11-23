@@ -7,6 +7,11 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller.game {
+import protos.BuildingLevel;
+import protos.UnitDTO;
+import protos.UnitId;
+import protos.UnitUpdate;
+
 import flash.display.Sprite;
 import flash.utils.Dictionary;
 
@@ -18,10 +23,6 @@ import ru.rknrl.core.GameObject;
 import ru.rknrl.core.GameObjectsController;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.core.points.Points;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.UnitDTO;
-import ru.rknrl.dto.UnitId;
-import ru.rknrl.dto.UnitUpdateDTO;
 
 public class UnitsController extends GameObjectsController {
     private var bloodView:BloodView;
@@ -49,7 +50,7 @@ public class UnitsController extends GameObjectsController {
         add(time, unit, unitView);
     }
 
-    public function updateUnit(time:int, dto:UnitUpdateDTO):void {
+    public function updateUnit(time:int, dto:UnitUpdate):void {
         const unit:Unit = getUnit(dto.id);
         if (unit) {
             if (unit.count > dto.count) addBlood(time, dto.id);

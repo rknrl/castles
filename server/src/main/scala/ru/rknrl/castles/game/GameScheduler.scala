@@ -22,7 +22,7 @@ class GameScheduler(game: ActorRef) extends Actor {
 
   case object Tick
 
-  val scheduler = context.system.scheduler.schedule(0 seconds, sendInterval milliseconds, self, Tick)
+  val scheduler = context.system.scheduler.scheduleO(0 seconds, sendInterval milliseconds, self, Tick)
 
   def receive = {
     case Tick ⇒ game ! UpdateGameState(newTime = System.currentTimeMillis())

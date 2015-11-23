@@ -7,25 +7,25 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu.bank {
-import ru.rknrl.dto.ProductDTO;
-import ru.rknrl.dto.ProductId;
+import protos.Product;
+import protos.ProductId;
 
 public class Products {
-    private var products:Vector.<ProductDTO>;
+    private var products:Vector.<Product>;
 
-    private var _product:ProductDTO;
+    private var _product:Product;
 
-    public function get product():ProductDTO {
+    public function get product():Product {
         return _product;
     }
 
-    public function Products(products:Vector.<ProductDTO>) {
+    public function Products(products:Vector.<Product>) {
         this.products = products;
         _product = getProductById(ProductId.STARS.id());
     }
 
-    private function getProductById(id:int):ProductDTO {
-        for each(var product:ProductDTO in products) {
+    private function getProductById(id:int):Product {
+        for each(var product:Product in products) {
             if (product.id == id) return product;
         }
         throw new Error("can't find product " + id);

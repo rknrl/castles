@@ -9,11 +9,11 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.BuildingLevel.{LEVEL_1, LEVEL_3}
+import protos.BuildingType.{HOUSE, TOWER}
+import protos._
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_3}
-import ru.rknrl.dto.BuildingType.{HOUSE, TOWER}
-import ru.rknrl.dto._
 
 class GameUnitTest extends WordSpec with Matchers {
 

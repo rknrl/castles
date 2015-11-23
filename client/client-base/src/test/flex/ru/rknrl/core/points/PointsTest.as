@@ -9,9 +9,10 @@
 package ru.rknrl.core.points {
 import org.flexunit.asserts.assertEquals;
 
+import protos.PointDTO;
+
 import ru.rknrl.core.kit.assertVectors;
 import ru.rknrl.core.kit.plusMinus;
-import ru.rknrl.dto.PointDTO;
 
 public class PointsTest {
     [Test("no points", expects='Error')]

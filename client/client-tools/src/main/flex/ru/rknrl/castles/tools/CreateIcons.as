@@ -16,8 +16,8 @@ import flash.geom.Matrix;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingLevel;
+import protos.BuildingType;
 
 [SWF(backgroundColor="#dddddd")]
 public class CreateIcons extends Sprite {

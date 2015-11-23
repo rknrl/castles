@@ -10,20 +10,17 @@ package ru.rknrl.castlesbot
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.io.Tcp.Connected
+import protos.BuildingLevel.{LEVEL_1, LEVEL_3}
+import protos.DeviceType.PC
+import protos.PlatformType.CANVAS
+import protos.SkillLevel.SKILL_LEVEL_3
+import protos._
 import ru.rknrl.RandomUtil.random
 import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.GameBot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
-import ru.rknrl.castles.rmi.B2C._
-import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_3}
-import ru.rknrl.dto.DeviceType.PC
-import ru.rknrl.dto.PlatformType.CANVAS
-import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_3
-import ru.rknrl.dto._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 import scala.concurrent.duration._
 
@@ -40,18 +37,23 @@ object MenuAction extends Enumeration {
 
 import ru.rknrl.castlesbot.MenuAction._
 
+object Bot {
+  def props(server: ActorRef, accountId: AccountId) =
+    Props(classOf[Bot], server, accountId)
+}
+
 class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
 
   override def supervisorStrategy = EscalateStrategy
 
   override val logFilter: Any ⇒ Boolean = {
-    case state: GameStateUpdated ⇒ false
+    case state: GameStateUpdate ⇒ false
     case DoMenuAction ⇒ false
     case _ ⇒ true
   }
 
-  var _config: Option[AccountConfigDTO] = None
-  var _accountState: Option[AccountStateDTO] = None
+  var _config: Option[protos.AccountConfig] = None
+  var _accountState: Option[AccountState] = None
   var gameBot: Option[ActorRef] = None
 
   def config = _config.get
@@ -69,9 +71,9 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
 
   def receive = logged {
     case _: Connected ⇒
-      send(Authenticate(AuthenticateDTO(UserInfoDTO(accountId), CANVAS, PC, AuthenticationSecretDTO(""))))
+      send(Authenticate(UserInfo(accountId), CANVAS, PC, AuthenticationSecret("")))
 
-    case Authenticated(dto) ⇒
+    case dto: Authenticated ⇒
       _config = Some(dto.config)
       _accountState = Some(dto.accountState)
 
@@ -83,18 +85,18 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       } else {
         if (dto.lastWeekTop.isDefined) {
           waitForAccountStateUpdate = true
-          send(C2B.AcceptWeekTop(WeekNumberDTO(dto.lastWeekTop.get.weekNumber)))
+          send(AcceptWeekTop(WeekNumber(dto.lastWeekTop.get.weekNumber)))
         }
         context become inMenu
       }
   }
 
   def persistent: Receive = logged {
-    case AccountStateUpdated(newAccountState) ⇒
+    case newAccountState: AccountState ⇒
       _accountState = Some(newAccountState)
       waitForAccountStateUpdate = false
 
-    case TopUpdated(top) ⇒
+    case top: protos.Top ⇒
   }
 
   def inMenu: Receive = logged {
@@ -110,7 +112,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
                 val slotId = random(emptySlots).id
                 val buildingType = random(BuildingType.values)
                 waitForAccountStateUpdate = true
-                send(BuyBuilding(BuyBuildingDTO(slotId, buildingType)))
+                send(BuyBuilding(slotId, buildingType))
               }
             }
 
@@ -123,7 +125,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
             if (upgradableSlots.nonEmpty) {
               val slotId = random(upgradableSlots).id
               waitForAccountStateUpdate = true
-              send(UpgradeBuilding(UpgradeBuildingDTO(slotId)))
+              send(UpgradeBuilding(slotId))
             }
 
           case REMOVE_BUILDING ⇒
@@ -131,14 +133,14 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
             if (notEmptySlots.size > 1) {
               val slotId = random(notEmptySlots).id
               waitForAccountStateUpdate = true
-              send(RemoveBuilding(RemoveBuildingDTO(slotId)))
+              send(RemoveBuilding(slotId))
             }
 
           case BUY_ITEM ⇒
             if (accountState.gold >= config.itemPrice) {
               val itemType = random(ItemType.values)
               waitForAccountStateUpdate = true
-              send(BuyItem(BuyItemDTO(itemType)))
+              send(BuyItem(itemType))
             }
 
           case UPGRADE_SKILL ⇒
@@ -147,7 +149,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
               val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
               val skillType = random(upgradableSkills).skillType
               waitForAccountStateUpdate = true
-              send(UpgradeSkill(UpgradeSkillDTO(skillType)))
+              send(UpgradeSkill(skillType))
             }
 
           case BUY_STARS ⇒ // todo
@@ -162,7 +164,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
     case EnteredGame(node) ⇒
       send(JoinGame)
 
-    case msg: JoinedGame ⇒
+    case msg: GameState ⇒
       gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId), "game-bot-" + accountId.id))
       gameBot.get ! ConnectToGame(sender)
       gameBot.get forward msg
@@ -170,7 +172,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
   } orElse persistent
 
   def inGame: Receive = logged {
-    case msg: GameStateUpdated ⇒
+    case msg: GameStateUpdate ⇒
       gameBot.get forward msg
 
     case msg: GameOver ⇒

@@ -12,7 +12,7 @@ import flash.display.Sprite;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.navigate.*;
-import ru.rknrl.utils.Align;
+import ru.rknrl.display.Align;
 
 public class NavigationPoints extends Sprite {
     private const points:Vector.<NavigationPoint> = new <NavigationPoint>[];

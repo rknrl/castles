@@ -12,7 +12,7 @@ import flash.display.Sprite;
 import flash.utils.getTimer;
 
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.dto.SkillLevel;
+import protos.SkillLevel;
 import ru.rknrl.utils.Tweener;
 
 public class FlaskFill extends Sprite {

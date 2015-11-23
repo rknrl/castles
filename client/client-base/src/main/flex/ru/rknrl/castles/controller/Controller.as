@@ -9,30 +9,30 @@
 package ru.rknrl.castles.controller {
 import flash.events.Event;
 
-import ru.rknrl.Log;
+import protos.Authenticated;
+import protos.CellSize;
+import protos.DeviceType;
+import protos.EnteredGameEvent;
+import protos.GameState;
+import protos.GameStateEvent;
+import protos.LeavedGameEvent;
+import protos.NodeLocator;
+import protos.Place;
+import protos.Top;
+import protos.WeekNumber;
+
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.castles.controller.game.GameController;
 import ru.rknrl.castles.controller.game.GameSplash;
+import ru.rknrl.castles.model.MutableTutorState;
 import ru.rknrl.castles.model.events.AcceptTopEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
-import ru.rknrl.castles.model.menu.top.Top;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.dto.AuthenticatedDTO;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.DeviceType;
-import ru.rknrl.dto.GameStateDTO;
-import ru.rknrl.dto.NodeLocator;
-import ru.rknrl.dto.PlaceDTO;
-import ru.rknrl.dto.TopDTO;
-import ru.rknrl.dto.WeekNumberDTO;
-import ru.rknrl.rmi.EnteredGameEvent;
-import ru.rknrl.rmi.JoinedGameEvent;
-import ru.rknrl.rmi.LeavedGameEvent;
-import ru.rknrl.rmi.Server;
+import ru.rknrl.log.Log;
 
 public class Controller {
     private var view:View;
@@ -44,7 +44,7 @@ public class Controller {
     private var deviceType:DeviceType;
 
     public function Controller(view:View,
-                               authenticated:AuthenticatedDTO,
+                               authenticated:Authenticated,
                                server:Server,
                                social:ISocial,
                                deviceType:DeviceType) {
@@ -55,12 +55,12 @@ public class Controller {
 
         isFirstGame = authenticated.accountState.gamesCount == 0;
 
-        server.addEventListener(EnteredGameEvent.ENTEREDGAME, onEnteredGame);
+        server.addEventListener(EnteredGameEvent.ENTERED_GAME, onEnteredGame);
         view.addEventListener(ViewEvents.PLAY, onPlay);
 
         const model:MenuModel = new MenuModel(authenticated);
         const menuView:MenuView = view.addMenu(model);
-        menu = new MenuController(menuView, server, model, social, authenticated.tutor, authenticated.accountState.gamesCount);
+        menu = new MenuController(menuView, server, model, social, MutableTutorState.fromDto(authenticated.tutor), authenticated.accountState.gamesCount);
 
         if (authenticated.searchOpponents) {
             view.hideMenu();
@@ -75,16 +75,14 @@ public class Controller {
         }
     }
 
-    private function addLastWeekTop(lastWeekTop:TopDTO, lastWeekPlace:PlaceDTO):void {
+    private function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:Place):void {
         view.addEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
-        view.addLastWeekTop(new Top(lastWeekTop), lastWeekPlace);
+        view.addLastWeekTop(lastWeekTop, lastWeekPlace);
     }
 
     private function onAcceptLastWeekTop(e:AcceptTopEvent):void {
         view.removeEventListener(AcceptTopEvent.ACCEPT_TOP, onAcceptLastWeekTop);
-        const dto:WeekNumberDTO = new WeekNumberDTO();
-        dto.weekNumber = e.top.weekNumber;
-        server.acceptWeekTop(dto);
+        server.acceptWeekTop(new WeekNumber(e.top.weekNumber));
         view.removeLastWeekTop();
         view.showMenu();
     }
@@ -124,15 +122,15 @@ public class Controller {
     }
 
     private function joinGame(nodeLocator:NodeLocator):void {
-        server.addEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
+        server.addEventListener(GameStateEvent.GAME_STATE, onJoinedGame);
         server.joinGame();
     }
 
-    private function onJoinedGame(e:JoinedGameEvent):void {
-        server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
-        server.addEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
+    private function onJoinedGame(e:GameStateEvent):void {
+        server.removeEventListener(GameStateEvent.GAME_STATE, onJoinedGame);
+        server.addEventListener(LeavedGameEvent.LEAVED_GAME, onLeavedGame);
 
-        const gameState:GameStateDTO = e.gameState;
+        const gameState:GameState = e.getGameState();
 
         const h:int = Math.round(gameState.width / CellSize.SIZE.id());
         const v:int = Math.round(gameState.height / CellSize.SIZE.id());
@@ -155,8 +153,8 @@ public class Controller {
         game = null;
         isFirstGame = false;
 
-        server.removeEventListener(JoinedGameEvent.JOINEDGAME, onJoinedGame);
-        server.removeEventListener(LeavedGameEvent.LEAVEDGAME, onLeavedGame);
+        server.removeEventListener(GameStateEvent.GAME_STATE, onJoinedGame);
+        server.removeEventListener(LeavedGameEvent.LEAVED_GAME, onLeavedGame);
     }
 
     public function destroy():void {

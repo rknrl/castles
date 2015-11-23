@@ -10,11 +10,11 @@ package ru.rknrl.castles.database
 
 import akka.actor.{Actor, ActorRef, Props}
 import akka.pattern.Patterns
+import protos.{AccountId, AccountState, TutorState, UserInfo}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO, UserInfoDTO}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 import scala.concurrent.duration._
 
@@ -34,21 +34,21 @@ object DatabaseTransaction {
   case class GetAccount(accountId: AccountId) extends Request
 
   case class AccountResponse(accountId: AccountId,
-                             state: Option[AccountStateDTO],
+                             state: Option[AccountState],
                              rating: Option[Double],
-                             tutorState: Option[TutorStateDTO],
+                             tutorState: Option[TutorState],
                              top: Top,
                              place: Option[Long],
                              lastWeekPlace: Option[Long],
                              lastWeekTop: Top) extends Response
 
-  case class GetAndUpdateAccountState(accountId: AccountId, transform: Option[AccountStateDTO] ⇒ AccountStateDTO) extends Request
+  case class GetAndUpdateAccountState(accountId: AccountId, transform: Option[AccountState] ⇒ AccountState) extends Request
 
-  case class AccountStateResponse(accountId: AccountId, state: AccountStateDTO) extends Response
+  case class AccountStateResponse(accountId: AccountId, state: AccountState) extends Response
 
-  case class GetAndUpdateAccountStateAndRating(accountId: AccountId, transform: (Option[AccountStateDTO], Option[Double]) ⇒ (AccountStateDTO, Double), userInfo: UserInfoDTO) extends Request
+  case class GetAndUpdateAccountStateAndRating(accountId: AccountId, transform: (Option[AccountState], Option[Double]) ⇒ (AccountState, Double), userInfo: UserInfo) extends Request
 
-  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountStateDTO, rating: Double, place: Long, top: Top) extends Response
+  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountState, rating: Double, place: Long, top: Top) extends Response
 
 
   trait Calendar {
@@ -165,7 +165,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     }
   }
 
-  def updateRating(weekNumber: Int, accountId: AccountId, newRating: Double, userInfo: UserInfoDTO, callback: () ⇒ Unit): Unit = {
+  def updateRating(weekNumber: Int, accountId: AccountId, newRating: Double, userInfo: UserInfo, callback: () ⇒ Unit): Unit = {
     val msg = UpdateRating(accountId, weekNumber, newRating, userInfo)
     Patterns.ask(database, msg, timeout) map {
       case RatingResponse(accountId, weekNumber, rating) ⇒ callback()
@@ -174,7 +174,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     }
   }
 
-  def getAccountState(accountId: AccountId, callback: Option[AccountStateDTO] ⇒ Unit): Unit = {
+  def getAccountState(accountId: AccountId, callback: Option[AccountState] ⇒ Unit): Unit = {
     val msg = GetAccountState(accountId)
     Patterns.ask(database, msg, timeout) map {
       case Database.AccountStateResponse(accountId, state) ⇒ callback(state)
@@ -183,7 +183,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     }
   }
 
-  def updateAccountState(accountId: AccountId, newState: AccountStateDTO, callback: () ⇒ Unit): Unit = {
+  def updateAccountState(accountId: AccountId, newState: AccountState, callback: () ⇒ Unit): Unit = {
     val msg = UpdateAccountState(accountId, newState)
     Patterns.ask(database, msg, timeout) map {
       case Database.AccountStateResponse(accountId, state) ⇒ callback()
@@ -192,7 +192,7 @@ class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor 
     }
   }
 
-  def getTutorState(accountId: AccountId, callback: Option[TutorStateDTO] ⇒ Unit): Unit = {
+  def getTutorState(accountId: AccountId, callback: Option[TutorState] ⇒ Unit): Unit = {
     val msg = GetTutorState(accountId)
     Patterns.ask(database, msg, timeout) map {
       case Database.TutorStateResponse(accountId, state) ⇒ callback(state)

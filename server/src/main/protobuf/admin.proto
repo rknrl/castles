@@ -1,23 +1,37 @@
-package ru.rknrl.dto;
-
-option java_outer_classname = "AdminDTO";
+package protos;
 
 option optimize_for = SPEED;
 
+import "options.proto";
 import "common.proto";
-
 import "account.proto";
 
-message AdminAuthenticateDTO {
+message AdminAuthenticate {
+    option (msgid) = 61;
+
     required string login = 1;
     required string password = 2;
 }
 
-message AdminGetAccountStateDTO {
+message AdminGetAccountState {
+    option (msgid) = 70;
+
     required AccountId accountId = 1;
 }
 
-message AdminAccountStateDTO {
+message AdminSetAccountState {
+    option (msgid) = 71;
+
+    required AccountState state = 1;
+}
+
+message AdminAccountState {
+    option (msgid) = 11;
+
     required AccountId accountId = 1;
-    required AccountStateDTO accountState = 2;
+    required AccountState accountState = 2;
+}
+
+message AuthenticatedAsAdmin {
+    option (msgid) = 10;
 }

@@ -18,7 +18,7 @@ import ru.rknrl.castles.view.menu.navigate.*;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoints;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.utils.OverrideMe;
+import ru.rknrl.common.OverrideMe;
 
 public class ScreenNavigator extends Sprite {
     private var locale:CastlesLocale;

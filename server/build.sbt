@@ -12,6 +12,7 @@ PB.protobufSettings
 
 version in PB.protobufConfig := "2.4.1"
 
+PB.includePaths in PB.protobufConfig += file("/Users/tolyayanot/dev/rknrl/protobuf-rpc/plugin/src/main/proto")
 PB.generatedTargets in PB.protobufConfig := Seq((file(baseDirectory.value + "/src/generated/scala"), "*.scala"))
 scalaSource in PB.protobufConfig := file(baseDirectory.value + "/src/generated/scala")
 PB.flatPackage in PB.protobufConfig := true
@@ -37,8 +38,8 @@ libraryDependencies ++= Seq(
   "com.trueaccord.scalapb" %% "scalapb-runtime" % "0.4.8" % PB.protobufConfig,
 
   "ru.rknrl" %% "common-server" % "1.0",
-  "ru.rknrl" %% "rmi-server" % "1.0",
-  "ru.rknrl" %% "social-server" % "1.0"
+  "ru.rknrl" %% "social-server" % "1.0",
+  "ru.rknrl" %% "rpc" % "1.0"
 )
 
 parallelExecution in Test := false

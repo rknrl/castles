@@ -9,23 +9,21 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.Game.UpdateGameState
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos._
+import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
+import ru.rknrl.castles.game.state.Moving.Move
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
-import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto._
 
 class GameCastsTest extends GameTestSpec {
 
   multi("Move", {
-    val move0 = MoveDTO(fromBuildings = List(BuildingId(0)), toBuilding = BuildingId(1))
-    val move1 = MoveDTO(fromBuildings = List(BuildingId(1)), toBuilding = BuildingId(0))
+    val move0 = protos.Move(fromBuildings = List(BuildingId(0)), toBuilding = BuildingId(1))
+    val move1 = protos.Move(fromBuildings = List(BuildingId(1)), toBuilding = BuildingId(0))
 
     checkCasts(
-      cast0 = Move(move0),
-      cast1 = Move(move1),
+      cast0 = move0,
+      cast1 = move1,
       newGameState = updateGameState(
         initGameState,
         newTime = 10,
@@ -74,12 +72,12 @@ class GameCastsTest extends GameTestSpec {
   })
 
   multi("CastTornado", {
-    val tornado0 = CastTornadoDTO(List(PointDTO(600, 600), PointDTO(601, 601), PointDTO(602, 602)))
-    val tornado1 = CastTornadoDTO(List(PointDTO(0, 0), PointDTO(1, 1), PointDTO(2, 2)))
+    val tornado0 = CastTornado(List(PointDTO(600, 600), PointDTO(601, 601), PointDTO(602, 602)))
+    val tornado1 = CastTornado(List(PointDTO(0, 0), PointDTO(1, 1), PointDTO(2, 2)))
 
     checkCasts(
-      cast0 = CastTornado(tornado0),
-      cast1 = CastTornado(tornado1),
+      cast0 = tornado0,
+      cast1 = tornado1,
       newGameState = updateGameState(
         initGameState,
         newTime = 10,
@@ -141,13 +139,9 @@ class GameCastsTest extends GameTestSpec {
 
     // Игроки получают в ответ JoinedGame
 
-    client0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameState])
 
-    client1.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameState])
 
     // Игроки делают касты
 
@@ -160,13 +154,9 @@ class GameCastsTest extends GameTestSpec {
 
     val gameStateUpdate = GameStateDiff.diff(initGameState, newGameState)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate
-    }
+    client0.expectMsg(gameStateUpdate)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate
-    }
+    client1.expectMsg(gameStateUpdate)
 
     // В следующий раз касты не учитываются
 
@@ -182,13 +172,9 @@ class GameCastsTest extends GameTestSpec {
       newGameState2
     )
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
-    }
+    client0.expectMsg(gameStateUpdate2)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
-    }
+    client1.expectMsg(gameStateUpdate2)
 
     // -------------------------------------------------------
     // Если отправить каст с невалидного адреса - он игнорируется
@@ -201,13 +187,9 @@ class GameCastsTest extends GameTestSpec {
     val newGameState3 = updateGameState(newGameState2, newTime = 50)
     val gameStateUpdate3 = GameStateDiff.diff(newGameState2, newGameState3)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate3
-    }
+    client0.expectMsg(gameStateUpdate3)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate3
-    }
+    client1.expectMsg(gameStateUpdate3)
 
     // -------------------------------------------------------
     // Если игрок проиграл или сдался - его касты игнорируются
@@ -235,14 +217,9 @@ class GameCastsTest extends GameTestSpec {
       updateGameState(newGameState3, newTime = 100)
     )
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate4
-    }
+    client0.expectMsg(gameStateUpdate4)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate4
-    }
-
+    client1.expectMsg(gameStateUpdate4)
 
   }
 }

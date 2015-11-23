@@ -8,10 +8,10 @@
 
 package ru.rknrl.castles.game.init
 
+import protos._
 import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.init.GameArea.{PlayerIdToSlotsPositions, SlotsPositions}
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto._
 
 object GameArea {
   val slotsPositions = Map(

@@ -9,7 +9,7 @@
 package ru.rknrl.core.points
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.dto.PointDTO
+import protos.PointDTO
 
 class PointTest extends WordSpec with Matchers {
   "equals" in {

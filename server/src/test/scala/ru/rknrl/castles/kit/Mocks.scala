@@ -9,23 +9,23 @@
 package ru.rknrl.castles.kit
 
 import org.scalatest.Matchers
+import protos.BuildingLevel.LEVEL_1
+import protos.BuildingType.{CHURCH, HOUSE, TOWER}
+import protos.SkillLevel.SKILL_LEVEL_0
+import protos.SlotId._
+import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMap, GameMaps}
-import ru.rknrl.castles.game.state._
+import ru.rknrl.castles.game.state.{Bullet, Fireball, GameState, Player, Tornado, Volcano, _}
 import ru.rknrl.castles.matchmaking.GameCreator
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}
-import ru.rknrl.dto.BuildingLevel.LEVEL_1
-import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
-import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_0
-import ru.rknrl.dto.SlotId._
-import ru.rknrl.dto._
 
 object Mocks extends Matchers {
   def checkPoint(a: Point, b: Point) = {
@@ -98,28 +98,28 @@ object Mocks extends Matchers {
 
   def slotsMock =
     List(
-      SlotDTO(SLOT_1, None),
-      SlotDTO(SLOT_2, None),
-      SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
-      SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
-      SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
+      Slot(SLOT_1, None),
+      Slot(SLOT_2, None),
+      Slot(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
+      Slot(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+      Slot(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
     )
 
   def skillsMock =
-    SkillType.values.map(SkillLevelDTO(_, SKILL_LEVEL_0))
+    SkillType.values.map(Skill(_, SKILL_LEVEL_0))
 
   def itemsMock =
-    ItemType.values.map(ItemDTO(_, 4))
+    ItemType.values.map(Item(_, 4))
 
-  def accountStateMock(slots: Seq[SlotDTO] = slotsMock,
-                       skills: Seq[SkillLevelDTO] = skillsMock,
-                       items: Seq[ItemDTO] = itemsMock,
+  def accountStateMock(slots: Seq[Slot] = slotsMock,
+                       skills: Seq[Skill] = skillsMock,
+                       items: Seq[Item] = itemsMock,
                        gold: Int = 10,
                        gamesCount: Int = 1,
                        weekNumberAccepted: Option[Int] = None,
                        lastPresentTime: Option[Long] = None,
                        lastGamesCountAdvert: Option[Int] = None) =
-    AccountStateDTO(
+    protos.AccountState(
       slots = slots,
       skills = skills,
       items = items,
@@ -251,7 +251,7 @@ object Mocks extends Matchers {
 
   def gameStateMock(width: Int = 10,
                     height: Int = 10,
-                    slotsPos: Iterable[SlotsPosDTO] = List.empty,
+                    slotsPos: Iterable[SlotsPos] = List.empty,
                     time: Long = 1,
                     players: Map[PlayerId, Player] = Map.empty,
                     buildings: Seq[Building] = List.empty,
@@ -303,10 +303,10 @@ object Mocks extends Matchers {
 
   def playerMock(id: PlayerId = PlayerId(1),
                  accountId: AccountId = AccountId(AccountType.DEV, "0"),
-                 userInfo: UserInfoDTO = UserInfoDTO(AccountId(AccountType.DEV, "0")),
-                 slots: Seq[SlotDTO] = List.empty,
+                 userInfo: UserInfo = UserInfo(AccountId(AccountType.DEV, "0")),
+                 slots: Seq[Slot] = List.empty,
                  stat: Stat = Stat(1, 1, 1),
-                 items: Seq[ItemDTO] = List.empty,
+                 items: Seq[Item] = List.empty,
                  isBot: Boolean = false) =
     new Player(
       id = id,
@@ -550,13 +550,13 @@ object Mocks extends Matchers {
 
   def newGameOrder(accountId: AccountId,
                    deviceType: DeviceType = DeviceType.PC,
-                   accountState: AccountStateDTO = accountStateMock(),
+                   accountState: AccountState = accountStateMock(),
                    rating: Double = 1400,
                    isBot: Boolean = false) =
     GameOrder(
       accountId = accountId,
       deviceType = deviceType,
-      userInfo = UserInfoDTO(accountId),
+      userInfo = UserInfo(accountId),
       accountState = accountState,
       rating = rating,
       isBot = isBot

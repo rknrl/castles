@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.game {
-import ru.rknrl.dto.PlayerId;
+import protos.PlayerId;
 
 public class BuildingOwner {
     private var _hasOwner:Boolean;

@@ -9,15 +9,15 @@
 package ru.rknrl.castles.payments
 
 import akka.util.Crypt
+import protos.{AccountId, AccountType}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.{AccountId, AccountType}
 import spray.http.HttpHeaders.RawHeader
 import spray.http._
 
 /**
- * http://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-Платёжка
- */
+  * http://apiok.ru/wiki/pages/viewpage.action?pageId=46137373#APIДокументация(Русский)-Платёжка
+  */
 class PaymentsCallbackOk(uri: Uri, config: SocialConfig) extends PaymentsCallback {
 
   override def error = errorResponse(OkErrorCode.SYSTEM)
@@ -102,8 +102,8 @@ class OkErrorCode private(val code: Int, val description: String) {
        |<?xml version="1.0" encoding="UTF-8"?>
        |<ns2:error_response xmlns:ns2='http://api.forticom.com/1.0/'>
        |<error_code>$code</error_code>
-                           |<error_msg>$description</error_msg>
-                                                     |</ns2:error_response>
+       |<error_msg>$description</error_msg>
+       |</ns2:error_response>
     """.stripMargin
 }
 

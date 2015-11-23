@@ -9,13 +9,13 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{FreeSpec, Matchers}
+import protos.BuildingLevel.{LEVEL_1, LEVEL_2}
+import protos.BuildingType.{HOUSE, TOWER}
+import protos.{BuildingId, BuildingPrototype, PlayerId, UnitId}
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.Stat
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2}
-import ru.rknrl.dto.BuildingType.{HOUSE, TOWER}
-import ru.rknrl.dto.{BuildingId, BuildingPrototype, PlayerId, UnitId}
 
 class AssistanceTest extends FreeSpec with Matchers {
 

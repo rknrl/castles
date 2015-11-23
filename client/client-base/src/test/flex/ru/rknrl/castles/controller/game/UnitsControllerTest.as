@@ -11,15 +11,16 @@ import flash.display.Sprite;
 
 import org.flexunit.asserts.assertEquals;
 
+import protos.BuildingType;
+import protos.UnitDTO;
+import protos.UnitUpdate;
+
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.Unit;
 import ru.rknrl.castles.view.game.area.units.BloodView;
 import ru.rknrl.castles.view.game.area.units.UnitKill;
 import ru.rknrl.castles.view.game.area.units.UnitView;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.UnitDTO;
-import ru.rknrl.dto.UnitUpdateDTO;
 
 public class UnitsControllerTest {
     [Test("add")]
@@ -95,7 +96,7 @@ public class UnitsControllerTest {
 
         unitsController.addUnit(2, endPos, unitDto);
 
-        const updateDto:UnitUpdateDTO = new UnitUpdateDTO();
+        const updateDto:UnitUpdate = new UnitUpdate();
         updateDto.id = DtoMock.unitId(0);
         updateDto.count = 30;
 
@@ -117,7 +118,7 @@ public class UnitsControllerTest {
         const bloodView:BloodView = new BloodView();
         const unitsController:UnitsController = new UnitsController(unitsLayer, bloodView);
 
-        const updateDto:UnitUpdateDTO = new UnitUpdateDTO();
+        const updateDto:UnitUpdate = new UnitUpdate();
         updateDto.id = DtoMock.unitId(0);
         updateDto.count = 30;
 

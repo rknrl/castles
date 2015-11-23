@@ -10,7 +10,7 @@ package {
 import flash.display.Sprite;
 
 import ru.rknrl.castles.view.game.ui.magicItems.GameMagicItem;
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 
 public class TestGameMagicItem extends Sprite {
     public function TestGameMagicItem() {

@@ -10,10 +10,10 @@ package ru.rknrl.castles.database
 
 import akka.testkit.TestProbe
 import org.scalatest.Matchers
+import protos.AccountId
+import protos.AccountType.VKONTAKTE
+import protos.StatAction._
 import ru.rknrl.castles.kit.Mocks
-import ru.rknrl.dto.AccountId
-import ru.rknrl.dto.AccountType.VKONTAKTE
-import ru.rknrl.dto.StatAction._
 import ru.rknrl.test.ActorsTest
 
 class StatisticsTest extends ActorsTest with Matchers {

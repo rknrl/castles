@@ -11,7 +11,7 @@ import ru.rknrl.castles.controller.game.TutorControllerBase;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.menu.MenuTutorView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.dto.SlotId;
+import protos.SlotId;
 
 public class MenuTutorController extends TutorControllerBase {
     private var view:MenuTutorView;

@@ -9,18 +9,18 @@
 package ru.rknrl.castles.matchmaking
 
 import akka.actor.{Actor, ActorRef, Props}
+import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction._
-import ru.rknrl.dto.{AccountId, AccountStateDTO, ItemType, UserInfoDTO}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 object AccountPatcher {
   def props(accountId: AccountId,
             reward: Int,
             usedItems: Map[ItemType, Int],
             ratingAmount: Double,
-            userInfo: UserInfoDTO,
+            userInfo: UserInfo,
             config: Config,
             matchmaking: ActorRef,
             databaseQueue: ActorRef) =
@@ -41,12 +41,12 @@ class AccountPatcher(accountId: AccountId,
                      reward: Int,
                      usedItems: Map[ItemType, Int],
                      ratingAmount: Double,
-                     userInfo: UserInfoDTO,
+                     userInfo: UserInfo,
                      config: Config,
                      matchmaking: ActorRef,
                      databaseQueue: ActorRef) extends Actor with ActorLog {
 
-  val transform = (stateDto: Option[AccountStateDTO], ratingDto: Option[Double]) ⇒ {
+  val transform = (stateDto: Option[protos.AccountState], ratingDto: Option[Double]) ⇒ {
     val state = stateDto.getOrElse(config.account.initState)
 
     val newState = AccountState.addGold(

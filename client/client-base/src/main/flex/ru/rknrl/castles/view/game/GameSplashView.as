@@ -22,8 +22,8 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingLevel;
+import protos.BuildingType;
 
 public class GameSplashView extends Sprite {
     private var area:Sprite;

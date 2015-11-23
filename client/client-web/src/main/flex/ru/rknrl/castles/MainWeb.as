@@ -7,16 +7,17 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles {
-import ru.rknrl.Log;
+import protos.AccountId;
+import protos.AccountType;
+import protos.AuthenticationSecret;
+
 import ru.rknrl.asocial.ISocialWeb;
 import ru.rknrl.asocial.platforms.Facebook;
 import ru.rknrl.asocial.platforms.MoiMir;
 import ru.rknrl.asocial.platforms.Odnoklassniki;
 import ru.rknrl.asocial.platforms.Vkontakte;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.print;
+import ru.rknrl.common.print;
+import ru.rknrl.log.Log;
 
 [SWF(frameRate="60", quality="high")]
 public class MainWeb extends MainWebBase {
@@ -32,13 +33,13 @@ public class MainWeb extends MainWebBase {
         const accountType:AccountType = getAccountType(flashVars.rknrlAccountType);
         const social:ISocialWeb = createSocial(accountType, flashVars);
 
-        const accountId:AccountId = new AccountId();
-        accountId.id = social.flashVars.uid;
-        accountId.accountType = accountType;
+        const accountId:AccountId = new AccountId(accountType, social.flashVars.uid);
 
-        const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
-        authenticationSecret.body = social.flashVars.authenticationSecret;
-        authenticationSecret.params = social.flashVars.authenticationParams;
+        const authenticationSecret:AuthenticationSecret = new AuthenticationSecret(
+                social.flashVars.authenticationSecret,
+                social.flashVars.authenticationParams,
+                null
+        );
 
         super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);
     }

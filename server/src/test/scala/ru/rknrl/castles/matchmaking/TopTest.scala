@@ -9,8 +9,8 @@
 package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
-import ru.rknrl.dto.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, TopUserInfoDTO, UserInfoDTO}
+import protos.AccountType.{FACEBOOK, ODNOKLASSNIKI, VKONTAKTE}
+import protos.{AccountId, TopUserInfo, UserInfo}
 
 class TopTest extends WordSpec with Matchers {
   val id1 = AccountId(VKONTAKTE, "1")
@@ -19,11 +19,11 @@ class TopTest extends WordSpec with Matchers {
   val id4 = AccountId(ODNOKLASSNIKI, "4")
   val id5 = AccountId(ODNOKLASSNIKI, "5")
 
-  val info1 = UserInfoDTO(id1)
-  val info2 = UserInfoDTO(id2)
-  val info3 = UserInfoDTO(id3)
-  val info4 = UserInfoDTO(id4)
-  val info5 = UserInfoDTO(id5)
+  val info1 = UserInfo(id1)
+  val info2 = UserInfo(id2)
+  val info3 = UserInfo(id3)
+  val info4 = UserInfo(id4)
+  val info5 = UserInfo(id5)
 
   val top5 = new Top(
     List(
@@ -48,30 +48,30 @@ class TopTest extends WordSpec with Matchers {
   "dto" in {
     top5.dto.weekNumber shouldBe 1
     top5.dto.users.size shouldBe 5
-    top5.dto.users(0) shouldBe TopUserInfoDTO(place = 1, info1)
-    top5.dto.users(1) shouldBe TopUserInfoDTO(place = 2, info2)
-    top5.dto.users(2) shouldBe TopUserInfoDTO(place = 3, info3)
-    top5.dto.users(3) shouldBe TopUserInfoDTO(place = 4, info4)
-    top5.dto.users(4) shouldBe TopUserInfoDTO(place = 5, info5)
+    top5.dto.users(0) shouldBe TopUserInfo(place = 1, info1)
+    top5.dto.users(1) shouldBe TopUserInfo(place = 2, info2)
+    top5.dto.users(2) shouldBe TopUserInfo(place = 3, info3)
+    top5.dto.users(3) shouldBe TopUserInfo(place = 4, info4)
+    top5.dto.users(4) shouldBe TopUserInfo(place = 5, info5)
 
     top3.dto.weekNumber shouldBe 2
     top3.dto.users.size shouldBe 3
-    top3.dto.users(0) shouldBe TopUserInfoDTO(place = 1, info1)
-    top3.dto.users(1) shouldBe TopUserInfoDTO(place = 2, info2)
-    top3.dto.users(2) shouldBe TopUserInfoDTO(place = 3, info3)
+    top3.dto.users(0) shouldBe TopUserInfo(place = 1, info1)
+    top3.dto.users(1) shouldBe TopUserInfo(place = 2, info2)
+    top3.dto.users(2) shouldBe TopUserInfo(place = 3, info3)
   }
 
   "insert" should {
     "last" in {
       val id6 = AccountId(ODNOKLASSNIKI, "6")
-      val info6 = UserInfoDTO(id6)
+      val info6 = UserInfo(id6)
 
       top5.insert(TopUser(id6, 1000, info6)).users shouldBe top5.users
     }
 
     "first" in {
       val id6 = AccountId(ODNOKLASSNIKI, "6")
-      val info6 = UserInfoDTO(id6)
+      val info6 = UserInfo(id6)
 
       top5.insert(TopUser(id6, 8000, info6)).users shouldBe
         List(
@@ -85,7 +85,7 @@ class TopTest extends WordSpec with Matchers {
 
     "middle" in {
       val id6 = AccountId(ODNOKLASSNIKI, "6")
-      val info6 = UserInfoDTO(id6)
+      val info6 = UserInfo(id6)
 
       top5.insert(TopUser(id6, 1380, info6)).users shouldBe
         List(
@@ -110,7 +110,7 @@ class TopTest extends WordSpec with Matchers {
 
     "3" in {
       val id6 = AccountId(ODNOKLASSNIKI, "6")
-      val info6 = UserInfoDTO(id6)
+      val info6 = UserInfo(id6)
 
       top3.insert(TopUser(id6, 1000, info6)).users shouldBe
         List(

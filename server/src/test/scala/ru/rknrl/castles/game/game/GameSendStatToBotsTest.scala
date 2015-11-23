@@ -9,14 +9,12 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos.{AccountId, BuildingId, PlayerId, StatAction}
 import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.Game.UpdateGameState
-import ru.rknrl.castles.game.state.{GameItems, GameState, GameStateDiff}
+import ru.rknrl.castles.game.state.{GameItems, GameState}
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, JoinedGame}
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{StatAction, AccountId, BuildingId, PlayerId}
 
 class GameSendStatToBotsTest extends GameTestSpec {
   multi("SendStatToBots", {
@@ -66,8 +64,8 @@ class GameSendStatToBotsTest extends GameTestSpec {
 
     val newGameState = updateGameState(initGameState, newTime = 7)
 
-    client0.expectMsgClass(classOf[JoinedGame])
-    client1.expectMsgClass(classOf[JoinedGame])
+    client0.expectMsgClass(classOf[GameState])
+    client1.expectMsgClass(classOf[GameState])
 
     // StatAction пересылается всем ботам
 

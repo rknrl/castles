@@ -8,18 +8,16 @@
 
 package ru.rknrl.castles.matchmaking
 
+import protos.AccountType.DEV
+import protos.{AccountId, Item, PlayerId}
 import ru.rknrl.IdIterator
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.{GameState, Player}
 import ru.rknrl.castles.matchmaking.GameCreator.NewGame
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
 import ru.rknrl.core.Stat
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountStateDTO, ItemDTO, AccountId, PlayerId}
 
 object GameCreator {
 
@@ -84,7 +82,7 @@ class GameCreator(gameMaps: GameMaps,
       items = botItems(humanOrder.accountState.items)
     )
 
-  def botItems(humanItems: Seq[ItemDTO]) =
+  def botItems(humanItems: Seq[Item]) =
     humanItems.map(item ⇒ item.copy(count = item.count * 2))
 
   val tutorHumanStat = new Stat(attack = 3, defence = 3, speed = 1)

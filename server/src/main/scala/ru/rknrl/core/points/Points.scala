@@ -8,8 +8,8 @@
 
 package ru.rknrl.core.points
 
+import protos.PointDTO
 import ru.rknrl.Assertion
-import ru.rknrl.dto.PointDTO
 
 class Points(val points: Seq[Point]) {
 

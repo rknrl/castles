@@ -9,10 +9,11 @@
 package ru.rknrl.castles.model.game {
 import org.flexunit.asserts.assertEquals;
 
+import protos.ItemStateDTO;
+import protos.ItemStatesDTO;
+import protos.ItemType;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.ItemStateDTO;
-import ru.rknrl.dto.ItemStatesDTO;
-import ru.rknrl.dto.ItemType;
 
 public class ItemStatesTest {
     private const itemStates:ItemStatesDTO =

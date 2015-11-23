@@ -7,18 +7,18 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu.shop {
-import ru.rknrl.dto.ItemDTO;
-import ru.rknrl.dto.ItemType;
+import protos.Item;
+import protos.ItemType;
 
 public class ItemsCount {
-    private var _itemsDto:Vector.<ItemDTO>;
+    private var _itemsDto:Vector.<Item>;
 
-    public function ItemsCount(itemsDto:Vector.<ItemDTO>) {
+    public function ItemsCount(itemsDto:Vector.<Item>) {
         _itemsDto = itemsDto;
     }
 
     public function getCount(itemType:ItemType):int {
-        for each(var item:ItemDTO in _itemsDto) {
+        for each(var item:Item in _itemsDto) {
             if (item.itemType == itemType) return item.count;
         }
         throw new Error("can't find item " + itemType);

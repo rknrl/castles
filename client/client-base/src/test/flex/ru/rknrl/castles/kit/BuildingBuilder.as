@@ -8,13 +8,14 @@
 
 package ru.rknrl.castles.kit {
 
+import protos.BuildingId;
+import protos.BuildingLevel;
+import protos.BuildingType;
+
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.Building;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
 
 public class BuildingBuilder {
     private var id:BuildingId = DtoMock.buildingId(1);

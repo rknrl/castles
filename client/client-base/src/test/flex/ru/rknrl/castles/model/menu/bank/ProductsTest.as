@@ -9,25 +9,25 @@
 package ru.rknrl.castles.model.menu.bank {
 import org.flexunit.asserts.assertEquals;
 
-import ru.rknrl.dto.ProductDTO;
-import ru.rknrl.dto.ProductId;
+import protos.Product;
+import protos.ProductId;
 
 public class ProductsTest {
     [Test("product")]
     public function t0():void {
-        const product:ProductDTO = new ProductDTO();
+        const product:Product = new Product();
         product.id = ProductId.STARS.id();
 
-        const products:Products = new Products(new <ProductDTO>[product]);
+        const products:Products = new Products(new <Product>[product]);
         assertEquals(product, products.product)
     }
 
     [Test("can't find product", expects="Error")]
     public function t1():void {
-        const product:ProductDTO = new ProductDTO();
+        const product:Product = new Product();
         product.id = 0;
 
-        new Products(new <ProductDTO>[product]).product;
+        new Products(new <Product>[product]).product;
     }
 }
 }

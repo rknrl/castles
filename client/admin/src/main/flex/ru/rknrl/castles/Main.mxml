@@ -53,24 +53,18 @@
         import mx.controls.Alert;
         import mx.events.FlexEvent;
 
+        import protos.AccountId;
+        import protos.AccountState;
+        import protos.AdminAccountStateEvent;
+        import protos.AuthenticatedAsAdminEvent;
+        import protos.Item;
+        import protos.Skill;
+        import protos.Slot;
+
         import ru.rknrl.castles.events.AddBalanceEvent;
         import ru.rknrl.castles.events.AddMagicItemEvent;
         import ru.rknrl.castles.events.SetSkillEvent;
         import ru.rknrl.castles.events.SetSlotEvent;
-        import ru.rknrl.dto.AccountId;
-        import ru.rknrl.dto.AccountStateDTO;
-        import ru.rknrl.dto.AdminAddGoldDTO;
-        import ru.rknrl.dto.AdminAddItemDTO;
-        import ru.rknrl.dto.AdminAuthenticateDTO;
-        import ru.rknrl.dto.AdminGetAccountStateDTO;
-        import ru.rknrl.dto.AdminSetSkillDTO;
-        import ru.rknrl.dto.AdminSetSlotDTO;
-        import ru.rknrl.dto.ItemDTO;
-        import ru.rknrl.dto.SkillLevelDTO;
-        import ru.rknrl.dto.SlotDTO;
-        import ru.rknrl.rmi.AccountStateEvent;
-        import ru.rknrl.rmi.AuthenticatedAsAdminEvent;
-        import ru.rknrl.rmi.Server;
 
         private static const port:int = 2337;
         private static const policyPort:int = 2336;
@@ -95,12 +89,13 @@
 
             Security.loadPolicyFile("xmlsocket://" + host + ":" + policyPort);
 
-            server = new Server(new Socket());
-            server.addEventListener(Event.CONNECT, onConnect);
-            server.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
-            server.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
-            server.addEventListener(Event.CLOSE, onConnectionError);
-            server.connect(host, port);
+            var socket:Socket = new Socket();
+            server = new Server(socket);
+            socket.addEventListener(Event.CONNECT, onConnect);
+            socket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
+            socket.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
+            socket.addEventListener(Event.CLOSE, onConnectionError);
+            socket.connect(host, port);
         }
 
         private function onConnectionError(event:Event):void {
@@ -108,38 +103,34 @@
         }
 
         private function onConnect(event:Event):void {
-            const authenticate:AdminAuthenticateDTO = new AdminAuthenticateDTO();
-            authenticate.login = loginTextInput.text;
-            authenticate.password = passwordTextInput.text;
-            server.addEventListener(AuthenticatedAsAdminEvent.AUTHENTICATEDASADMIN, onAuthenticatedAsAdmin);
-            server.authenticateAsAdmin(authenticate);
+            server.addEventListener(AuthenticatedAsAdminEvent.AUTHENTICATED_AS_ADMIN, onAuthenticatedAsAdmin);
+            server.adminAuthenticate(loginTextInput.text, passwordTextInput.text);
         }
 
         public function onAuthenticatedAsAdmin(e:AuthenticatedAsAdminEvent):void {
-            server.removeEventListener(AuthenticatedAsAdminEvent.AUTHENTICATEDASADMIN, onAuthenticatedAsAdmin);
+            server.removeEventListener(AuthenticatedAsAdminEvent.AUTHENTICATED_AS_ADMIN, onAuthenticatedAsAdmin);
             loadingGroup.includeInLayout = loadingGroup.visible = false;
             adminGroup.includeInLayout = adminGroup.visible = true;
-            server.addEventListener(AccountStateEvent.ACCOUNTSTATE, onAccountState);
+            server.addEventListener(AdminAccountStateEvent.ADMIN_ACCOUNT_STATE, onAccountState);
         }
 
         private function onGetClick(event:MouseEvent):void {
             stateHolder.removeAllElements();
 
-            const dto:AdminGetAccountStateDTO = new AdminGetAccountStateDTO();
-            dto.accountId = new AccountId();
-            dto.accountId.id = accountIdInput.text;
-            dto.accountId.accountType = accountTypeComboBox.selectedItem;
-            server.getAccountState(dto);
+            const accountId:AccountId = new AccountId();
+            accountId.id = accountIdInput.text;
+            accountId.accountType = accountTypeComboBox.selectedItem;
+            server.adminGetAccountState(accountId);
         }
 
         private var currentAccountId:AccountId;
 
-        public function onAccountState(e:AccountStateEvent):void {
+        public function onAccountState(e:AdminAccountStateEvent):void {
             stateHolder.removeAllElements();
 
-            const state:AccountStateDTO = e.adminAccountState.accountState;
+            const state:AccountState = e.accountState;
 
-            currentAccountId = e.adminAccountState.accountId;
+            currentAccountId = e.accountId;
 
             const nameRow:NameRow = new NameRow();
             nameRow.init(currentAccountId);
@@ -153,7 +144,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var slot:SlotDTO in state.slots) {
+            for each(var slot:Slot in state.slots) {
                 const slotRow:SlotRow = new SlotRow();
                 slotRow.init(slot.id, slot.buildingPrototype);
                 stateHolder.addElement(slotRow);
@@ -161,7 +152,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var skill:SkillLevelDTO in state.skills) {
+            for each(var skill:Skill in state.skills) {
                 const skillRow:SkillRow = new SkillRow();
                 skillRow.init(skill.skillType, skill.level);
                 stateHolder.addElement(skillRow);
@@ -169,7 +160,7 @@
 
             stateHolder.addElement(spacer);
 
-            for each(var item:ItemDTO in state.items) {
+            for each(var item:Item in state.items) {
                 const magicItemRow:MagicItemRow = new MagicItemRow();
                 magicItemRow.init(item.itemType, item.count);
                 stateHolder.addElement(magicItemRow);

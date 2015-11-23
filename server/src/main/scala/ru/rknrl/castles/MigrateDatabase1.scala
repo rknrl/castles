@@ -12,11 +12,11 @@ import akka.actor.{Actor, ActorSystem, Props}
 import com.github.mauricio.async.db.RowData
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.ConnectionPool
+import protos._
 import ru.rknrl.castles.MigrateDatabase1.Migrate
 import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
 import ru.rknrl.castles.database.DbConfiguration
-import ru.rknrl.dto.{AccountId, AccountStateDTO, UserInfoDTO}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 object MigrateDatabase1 {
   def main(args: Array[String]) {
@@ -63,10 +63,10 @@ class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ActorL
             resultSet
               .map(rowToUserData)
               .foreach(userData ⇒ {
-              write("REPLACE INTO account_state (id,state) VALUES (?,?);", Seq(userData.id.toByteArray, userData.state.toByteArray), 1)
-              write("REPLACE INTO ratings (id,weekNumber,rating) VALUES (?,?,?);", Seq(userData.id.toByteArray, weekNumber, userData.rating), 1)
-              write("REPLACE INTO user_info (id,userInfo) VALUES (?,?);", Seq(userData.id.toByteArray, userData.info.toByteArray), 1)
-            })
+                write("REPLACE INTO account_state (id,state) VALUES (?,?);", Seq(userData.id.toByteArray, userData.state.toByteArray), 1)
+                write("REPLACE INTO ratings (id,weekNumber,rating) VALUES (?,?,?);", Seq(userData.id.toByteArray, weekNumber, userData.rating), 1)
+                write("REPLACE INTO user_info (id,userInfo) VALUES (?,?);", Seq(userData.id.toByteArray, userData.info.toByteArray), 1)
+              })
 
           case None ⇒ log.error("Get none " + queryResult)
         }
@@ -82,10 +82,10 @@ class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ActorL
     val rating = rowData("rating").asInstanceOf[Double]
 
     val stateByteArray = rowData("state").asInstanceOf[Array[Byte]]
-    val state = AccountStateDTO.parseFrom(stateByteArray)
+    val state = AccountState.parseFrom(stateByteArray)
 
     val userInfoByteArray = rowData("userInfo").asInstanceOf[Array[Byte]]
-    val info = UserInfoDTO.parseFrom(userInfoByteArray)
+    val info = UserInfo.parseFrom(userInfoByteArray)
 
     UserData(id, rating, state, info)
   }
@@ -105,5 +105,5 @@ class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ActorL
 
 case class UserData(id: AccountId,
                     rating: Double,
-                    state: AccountStateDTO,
-                    info: UserInfoDTO)
+                    state: AccountState,
+                    info: UserInfo)

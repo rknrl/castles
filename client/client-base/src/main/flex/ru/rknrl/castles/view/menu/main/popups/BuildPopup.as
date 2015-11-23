@@ -15,8 +15,8 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.main.popups.icons.PopupBuildIcon;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.SlotId;
+import protos.BuildingType;
+import protos.SlotId;
 
 public class BuildPopup extends Popup {
     private var slotId:SlotId;

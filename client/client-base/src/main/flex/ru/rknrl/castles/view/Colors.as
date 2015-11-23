@@ -12,10 +12,10 @@ import flash.geom.ColorTransform;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.game.BuildingOwner;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlayerId;
-import ru.rknrl.dto.SkillType;
-import ru.rknrl.dto.SlotId;
+import protos.ItemType;
+import protos.PlayerId;
+import protos.SkillType;
+import protos.SlotId;
 
 public class Colors {
 

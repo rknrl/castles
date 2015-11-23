@@ -19,8 +19,7 @@ object ELO {
         case 3 ⇒ 0.25
         case 4 ⇒ 0.0
       }
-    else
-    if (place == 1) 1.0 else 0.0
+    else if (place == 1) 1.0 else 0.0
 
   /** http://en.wikipedia.org/wiki/Elo_rating_system */
   def getRatingAmount(ratingA: Double, ratingB: Double, gamesCountA: Int, sA: Double) = {

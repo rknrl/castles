@@ -8,10 +8,10 @@
 
 package ru.rknrl.castles.game.state
 
+import protos._
 import ru.rknrl.castles.game.{DamagerConfig, GameConfig}
 import ru.rknrl.core.points.{Point, Points}
 import ru.rknrl.core.{Damager, Periodic, Stat}
-import ru.rknrl.dto._
 
 case class Fireball(playerId: PlayerId,
                     pos: Point,
@@ -21,7 +21,7 @@ case class Fireball(playerId: PlayerId,
 
   def pos(time: Long) = pos
 
-  def dto(time: Long) = FireballDTO(pos.dto, millisTillEnd(time))
+  def dto(time: Long) = protos.Fireball(pos.dto, millisTillEnd(time))
 }
 
 object Fireballs {
@@ -43,7 +43,7 @@ case class Volcano(playerId: PlayerId,
 
   def pos(time: Long) = pos
 
-  def dto(time: Long) = VolcanoDTO(pos.dto, millisTillEnd(time))
+  def dto(time: Long) = protos.Volcano(pos.dto, millisTillEnd(time))
 }
 
 object Volcanoes {
@@ -66,7 +66,7 @@ case class Tornado(playerId: PlayerId,
   def pos(time: Long) = points.pos(progress(time))
 
   def dto(time: Long) =
-    TornadoDTO(
+    protos.Tornado(
       points = points.dto,
       millisFromStart = millisFromStart(time),
       millisTillEnd = millisTillEnd(time)
@@ -74,7 +74,7 @@ case class Tornado(playerId: PlayerId,
 }
 
 object Tornadoes {
-  def castToTornado(cast: (PlayerId, CastTornadoDTO), time: Long, churchesProportion: ChurchesProportion, config: GameConfig) =
+  def castToTornado(cast: (PlayerId, CastTornado), time: Long, churchesProportion: ChurchesProportion, config: GameConfig) =
     new Tornado(
       playerId = cast._1,
       points = Points.fromDto(cast._2.points).toDistance(config.tornado.duration * config.tornado.speed),

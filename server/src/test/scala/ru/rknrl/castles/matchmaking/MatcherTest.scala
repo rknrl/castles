@@ -9,11 +9,11 @@
 package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.AccountId
+import protos.AccountType.VKONTAKTE
+import protos.DeviceType.{PC, PHONE, TABLET}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
-import ru.rknrl.dto.AccountId
-import ru.rknrl.dto.AccountType.VKONTAKTE
-import ru.rknrl.dto.DeviceType.{PC, PHONE, TABLET}
 
 class MatcherTest extends WordSpec with Matchers {
 

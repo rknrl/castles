@@ -7,10 +7,14 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view {
+import protos.Place;
+
 import flash.display.Sprite;
 
+import protos.Top;
+
 import ru.rknrl.castles.model.menu.MenuModel;
-import ru.rknrl.castles.model.menu.top.Top;
+import ru.rknrl.castles.model.menu.top.TopUtils;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.game.GameSplashView;
 import ru.rknrl.castles.view.game.GameView;
@@ -22,7 +26,6 @@ import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.menu.top.LastWeekTopScreen;
-import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class View extends Sprite {
@@ -160,7 +163,7 @@ public class View extends Sprite {
 
     private var lastWeekTopScreen:LastWeekTopScreen;
 
-    public function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:PlaceDTO):void {
+    public function addLastWeekTop(lastWeekTop:Top, lastWeekPlace:Place):void {
         if (lastWeekTopScreen) throw new Error("lastWeekTopScreen already exists");
         addChild(lastWeekTopScreen = new LastWeekTopScreen(lastWeekTop, lastWeekPlace, _layout, locale, loadImageManager));
     }

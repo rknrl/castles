@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.game.state
 
+import protos._
 import ru.rknrl.Assertion
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.dto._
 
 case class ItemState(itemType: ItemType,
                      count: Int,
@@ -61,11 +61,11 @@ class ItemStates(val items: Map[ItemType, ItemState]) {
 }
 
 object GameItems {
-  private def initMap(items: Seq[ItemDTO]) =
+  private def initMap(items: Seq[Item]) =
     for (item ← items)
       yield item.itemType → new ItemState(item.itemType, item.count, lastUseTime = 0, useCount = 0)
 
-  def init(items: Seq[ItemDTO]) =
+  def init(items: Seq[Item]) =
     new ItemStates(initMap(items).toMap)
 }
 
@@ -74,10 +74,10 @@ class GameItems(val states: Map[PlayerId, ItemStates]) {
     new GameItems(
       for ((playerId, state) ← states)
         yield
-        if (casts.contains(playerId))
-          playerId → state.use(itemType, time)
-        else
-          playerId → state
+          if (casts.contains(playerId))
+            playerId → state.use(itemType, time)
+          else
+            playerId → state
     )
 
   def canCast(playerId: PlayerId, itemType: ItemType, config: GameConfig, time: Long) =

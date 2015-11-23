@@ -10,13 +10,14 @@ package ru.rknrl.castles.model.userInfo {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNull;
 
+import protos.AccountType;
+import protos.UserInfo;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.UserInfoDTO;
 
 public class CastlesUserInfoTest {
 
-    private static function checkEquals(a:UserInfoDTO, b:UserInfoDTO):void {
+    private static function checkEquals(a:UserInfo, b:UserInfo):void {
         assertEquals(a.accountId.accountType, b.accountId.accountType);
         assertEquals(a.accountId.id, b.accountId.id);
         assertEquals(a.firstName, b.firstName);
@@ -27,7 +28,7 @@ public class CastlesUserInfoTest {
 
     [Test("full info")]
     public function t0():void {
-        const dto:UserInfoDTO = new UserInfoDTO();
+        const dto:UserInfo = new UserInfo();
         dto.accountId = DtoMock.accountId(AccountType.FACEBOOK, "123");
         dto.firstName = "Tolya";
         dto.lastName = "Yanot";
@@ -42,13 +43,13 @@ public class CastlesUserInfoTest {
         assertEquals("http://small_photo", userInfo.getPhotoUrl(96, 96));
         assertEquals("http://big_photo", userInfo.getPhotoUrl(256, 256));
 
-        const newDto:UserInfoDTO = CastlesUserInfo.userInfoDto(userInfo, userInfo.accountType);
+        const newDto:UserInfo = CastlesUserInfo.userInfoDto(userInfo, userInfo.accountType);
         checkEquals(dto, newDto);
     }
 
     [Test("empty info")]
     public function t1():void {
-        const dto:UserInfoDTO = new UserInfoDTO();
+        const dto:UserInfo = new UserInfo();
         dto.accountId = DtoMock.accountId(AccountType.FACEBOOK, "123");
 
         const userInfo:CastlesUserInfo = CastlesUserInfo.fromDto(dto);
@@ -59,7 +60,7 @@ public class CastlesUserInfoTest {
         assertNull(userInfo.getPhotoUrl(96, 96));
         assertNull(userInfo.getPhotoUrl(256, 256));
 
-        const newDto:UserInfoDTO = CastlesUserInfo.userInfoDto(userInfo, userInfo.accountType);
+        const newDto:UserInfo = CastlesUserInfo.userInfoDto(userInfo, userInfo.accountType);
         checkEquals(dto, newDto);
     }
 }

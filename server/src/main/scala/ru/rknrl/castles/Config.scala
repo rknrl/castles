@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles
 
+import protos._
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.social.{Product, SocialConfigs}
-import ru.rknrl.dto._
 
 class Config(val host: String,
              val staticHost: String,
@@ -77,7 +77,7 @@ class Config(val host: String,
   def productsDto(platformType: PlatformType, accountType: AccountType) =
     for (p ← products;
          productInfo = socialByAccountType(platformType, accountType).get.productsInfo.find(_.id == p.id).get)
-      yield ProductDTO(
+      yield Product(
         id = p.id,
         title = p.title,
         description = p.description,
@@ -90,7 +90,7 @@ class Config(val host: String,
   def botUserInfo(accountId: AccountId, number: Int) =
     number match {
       case 0 ⇒
-        UserInfoDTO(
+        UserInfo(
           accountId,
           Some("Sasha"),
           Some("Serova"),
@@ -98,15 +98,15 @@ class Config(val host: String,
           Some("http://" + staticHost + "/avatars/Sasha256.png")
         )
       case 1 ⇒
-        UserInfoDTO(
+        UserInfo(
           accountId,
-          Some("Napoleon"),
+          Some("oleon"),
           Some("1769"),
           Some("http://" + staticHost + "/avatars/Napoleon96.png"),
           Some("http://" + staticHost + "/avatars/Napoleon256.png")
         )
       case 2 ⇒
-        UserInfoDTO(
+        UserInfo(
           accountId,
           Some("Виктория"),
           Some("Викторовна"),

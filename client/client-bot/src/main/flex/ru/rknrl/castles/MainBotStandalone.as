@@ -9,11 +9,12 @@
 package ru.rknrl.castles {
 import flash.system.Security;
 
+import protos.AccountId;
+import protos.AccountType;
+import protos.AuthenticationSecret;
+
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.platforms.SocialMock;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticationSecretDTO;
 
 [SWF(width="1024", height="768", frameRate="60", quality="high")]
 public class MainBotStandalone extends MainBotBase {
@@ -33,7 +34,7 @@ public class MainBotStandalone extends MainBotBase {
 
         const social:ISocial = new SocialMock(accountId.id);
 
-        const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
+        const authenticationSecret:AuthenticationSecret = new AuthenticationSecret();
         authenticationSecret.body = "body";
 
         super(host, gamePort, policyPort, httpPort, accountId, authenticationSecret, social);

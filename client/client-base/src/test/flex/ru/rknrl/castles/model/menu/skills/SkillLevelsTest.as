@@ -11,25 +11,26 @@ import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 
+import protos.Skill;
+import protos.SkillLevel;
+import protos.SkillType;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.SkillLevel;
-import ru.rknrl.dto.SkillLevelDTO;
-import ru.rknrl.dto.SkillType;
 
 public class SkillLevelsTest {
-    private const start:SkillLevels = new SkillLevels(new <SkillLevelDTO>[
+    private const start:SkillLevels = new SkillLevels(new <Skill>[
         DtoMock.skillLevel(SkillType.ATTACK, SkillLevel.SKILL_LEVEL_0),
         DtoMock.skillLevel(SkillType.DEFENCE, SkillLevel.SKILL_LEVEL_0),
         DtoMock.skillLevel(SkillType.SPEED, SkillLevel.SKILL_LEVEL_0)
     ]);
 
-    private const middle:SkillLevels = new SkillLevels(new <SkillLevelDTO>[
+    private const middle:SkillLevels = new SkillLevels(new <Skill>[
         DtoMock.skillLevel(SkillType.ATTACK, SkillLevel.SKILL_LEVEL_1),
         DtoMock.skillLevel(SkillType.DEFENCE, SkillLevel.SKILL_LEVEL_2),
         DtoMock.skillLevel(SkillType.SPEED, SkillLevel.SKILL_LEVEL_3)
     ]);
 
-    private const last:SkillLevels = new SkillLevels(new <SkillLevelDTO>[
+    private const last:SkillLevels = new SkillLevels(new <Skill>[
         DtoMock.skillLevel(SkillType.ATTACK, SkillLevel.SKILL_LEVEL_3),
         DtoMock.skillLevel(SkillType.DEFENCE, SkillLevel.SKILL_LEVEL_3),
         DtoMock.skillLevel(SkillType.SPEED, SkillLevel.SKILL_LEVEL_3)

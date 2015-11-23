@@ -12,7 +12,7 @@
     </s:HGroup>
 
     <fx:Script><![CDATA[
-        import ru.rknrl.dto.AccountId;
+        import protos.AccountId;
 
         public function init(accountId:AccountId): void {
             idLabel.text = accountId.id;

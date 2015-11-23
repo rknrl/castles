@@ -15,7 +15,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.AnimatedShadow;
 import ru.rknrl.castles.view.utils.Fly;
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 
 public class ShopMagicItem extends Sprite {
     private static const mouseHolderW:Number = Layout.itemSize + Layout.itemGap;

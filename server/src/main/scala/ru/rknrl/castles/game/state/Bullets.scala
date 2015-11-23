@@ -10,7 +10,6 @@ package ru.rknrl.castles.game.state
 
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.core.Periodic
-import ru.rknrl.dto.BulletDTO
 
 case class Bullet(building: Building,
                   unit: GameUnit,
@@ -18,7 +17,7 @@ case class Bullet(building: Building,
                   duration: Long,
                   powerVsUnit: Double) extends Periodic {
 
-  def dto(time: Long) = BulletDTO(building.id, unit.id, duration.toInt)
+  def dto(time: Long) = protos.Bullet(building.id, unit.id, duration.toInt)
 
 }
 

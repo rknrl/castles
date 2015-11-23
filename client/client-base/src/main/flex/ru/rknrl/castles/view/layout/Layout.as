@@ -14,9 +14,9 @@ import ru.rknrl.castles.model.getSlotPos;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.PlayerId;
-import ru.rknrl.dto.SlotId;
-import ru.rknrl.utils.OverrideMe;
+import protos.PlayerId;
+import protos.SlotId;
+import ru.rknrl.common.OverrideMe;
 
 public class Layout {
     public static const navigationPointSize:int = 8;

@@ -9,12 +9,10 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.game.Game.Join
-import ru.rknrl.castles.game.Game.UpdateGameState
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos.{AccountId, GameState, PlayerId}
+import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.GameStateDiff
-import ru.rknrl.castles.rmi.B2C.{GameStateUpdated, JoinedGame}
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, PlayerId}
 
 class GameJoinTest extends GameTestSpec {
   multi("Join", {
@@ -37,23 +35,21 @@ class GameJoinTest extends GameTestSpec {
     client0.send(game, Join(AccountId(VKONTAKTE, "1"), client0.ref))
     client1.send(game, Join(AccountId(FACEBOOK, "1"), client1.ref))
 
-    // Игроки получают в ответ JoinedGame с актуальным геймстейтом
+    // Игроки получают в ответ актуальный геймстейт
 
     val newGameState = updateGameState(initGameState, newTime = 7)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ gameStateDto shouldBe newGameState.dto(
-        id = PlayerId(0), // <- Проверяем, что playerId верный
-        gameOvers = List.empty
-      )
-    }
+    client0.expectMsg(newGameState.dto(
+      id = PlayerId(0), // <- Проверяем, что playerId верный
+      gameOvers = List.empty
+    )
+    )
 
-    client1.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ gameStateDto shouldBe newGameState.dto(
-        id = PlayerId(1), // <- Проверяем, что playerId верный
-        gameOvers = List.empty
-      )
-    }
+    client1.expectMsg(newGameState.dto(
+      id = PlayerId(1), // <- Проверяем, что playerId верный
+      gameOvers = List.empty
+    )
+    )
 
     // Теперь после UpdateGameState оба игрока получают GameStateUpdated
 
@@ -61,13 +57,9 @@ class GameJoinTest extends GameTestSpec {
 
     val gameStateUpdate = GameStateDiff.diff(newGameState, updateGameState(newGameState, newTime = 10))
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate
-    }
+    client0.expectMsg(gameStateUpdate)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate
-    }
+    client1.expectMsg(gameStateUpdate)
 
     // Первый игрок переконнекчивается
 
@@ -78,7 +70,7 @@ class GameJoinTest extends GameTestSpec {
     client0.expectNoMsg(noMsgTimeout)
 
     newClient0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ gameStateDto.selfId shouldBe PlayerId(0)
+      case gameStateDto: GameState ⇒ gameStateDto.selfId shouldBe PlayerId(0)
     }
 
     // Теперь сообщения приходят на новый актор, а на старый не приходит
@@ -89,13 +81,9 @@ class GameJoinTest extends GameTestSpec {
 
     client0.expectNoMsg(noMsgTimeout)
 
-    newClient0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
-    }
+    newClient0.expectMsg(gameStateUpdate2)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ dto shouldBe gameStateUpdate2
-    }
+    client1.expectMsg(gameStateUpdate2)
 
   })
 }

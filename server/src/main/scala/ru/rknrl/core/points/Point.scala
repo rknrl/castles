@@ -8,7 +8,7 @@
 
 package ru.rknrl.core.points
 
-import ru.rknrl.dto.PointDTO
+import protos.PointDTO
 
 class Point(val x: Double, val y: Double) {
   def distance(that: Point) = {

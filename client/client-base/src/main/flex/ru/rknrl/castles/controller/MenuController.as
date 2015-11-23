@@ -7,15 +7,27 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller {
+import com.netease.protobuf.Bool;
+
 import flash.events.Event;
 import flash.utils.Dictionary;
 import flash.utils.setTimeout;
+
+import protos.AcceptAdvert;
+import protos.AccountStateEvent;
+import protos.BuildingLevel;
+import protos.PlaceEvent;
+import protos.Product;
+import protos.SkillLevel;
+import protos.Slot;
+import protos.StatAction;
+import protos.TopEvent;
 
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.PaymentDialogData;
 import ru.rknrl.asocial.PaymentDialogEvent;
 import ru.rknrl.asocial.VideoAdvertEvent;
-import ru.rknrl.castles.model.DtoMock;
+import ru.rknrl.castles.model.MutableTutorState;
 import ru.rknrl.castles.model.events.BuildEvent;
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.model.events.RemoveBuildingEvent;
@@ -26,29 +38,13 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.view.menu.MenuView;
-import ru.rknrl.dto.AcceptAdvertDTO;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuyBuildingDTO;
-import ru.rknrl.dto.BuyItemDTO;
-import ru.rknrl.dto.ProductDTO;
-import ru.rknrl.dto.RemoveBuildingDTO;
-import ru.rknrl.dto.SkillLevel;
-import ru.rknrl.dto.SlotDTO;
-import ru.rknrl.dto.StatAction;
-import ru.rknrl.dto.TutorStateDTO;
-import ru.rknrl.dto.UpgradeBuildingDTO;
-import ru.rknrl.dto.UpgradeSkillDTO;
-import ru.rknrl.rmi.AccountStateUpdatedEvent;
-import ru.rknrl.rmi.PlaceUpdatedEvent;
-import ru.rknrl.rmi.Server;
-import ru.rknrl.rmi.TopUpdatedEvent;
 
 public class MenuController {
     private var view:MenuView;
     private var server:Server;
     private var model:MenuModel;
     private var social:ISocial;
-    private var tutorState:TutorStateDTO;
+    private var tutorState:MutableTutorState;
     private var gamesCount:int;
 
     private var tutor:MenuTutorController;
@@ -64,7 +60,7 @@ public class MenuController {
         return result;
     }
 
-    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:ISocial, tutorState:TutorStateDTO, gamesCount:int) {
+    public function MenuController(view:MenuView, server:Server, model:MenuModel, social:ISocial, tutorState:MutableTutorState, gamesCount:int) {
         this.view = view;
         this.server = server;
         this.model = model;
@@ -75,9 +71,9 @@ public class MenuController {
 
         tutor = new MenuTutorController(view.tutor);
 
-        server.addEventListener(AccountStateUpdatedEvent.ACCOUNTSTATEUPDATED, onAccountStateUpdated);
-        server.addEventListener(TopUpdatedEvent.TOPUPDATED, onTopUpdated);
-        server.addEventListener(PlaceUpdatedEvent.PLACEUPDATED, onPlaceUpdated);
+        server.addEventListener(AccountStateEvent.ACCOUNT_STATE, onAccountStateUpdated);
+        server.addEventListener(TopEvent.TOP, onTopUpdated);
+        server.addEventListener(PlaceEvent.PLACE, onPlaceUpdated);
 
         social.addEventListener(PaymentDialogEvent.PAYMENT_DIALOG_CLOSED, onPaymentDialogClosed);
         social.addEventListener(PaymentDialogEvent.PAYMENT_SUCCESS, onPaymentSuccess);
@@ -107,15 +103,13 @@ public class MenuController {
 
     private function onAdvertComplete(event:VideoAdvertEvent):void {
         setTimeout(function ():void {
-            const dto:AcceptAdvertDTO = new AcceptAdvertDTO();
-            dto.accepted = true;
-            server.acceptAdvert(dto)
+            server.acceptAdvert(new AcceptAdvert(true))
         }, 2000); // таймаут, чтобы игрок увидел анимацию
     }
 
-    private function onAccountStateUpdated(event:AccountStateUpdatedEvent):void {
-        const afterGame:Boolean = event.accountState.gamesCount >= model.gamesCount;
-        model.mergeAccountStateDto(event.accountState);
+    private function onAccountStateUpdated(event:AccountStateEvent):void {
+        const afterGame:Boolean = event.gamesCount >= model.gamesCount;
+        model.mergeAccountStateDto(event.getAccountState());
         view.slots = model.slots;
         view.gold = model.gold;
         view.itemsCount = model.itemsCount;
@@ -125,18 +119,18 @@ public class MenuController {
         if (afterGame && model.canShowAdvert) view.advertVisible = true;
     }
 
-    private function onTopUpdated(e:TopUpdatedEvent):void {
-        model.mergeTopDto(e.top);
+    private function onTopUpdated(e:TopEvent):void {
+        model.mergeTopDto(e.getTop());
         view.top = model.top;
     }
 
-    private function onPlaceUpdated(e:PlaceUpdatedEvent):void {
-        model.mergePlaceDto(e.place);
+    private function onPlaceUpdated(e:PlaceEvent):void {
+        model.mergePlaceDto(e.getPlace());
         view.place = model.place;
     }
 
     private function onSlotClick(event:SlotClickEvent):void {
-        const slot:SlotDTO = model.slots.getSlot(event.slotId);
+        const slot:Slot = model.slots.getSlot(event.slotId);
         if (slot.hasBuildingPrototype) {
             const canUpgrade:Boolean = slot.buildingPrototype.buildingLevel != BuildingLevel.LEVEL_3;
             const canRemove:Boolean = model.slots.buildingsCount > 1;
@@ -146,9 +140,9 @@ public class MenuController {
             }
             if (canUpgrade || canRemove) {
                 if (!tutorState.slot) {
-                    tutorState.slot = true;
-                    server.updateTutorState(tutorState);
-                    server.updateStatistics(DtoMock.stat(StatAction.TUTOR_SLOT_CLICK));
+                    tutorState.slot = Bool.TRUE;
+                    server.sendTutorState(tutorState.toDto());
+                    server.stat(StatAction.TUTOR_SLOT_CLICK);
                 }
 
                 view.openUpgradePopup(event.slotId, slot.buildingPrototype.buildingType, canUpgrade, canRemove, upgradePrice);
@@ -156,9 +150,9 @@ public class MenuController {
 
         } else {
             if (!tutorState.emptySlot) {
-                tutorState.emptySlot = true;
-                server.updateTutorState(tutorState);
-                server.updateStatistics(DtoMock.stat(StatAction.TUTOR_EMPTY_SLOT_CLICK));
+                tutorState.emptySlot = Bool.TRUE;
+                server.sendTutorState(tutorState.toDto());
+                server.stat(StatAction.TUTOR_EMPTY_SLOT_CLICK);
             }
 
             view.openBuildPopup(event.slotId, model.buildingPrices.buildPrice);
@@ -169,10 +163,7 @@ public class MenuController {
         if (model.gold < model.buildingPrices.buildPrice) {
             view.animatePrice();
         } else {
-            const dto:BuyBuildingDTO = new BuyBuildingDTO();
-            dto.id = event.slotId;
-            dto.buildingType = event.buildingType;
-            server.buyBuilding(dto);
+            server.buyBuilding(event.slotId, event.buildingType);
 
             view.closePopup();
             view.lock = true;
@@ -180,7 +171,7 @@ public class MenuController {
     }
 
     private function onUpgradeBuilding(event:UpgradeBuildingEvent):void {
-        const slot:SlotDTO = model.slots.getSlot(event.slotId);
+        const slot:Slot = model.slots.getSlot(event.slotId);
         if (!slot.hasBuildingPrototype) throw new Error();
         const nextLevel:BuildingLevel = getNextLevel(slot.buildingPrototype.buildingLevel);
         const price:int = model.buildingPrices.getPrice(nextLevel);
@@ -188,9 +179,7 @@ public class MenuController {
         if (model.gold < price) {
             view.animatePrice();
         } else {
-            const dto:UpgradeBuildingDTO = new UpgradeBuildingDTO();
-            dto.id = event.slotId;
-            server.upgradeBuilding(dto);
+            server.upgradeBuilding(event.slotId);
 
             view.closePopup();
             view.lock = true;
@@ -208,9 +197,7 @@ public class MenuController {
     }
 
     private function onRemoveBuilding(event:RemoveBuildingEvent):void {
-        const dto:RemoveBuildingDTO = new RemoveBuildingDTO();
-        dto.id = event.slotId;
-        server.removeBuilding(dto);
+        server.removeBuilding(event.slotId);
 
         view.closePopup();
         view.lock = true;
@@ -221,14 +208,12 @@ public class MenuController {
             view.animatePrice();
         } else {
             if (!tutorState.magicItem) {
-                tutorState.magicItem = true;
-                server.updateTutorState(tutorState);
-                server.updateStatistics(DtoMock.stat(StatAction.TUTOR_ITEM_CLICK));
+                tutorState.magicItem = Bool.TRUE;
+                server.sendTutorState(tutorState.toDto());
+                server.stat(StatAction.TUTOR_ITEM_CLICK);
             }
 
-            const dto:BuyItemDTO = new BuyItemDTO();
-            dto.itemType = event.itemType;
-            server.buyItem(dto);
+            server.buyItem(event.itemType);
 
             view.animateMagicItem(event.itemType);
             view.lock = true;
@@ -241,14 +226,12 @@ public class MenuController {
                 view.animatePrice();
             } else {
                 if (!tutorState.skills) {
-                    tutorState.skills = true;
-                    server.updateTutorState(tutorState);
-                    server.updateStatistics(DtoMock.stat(StatAction.TUTOR_SKILL_CLICK));
+                    tutorState.skills = Bool.TRUE;
+                    server.sendTutorState(tutorState.toDto());
+                    server.stat(StatAction.TUTOR_SKILL_CLICK);
                 }
 
-                const dto:UpgradeSkillDTO = new UpgradeSkillDTO();
-                dto.skillType = event.skillType;
-                server.upgradeSkill(dto);
+                server.upgradeSkill(event.skillType);
 
                 view.animateFlask(event.skillType);
                 view.lock = true;
@@ -259,7 +242,7 @@ public class MenuController {
     // payment
 
     private function onBuy(event:Event):void {
-        const product:ProductDTO = model.products.product;
+        const product:Product = model.products.product;
         social.ui.showPaymentDialog(new PaymentDialogData(product.id, product.title, product.description, product.price));
         // todo temp view.lock = true;
     }
@@ -281,9 +264,7 @@ public class MenuController {
 
     public function cancelAdvert():void {
         if (view.advertVisible) {
-            const dto:AcceptAdvertDTO = new AcceptAdvertDTO();
-            dto.accepted = false;
-            server.acceptAdvert(dto);
+            server.acceptAdvert(new AcceptAdvert(false));
             view.advertVisible = false;
         }
     }
@@ -297,9 +278,9 @@ public class MenuController {
 
         if (screenIndex > 0) {
             if (!tutorState.navigate) {
-                tutorState.navigate = true;
-                server.updateTutorState(tutorState);
-                server.updateStatistics(DtoMock.stat(StatAction.TUTOR_NAVIGATE));
+                tutorState.navigate = Bool.TRUE;
+                server.sendTutorState(tutorState.toDto());
+                server.stat(StatAction.TUTOR_NAVIGATE);
             }
         }
 

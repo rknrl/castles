@@ -10,9 +10,9 @@ package ru.rknrl.castles.database
 
 import akka.actor.Props
 import com.github.mauricio.async.db.RowData
+import protos.{AccountId, UserInfo}
 import ru.rknrl.castles.database.Database.UserInfoResponse
 import ru.rknrl.castles.database.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
-import ru.rknrl.dto.{AccountId, UserInfoDTO}
 
 object TestDatabase {
   def props(config: DbConfiguration) = Props(classOf[TestDatabase], config)
@@ -55,7 +55,7 @@ class TestDatabase(configuration: DbConfiguration) extends Database(configuratio
 
   def rowDataToUserInfo(row: RowData) = {
     val byteArray = row("userInfo").asInstanceOf[Array[Byte]]
-    UserInfoDTO.parseFrom(byteArray)
+    UserInfo.parseFrom(byteArray)
   }
 
   override def receive = testReceive.orElse(super.receive)

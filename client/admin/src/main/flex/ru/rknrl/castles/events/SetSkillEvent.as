@@ -9,8 +9,8 @@
 package ru.rknrl.castles.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.SkillLevel;
-import ru.rknrl.dto.SkillType;
+import protos.SkillLevel;
+import protos.SkillType;
 
 public class SetSkillEvent extends Event {
     public static const SET_SKILL:String = "setSkill";

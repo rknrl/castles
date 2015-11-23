@@ -8,21 +8,21 @@
 
 package ru.rknrl.castles.account
 
+import protos.BuildingLevel.LEVEL_1
+import protos.BuildingType.{CHURCH, HOUSE, TOWER}
+import protos.SkillLevel.SKILL_LEVEL_0
+import protos.SkillType.{ATTACK, DEFENCE, SPEED}
+import protos.SlotId._
+import protos._
 import ru.rknrl.Assertion
 import ru.rknrl.core.Stat
-import ru.rknrl.dto.BuildingLevel.LEVEL_1
-import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
-import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_0
-import ru.rknrl.dto.SkillType.{ATTACK, DEFENCE, SPEED}
-import ru.rknrl.dto.SlotId._
-import ru.rknrl.dto._
 
 class BuildingPrices(map: Map[BuildingLevel, Int]) {
   def apply(level: BuildingLevel) = map(level)
 
   def dto =
     for ((buildingLevel, price) ← map)
-      yield BuildingPriceDTO(buildingLevel, price)
+      yield BuildingPrice(buildingLevel, price)
 }
 
 class SkillUpgradePrices(map: Map[Int, Int]) {
@@ -30,7 +30,7 @@ class SkillUpgradePrices(map: Map[Int, Int]) {
 
   def dto =
     for ((totalLevel, price) ← map)
-      yield SkillUpgradePriceDTO(totalLevel, price)
+      yield SkillUpgradePrice(totalLevel, price)
 }
 
 class AccountConfig(val buildingPrices: BuildingPrices,
@@ -47,7 +47,7 @@ class AccountConfig(val buildingPrices: BuildingPrices,
                     maxDefence: Double,
                     maxSpeed: Double) {
 
-  def dto = AccountConfigDTO(
+  def dto = protos.AccountConfig(
     buildings = buildingPrices.dto.toSeq,
     skillUpgradePrices = skillUpgradePrices.dto.toSeq,
     itemPrice = itemPrice,
@@ -57,10 +57,10 @@ class AccountConfig(val buildingPrices: BuildingPrices,
   private val levelsCount = SkillLevel.values.size - 1
 
   /**
-   * При SKILL_LEVEL_0 возвращает 1.0
-   * При SKILL_LEVEL_3 возвращает maxAttack, maxDefence, maxSpeed
-   */
-  def skillsToStat(levels: Seq[SkillLevelDTO]) =
+    * При SKILL_LEVEL_0 возвращает 1.0
+    * При SKILL_LEVEL_3 возвращает maxAttack, maxDefence, maxSpeed
+    */
+  def skillsToStat(levels: Seq[Skill]) =
     new Stat(
       1 + levels.find(_.skillType == ATTACK).get.level.id * (maxAttack - 1) / levelsCount,
       1 + levels.find(_.skillType == DEFENCE).get.level.id * (maxDefence - 1) / levelsCount,
@@ -69,21 +69,21 @@ class AccountConfig(val buildingPrices: BuildingPrices,
 
   private def initSlots =
     List(
-      SlotDTO(SLOT_1, None),
-      SlotDTO(SLOT_2, None),
-      SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
-      SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
-      SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
+      Slot(SLOT_1, None),
+      Slot(SLOT_2, None),
+      Slot(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_1))),
+      Slot(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+      Slot(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
     )
 
   private def initSkills =
-    SkillType.values.map(SkillLevelDTO(_, SKILL_LEVEL_0))
+    SkillType.values.map(Skill(_, SKILL_LEVEL_0))
 
   private def initItems =
-    ItemType.values.map(ItemDTO(_, initItemCount))
+    ItemType.values.map(Item(_, initItemCount))
 
   def initState =
-    AccountStateDTO(
+    protos.AccountState(
       slots = initSlots,
       skills = initSkills,
       items = initItems,
@@ -107,14 +107,14 @@ object AccountConfig {
     }
 
 
-  private def isLastTotalLevel(levels: Seq[SkillLevelDTO]) = getTotalLevel(levels) == 9
+  private def isLastTotalLevel(levels: Seq[Skill]) = getTotalLevel(levels) == 9
 
-  def nextTotalLevel(levels: Seq[SkillLevelDTO]) = {
+  def nextTotalLevel(levels: Seq[Skill]) = {
     Assertion.check(!isLastTotalLevel(levels))
     getTotalLevel(levels) + 1
   }
 
-  def getTotalLevel(skillLevels: Seq[SkillLevelDTO]) = {
+  def getTotalLevel(skillLevels: Seq[Skill]) = {
     var total = 0
     for (skillLevel ← skillLevels) total += skillLevel.level.id
     total

@@ -8,46 +8,42 @@
 
 package ru.rknrl.castles.admin
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, PoisonPill, Props}
+import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
-import ru.rknrl.castles.rmi.B2C.{AdminAccountState, AuthenticatedAsAdmin}
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.{AccountId, AdminAccountStateDTO}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 object Admin {
-  def props(databaseQueue: ActorRef,
+  def props(client: ActorRef,
+            databaseQueue: ActorRef,
             matchmaking: ActorRef,
             config: Config) =
-    Props(classOf[Admin], databaseQueue, matchmaking, config)
+    Props(classOf[Admin], client, databaseQueue, matchmaking, config)
 }
 
-class Admin(databaseQueue: ActorRef,
+class Admin(client: ActorRef,
+            databaseQueue: ActorRef,
             matchmaking: ActorRef,
             config: Config) extends Actor with ActorLog {
-
-  var client: Option[ActorRef] = None
 
   var accountId: Option[AccountId] = None
 
   override def receive = auth
 
   def auth: Receive = logged {
-    case AuthenticateAsAdmin(authenticate) ⇒
+    case authenticate: AdminAuthenticate ⇒
       if (authenticate.login == config.adminLogin && authenticate.password == config.adminPassword) {
-        client = Some(sender)
-        send(client.get, AuthenticatedAsAdmin)
+        send(client, AuthenticatedAsAdmin())
         become(admin, "admin")
       } else {
         log.debug("reject")
-        send(sender, CloseConnection)
+        send(sender, PoisonPill)
       }
   }
 
   def admin: Receive = logged {
-    case AdminGetAccountState(dto) ⇒
+    case dto: AdminGetAccountState ⇒
       accountId = Some(dto.accountId)
       send(databaseQueue, GetAccount(dto.accountId))
       become(waitForState, "waitForState")
@@ -60,13 +56,13 @@ class Admin(databaseQueue: ActorRef,
   def waitForState = logged {
     case msg: AccountResponse ⇒
       if (msg.state.isDefined)
-        send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, msg.state.get)))
+        send(client, AdminAccountState(accountId.get, msg.state.get))
       become(admin, "admin")
   }
 
   def waitForUpdatedState = logged {
     case msg@AccountStateResponse(_, accountState) ⇒
-      send(client.get, AdminAccountState(AdminAccountStateDTO(accountId.get, accountState)))
+      send(client, AdminAccountState(accountId.get, accountState))
       send(matchmaking, msg)
       become(admin, "admin")
   }

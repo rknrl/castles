@@ -11,9 +11,10 @@ import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 
+import protos.ItemStateDTO;
+import protos.ItemType;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.ItemStateDTO;
-import ru.rknrl.dto.ItemType;
 
 public class ItemStateTest {
     [Test("progress")]

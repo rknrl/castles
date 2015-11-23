@@ -9,13 +9,12 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.GameItems
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, BuildingId, PlayerId}
 
 class GameOverTest extends GameTestSpec {
   multi("GameOver", {
@@ -45,49 +44,41 @@ class GameOverTest extends GameTestSpec {
 
     // Игроки получают в ответ JoinedGame с актуальным геймстейтом
 
-    client0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameState])
 
-    client1.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameState])
 
     // После UpdateGameState оба игрока должны получить GameOver
 
     game ! UpdateGameState(newTime = 10)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameStateUpdate])
 
     client0.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
+      case dto: GameOver ⇒
         dto.playerId shouldBe PlayerId(0)
         dto.reward shouldBe 0
         dto.place shouldBe 2
     }
 
     client0.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
+      case dto: GameOver ⇒
         dto.playerId shouldBe PlayerId(1)
         dto.reward shouldBe 2
         dto.place shouldBe 1
     }
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameStateUpdate])
 
     client1.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
+      case dto: GameOver ⇒
         dto.playerId shouldBe PlayerId(0)
         dto.reward shouldBe 0
         dto.place shouldBe 2
     }
 
     client1.expectMsgPF(TIMEOUT) {
-      case GameOver(dto) ⇒
+      case dto: GameOver ⇒
         dto.playerId shouldBe PlayerId(1)
         dto.reward shouldBe 2
         dto.place shouldBe 1
@@ -97,15 +88,11 @@ class GameOverTest extends GameTestSpec {
 
     game ! UpdateGameState(newTime = 10)
 
-    client0.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameStateUpdate])
 
     client0.expectNoMsg(noMsgTimeout)
 
-    client1.expectMsgPF(TIMEOUT) {
-      case GameStateUpdated(dto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameStateUpdate])
 
     client1.expectNoMsg(noMsgTimeout)
   })

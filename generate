@@ -1,0 +1,54 @@
+#!/bin/sh
+
+project="/Users/tolyayanot/dev/rknrl/castles"
+protobuf_as3="/Users/tolyayanot/dev/rknrl/protobuf-as3"
+protobuf_rpc="/Users/tolyayanot/dev/rknrl/protobuf-rpc"
+
+proto_dir="${project}/server/src/main/protobuf"
+scala_out="${project}/server/src/generated/scala/"
+as3_out="${project}/client/client-base/src/generated/flex/"
+
+# Generate java and action-script dto classes by protobuf
+
+sbt clean
+sbt protobuf:protobufScalaGenerate
+
+rm -rf ${as3_out}/protos/*
+
+protoc \
+--as3_out=${as3_out} \
+--plugin=protoc-gen-as3=${protobuf_as3}/generate-as3 \
+--proto_path=${proto_dir} \
+--proto_path=${protobuf_rpc}/plugin/src/main/proto \
+${proto_dir}/auth.proto \
+${proto_dir}/common.proto \
+${proto_dir}/account.proto \
+${proto_dir}/game.proto \
+${proto_dir}/admin.proto
+
+# Generate rpc
+
+protoc \
+--rpc_out=${as3_out} \
+--plugin=protoc-gen-rpc=${protobuf_rpc}/generate-rpc-as3 \
+--proto_path=${proto_dir} \
+--proto_path=${protobuf_rpc}/plugin/src/main/proto \
+${proto_dir}/auth.proto \
+${proto_dir}/common.proto \
+${proto_dir}/account.proto \
+${proto_dir}/game.proto \
+${proto_dir}/admin.proto
+
+protoc \
+--rpc_out=${scala_out} \
+--plugin=protoc-gen-rpc=${protobuf_rpc}/generate-rpc-scala \
+--proto_path=${proto_dir} \
+--proto_path=${protobuf_rpc}/plugin/src/main/proto \
+${proto_dir}/auth.proto \
+${proto_dir}/common.proto \
+${proto_dir}/account.proto \
+${proto_dir}/game.proto \
+${proto_dir}/admin.proto
+
+
+

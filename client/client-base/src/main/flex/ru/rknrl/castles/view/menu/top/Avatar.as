@@ -11,12 +11,12 @@ import flash.display.BitmapData;
 import flash.display.Shape;
 import flash.display.Sprite;
 
-import ru.rknrl.BitmapUtils;
+import ru.rknrl.display.BitmapUtils;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.loaders.ILoadImageManager;
-import ru.rknrl.utils.centerize;
+import ru.rknrl.display.centerize;
 
 public class Avatar extends Sprite {
     private var loadImageManager:ILoadImageManager;

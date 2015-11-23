@@ -9,12 +9,12 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.BuildingLevel.LEVEL_3
+import protos.BuildingType.TOWER
+import protos.{BuildingPrototype, PlayerId}
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.BuildingLevel.LEVEL_3
-import ru.rknrl.dto.{PlayerId, BuildingPrototype}
-import ru.rknrl.dto.BuildingType.TOWER
 
 class BulletsTest extends WordSpec with Matchers {
 
@@ -85,7 +85,7 @@ class BulletsTest extends WordSpec with Matchers {
       duration = 10
     )
     val u1 = unitMock(
-      fromBuilding = buildingMock(pos = Point(3, 2),owner = Some(playerMock(PlayerId(0)))),
+      fromBuilding = buildingMock(pos = Point(3, 2), owner = Some(playerMock(PlayerId(0)))),
       toBuilding = b,
       startTime = 0,
       duration = 2
@@ -119,7 +119,7 @@ class BulletsTest extends WordSpec with Matchers {
     )
 
     canCreateBullet(b, u0, time = 4, config) shouldBe false // не в радиусе
-    canCreateBullet(b, u0, time = 5, config) shouldBe true  // в радиусе
+    canCreateBullet(b, u0, time = 5, config) shouldBe true // в радиусе
     canCreateBullet(b, u1, time = 1, config) shouldBe false // в радиусе но успеет дойти до дома
 
     canCreateBullet(b, u3, time = 5, config) shouldBe false // because same owner

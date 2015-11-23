@@ -9,13 +9,11 @@
 package ru.rknrl.castles.bot
 
 import akka.actor.{Actor, ActorRef}
+import protos._
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
-import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
-import ru.rknrl.castles.rmi.C2B._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 class GameBot(accountId: AccountId) extends Actor with ActorLog {
   val moveInterval = 5000
@@ -25,7 +23,7 @@ class GameBot(accountId: AccountId) extends Actor with ActorLog {
   var mapDiagonal = Double.NaN
 
   var game: Option[ActorRef] = None
-  var gameState: Option[GameStateDTO] = None
+  var gameState: Option[GameState] = None
   var playerId: Option[PlayerId] = None
 
   var toBuildingId: Option[BuildingId] = None
@@ -39,7 +37,7 @@ class GameBot(accountId: AccountId) extends Actor with ActorLog {
   case class Weight(id: BuildingId, weight: Double)
 
   override val logFilter: Any ⇒ Boolean = {
-    case _: GameStateUpdated ⇒ false
+    case _: GameStateUpdate ⇒ false
     case _ ⇒ true
   }
 
@@ -48,20 +46,20 @@ class GameBot(accountId: AccountId) extends Actor with ActorLog {
       game = Some(gameRef)
       send(gameRef, Join(accountId, self))
 
-    case JoinedGame(newGameState) ⇒
+    case newGameState: GameState ⇒
       gameState = Some(newGameState)
       playerId = Some(newGameState.selfId)
       mapDiagonal = Math.sqrt(newGameState.width * newGameState.height)
 
-    case GameStateUpdated(gameStateUpdate) ⇒
+    case gameStateUpdate: GameStateUpdate ⇒
       update(GameStateMerge.merge(gameState.get, gameStateUpdate))
 
-    case GameOver(gameOver) ⇒
+    case gameOver: GameOver ⇒
       if (gameOver.playerId == playerId.get)
         send(game.get, LeaveGame)
   }
 
-  def update(newGameState: GameStateDTO) = {
+  def update(newGameState: GameState) = {
     gameState = Some(newGameState)
     val time = System.currentTimeMillis()
 
@@ -96,12 +94,12 @@ class GameBot(accountId: AccountId) extends Actor with ActorLog {
 
         myBuildingsSize = myBuildings.size
 
-        send(sender, Move(
-          MoveDTO(
+        send(sender,
+          Move(
             fromBuildings.map(_.id),
             toBuildingId.get
           )
-        ))
+        )
 
         if (time - lastCastTime > castInterval) {
           lastCastTime = time

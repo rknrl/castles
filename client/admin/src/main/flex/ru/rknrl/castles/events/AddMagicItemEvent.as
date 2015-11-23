@@ -9,7 +9,7 @@
 package ru.rknrl.castles.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 
 public class AddMagicItemEvent extends Event {
     public static const ADD_MAGIC_ITEM:String = "addMagicItem";

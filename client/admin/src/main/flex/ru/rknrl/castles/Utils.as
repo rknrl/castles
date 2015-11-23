@@ -9,10 +9,10 @@
 package ru.rknrl.castles {
 import mx.collections.ArrayCollection;
 
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.SkillLevel;
+import protos.AccountType;
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.SkillLevel;
 
 public class Utils {
     public static const NO_BUILDING:BuildingType = new BuildingType(666, "NONE");

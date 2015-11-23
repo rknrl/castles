@@ -9,7 +9,7 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.SlotId;
+import protos.SlotId;
 
 public class RemoveBuildingEvent extends Event {
     public static const REMOVE_BUILDING:String = "removeBuilding";

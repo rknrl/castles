@@ -9,7 +9,7 @@
 package ru.rknrl.castles.model.game {
 import ru.rknrl.core.Movable;
 import ru.rknrl.core.points.Points;
-import ru.rknrl.dto.PlayerId;
+import protos.PlayerId;
 
 public class Unit extends Movable {
     public var count:int;

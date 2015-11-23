@@ -12,7 +12,7 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
 import ru.rknrl.castles.view.utils.tutor.*;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
-import ru.rknrl.dto.SlotId;
+import protos.SlotId;
 
 public class MenuTutorView extends TutorialView {
     public function MenuTutorView(layout:Layout, deviceFactory:DeviceFactory) {

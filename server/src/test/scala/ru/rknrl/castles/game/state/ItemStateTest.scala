@@ -9,8 +9,8 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.ItemType.FIREBALL
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.ItemType.FIREBALL
 
 class ItemStateTest extends WordSpec with Matchers {
 

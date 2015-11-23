@@ -12,7 +12,7 @@ import flash.text.TextField;
 
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.createTextField;
 
 public class PopupCancelButton extends Sprite {
     private var textField:TextField;

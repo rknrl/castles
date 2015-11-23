@@ -9,22 +9,23 @@
 package ru.rknrl.castles.model.userInfo {
 import org.flexunit.asserts.assertEquals;
 
+import protos.AccountType;
+import protos.Player;
+import protos.UserInfo;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.UserInfoDTO;
 
 public class PlayerInfoTest {
     [Test("fromDto")]
     public function t0():void {
-        const userInfoDto:UserInfoDTO = new UserInfoDTO();
+        const userInfoDto:UserInfo = new UserInfo();
         userInfoDto.accountId = DtoMock.accountId(AccountType.FACEBOOK, "123");
         userInfoDto.firstName = "Tolya";
         userInfoDto.lastName = "Yanot";
         userInfoDto.photo96 = "http://small_photo";
         userInfoDto.photo256 = "http://big_photo";
 
-        const playerDto:PlayerDTO = new PlayerDTO();
+        const playerDto:Player = new Player();
         playerDto.id = DtoMock.playerId(7);
         playerDto.info = userInfoDto;
 
@@ -42,21 +43,21 @@ public class PlayerInfoTest {
 
     [Test("fromDtoVector")]
     public function t1():void {
-        const userInfoDto1:UserInfoDTO = new UserInfoDTO();
+        const userInfoDto1:UserInfo = new UserInfo();
         userInfoDto1.accountId = DtoMock.accountId(AccountType.FACEBOOK, "0");
 
-        const player1:PlayerDTO = new PlayerDTO();
+        const player1:Player = new Player();
         player1.id = DtoMock.playerId(0);
         player1.info = userInfoDto1;
 
-        const userInfoDto2:UserInfoDTO = new UserInfoDTO();
+        const userInfoDto2:UserInfo = new UserInfo();
         userInfoDto2.accountId = DtoMock.accountId(AccountType.VKONTAKTE, "1");
 
-        const player2:PlayerDTO = new PlayerDTO();
+        const player2:Player = new Player();
         player2.id = DtoMock.playerId(1);
         player2.info = userInfoDto2;
 
-        const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(new <PlayerDTO>[player1, player2]);
+        const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(new <Player>[player1, player2]);
         assertEquals(0, playerInfos[0].playerId.id);
         assertEquals(1, playerInfos[1].playerId.id);
     }

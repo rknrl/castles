@@ -8,8 +8,7 @@
 
 package ru.rknrl.castles.bot
 
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto._
+import protos._
 
 object BotMode extends Enumeration {
   type BotMode = Value
@@ -34,7 +33,7 @@ class TutorBot(accountId: AccountId) extends GameBot(accountId) {
 
   }.orElse(super.receive)
 
-  override def update(newGameState: GameStateDTO) = {
+  override def update(newGameState: GameState) = {
     gameState = Some(newGameState)
     mode match {
       case SEND_UNITS_TO_ONE_BUILDING ⇒
@@ -43,12 +42,12 @@ class TutorBot(accountId: AccountId) extends GameBot(accountId) {
         if (time - lastTime > moveInterval) {
           lastTime = time
 
-          send(sender, Move(
-            MoveDTO(
+          send(sender,
+            Move(
               getMyBuildings.map(_.id),
               towers.last.id
             )
-          ))
+          )
         }
       case GAME ⇒
         super.update(newGameState)
@@ -57,6 +56,6 @@ class TutorBot(accountId: AccountId) extends GameBot(accountId) {
 
     def towers = buildings
       .filter(b ⇒ b.building.buildingType == BuildingType.TOWER &&
-      b.building.buildingLevel == BuildingLevel.LEVEL_2)
+        b.building.buildingLevel == BuildingLevel.LEVEL_2)
   }
 }

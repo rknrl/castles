@@ -9,14 +9,15 @@
 package ru.rknrl.castles.model.menu.main {
 import org.flexunit.asserts.assertEquals;
 
+import protos.BuildingLevel;
+import protos.BuildingPrice;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingPriceDTO;
 
 public class BuildingPricesTest {
     [Test("prices")]
     public function t0():void {
-        const prices:BuildingPrices = new BuildingPrices(new <BuildingPriceDTO>[
+        const prices:BuildingPrices = new BuildingPrices(new <BuildingPrice>[
             DtoMock.buildingPrice(BuildingLevel.LEVEL_1, 10),
             DtoMock.buildingPrice(BuildingLevel.LEVEL_2, 20),
             DtoMock.buildingPrice(BuildingLevel.LEVEL_3, 30)
@@ -29,7 +30,7 @@ public class BuildingPricesTest {
 
     [Test("get invalid prices", expects="Error")]
     public function t1():void {
-        new BuildingPrices(new <BuildingPriceDTO>[]).buildPrice
+        new BuildingPrices(new <BuildingPrice>[]).buildPrice
     }
 }
 }

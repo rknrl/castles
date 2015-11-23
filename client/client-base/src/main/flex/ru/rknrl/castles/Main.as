@@ -18,7 +18,13 @@ import flash.net.Socket;
 import flash.system.Security;
 import flash.text.TextField;
 
-import ru.rknrl.Log;
+import protos.AccountId;
+import protos.Authenticate;
+import protos.AuthenticatedEvent;
+import protos.AuthenticationSecret;
+import protos.DeviceType;
+import protos.PlatformType;
+
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.controller.Controller;
@@ -29,16 +35,10 @@ import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AuthenticateDTO;
-import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.DeviceType;
-import ru.rknrl.dto.PlatformType;
+import ru.rknrl.display.createTextField;
 import ru.rknrl.loaders.LoadImageManager;
-import ru.rknrl.loaders.TextLoader;
-import ru.rknrl.rmi.AuthenticatedEvent;
-import ru.rknrl.rmi.Server;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.loaders.typed.StringLoader;
+import ru.rknrl.log.Log;
 
 public class Main extends Sprite {
     private static const cachedAvatarsLimit:int = 10;
@@ -48,7 +48,7 @@ public class Main extends Sprite {
     private var policyPort:int;
 
     private var accountId:AccountId;
-    private var secret:AuthenticationSecretDTO;
+    private var secret:AuthenticationSecret;
     private var deviceType:DeviceType;
     private var platformType:PlatformType;
 
@@ -60,14 +60,14 @@ public class Main extends Sprite {
 
     private var server:Server;
 
-    private var localeLoader:TextLoader;
+    private var localeLoader:StringLoader;
 
     private var view:View;
     private var deviceFactory:DeviceFactory;
 
     private var controller:Controller;
 
-    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountId, secret:AuthenticationSecretDTO, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, myUserInfo:UserInfo) {
+    public function Main(host:String, gamePort:int, policyPort:int, accountId:AccountId, secret:AuthenticationSecret, deviceType:DeviceType, platformType:PlatformType, localesUrl:String, defaultLocale:String, social:ISocial, layout:Layout, deviceFactory:DeviceFactory, myUserInfo:UserInfo) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;
@@ -107,7 +107,7 @@ public class Main extends Sprite {
         verTextField.text = "1.16";
         stage.addChild(verTextField);
 
-        localeLoader = new TextLoader(localesUrl + "castles - RU.tsv");
+        localeLoader = new StringLoader(localesUrl + "castles - RU.tsv");
         localeLoader.addEventListener(Event.COMPLETE, onLocaleComplete);
         localeLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onLocaleError);
         localeLoader.addEventListener(IOErrorEvent.IO_ERROR, onLocaleError);
@@ -122,7 +122,7 @@ public class Main extends Sprite {
     }
 
     private function onLocaleComplete(event:Event):void {
-        setupLocale(localeLoader.text);
+        setupLocale(localeLoader.string);
     }
 
     private function setupLocale(data:String):void {
@@ -151,30 +151,33 @@ public class Main extends Sprite {
         Log.info("loadPolicyFile:" + policyUrl);
         Security.loadPolicyFile(policyUrl);
 
-        server = new Server(new Socket());
-        server.addEventListener(Event.CONNECT, onConnect);
-        server.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
-        server.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
-        server.addEventListener(Event.CLOSE, onConnectionError);
-        server.connect(host, port);
+        const socket:Socket = new Socket();
+        server = new Server(socket);
+        socket.addEventListener(Event.CONNECT, onConnect);
+        socket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onConnectionError);
+        socket.addEventListener(IOErrorEvent.IO_ERROR, onConnectionError);
+        socket.addEventListener(Event.CLOSE, onConnectionError);
+        socket.connect(host, port);
     }
 
     private function onConnect(event:Event):void {
         Log.info("onConnect");
-        const authenticate:AuthenticateDTO = new AuthenticateDTO();
-        authenticate.userInfo = CastlesUserInfo.userInfoDto(myUserInfo, accountId.accountType);
-        authenticate.secret = secret;
-        authenticate.deviceType = deviceType;
-        authenticate.platformType = platformType;
+
+        const authenticate:Authenticate = new Authenticate(
+                CastlesUserInfo.userInfoDto(myUserInfo, accountId.accountType),
+                platformType,
+                deviceType,
+                secret
+        );
         server.addEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
-        server.authenticate(authenticate);
+        server.sendAuthenticate(authenticate);
     }
 
     private function onAuthenticated(e:AuthenticatedEvent):void {
         server.removeEventListener(AuthenticatedEvent.AUTHENTICATED, onAuthenticated);
 
         view.removeLoadingScreen();
-        controller = new Controller(view, e.success, server, social, deviceType);
+        controller = new Controller(view, e.getAuthenticated(), server, social, deviceType);
     }
 
     private function destroyConnection():void {

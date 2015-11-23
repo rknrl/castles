@@ -9,13 +9,10 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
-import ru.rknrl.castles.matchmaking.MatchMaking.{PlayerLeaveGame, AllPlayersLeaveGame}
-import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
-import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B.Surrender
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, ItemType, PlayerId}
+import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
 
 class GameLeaveTest extends GameTestSpec {
   multi("Leave", {
@@ -34,25 +31,21 @@ class GameLeaveTest extends GameTestSpec {
 
     // Игроки получают в ответ JoinedGame с актуальным геймстейтом
 
-    client0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameState])
 
-    client1.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameState])
 
     // Если отправить LeaveGame раньше Surrender - они игнорируются
 
-    client0.send(game, C2B.LeaveGame)
-    client1.send(game, C2B.LeaveGame)
+    client0.send(game, LeaveGame())
+    client1.send(game, LeaveGame())
     client0.expectNoMsg(noMsgTimeout)
     client1.expectNoMsg(noMsgTimeout)
     expectNoMsg(noMsgTimeout)
 
     // Игроки отправляют Surrender и получают в ответ GameOver
 
-    client0.send(game, Surrender)
+    client0.send(game, Surrender())
 
     client0.expectMsgClass(classOf[GameOver])
     client0.expectMsgClass(classOf[GameOver])
@@ -63,7 +56,7 @@ class GameLeaveTest extends GameTestSpec {
     // Если отправить LeaveGame с невалидного адреса - он игнорируется
 
     val client3 = new TestProbe(system)
-    client3.send(game, C2B.LeaveGame)
+    client3.send(game, LeaveGame())
     client0.expectNoMsg(noMsgTimeout)
     client1.expectNoMsg(noMsgTimeout)
     expectNoMsg(noMsgTimeout)
@@ -71,7 +64,7 @@ class GameLeaveTest extends GameTestSpec {
     // Игроки отправляют LeaveGame
     // Матчмайкинг получает PlayerLeaveGame
 
-    client0.send(game, C2B.LeaveGame)
+    client0.send(game, LeaveGame())
     client0.expectNoMsg(noMsgTimeout)
     expectMsgPF(TIMEOUT) {
       case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
@@ -83,7 +76,7 @@ class GameLeaveTest extends GameTestSpec {
 
     expectNoMsg(noMsgTimeout) // Матчмайкинг НЕ получает AllPlayersLeaveGame раньше чем надо
 
-    client1.send(game, C2B.LeaveGame)
+    client1.send(game, LeaveGame())
     client1.expectNoMsg(noMsgTimeout)
     expectMsgPF(TIMEOUT) {
       case PlayerLeaveGame(accountId, place, reward, usedItems) ⇒
@@ -98,8 +91,8 @@ class GameLeaveTest extends GameTestSpec {
     expectMsg(AllPlayersLeaveGame(game))
 
     // Если еще раз отправить LeaveGame они будут игнорироваться
-    client0.send(game, C2B.LeaveGame)
-    client1.send(game, C2B.LeaveGame)
+    client0.send(game, LeaveGame())
+    client1.send(game, LeaveGame())
     client0.expectNoMsg(noMsgTimeout)
     client1.expectNoMsg(noMsgTimeout)
     expectNoMsg(noMsgTimeout)

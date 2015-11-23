@@ -22,9 +22,9 @@
 
     <fx:Script><![CDATA[
         import ru.rknrl.castles.events.SetSlotEvent;
-        import ru.rknrl.dto.BuildingPrototype;
-        import ru.rknrl.dto.SlotDTO;
-        import ru.rknrl.dto.SlotId;
+        import protos.BuildingPrototype;
+        import protos.Slot;
+        import protos.SlotId;
 
         private var slotId:SlotId;
 
@@ -35,7 +35,7 @@
         }
 
         private function onClick(event:MouseEvent):void {
-            const dto:SlotDTO = new SlotDTO();
+            const dto:Slot = new Slot();
             dto.id = slotId;
             if (typeComboBox.selectedItem != Utils.NO_BUILDING) {
                 dto.buildingPrototype = new BuildingPrototype();

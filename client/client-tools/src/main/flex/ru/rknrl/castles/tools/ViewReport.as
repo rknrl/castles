@@ -17,10 +17,15 @@ import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.utils.Dictionary;
 
+import protos.BuildingDTO;
+import protos.BuildingType;
+import protos.Player;
+import protos.SlotId;
+import protos.SlotsPos;
+
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.castles.model.menu.MenuModel;
-import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.model.userInfo.PlayerInfo;
 import ru.rknrl.castles.view.View;
 import ru.rknrl.castles.view.game.GameView;
@@ -30,16 +35,12 @@ import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.MenuView;
 import ru.rknrl.castles.view.menu.factory.MobileFactory;
-import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.SlotId;
-import ru.rknrl.dto.SlotsPosDTO;
-import ru.rknrl.loaders.BitmapLoader;
-import ru.rknrl.loaders.ILoader;
+import ru.rknrl.core.points.Point;
 import ru.rknrl.loaders.LoadImageManagerMock;
 import ru.rknrl.loaders.ParallelLoader;
-import ru.rknrl.loaders.TextLoader;
+import ru.rknrl.loaders.base.ILoader;
+import ru.rknrl.loaders.typed.BitmapDataLoader;
+import ru.rknrl.loaders.typed.StringLoader;
 import ru.rknrl.test;
 
 public class ViewReport extends Sprite {
@@ -99,16 +100,16 @@ public class ViewReport extends Sprite {
     layouts["iPad"] = new LayoutLandscape(1024, 768, 1);
     layouts["iPad2"] = new LayoutLandscape(2048, 1536, 1);
 
-    private var localeLoader:TextLoader;
+    private var localeLoader:StringLoader;
 
     public function ViewReport() {
         const loaders:Vector.<ILoader> = new <ILoader>[];
         for each(var device:String in devices) {
             for each(var name:String in names) {
-                loaders.push(new BitmapLoader("reference/" + device + "/" + name + ".png"))
+                loaders.push(new BitmapDataLoader("reference/" + device + "/" + name + ".png"))
             }
         }
-        loaders.push(localeLoader = new TextLoader("locale - RU.tsv"));
+        loaders.push(localeLoader = new StringLoader("locale - RU.tsv"));
         const loader:ParallelLoader = new ParallelLoader(loaders);
         loader.addEventListener(Event.COMPLETE, onComplete);
         loader.load();
@@ -134,7 +135,7 @@ public class ViewReport extends Sprite {
 
     private function createViewReport():void {
         html = htmlBegin();
-        const locale:CastlesLocale = new CastlesLocale(localeLoader.text);
+        const locale:CastlesLocale = new CastlesLocale(localeLoader.string);
         for (var name:String in layouts) {
             html += "<p>" + name + "</p>";
             render("report/", name + "/", layouts[name], locale, false);
@@ -149,7 +150,7 @@ public class ViewReport extends Sprite {
 
     private function createViewMergers():void {
         html = htmlBegin();
-        const locale:CastlesLocale = new CastlesLocale(localeLoader.text);
+        const locale:CastlesLocale = new CastlesLocale(localeLoader.string);
         render("merge/", "iPhone5/", layouts["iPhone5"], locale, true);
         render("merge/", "iPad2/", layouts["iPad2"], locale, true);
         html += htmlEnd();
@@ -214,8 +215,8 @@ public class ViewReport extends Sprite {
 
         const w:int = layout is LayoutPortrait ? 8 : 15;
         const h:int = layout is LayoutPortrait ? 11 : 15;
-        const playerInfos:Vector.<PlayerDTO> = layout is LayoutPortrait ? DtoMock.playerInfosPortrait() : DtoMock.playerInfosLandscape();
-        const losers:Vector.<PlayerDTO> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
+        const playerInfos:Vector.<Player> = layout is LayoutPortrait ? DtoMock.playerInfosPortrait() : DtoMock.playerInfosLandscape();
+        const losers:Vector.<Player> = layout is LayoutPortrait ? DtoMock.losersPortrait() : DtoMock.losersLandscape();
 
         view.removeSearchOpponentsScreen();
         const gameView:GameView = view.createGame(PlayerInfo.fromDtoVector(playerInfos), w, h);
@@ -224,8 +225,8 @@ public class ViewReport extends Sprite {
         for each(var b:BuildingDTO in  buildings) {
             gameView.area.addBuilding(b.id, b.building.buildingType, b.building.buildingLevel, new BuildingOwner(b.hasOwner, b.owner), b.population, b.strengthened, new Point(b.pos.x, b.pos.y));
         }
-        const slotsPos:Vector.<SlotsPosDTO> = layout is LayoutPortrait ? DtoMock.slotsPosPortrait() : DtoMock.slotsPosLandscape();
-        for each(var s:SlotsPosDTO in slotsPos) {
+        const slotsPos:Vector.<SlotsPos> = layout is LayoutPortrait ? DtoMock.slotsPosPortrait() : DtoMock.slotsPosLandscape();
+        for each(var s:SlotsPos in slotsPos) {
             gameView.area.addSlots(s);
         }
 

@@ -17,7 +17,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.AnimatedTextField;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.createTextField;
 
 public class PopupItem extends Sprite {
     private var mouseHolder:Bitmap;

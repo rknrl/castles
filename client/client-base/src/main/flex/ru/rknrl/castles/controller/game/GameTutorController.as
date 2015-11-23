@@ -8,6 +8,12 @@
 
 package ru.rknrl.castles.controller.game {
 
+import protos.CellSize;
+import protos.ItemType;
+import protos.Player;
+import protos.Stat;
+import protos.StatAction;
+
 import flash.events.EventDispatcher;
 
 import ru.rknrl.castles.model.DtoMock;
@@ -20,12 +26,6 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForClick;
 import ru.rknrl.castles.view.utils.tutor.commands.WaitForEvent;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.StatAction;
-import ru.rknrl.dto.StatDTO;
-import ru.rknrl.rmi.Server;
 
 public class GameTutorController extends TutorControllerBase {
     private var view:GameView;
@@ -197,7 +197,7 @@ public class GameTutorController extends TutorControllerBase {
     private var enemyIndex:int;
 
     private function _highlightNextEnemyBuildings():void {
-        const player:PlayerDTO = players.getEnemiesPlayers()[enemyIndex];
+        const player:Player = players.getEnemiesPlayers()[enemyIndex];
         view.tutorUnblur();
         view.tutorBlur(Players.playersToIds(players.getPlayersWithout(player.id)), buildings.notPlayerId(player.id));
         enemyIndex++;
@@ -345,9 +345,7 @@ public class GameTutorController extends TutorControllerBase {
 
     private function stat(action:StatAction):ITutorCommand {
         return exec(function ():void {
-            const dto:StatDTO = new StatDTO();
-            dto.action = action;
-            server.updateStatistics(DtoMock.stat(action))
+            server.stat(action)
         })
     }
 

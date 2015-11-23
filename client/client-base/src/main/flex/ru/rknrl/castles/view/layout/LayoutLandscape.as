@@ -15,8 +15,8 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupLandscape;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerId;
+import protos.CellSize;
+import protos.PlayerId;
 
 public class LayoutLandscape extends Layout {
     public static const iPadWidth:int = 1024;

@@ -15,7 +15,7 @@
 
     <fx:Script><![CDATA[
         import ru.rknrl.castles.events.AddMagicItemEvent;
-        import ru.rknrl.dto.ItemType;
+        import protos.ItemType;
 
         private var itemType:ItemType;
 

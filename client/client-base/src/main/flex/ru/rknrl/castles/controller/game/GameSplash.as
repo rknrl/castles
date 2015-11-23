@@ -7,6 +7,12 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller.game {
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.PointDTO;
+import protos.UnitDTO;
+import protos.UnitId;
+
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.utils.getTimer;
@@ -20,10 +26,6 @@ import ru.rknrl.castles.view.game.area.units.UnitView;
 import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.core.points.Points;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.UnitDTO;
-import ru.rknrl.dto.UnitId;
 
 public class GameSplash extends TutorControllerBase {
     public static const GAME_SPLASH_COMPLETE:String = "gameSplashComplete";
@@ -109,15 +111,16 @@ public class GameSplash extends TutorControllerBase {
             if (mousePos.distance(view.tower2Pos) < buildingRadius) {
                 view.mouseEnabled = false;
 
-                const dto:UnitDTO = new UnitDTO();
-                dto.id = new UnitId();
-                dto.id.id = 0;
-                dto.buildingType = BuildingType.TOWER;
-                dto.count = 4;
-                dto.pos = DtoMock.point(view.tower1.x, view.tower1.y);
-                dto.owner = DtoMock.playerId(0);
-                dto.duration = 4000;
-                dto.strengthened = false;
+                const dto:UnitDTO = new UnitDTO(
+                        new UnitId(0),
+                        BuildingType.TOWER,
+                        4,
+                        new PointDTO(view.tower1.x, view.tower1.y),
+                        4000,
+                        null,
+                        null,
+                        false
+                );
 
                 const startPos:Point = view.tower1Pos;
                 const endPos:Point = view.tower2Pos;

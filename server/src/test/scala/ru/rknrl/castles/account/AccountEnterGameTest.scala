@@ -9,16 +9,13 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
+import protos._
 import ru.rknrl.castles.database.DatabaseTransaction
 import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.rmi.B2C.EnteredGame
-import ru.rknrl.castles.rmi.C2B.{CastFireball, EnterGame, UpdateStatistics}
-import ru.rknrl.castles.rmi.{B2C, C2B}
-import ru.rknrl.dto._
 
 class AccountEnterGameTest extends AccountTestSpec {
   val config = configMock()
@@ -77,7 +74,7 @@ class AccountEnterGameTest extends AccountTestSpec {
     val game = new TestProbe(system)
     matchmaking.send(account, ConnectToGame(game.ref))
     client.expectMsg(EnteredGame(NodeLocator(config.host, config.gamePort)))
-    client.send(account, C2B.JoinGame)
+    client.send(account, JoinGame())
     game.expectMsg(Join(accountId, client.ref))
 
     // game
@@ -86,12 +83,12 @@ class AccountEnterGameTest extends AccountTestSpec {
     client.send(account, cast)
     game.expectMsg(cast)
 
-    client.send(account, UpdateStatistics(StatDTO(StatAction.TUTOR_BIG_TOWER)))
+    client.send(account, protos.Stat(StatAction.TUTOR_BIG_TOWER))
     game.expectMsg(StatAction.TUTOR_BIG_TOWER)
     graphite.expectMsg(StatAction.TUTOR_BIG_TOWER)
 
     matchmaking.send(account, AccountLeaveGame)
-    client.expectMsg(B2C.LeavedGame)
+    client.expectMsg(LeavedGame())
   })
 
 }

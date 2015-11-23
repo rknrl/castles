@@ -7,11 +7,12 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.game {
+import protos.BuildingDTO;
+import protos.BuildingId;
+import protos.BuildingLevel;
+import protos.BuildingType;
+
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
 
 public class Building {
     private var _id:BuildingId;

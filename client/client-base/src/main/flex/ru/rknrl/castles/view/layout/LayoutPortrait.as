@@ -15,9 +15,9 @@ import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
 import ru.rknrl.castles.view.popups.popup.PopupPortrait;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerId;
-import ru.rknrl.utils.createTextField;
+import protos.CellSize;
+import protos.PlayerId;
+import ru.rknrl.display.createTextField;
 
 public class LayoutPortrait extends Layout {
     public static const iPhone5Width:int = 320;

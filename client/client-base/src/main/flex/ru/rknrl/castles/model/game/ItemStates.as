@@ -9,9 +9,9 @@
 package ru.rknrl.castles.model.game {
 import flash.utils.Dictionary;
 
-import ru.rknrl.dto.ItemStateDTO;
-import ru.rknrl.dto.ItemStatesDTO;
-import ru.rknrl.dto.ItemType;
+import protos.ItemStateDTO;
+import protos.ItemStatesDTO;
+import protos.ItemType;
 
 public class ItemStates {
     private const itemTypeToState:Dictionary = new Dictionary();

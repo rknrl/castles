@@ -7,6 +7,10 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.menu.main {
+import protos.BuildingLevel;
+import protos.Slot;
+import protos.SlotId;
+
 import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
@@ -17,9 +21,6 @@ import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.SlotDTO;
-import ru.rknrl.dto.SlotId;
 
 public class SlotView extends Animated {
     private static const lockViewY:Number = -8;
@@ -29,7 +30,7 @@ public class SlotView extends Animated {
     private var buildingLayer:Sprite;
     private var lockView:LockView;
 
-    public function SlotView(slotId:SlotId, dto:SlotDTO) {
+    public function SlotView(slotId:SlotId, dto:Slot) {
         _id = slotId;
         mouseChildren = false;
 
@@ -54,9 +55,9 @@ public class SlotView extends Animated {
 
     private var building:DisplayObject;
 
-    private var _dto:SlotDTO;
+    private var _dto:Slot;
 
-    public function set dto(value:SlotDTO):void {
+    public function set dto(value:Slot):void {
         if (_dto && Slots.equals(_dto, value)) return;
         _dto = value;
 

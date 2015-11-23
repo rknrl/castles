@@ -12,13 +12,13 @@ import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 
-import ru.rknrl.dto.PointDTO;
+import protos.PointDTO;
 
 public class PointTest {
     [Test("equals")]
     public function t1():void {
-        assertTrue(new Point(1.1, 2.2).equals(new Point(1.1, 2.2)))
-        assertFalse(new Point(0, 4).equals(new Point(1, 4)))
+        assertTrue(new Point(1.1, 2.2).equals(new Point(1.1, 2.2)));
+        assertFalse(new Point(0, 4).equals(new Point(1, 4)));
     }
 
     [Test("dto")]

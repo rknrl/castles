@@ -17,8 +17,8 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.LockView;
 import ru.rknrl.castles.view.utils.applyStarTextFormat;
-import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.centerize;
+import ru.rknrl.display.createTextField;
 
 public class Button extends Sprite {
     private var holder:Animated;

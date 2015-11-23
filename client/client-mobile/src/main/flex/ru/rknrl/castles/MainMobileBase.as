@@ -18,8 +18,14 @@ import flash.utils.ByteArray;
 
 import org.onepf.OpenIAB;
 
+import protos.AccountId;
+import protos.AccountType;
+import protos.AuthenticationSecret;
+import protos.DeviceType;
+import protos.PlatformType;
+
 import ru.rknrl.DeviceId;
-import ru.rknrl.Log;
+import ru.rknrl.log.Log;
 import ru.rknrl.asocial.ISocialMobile;
 import ru.rknrl.asocial.Social;
 import ru.rknrl.asocial.platforms.Facebook;
@@ -36,11 +42,6 @@ import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.layout.LayoutPortrait;
 import ru.rknrl.castles.view.menu.factory.MobileFactory;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.DeviceType;
-import ru.rknrl.dto.PlatformType;
 
 public class MainMobileBase extends Sprite {
     [Embed(source="/locale - RU.tsv", mimeType="application/octet-stream")]
@@ -200,7 +201,7 @@ public class MainMobileBase extends Sprite {
         accountId.id = id;
         accountId.accountType = accountType;
 
-        const authenticationSecret:AuthenticationSecretDTO = new AuthenticationSecretDTO();
+        const authenticationSecret:AuthenticationSecret = new AuthenticationSecret();
         authenticationSecret.body = accessToken;
         authenticationSecret.params = null;
         authenticationSecret.accessToken = accessToken;

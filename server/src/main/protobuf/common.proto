@@ -1,8 +1,8 @@
-package ru.rknrl.dto;
-
-option java_outer_classname = "CommonDTO";
+package protos;
 
 option optimize_for = SPEED;
+
+import "options.proto";
 
 message NodeLocator {
     required string host = 1;
@@ -109,7 +109,9 @@ enum StatAction {
     START_GAME_4_WITH_PLAYERS = 61; // Создана игра на 4-ех игроков, не меньше двух реальных игроков
 }
 
-message StatDTO {
+message Stat {
+    option (msgid) = 87;
+
     required StatAction action = 1;
 }
 
@@ -118,7 +120,7 @@ message AccountId {
     required string id = 2;
 }
 
-message UserInfoDTO {
+message UserInfo {
     required AccountId accountId = 1;
     optional string firstName = 2;
     optional string lastName = 3;
@@ -164,7 +166,9 @@ message BuildingPrototype {
     required BuildingLevel buildingLevel = 2;
 }
 
-message TutorStateDTO {
+message TutorState {
+    option (msgid) = 86;
+
     optional bool slot = 1;
     optional bool emptySlot = 2;
     optional bool navigate = 3;
@@ -204,5 +208,4 @@ enum Slot5Pos {
     SLOT_5_X = 2;
     SLOT_5_Y = 0;
 }
-
 

@@ -8,8 +8,8 @@
 
 package ru.rknrl.castles.account
 
+import protos.CellSize
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.CellSize
 
 case class IJ(i: Int, j: Int) {
   val cellSize = CellSize.SIZE.id

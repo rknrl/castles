@@ -7,12 +7,12 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.userInfo {
+import protos.AccountId;
+import protos.AccountType;
+
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.asocial.userInfo.UserInfoAvatarUrl;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AccountType;
-import ru.rknrl.dto.UserInfoDTO;
 
 public class CastlesUserInfo extends UserInfo {
 
@@ -39,30 +39,18 @@ public class CastlesUserInfo extends UserInfo {
         return urls;
     }
 
-    public static function fromDto(dto:UserInfoDTO):CastlesUserInfo {
+    public static function fromDto(dto:protos.UserInfo):CastlesUserInfo {
         return new CastlesUserInfo(dto.accountId.id, dto.accountId.accountType, dto.firstName, dto.lastName, dto.photo96, dto.photo256);
     }
 
-    public static function userInfoDto(userInfo:UserInfo, accountType:AccountType):UserInfoDTO {
-        const dto:UserInfoDTO = new UserInfoDTO();
-
-        dto.accountId = new AccountId();
-        dto.accountId.id = userInfo.uid;
-        dto.accountId.accountType = accountType;
-
-        const firstName:String = userInfo.firstName;
-        if (firstName) dto.firstName = firstName;
-
-        const lastName:String = userInfo.lastName;
-        if (lastName) dto.lastName = lastName;
-
-        const photo96:String = userInfo.getPhotoUrl(96, 96);
-        if (photo96) dto.photo96 = photo96;
-
-        const photo256:String = userInfo.getPhotoUrl(256, 256);
-        if (photo256) dto.photo256 = photo256;
-
-        return dto;
+    public static function userInfoDto(userInfo:UserInfo, accountType:AccountType):protos.UserInfo {
+        return new protos.UserInfo(
+                new AccountId(accountType, userInfo.uid),
+                userInfo.firstName,
+                userInfo.lastName,
+                userInfo.getPhotoUrl(96, 96),
+                userInfo.getPhotoUrl(256, 256)
+        );
     }
 }
 }

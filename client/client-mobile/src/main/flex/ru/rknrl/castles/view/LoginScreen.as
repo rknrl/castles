@@ -14,8 +14,8 @@ import flash.text.TextField;
 
 import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.utils.Align;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.Align;
+import ru.rknrl.display.createTextField;
 
 public class LoginScreen extends Sprite {
     public static const DEVICE_ID:String = "DEVICE_ID";

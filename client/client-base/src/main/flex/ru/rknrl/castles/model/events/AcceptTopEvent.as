@@ -9,7 +9,9 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.castles.model.menu.top.Top;
+import protos.Top;
+
+import ru.rknrl.castles.model.menu.top.TopUtils;
 
 public class AcceptTopEvent extends Event {
     public static const ACCEPT_TOP:String = "acceptTop";

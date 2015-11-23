@@ -10,8 +10,8 @@ package ru.rknrl.castles.view.utils {
 import flash.text.TextField;
 import flash.text.TextFormat;
 
-import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.centerize;
+import ru.rknrl.display.createTextField;
 
 public class AnimatedTextField extends Animated {
     private var textField:TextField;

@@ -9,16 +9,13 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
-import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos._
+import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.state.GameItems
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, PlayerLeaveGame}
-import ru.rknrl.castles.rmi.B2C.{GameOver, JoinedGame}
-import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B.Surrender
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, BuildingId, ItemType, PlayerId}
 
 class GameLeaveBotTest extends GameTestSpec {
   multi("Leave", {
@@ -67,17 +64,13 @@ class GameLeaveBotTest extends GameTestSpec {
 
     // Игроки получают в ответ JoinedGame с актуальным геймстейтом
 
-    client0.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client0.expectMsgClass(classOf[GameState])
 
-    client1.expectMsgPF(TIMEOUT) {
-      case JoinedGame(gameStateDto) ⇒ true
-    }
+    client1.expectMsgClass(classOf[GameState])
 
     // Игроки отправляют Surrender и получают в ответ GameOver
 
-    client0.send(game, Surrender)
+    client0.send(game, Surrender())
 
     client0.expectMsgClass(classOf[GameOver])
     client0.expectMsgClass(classOf[GameOver])
@@ -88,7 +81,7 @@ class GameLeaveBotTest extends GameTestSpec {
     // Игроки отправляют LeaveGame
     // Матчмайкинг получает PlayerLeaveGame про живого игрока, но не получает про бота
 
-    client0.send(game, C2B.LeaveGame)
+    client0.send(game, LeaveGame())
     client0.expectNoMsg(noMsgTimeout)
 
     expectMsgPF(TIMEOUT) {

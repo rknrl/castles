@@ -10,10 +10,11 @@ package ru.rknrl.castles.model.game {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 
+import protos.BuildingDTO;
+import protos.BuildingLevel;
+import protos.BuildingType;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.BuildingDTO;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
 
 public class BuildingTest {
 

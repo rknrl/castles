@@ -9,10 +9,10 @@
 package ru.rknrl.castles.database
 
 import akka.actor.{Actor, ActorRef, Props}
+import protos._
 import ru.rknrl.castles.database.Database.{UpdateAccountState, UpdateRating, UpdateTutorState}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.dto.{AccountId, AccountStateDTO, TutorStateDTO}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 class LRU[K, V](capacity: Int) extends java.util.LinkedHashMap[K, V](capacity, 0.7f, true) {
   override def removeEldestEntry(entry: java.util.Map.Entry[K, V]): Boolean = {
@@ -31,8 +31,8 @@ class DatabaseCache(database: ActorRef) extends Actor with ActorLog {
   case class RatingKey(weekNumber: Int, accountId: AccountId)
 
   val capacity = 100
-  val accountStates = new LRU[AccountId, Option[AccountStateDTO]](capacity)
-  val tutorStates = new LRU[AccountId, Option[TutorStateDTO]](capacity)
+  val accountStates = new LRU[AccountId, Option[AccountState]](capacity)
+  val tutorStates = new LRU[AccountId, Option[TutorState]](capacity)
   val ratings = new LRU[RatingKey, Option[Double]](capacity)
   var tops = new LRU[Int, Top](2)
 

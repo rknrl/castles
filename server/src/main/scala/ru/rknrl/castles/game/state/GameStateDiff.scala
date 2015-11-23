@@ -8,8 +8,8 @@
 
 package ru.rknrl.castles.game.state
 
+import protos.GameStateUpdate
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.dto.GameStateUpdateDTO
 
 object GameStateDiff {
   def diff(oldState: GameState, newState: GameState) = {
@@ -22,7 +22,7 @@ object GameStateDiff {
     val createdTornadoes = newState.tornadoes.filter(t ⇒ !oldState.tornadoes.exists(_ == t))
     val createdBullets = newState.bullets.filter(b ⇒ !oldState.bullets.exists(_ == b))
 
-    GameStateUpdateDTO(
+    GameStateUpdate(
       newUnits = createdUnits.map(_.dto(newTime)),
       newFireballs = createdFireballs.map(_.dto(newTime)).toSeq,
       newVolcanoes = createdVolcanoes.map(_.dto(newTime)).toSeq,

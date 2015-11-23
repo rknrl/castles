@@ -10,12 +10,12 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor._
 import akka.testkit.TestProbe
+import protos.AccountType.VKONTAKTE
+import protos.StatAction.START_GAME_4_WITH_BOTS
+import protos._
 import ru.rknrl.castles.database.DatabaseTransaction.AccountStateResponse
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
-import ru.rknrl.dto.AccountType.VKONTAKTE
-import ru.rknrl.dto.StatAction.START_GAME_4_WITH_BOTS
-import ru.rknrl.dto._
 
 import scala.concurrent.duration._
 

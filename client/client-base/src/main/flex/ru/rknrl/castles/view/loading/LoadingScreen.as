@@ -16,8 +16,8 @@ import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingLevel;
+import protos.BuildingType;
 
 public class LoadingScreen extends Sprite {
     private var holder:Sprite;

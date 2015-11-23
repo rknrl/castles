@@ -9,9 +9,9 @@
 package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.AccountId
+import protos.AccountType.VKONTAKTE
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.AccountId
-import ru.rknrl.dto.AccountType.VKONTAKTE
 
 class ELOTest extends WordSpec with Matchers {
   "getNewRating" in {

@@ -15,10 +15,10 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.PlayerId;
-import ru.rknrl.utils.createTextField;
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.PlayerId;
+import ru.rknrl.display.createTextField;
 
 public class UnitView extends Sprite {
     private static const textFieldBottom:int = -18;

@@ -10,14 +10,14 @@ package ru.rknrl.castles.matchmaking
 
 import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
+import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.DatabaseTransaction
 import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.core.Graphite.Health
-import ru.rknrl.dto._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 import scala.concurrent.duration.{FiniteDuration, _}
 
@@ -25,8 +25,8 @@ object MatchMaking {
 
   case class GameOrder(accountId: AccountId,
                        deviceType: DeviceType,
-                       userInfo: UserInfoDTO,
-                       accountState: AccountStateDTO,
+                       userInfo: UserInfo,
+                       accountState: AccountState,
                        rating: Double,
                        isBot: Boolean)
 

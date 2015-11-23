@@ -9,8 +9,8 @@
 package ru.rknrl.castles.payments
 
 import org.slf4j.LoggerFactory
+import protos.AccountId
 import ru.rknrl.castles.payments.PaymentsCallback.{Response, ResponseBase}
-import ru.rknrl.dto.AccountId
 import spray.http.HttpResponse
 
 object PaymentsCallback {
@@ -18,57 +18,57 @@ object PaymentsCallback {
   trait ResponseBase
 
   /**
-   * Платеж
-   * @param orderId       идентификатор заказа в системе платежей соц. сети
-   * @param accountId     идентификатор получателя заказа (он же и сделал заказ)
-   * @param price         стоимость в валюте соц. cети
-   * @param httpResponse  ответ для соц сети
-   */
+    * Платеж
+    * @param orderId       идентификатор заказа в системе платежей соц. сети
+    * @param accountId     идентификатор получателя заказа (он же и сделал заказ)
+    * @param price         стоимость в валюте соц. cети
+    * @param httpResponse  ответ для соц сети
+    */
   case class PaymentResponse(orderId: String, accountId: AccountId, productId: Int, price: Int, httpResponse: HttpResponse) extends ResponseBase
 
   /**
-   * Не платеж
-   */
+    * Не платеж
+    */
   case class Response(httpResponse: HttpResponse) extends ResponseBase
 
 }
 
 /**
- * Обработчик платежных сообщений от соц. сети
- */
+  * Обработчик платежных сообщений от соц. сети
+  */
 trait PaymentsCallback {
   val log = LoggerFactory.getLogger(getClass)
 
   def response: ResponseBase
 
   /**
-   * У нас что-то сломалось
-   * НЕ ожидаем перезапроса от соц. сети
-   */
+    * У нас что-то сломалось
+    * НЕ ожидаем перезапроса от соц. сети
+    */
   def error: HttpResponse
 
   /**
-   * Временная ошибка базы данных
-   * Ожидаем перезапроса от соц. сети
-   */
+    * Временная ошибка базы данных
+    * Ожидаем перезапроса от соц. сети
+    */
   def databaseError: HttpResponse
 
   /**
-   * Пользователя не существует
-   * НЕ ожидаем перезапроса от соц. сети
-   */
+    * Пользователя не существует
+    * НЕ ожидаем перезапроса от соц. сети
+    */
   def accountNotFoundError: HttpResponse
 
   /**
-   * Товара не существует
-   * НЕ ожидаем перезапроса от соц. сети
-   */
+    * Товара не существует
+    * НЕ ожидаем перезапроса от соц. сети
+    */
   def itemNotFoundError: HttpResponse
 
   /**
-   * Цена в запросе не соответствует цене на сервере
-   * НЕ ожидаем перезапроса от соц. сети
-   */
+    * Цена в запросе не соответствует цене на сервере
+    * НЕ ожидаем перезапроса от соц. сети
+    */
   def invalidPriceError: HttpResponse
 
   protected def response(string: String) = Response(HttpResponse(entity = string))

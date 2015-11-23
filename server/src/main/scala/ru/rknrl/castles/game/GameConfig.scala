@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles.game
 
+import protos.BuildingLevel.{LEVEL_1, LEVEL_2, LEVEL_3}
+import protos.BuildingType.{CHURCH, HOUSE, TOWER}
+import protos.{BuildingLevel, BuildingPrototype, BuildingType}
 import ru.rknrl.Assertion
 import ru.rknrl.castles.game.state.{Building, GameUnit}
 import ru.rknrl.core.Stat
-import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2, LEVEL_3}
-import ru.rknrl.dto.BuildingType.{CHURCH, HOUSE, TOWER}
-import ru.rknrl.dto.{BuildingLevel, BuildingPrototype, BuildingType}
 
 case class DamagerConfig(powerVsUnit: Double,
                          powerVsBuilding: Double,
@@ -156,15 +156,15 @@ case class GameConfig(constants: Constants,
   }
 
   /**
-   * Сколько юнитов будет в здании после входа в него дружественного отряда
-   */
+    * Сколько юнитов будет в здании после входа в него дружественного отряда
+    */
   def countAfterFriendlyUnitEnter(b: Building, unitCount: Double) =
     Math.min(maxCount(b), b.count + unitCount)
 
   /**
-   * Сколько юнитов будет в здании после входа в него вражеского отряда
-   * Вторым параметром возвращает захвачено здание или нет
-   */
+    * Сколько юнитов будет в здании после входа в него вражеского отряда
+    * Вторым параметром возвращает захвачено здание или нет
+    */
   def countAfterEnemyUnitEnter(b: Building, unit: GameUnit, buildingStat: Stat, unitStat: Stat) = {
     val attackPower = unitStat.attack
     val defencePower = buildingStat.defence * buildings(b.buildingPrototype).fortification
@@ -187,8 +187,8 @@ case class GameConfig(constants: Constants,
     buildings(building.buildingPrototype).shotPower.get
 
   /**
-   * Награда★ за выигранный бой (1ое место)
-   */
+    * Награда★ за выигранный бой (1ое место)
+    */
   val winReward = 2
 }
 

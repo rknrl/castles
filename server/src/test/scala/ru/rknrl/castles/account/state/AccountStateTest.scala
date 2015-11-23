@@ -9,24 +9,24 @@
 package ru.rknrl.castles.account.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.BuildingLevel._
+import protos.BuildingType._
+import protos.ItemType._
+import protos.SkillLevel._
+import protos.SkillType._
+import protos.SlotId._
+import protos._
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.database.DatabaseTransaction.FakeCalendar
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.social.Product
-import ru.rknrl.dto.BuildingLevel._
-import ru.rknrl.dto.BuildingType._
-import ru.rknrl.dto.ItemType._
-import ru.rknrl.dto.SkillLevel._
-import ru.rknrl.dto.SkillType._
-import ru.rknrl.dto.SlotId._
-import ru.rknrl.dto.{AccountStateDTO, BuildingPrototype, SkillLevelDTO, SlotDTO}
 
 class AccountStateTest extends WordSpec with Matchers {
 
   val GOLD = "gold"
   val GAMES_COUNT = "gamesCount"
 
-  def checkEquals(a: AccountStateDTO, b: AccountStateDTO, without: Set[Any]) = {
+  def checkEquals(a: AccountState, b: AccountState, without: Set[Any]) = {
     for (slot ← a.slots if !(without contains slot.id))
       slot shouldBe b.slots.find(_.id == slot.id).get
 
@@ -97,11 +97,11 @@ class AccountStateTest extends WordSpec with Matchers {
 
       val slots =
         List(
-          SlotDTO(SLOT_1, None),
-          SlotDTO(SLOT_2, None),
-          SlotDTO(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_3))),
-          SlotDTO(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
-          SlotDTO(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
+          Slot(SLOT_1, None),
+          Slot(SLOT_2, None),
+          Slot(SLOT_3, Some(BuildingPrototype(HOUSE, LEVEL_3))),
+          Slot(SLOT_4, Some(BuildingPrototype(TOWER, LEVEL_1))),
+          Slot(SLOT_5, Some(BuildingPrototype(CHURCH, LEVEL_1)))
         )
 
       a[Exception] shouldBe thrownBy {
@@ -155,9 +155,9 @@ class AccountStateTest extends WordSpec with Matchers {
     "Если слот последнего уровня - кидаем эксепшн" in {
 
       val skills = List(
-        SkillLevelDTO(ATTACK, SKILL_LEVEL_3),
-        SkillLevelDTO(DEFENCE, SKILL_LEVEL_1),
-        SkillLevelDTO(SPEED, SKILL_LEVEL_1)
+        Skill(ATTACK, SKILL_LEVEL_3),
+        Skill(DEFENCE, SKILL_LEVEL_1),
+        Skill(SPEED, SKILL_LEVEL_1)
       )
 
       a[Exception] shouldBe thrownBy {

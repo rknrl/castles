@@ -8,7 +8,7 @@
 
 package ru.rknrl.core.points {
 
-import ru.rknrl.dto.PointDTO;
+import protos.PointDTO;
 
 public class Points {
     private var _points:Vector.<Point>;

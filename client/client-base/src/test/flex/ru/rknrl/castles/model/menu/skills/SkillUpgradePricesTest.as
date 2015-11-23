@@ -9,13 +9,14 @@
 package ru.rknrl.castles.model.menu.skills {
 import org.flexunit.asserts.assertEquals;
 
+import protos.SkillUpgradePrice;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.SkillUpgradePriceDTO;
 
 public class SkillUpgradePricesTest {
     [Test("getPrice")]
     public function t0():void {
-        const prices:SkillUpgradePrices = new SkillUpgradePrices(new <SkillUpgradePriceDTO>[
+        const prices:SkillUpgradePrices = new SkillUpgradePrices(new <SkillUpgradePrice>[
             DtoMock.skillUpgradePrice(1, 10),
             DtoMock.skillUpgradePrice(2, 20),
             DtoMock.skillUpgradePrice(3, 30)
@@ -28,7 +29,7 @@ public class SkillUpgradePricesTest {
 
     [Test("getPrice invalid", expects="Error")]
     public function t1():void {
-        const prices:SkillUpgradePrices = new SkillUpgradePrices(new <SkillUpgradePriceDTO>[]);
+        const prices:SkillUpgradePrices = new SkillUpgradePrices(new <SkillUpgradePrice>[]);
         prices.getPrice(1);
     }
 }

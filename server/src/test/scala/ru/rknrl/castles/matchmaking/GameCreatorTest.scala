@@ -9,15 +9,15 @@
 package ru.rknrl.castles.matchmaking
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.AccountType.{DEV, VKONTAKTE}
+import protos.DeviceType.{PC, PHONE, TABLET}
+import protos.{AccountId, PlayerId}
 import ru.rknrl.castles.game.init.GameStateInit
 import ru.rknrl.castles.game.state.Player
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.GameCreator.NewGame
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Matcher.MatchedGameOrders
-import ru.rknrl.dto.AccountType.{DEV, VKONTAKTE}
-import ru.rknrl.dto.DeviceType.{PC, PHONE, TABLET}
-import ru.rknrl.dto.{AccountId, PlayerId}
 
 class GameCreatorTest extends WordSpec with Matchers {
 

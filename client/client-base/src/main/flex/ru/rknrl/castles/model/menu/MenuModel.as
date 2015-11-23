@@ -7,19 +7,20 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu {
+import protos.AccountConfig;
+import protos.AccountState;
+import protos.Authenticated;
+import protos.Place;
+import protos.Product;
+import protos.Top;
+
 import ru.rknrl.castles.model.menu.bank.Products;
 import ru.rknrl.castles.model.menu.main.BuildingPrices;
 import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
 import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
-import ru.rknrl.castles.model.menu.top.Top;
-import ru.rknrl.dto.AccountConfigDTO;
-import ru.rknrl.dto.AccountStateDTO;
-import ru.rknrl.dto.AuthenticatedDTO;
-import ru.rknrl.dto.PlaceDTO;
-import ru.rknrl.dto.ProductDTO;
-import ru.rknrl.dto.TopDTO;
+import ru.rknrl.castles.model.menu.top.TopUtils;
 
 public class MenuModel {
     private var _slots:Slots;
@@ -40,9 +41,9 @@ public class MenuModel {
         return _top;
     }
 
-    private var _place:PlaceDTO;
+    private var _place:Place;
 
-    public function get place():PlaceDTO {
+    public function get place():Place {
         return _place;
     }
 
@@ -104,7 +105,7 @@ public class MenuModel {
         return gamesCount - lastGamesCountAdvert >= advertGamesInterval;
     }
 
-    public function MenuModel(authenticated:AuthenticatedDTO) {
+    public function MenuModel(authenticated:Authenticated) {
         mergeAccountStateDto(authenticated.accountState);
         mergeConfigDto(authenticated.config);
         mergeProductsDto(authenticated.products);
@@ -112,7 +113,7 @@ public class MenuModel {
         mergePlaceDto(authenticated.place);
     }
 
-    public function mergeAccountStateDto(dto:AccountStateDTO):void {
+    public function mergeAccountStateDto(dto:AccountState):void {
         _slots = new Slots(dto.slots);
         _gold = dto.gold;
         _itemsCount = new ItemsCount(dto.items);
@@ -121,22 +122,22 @@ public class MenuModel {
         _lastGamesCountAdvert = dto.lastGamesCountAdvert;
     }
 
-    public function mergeTopDto(dto:TopDTO):void {
-        _top = new Top(dto);
+    public function mergeTopDto(dto:Top):void {
+        _top = dto;
     }
 
-    public function mergePlaceDto(dto:PlaceDTO):void {
+    public function mergePlaceDto(dto:Place):void {
         _place = dto;
     }
 
-    public function mergeConfigDto(dto:AccountConfigDTO):void {
+    public function mergeConfigDto(dto:AccountConfig):void {
         _itemPrice = dto.itemPrice;
         _upgradePrices = new SkillUpgradePrices(dto.skillUpgradePrices);
         _buildingPrices = new BuildingPrices(dto.buildings);
         _advertGamesInterval = dto.advertGamesInterval;
     }
 
-    public function mergeProductsDto(dto:Vector.<ProductDTO>):void {
+    public function mergeProductsDto(dto:Vector.<Product>):void {
         _products = new Products(dto);
     }
 }

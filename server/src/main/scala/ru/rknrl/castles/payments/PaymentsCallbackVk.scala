@@ -9,10 +9,10 @@
 package ru.rknrl.castles.payments
 
 import akka.util.Crypt
+import protos.{AccountId, AccountType}
 import ru.rknrl.Assertion
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.{AccountId, AccountType}
 import spray.http.HttpResponse
 
 object VkNotificationType {
@@ -27,11 +27,11 @@ object VkNotificationType {
 
 object VkStatus {
   /**
-   * Заказ готов к оплате.
-   * Необходимо оформить заказ пользователю внутри приложения.
-   * В случае ответа об успехе платёжная система зачислит голоса на счёт приложения.
-   * Если в ответ будет получено сообщение об ошибке, заказ отменяется.
-   */
+    * Заказ готов к оплате.
+    * Необходимо оформить заказ пользователю внутри приложения.
+    * В случае ответа об успехе платёжная система зачислит голоса на счёт приложения.
+    * Если в ответ будет получено сообщение об ошибке, заказ отменяется.
+    */
   val CHARGEABLE = "chargeable"
 }
 
@@ -43,9 +43,9 @@ object VkLang {
 }
 
 /**
- * 15 dec 2014
- * http://vk.com/dev/payments_callbacks
- */
+  * 15 dec 2014
+  * http://vk.com/dev/payments_callbacks
+  */
 class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterable[ru.rknrl.core.social.Product]) extends PaymentsCallback {
 
   override def error = HttpResponse(entity = VkPaymentsError.COMMON(critical = true).toString)
@@ -167,9 +167,9 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
     }
 
   /**
-   * @param orderId     идентификатор заказа в системе платежей ВКонтакте
-   * @param appOrderId  (Optional) идентификатор заказа в приложении. Должен быть уникальным для каждого заказа.
-   */
+    * @param orderId     идентификатор заказа в системе платежей ВКонтакте
+    * @param appOrderId  (Optional) идентификатор заказа в приложении. Должен быть уникальным для каждого заказа.
+    */
   private def successResponse(orderId: String, appOrderId: Option[Int]) = {
     val appOrderIdStr = if (appOrderId.isDefined) s""", "app_order_id":${appOrderId.get}""" else ""
 
@@ -177,22 +177,22 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
        |{
        |"response": {
        |"order_id":$orderId
-        | $appOrderIdStr
-        |}
-        |}""".stripMargin
+       | $appOrderIdStr
+       |}
+       |}""".stripMargin
   }
 
   /**
-   * @param title       название товара, до 48 символов
-   * @param photoUrl    (Optional) URL изображения товара на сервере разработчика. Рекомендуемый размер изображения – 75х75px.
-   * @param price       стоимость товара в голосах
-   * @param itemId      (Optional) идентификатор товара в приложении
-   * @param expiration  (Optional) разрешает кэширование товара на {expiration} секунд.
-   *                    Допустимый диапазон от 600 до 604800 секунд.
-   *                    Внимание! При отсутствии параметра возможно кэширование товара на 3600 секунд при
-   *                    большом количестве подряд одинаковых ответов.
-   *                    Для отмены кэширования необходимо передать 0 в качестве значения параметра.
-   */
+    * @param title       название товара, до 48 символов
+    * @param photoUrl    (Optional) URL изображения товара на сервере разработчика. Рекомендуемый размер изображения – 75х75px.
+    * @param price       стоимость товара в голосах
+    * @param itemId      (Optional) идентификатор товара в приложении
+    * @param expiration  (Optional) разрешает кэширование товара на {expiration} секунд.
+    *                    Допустимый диапазон от 600 до 604800 секунд.
+    *                    Внимание! При отсутствии параметра возможно кэширование товара на 3600 секунд при
+    *                    большом количестве подряд одинаковых ответов.
+    *                    Для отмены кэширования необходимо передать 0 в качестве значения параметра.
+    */
   private def itemResponse(title: String, photoUrl: Option[String], price: Int, itemId: Option[String], expiration: Option[Int]) = {
     val photoUrlStr = if (photoUrl.isDefined) s""""photo_url":"${photoUrl.get}",""" else ""
 
@@ -204,27 +204,27 @@ class PaymentsCallbackVk(request: String, config: SocialConfig, products: Iterab
        |{
        |"response": {
        |"title":"$title",
-                         | $photoUrlStr
-        | $itemIdStr
-        | $expirationStr
-        |"price": $price
-        |}
-        |}""".stripMargin
+       | $photoUrlStr
+       | $itemIdStr
+       | $expirationStr
+       |"price": $price
+       |}
+       |}""".stripMargin
   }
 }
 
 /**
- * @param errorCode   числовой код ошибки
- * @param description описание ошибки в текстовом виде для чтения человеком,
- *                    обязательно для ошибок задаваемых продавцом
- * @param critical    true, если повторение уведомления с такими же параметрами приведёт к такой же ошибке
- *                    (например, указанного товара не существует).
- *                    Уведомление не будет отправляться повторно, пользователь получит ошибку.
- *
- *                    false, если ошибка временная, и уведомление может быть обработано позже
- *                    (например, временная ошибка записи в базу данных).
- *                    Уведомление будет отправлено через некоторое время, пользователь будет ждать ответа.
- */
+  * @param errorCode   числовой код ошибки
+  * @param description описание ошибки в текстовом виде для чтения человеком,
+  *                    обязательно для ошибок задаваемых продавцом
+  * @param critical    true, если повторение уведомления с такими же параметрами приведёт к такой же ошибке
+  *                    (например, указанного товара не существует).
+  *                    Уведомление не будет отправляться повторно, пользователь получит ошибку.
+  *
+  *                    false, если ошибка временная, и уведомление может быть обработано позже
+  *                    (например, временная ошибка записи в базу данных).
+  *                    Уведомление будет отправлено через некоторое время, пользователь будет ждать ответа.
+  */
 private class VkPaymentsError private(val errorCode: Int,
                                       val description: String,
                                       val critical: Boolean) {
@@ -236,10 +236,10 @@ private class VkPaymentsError private(val errorCode: Int,
        |{
        |"error": {
        |"error_code": $errorCode,
-                                  |"error_msg": "$description",
-                                                               |"critical": $criticalToString
-        |}
-        |}
+       |"error_msg": "$description",
+       |"critical": $criticalToString
+       |}
+       |}
     """.stripMargin
 }
 

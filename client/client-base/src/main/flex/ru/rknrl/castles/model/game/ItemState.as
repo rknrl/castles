@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.core.Periodic;
-import ru.rknrl.dto.ItemStateDTO;
+import protos.ItemStateDTO;
 
 public class ItemState {
     private var _count:int;

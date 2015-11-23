@@ -9,11 +9,11 @@
 package ru.rknrl.castles.game.game
 
 import akka.testkit.TestProbe
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos.{AccountId, PlayerId}
 import ru.rknrl.castles.game.FakeBotFactory
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.{AccountId, PlayerId}
 
 class GameCreateBotsTest extends GameTestSpec {
 

@@ -3,12 +3,9 @@
   <component name="FlexBuildConfigurationManager" active="client-base">
     <configurations>
       <configuration name="client-base" pure-as="true" output-type="Library" output-file="castles-base.swc" output-folder="$MODULE_DIR$/target">
-        <dependencies target-player="10.1">
+        <dependencies target-player="19.0">
           <entries>
             <entry module-name="common-client" build-configuration-name="common-client">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="rmi-client" build-configuration-name="rmi-core-client">
               <dependency linkage="Merged" />
             </entry>
             <entry library-id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc">
@@ -17,17 +14,20 @@
             <entry module-name="asocial-base" build-configuration-name="base">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="aslog" build-configuration-name="aslog">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="dto-client" build-configuration-name="dto-core-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-name="flexunit" library-level="application">
               <dependency linkage="Merged" />
             </entry>
+            <entry library-name="protobuf-as3" library-level="application">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-name="protobuf-rpc" library-level="application">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="common-as3" build-configuration-name="common-as3">
+              <dependency linkage="Merged" />
+            </entry>
           </entries>
-          <sdk name="Air" />
+          <sdk name="AIRSDK_Compiler" />
         </dependencies>
         <compiler-options>
           <map>
@@ -52,12 +52,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/generated/flex" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="jdk" jdkName="Air" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="AIRSDK_Compiler" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Maven: ru.rknrl.castles:base-swc:swc:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.flexunit:flexunit:swc:as3:4.1.0" level="project" />
     <orderEntry type="module" module-name="common-client" exported="" />
-    <orderEntry type="module" module-name="rmi-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc" />
@@ -69,8 +68,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="asocial-base" exported="" />
-    <orderEntry type="module" module-name="aslog" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
     <orderEntry type="library" exported="" name="flexunit" level="application" />
+    <orderEntry type="library" exported="" name="protobuf-as3" level="application" />
+    <orderEntry type="library" exported="" name="protobuf-rpc" level="application" />
+    <orderEntry type="module" module-name="common-as3" exported="" />
   </component>
 </module>

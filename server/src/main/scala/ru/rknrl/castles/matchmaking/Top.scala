@@ -8,11 +8,11 @@
 
 package ru.rknrl.castles.matchmaking
 
-import ru.rknrl.dto.{TopDTO, AccountId, TopUserInfoDTO, UserInfoDTO}
+import protos.{AccountId, TopUserInfo, UserInfo}
 
 case class TopUser(accountId: AccountId,
                    rating: Double,
-                   info: UserInfoDTO)
+                   info: UserInfo)
 
 case class Top(users: Seq[TopUser], weekNumber: Int) {
   def insert(user: TopUser) =
@@ -25,10 +25,10 @@ case class Top(users: Seq[TopUser], weekNumber: Int) {
 
   private def usersDto =
     for (i ← users.indices)
-      yield TopUserInfoDTO(
+      yield TopUserInfo(
         place = i + 1,
         info = users(i).info
       )
 
-  def dto = TopDTO(weekNumber, usersDto)
+  def dto = protos.Top(weekNumber, usersDto)
 }

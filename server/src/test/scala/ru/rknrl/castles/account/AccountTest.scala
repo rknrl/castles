@@ -9,21 +9,19 @@
 package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
+import protos.BuildingLevel.{LEVEL_1, LEVEL_2}
+import protos.BuildingType.{HOUSE, TOWER}
+import protos.ItemType.FIREBALL
+import protos.SkillLevel.SKILL_LEVEL_1
+import protos.SkillType.ATTACK
+import protos.SlotId.{SLOT_1, SLOT_3}
+import protos._
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.database.DatabaseTransaction.{FakeCalendar, GetAccount}
 import ru.rknrl.castles.database.{DatabaseTransaction, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.rmi.B2C.AccountStateUpdated
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto.BuildingLevel.{LEVEL_1, LEVEL_2}
-import ru.rknrl.dto.BuildingType.{HOUSE, TOWER}
-import ru.rknrl.dto.ItemType.FIREBALL
-import ru.rknrl.dto.SkillLevel.SKILL_LEVEL_1
-import ru.rknrl.dto.SkillType.ATTACK
-import ru.rknrl.dto.SlotId.{SLOT_1, SLOT_3}
-import ru.rknrl.dto._
 
 import scala.concurrent.duration._
 
@@ -43,7 +41,7 @@ class AccountTest extends AccountTestSpec {
   multi("AcceptAdvert", {
     check(
       expectedAccountState = acceptAdvert(Some(accountState), true, config.account),
-      clientMessage = AcceptAdvert(AcceptAdvertDTO(true)),
+      clientMessage = AcceptAdvert(true),
       statMessage = None
     )
   })
@@ -51,7 +49,7 @@ class AccountTest extends AccountTestSpec {
   multi("AcceptWeekTop", {
     check(
       expectedAccountState = acceptWeekTop(Some(accountState), config.account, 3),
-      clientMessage = AcceptWeekTop(WeekNumberDTO(3)),
+      clientMessage = AcceptWeekTop(WeekNumber(3)),
       statMessage = None
     )
   })
@@ -59,7 +57,7 @@ class AccountTest extends AccountTestSpec {
   multi("BuyBuilding", {
     check(
       expectedAccountState = buyBuilding(Some(accountState), SLOT_1, TOWER, config.account),
-      clientMessage = BuyBuilding(BuyBuildingDTO(SLOT_1, TOWER)),
+      clientMessage = BuyBuilding(SLOT_1, TOWER),
       statMessage = Statistics.buyBuilding(TOWER, LEVEL_1)
     )
   })
@@ -67,7 +65,7 @@ class AccountTest extends AccountTestSpec {
   multi("UpgradeBuilding", {
     check(
       expectedAccountState = upgradeBuilding(Some(accountState), SLOT_3, config.account),
-      clientMessage = UpgradeBuilding(UpgradeBuildingDTO(SLOT_3)),
+      clientMessage = UpgradeBuilding(SLOT_3),
       statMessage = Statistics.buyBuilding(HOUSE, LEVEL_2)
     )
   })
@@ -75,7 +73,7 @@ class AccountTest extends AccountTestSpec {
   multi("RemoveBuilding", {
     check(
       expectedAccountState = removeBuilding(Some(accountState), SLOT_3, config.account),
-      clientMessage = RemoveBuilding(RemoveBuildingDTO(SLOT_3)),
+      clientMessage = RemoveBuilding(SLOT_3),
       statMessage = StatAction.REMOVE_BUILDING
     )
   })
@@ -83,7 +81,7 @@ class AccountTest extends AccountTestSpec {
   multi("UpgradeSkill", {
     check(
       expectedAccountState = upgradeSkill(Some(accountState), ATTACK, config.account),
-      clientMessage = UpgradeSkill(UpgradeSkillDTO(ATTACK)),
+      clientMessage = UpgradeSkill(ATTACK),
       statMessage = Statistics.buySkill(ATTACK, SKILL_LEVEL_1)
     )
   })
@@ -91,17 +89,17 @@ class AccountTest extends AccountTestSpec {
   multi("BuyItem", {
     check(
       expectedAccountState = buyItem(Some(accountState), FIREBALL, config.account),
-      clientMessage = BuyItem(BuyItemDTO(FIREBALL)),
+      clientMessage = BuyItem(FIREBALL),
       statMessage = Statistics.buyItem(FIREBALL)
     )
   })
 
-  def check(expectedAccountState: AccountStateDTO,
+  def check(expectedAccountState: AccountState,
             clientMessage: Any,
             statMessage: StatAction): Unit =
     check(expectedAccountState, clientMessage, Some(statMessage))
 
-  def check(expectedAccountState: AccountStateDTO,
+  def check(expectedAccountState: AccountState,
             clientMessage: Any,
             statMessage: Option[StatAction]): Unit = {
     val secretChecker = new TestProbe(system)
@@ -138,7 +136,7 @@ class AccountTest extends AccountTestSpec {
     if (statMessage.isDefined) graphite.expectMsg(statMessage.get)
     database.send(account, DatabaseTransaction.AccountStateResponse(accountId, expectedAccountState))
 
-    client.expectMsg(AccountStateUpdated(expectedAccountState))
+    client.expectMsg(expectedAccountState)
   }
 
   multi("EnterGame", {

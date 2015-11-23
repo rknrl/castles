@@ -11,7 +11,7 @@ import flash.display.DisplayObject;
 import flash.display.Sprite;
 
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.utils.OverrideMe;
+import ru.rknrl.common.OverrideMe;
 
 public class Screen extends Sprite {
     public function set layout(value:Layout):void {

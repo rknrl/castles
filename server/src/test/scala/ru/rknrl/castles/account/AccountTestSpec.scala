@@ -10,6 +10,9 @@ package ru.rknrl.castles.account
 
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
+import protos.AccountType.VKONTAKTE
+import protos.PlatformType.CANVAS
+import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.DatabaseTransaction.{Calendar, FakeCalendar, GetAccount}
@@ -17,11 +20,6 @@ import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.rmi.B2C.Authenticated
-import ru.rknrl.castles.rmi.C2B.Authenticate
-import ru.rknrl.dto.AccountType.VKONTAKTE
-import ru.rknrl.dto.PlatformType.CANVAS
-import ru.rknrl.dto._
 import ru.rknrl.test.ActorsTest
 
 class AccountTestSpec extends ActorsTest {
@@ -48,11 +46,11 @@ class AccountTestSpec extends ActorsTest {
     )
   }
 
-  def authenticateMock(userInfo: UserInfoDTO = UserInfoDTO(AccountId(VKONTAKTE, "1")),
-                       secret: AuthenticationSecretDTO = AuthenticationSecretDTO(body = "body"),
+  def authenticateMock(userInfo: UserInfo = UserInfo(AccountId(VKONTAKTE, "1")),
+                       secret: AuthenticationSecret = AuthenticationSecret(body = "body"),
                        platformType: PlatformType = PlatformType.CANVAS,
                        deviceType: DeviceType = DeviceType.PC) =
-    AuthenticateDTO(userInfo, platformType, deviceType, secret)
+    Authenticate(userInfo, platformType, deviceType, secret)
 
   def authorize(config: Config = configMock(),
                 secretChecker: TestProbe,
@@ -61,16 +59,16 @@ class AccountTestSpec extends ActorsTest {
                 matchmaking: TestProbe,
                 client: TestProbe,
                 account: ActorRef,
-                accountState: AccountStateDTO = accountStateMock()) = {
+                accountState: AccountState = accountStateMock()) = {
 
     val authenticate = authenticateMock(platformType = CANVAS)
     val accountId = authenticate.userInfo.accountId
-    client.send(account, Authenticate(authenticate))
+    client.send(account, authenticate)
 
     secretChecker.expectMsg(authenticate)
     secretChecker.send(account, SecretChecked(valid = true))
 
-    val tutorState = TutorStateDTO()
+    val tutorState = TutorState()
     val rating = config.account.initRating
 
     database.expectMsg(GetAccount(accountId))
@@ -91,17 +89,17 @@ class AccountTestSpec extends ActorsTest {
     matchmaking.expectMsg(InGame(accountId))
     matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false))
 
-    client.expectMsg(Authenticated(AuthenticatedDTO(
+    client.expectMsg(Authenticated(
       accountState,
       config.account.dto,
-      TopDTO(5, List.empty),
-      Some(PlaceDTO(777)),
+      protos.Top(5, List.empty),
+      Some(Place(777)),
       config.productsDto(CANVAS, VKONTAKTE),
       tutorState,
       searchOpponents = false,
       game = None,
-      lastWeekPlace = Some(PlaceDTO(666)),
-      lastWeekTop = Some(TopDTO(4, List.empty))
-    )))
+      lastWeekPlace = Some(Place(666)),
+      lastWeekTop = Some(protos.Top(4, List.empty))
+    ))
   }
 }

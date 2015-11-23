@@ -17,8 +17,8 @@ import ru.rknrl.castles.view.menu.main.popups.icons.RemoveIcon;
 import ru.rknrl.castles.view.menu.main.popups.icons.UpgradeIcon;
 import ru.rknrl.castles.view.popups.popup.Popup;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.SlotId;
+import protos.BuildingType;
+import protos.SlotId;
 
 public class UpgradePopup extends Popup {
     private var slotId:SlotId;

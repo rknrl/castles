@@ -15,12 +15,12 @@ import akka.actor.{Actor, Props}
 import akka.util.Crypt
 import org.apache.commons.codec.binary.Base64
 import org.json.JSONObject
+import protos.AccountType._
+import protos.Authenticate
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.{SecretChecked, _}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.AccountType._
-import ru.rknrl.dto.AuthenticateDTO
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 object SecretChecker {
   def props(config: Config) = Props(classOf[SecretChecker], config)
@@ -28,27 +28,27 @@ object SecretChecker {
   case class SecretChecked(valid: Boolean)
 
   /**
-   * auth_key  http://vk.com/dev/apps_init
-   */
+    * auth_key  http://vk.com/dev/apps_init
+    */
   def checkSecretVk(secret: String, uid: String, config: SocialConfig) =
     secret.toUpperCase == Crypt.md5(config.appId + '_' + uid + '_' + config.appSecret)
 
   /**
-   * auth_sig   http://apiok.ru/wiki/pages/viewpage.action?pageId=42476523
-   */
+    * auth_sig   http://apiok.ru/wiki/pages/viewpage.action?pageId=42476523
+    */
   def checkSecretOk(secret: String, sessionKey: String, uid: String, config: SocialConfig) =
     secret.toUpperCase == Crypt.md5(uid + sessionKey + config.appSecret)
 
   /**
-   * sig      http://api.mail.ru/docs/guides/restapi/#session
-   * http://api.mail.ru/docs/guides/social-apps/
-   */
+    * sig      http://api.mail.ru/docs/guides/restapi/#session
+    * http://api.mail.ru/docs/guides/social-apps/
+    */
   def checkSecretMm(secret: String, params: String, config: SocialConfig) =
     secret.toUpperCase == Crypt.md5(params + config.appSecret)
 
   /**
-   * signed_request  https://developers.facebook.com/docs/facebook-login/using-login-with-games
-   */
+    * signed_request  https://developers.facebook.com/docs/facebook-login/using-login-with-games
+    */
   def checkSecretFb(secret: String, uid: String, config: SocialConfig) = {
     val split = secret.split('.')
     val encodedSig = split(0)
@@ -75,11 +75,11 @@ object SecretChecker {
 
 class SecretChecker(config: Config) extends Actor with ActorLog {
   def receive = logged {
-    case authenticate: AuthenticateDTO ⇒
+    case authenticate: Authenticate ⇒
       send(sender, SecretChecked(checkSecret(authenticate)))
   }
 
-  def checkSecret(authenticate: AuthenticateDTO) =
+  def checkSecret(authenticate: Authenticate) =
     authenticate.userInfo.accountId.accountType match {
       case DEV ⇒
         config.isDev

@@ -16,7 +16,7 @@ import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.top.Avatar;
-import ru.rknrl.dto.PlayerId;
+import protos.PlayerId;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameAvatar extends Sprite {

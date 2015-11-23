@@ -8,13 +8,14 @@
 
 package ru.rknrl.castles.controller.game {
 
+import protos.BuildingId;
+
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.castles.view.game.area.arrows.ArrowView;
 import ru.rknrl.castles.view.game.area.arrows.ArrowsView;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingId;
 
 public class Arrows {
     private var layer:ArrowsView;

@@ -9,54 +9,54 @@
 package ru.rknrl.castles.payments
 
 import akka.util.Crypt
+import protos.{AccountId, AccountType}
 import ru.rknrl.Assertion
 import ru.rknrl.castles.payments.PaymentsCallback.PaymentResponse
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.{AccountId, AccountType}
 import spray.http.{HttpResponse, Uri}
 
 object MmErrorCode {
   /**
-   * Если приложение не смогло найти пользователя для оказания услуги
-   */
+    * Если приложение не смогло найти пользователя для оказания услуги
+    */
   val USER_NOT_FOUND = 701
 
   /**
-   * Если услуга с данный идентификатором не существуем в вашем приложении
-   */
+    * Если услуга с данный идентификатором не существуем в вашем приложении
+    */
   val SERVICE_NOT_FOUND = 702
 
   /**
-   * Если данная услуга для данного пользователя не могла быть оказана за указанную цену
-   */
+    * Если данная услуга для данного пользователя не могла быть оказана за указанную цену
+    */
   val INCORRECT_PRICE = 703
 
   /**
-   * Другая ошибка
-   */
+    * Другая ошибка
+    */
   val OTHER_ERROR = 700
 }
 
 object MmStatus {
   /**
-   * Услуга на данный момент не оказана, но может быть оказана позднее
-   */
+    * Услуга на данный момент не оказана, но может быть оказана позднее
+    */
   val TEMP_FAIL = 0
 
   /**
-   * Услуга оказана успешно
-   */
+    * Услуга оказана успешно
+    */
   val SUCCESS = 1
 
   /**
-   * Услуга не может быть оказана
-   */
+    * Услуга не может быть оказана
+    */
   val FAIL = 2
 }
 
 /**
- * http://api.mail.ru/docs/guides/billing/
- */
+  * http://api.mail.ru/docs/guides/billing/
+  */
 class PaymentsCallbackMm(uri: Uri, config: SocialConfig) extends PaymentsCallback {
 
   override def error = HttpResponse(entity = errorResponse(MmStatus.FAIL, MmErrorCode.OTHER_ERROR))

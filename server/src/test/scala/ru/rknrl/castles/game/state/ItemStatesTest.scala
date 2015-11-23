@@ -9,9 +9,9 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.ItemType._
+import protos.PlayerId
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.ItemType._
-import ru.rknrl.dto.PlayerId
 
 class ItemStatesTest extends WordSpec with Matchers {
   "getUpdateItemsStatesMessages" in {

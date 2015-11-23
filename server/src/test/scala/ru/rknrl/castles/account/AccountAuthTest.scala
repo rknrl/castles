@@ -8,19 +8,17 @@
 
 package ru.rknrl.castles.account
 
+import akka.actor.PoisonPill
 import akka.testkit.TestProbe
+import protos.AccountType.VKONTAKTE
+import protos.PlatformType.CANVAS
+import protos._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
 import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.rmi.B2C.Authenticated
-import ru.rknrl.castles.rmi.C2B.Authenticate
-import ru.rknrl.core.rmi.CloseConnection
-import ru.rknrl.dto.AccountType.VKONTAKTE
-import ru.rknrl.dto.PlatformType.CANVAS
-import ru.rknrl.dto._
 
 class AccountAuthTest extends AccountTestSpec {
   "auth" should {
@@ -33,12 +31,12 @@ class AccountAuthTest extends AccountTestSpec {
       val account = newAccount(secretChecker = secretChecker.ref, database = database.ref, graphite = graphite.ref)
 
       val authenticate = authenticateMock()
-      client.send(account, Authenticate(authenticate))
+      client.send(account, authenticate)
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = false))
 
-      client.expectMsg(CloseConnection)
+      client.expectMsg(PoisonPill)
 
       graphite.expectMsg(StatAction.NOT_AUTHENTICATED)
     })
@@ -61,7 +59,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       val authenticate = authenticateMock(platformType = CANVAS)
       val accountId = authenticate.userInfo.accountId
-      client.send(account, Authenticate(authenticate))
+      client.send(account, authenticate)
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
@@ -81,25 +79,25 @@ class AccountAuthTest extends AccountTestSpec {
       ))
 
       val initAccountState = config.account.initState
-      val initTutorState = TutorStateDTO()
+      val initTutorState = TutorState()
 
       graphite.expectMsg(StatAction.FIRST_AUTHENTICATED)
       matchmaking.expectMsg(Online(accountId))
       matchmaking.expectMsg(InGame(accountId))
       matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false))
 
-      client.expectMsg(Authenticated(AuthenticatedDTO(
+      client.expectMsg(Authenticated(
         initAccountState,
         config.account.dto,
-        TopDTO(5, List.empty),
+        protos.Top(5, List.empty),
         None,
         config.productsDto(CANVAS, VKONTAKTE),
         initTutorState,
         searchOpponents = true,
         game = None,
         lastWeekPlace = None,
-        lastWeekTop = Some(TopDTO(4, List.empty))
-      )))
+        lastWeekTop = Some(protos.Top(4, List.empty))
+      ))
 
       graphite.expectMsg(StatAction.START_TUTOR)
       database.expectMsg(GetAccount(accountId))
@@ -134,13 +132,13 @@ class AccountAuthTest extends AccountTestSpec {
 
       val authenticate = authenticateMock(platformType = CANVAS)
       val accountId = authenticate.userInfo.accountId
-      client.send(account, Authenticate(authenticate))
+      client.send(account, authenticate)
 
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
       val accountState = accountStateMock(weekNumberAccepted = Some(4))
-      val tutorState = TutorStateDTO()
+      val tutorState = TutorState()
       val rating = config.account.initRating
 
       database.expectMsg(DatabaseTransaction.GetAccount(accountId))
@@ -161,17 +159,17 @@ class AccountAuthTest extends AccountTestSpec {
       matchmaking.expectMsg(InGame(accountId))
       matchmaking.send(account, InGameResponse(gameRef = None, searchOpponents = false))
 
-      client.expectMsg(Authenticated(AuthenticatedDTO(
+      client.expectMsg(Authenticated(
         accountState,
         config.account.dto,
-        TopDTO(5, List.empty),
-        Some(PlaceDTO(666)),
+        protos.Top(5, List.empty),
+        Some(Place(666)),
         config.productsDto(CANVAS, VKONTAKTE),
         tutorState,
         searchOpponents = false,
         game = None
         // lastWeekPlace & lastWeekTop не отправляем, потому что игрок их уже видел
-      )))
+      ))
     })
 
     multi("other", {

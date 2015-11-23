@@ -15,9 +15,9 @@ import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.utils.Animated;
 import ru.rknrl.castles.view.utils.LockView;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.utils.centerize;
-import ru.rknrl.utils.createTextField;
+import protos.ItemType;
+import ru.rknrl.display.centerize;
+import ru.rknrl.display.createTextField;
 
 public class ShopMagicItemIcon extends Animated {
     private var textField:TextField;

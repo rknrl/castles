@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.events {
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 
 public class GameTutorEvents {
     public static const ARROW_SENDED:String = "arrowSended";

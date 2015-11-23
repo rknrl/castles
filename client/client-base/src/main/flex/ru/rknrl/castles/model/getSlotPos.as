@@ -7,13 +7,14 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model {
+import protos.Slot1Pos;
+import protos.Slot2Pos;
+import protos.Slot3Pos;
+import protos.Slot4Pos;
+import protos.Slot5Pos;
+import protos.SlotId;
+
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.Slot1Pos;
-import ru.rknrl.dto.Slot2Pos;
-import ru.rknrl.dto.Slot3Pos;
-import ru.rknrl.dto.Slot4Pos;
-import ru.rknrl.dto.Slot5Pos;
-import ru.rknrl.dto.SlotId;
 
 public function getSlotPos(slotId:SlotId):Point {
     switch (slotId) {

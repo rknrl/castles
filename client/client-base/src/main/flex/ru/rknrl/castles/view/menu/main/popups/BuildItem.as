@@ -11,7 +11,7 @@ import flash.display.DisplayObject;
 
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.popups.popup.PopupItem;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingType;
 
 public class BuildItem extends PopupItem {
     private var _buildingType:BuildingType;

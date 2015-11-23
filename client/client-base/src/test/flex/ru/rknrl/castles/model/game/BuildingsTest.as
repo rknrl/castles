@@ -10,12 +10,13 @@ package ru.rknrl.castles.model.game {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNull;
 
+import protos.BuildingLevel;
+import protos.BuildingType;
+
 import ru.rknrl.castles.kit.BuildingBuilder;
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.core.kit.assertVectors;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
 
 public class BuildingsTest {
     private const b0:Building = new BuildingBuilder()

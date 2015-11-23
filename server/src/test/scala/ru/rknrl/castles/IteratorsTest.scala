@@ -9,10 +9,10 @@
 package ru.rknrl.castles
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.AccountType.DEV
+import protos.{AccountId, BuildingId, PlayerId, UnitId}
 import ru.rknrl.castles.game.state.{BuildingIdIterator, UnitIdIterator}
 import ru.rknrl.castles.matchmaking.{BotIdIterator, PlayerIdIterator}
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, BuildingId, PlayerId, UnitId}
 
 class IteratorsTest extends WordSpec with Matchers {
   "building" in {

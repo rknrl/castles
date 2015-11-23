@@ -8,13 +8,13 @@
 
 package ru.rknrl.castles.game.state
 
+import protos._
 import ru.rknrl.core.Stat
-import ru.rknrl.dto._
 
 case class Player(id: PlayerId,
                   accountId: AccountId,
-                  userInfo: UserInfoDTO,
-                  slots: Seq[SlotDTO],
+                  userInfo: UserInfo,
+                  slots: Seq[Slot],
                   stat: Stat,
-                  items: Seq[ItemDTO],
+                  items: Seq[Item],
                   isBot: Boolean)

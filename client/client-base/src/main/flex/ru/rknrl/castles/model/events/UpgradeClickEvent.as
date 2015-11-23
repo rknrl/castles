@@ -9,7 +9,7 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.SkillType;
+import protos.SkillType;
 
 public class UpgradeClickEvent extends Event {
     public static const UPGRADE_CLICK:String = "upgradeClick";

@@ -10,9 +10,9 @@ package ru.rknrl.castles.view {
 import flash.display.DisplayObject;
 import flash.display.MovieClip;
 
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.ItemType;
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.ItemType;
 
 public class Fla {
     public static function createItem(itemType:ItemType):DisplayObject {

@@ -8,11 +8,11 @@
 
 package ru.rknrl.castles.bot
 
-import ru.rknrl.dto._
+import protos._
 
 object GameStateMerge {
-  def merge(gameState: GameStateDTO, gameStateUpdate: GameStateUpdateDTO) = {
-    GameStateDTO(
+  def merge(gameState: GameState, gameStateUpdate: GameStateUpdate) = {
+    GameState(
       gameState.width,
       gameState.height,
       gameState.players,
@@ -29,10 +29,10 @@ object GameStateMerge {
     )
   }
 
-  private def mergeBuildings(buildings: Seq[BuildingDTO], updates: Seq[BuildingUpdateDTO]) =
+  private def mergeBuildings(buildings: Seq[BuildingDTO], updates: Seq[BuildingUpdate]) =
     buildings.map(b ⇒ mergeBuilding(b, updates.find(_.id == b.id)))
 
-  private def mergeBuilding(building: BuildingDTO, update: Option[BuildingUpdateDTO]) =
+  private def mergeBuilding(building: BuildingDTO, update: Option[BuildingUpdate]) =
     if (update.isDefined)
       BuildingDTO(
         id = building.id,

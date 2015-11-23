@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.view.locale {
 import ru.rknrl.Locale;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.SkillType;
+import protos.BuildingType;
+import protos.ItemType;
+import protos.SkillType;
 
 public class CastlesLocale extends Locale {
     private static const PLAY:String = "play";

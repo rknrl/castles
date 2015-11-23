@@ -7,7 +7,15 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.menu {
+import protos.BuildingType;
+import protos.ItemType;
+import protos.Place;
+import protos.SkillType;
+import protos.SlotId;
+
 import flash.display.Sprite;
+
+import protos.Top;
 
 import ru.rknrl.castles.model.events.ScreenChangedEvent;
 import ru.rknrl.castles.model.menu.MenuModel;
@@ -16,7 +24,7 @@ import ru.rknrl.castles.model.menu.main.Slots;
 import ru.rknrl.castles.model.menu.shop.ItemsCount;
 import ru.rknrl.castles.model.menu.skills.SkillLevels;
 import ru.rknrl.castles.model.menu.skills.SkillUpgradePrices;
-import ru.rknrl.castles.model.menu.top.Top;
+import ru.rknrl.castles.model.menu.top.TopUtils;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.bank.BankScreen;
@@ -31,11 +39,6 @@ import ru.rknrl.castles.view.menu.skills.SkillsScreen;
 import ru.rknrl.castles.view.menu.top.TopScreen;
 import ru.rknrl.castles.view.popups.PopupEvent;
 import ru.rknrl.castles.view.popups.PopupManager;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlaceDTO;
-import ru.rknrl.dto.SkillType;
-import ru.rknrl.dto.SlotId;
 import ru.rknrl.loaders.ILoadImageManager;
 import ru.rknrl.test;
 
@@ -150,7 +153,7 @@ public class MenuView extends Sprite {
         topScreen.top = value;
     }
 
-    public function set place(value: PlaceDTO):void {
+    public function set place(value:Place):void {
         topScreen.place = value;
     }
 

@@ -1,15 +1,16 @@
-package ru.rknrl.dto;
-
-option java_outer_classname = "AccountDTO";
+package protos;
 
 option optimize_for = SPEED;
 
+import "options.proto";
 import "common.proto";
 
-message AccountStateDTO {
-    repeated SlotDTO slots = 1;
-    repeated SkillLevelDTO skills = 2;
-    repeated ItemDTO items = 3;
+message AccountState {
+    option (msgid) = 20;
+
+    repeated Slot slots = 1;
+    repeated Skill skills = 2;
+    repeated Item items = 3;
     required int32 gold = 4;
     //    required double rating = 5;
     required int32 gamesCount = 6;
@@ -18,67 +19,90 @@ message AccountStateDTO {
     optional int32 lastGamesCountAdvert = 9;
 }
 
-message AcceptAdvertDTO {
+message AcceptAdvert {
+    option (msgid) = 90;
+
     required bool accepted = 1;
 }
 
-message PlaceDTO {
+message Place {
+    option (msgid) = 23;
+
     required int64 place = 1;
 }
 
-message SlotDTO {
+message Slot {
     required SlotId id = 1;
     optional BuildingPrototype buildingPrototype = 2;
 }
 
-message SkillLevelDTO {
+message Skill {
     required SkillType skillType = 1;
     required SkillLevel level = 2;
 }
 
-message ItemDTO {
+message Item {
     required ItemType itemType = 1;
     required int32 count = 2;
 }
 
 // config
 
-message AccountConfigDTO {
-    repeated BuildingPriceDTO buildings = 1;
-    repeated SkillUpgradePriceDTO skillUpgradePrices = 2;
+message AccountConfig {
+    repeated BuildingPrice buildings = 1;
+    repeated SkillUpgradePrice skillUpgradePrices = 2;
     required int32 itemPrice = 3;
     required int32 advertGamesInterval = 4;
 }
 
-message SkillUpgradePriceDTO {
+message SkillUpgradePrice {
     required int32 totalLevel = 1;
     required int32 price = 2;
 }
 
-message BuildingPriceDTO {
+message BuildingPrice {
     required BuildingLevel level = 1;
     required int32 price = 2;
 }
 
 // client->server actions
 
-message BuyBuildingDTO {
+message BuyBuilding {
+    option (msgid) = 80;
+
     required SlotId id = 1;
     required BuildingType buildingType = 2;
 }
 
-message UpgradeBuildingDTO {
+message UpgradeBuilding {
+    option (msgid) = 81;
+
     required SlotId id = 1;
 }
 
-message RemoveBuildingDTO {
+message RemoveBuilding {
+    option (msgid) = 82;
+
     required SlotId id = 1;
 }
 
-message UpgradeSkillDTO {
+message UpgradeSkill {
+    option (msgid) = 83;
+
     required SkillType skillType = 1;
 }
 
-message BuyItemDTO {
+message BuyItem {
+    option (msgid) = 84;
+
     required ItemType itemType = 1;
 }
+
+message EnterGame {
+    option (msgid) = 85;
+}
+
+message AcceptPresent {
+    option (msgid) = 89;
+}
+

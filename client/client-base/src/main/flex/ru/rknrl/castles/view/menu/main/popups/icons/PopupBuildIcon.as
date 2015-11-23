@@ -13,8 +13,8 @@ import flash.display.Sprite;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fla;
 import ru.rknrl.castles.view.utils.Shadow;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
+import protos.BuildingLevel;
+import protos.BuildingType;
 
 public class PopupBuildIcon extends Sprite {
     public function PopupBuildIcon(buildingType:BuildingType) {

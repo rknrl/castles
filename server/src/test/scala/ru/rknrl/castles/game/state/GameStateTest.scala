@@ -9,30 +9,28 @@
 package ru.rknrl.castles.game.state
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.BuildingLevel._
+import protos.BuildingType._
+import protos.ItemType._
+import protos._
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.game.state.Bullets._
 import ru.rknrl.castles.game.state.Fireballs.castToFireball
-import ru.rknrl.castles.game.state.GameItems._
 import ru.rknrl.castles.game.state.Moving.moveActionsToExitUnits
 import ru.rknrl.castles.game.state.Strengthening.castToStrengthening
 import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.castles.rmi.B2C._
 import ru.rknrl.core.points.{Point, Points}
-import ru.rknrl.dto.BuildingLevel._
-import ru.rknrl.dto.BuildingType._
-import ru.rknrl.dto.ItemType._
-import ru.rknrl.dto._
 
 class GameStateTest extends WordSpec with Matchers {
 
   def updateGameState(gameState: GameState,
                       newTime: Long = 1,
-                      moveActions: Map[PlayerId, MoveDTO] = Map.empty,
+                      moveActions: Map[PlayerId, protos.Move] = Map.empty,
                       fireballCasts: Map[PlayerId, PointDTO] = Map.empty,
                       volcanoCasts: Map[PlayerId, PointDTO] = Map.empty,
-                      tornadoCasts: Map[PlayerId, CastTornadoDTO] = Map.empty,
+                      tornadoCasts: Map[PlayerId, CastTornado] = Map.empty,
                       strengtheningCasts: Map[PlayerId, BuildingId] = Map.empty,
                       assistanceCasts: Map[PlayerId, BuildingId] = Map.empty) =
     gameState.update(
@@ -137,8 +135,8 @@ class GameStateTest extends WordSpec with Matchers {
     )
 
     val moveActions = Map(
-      PlayerId(0) → MoveDTO(List(BuildingId(0)), BuildingId(1)),
-      PlayerId(1) → MoveDTO(List(BuildingId(2)), BuildingId(1))
+      PlayerId(0) → protos.Move(List(BuildingId(0)), BuildingId(1)),
+      PlayerId(1) → protos.Move(List(BuildingId(2)), BuildingId(1))
     )
 
     val newGameState = updateGameState(
@@ -804,8 +802,8 @@ class GameStateTest extends WordSpec with Matchers {
     ))
 
 
-    val cast1 = PlayerId(0) → CastTornadoDTO(Seq(PointDTO(0, 0), PointDTO(1, 1)))
-    val cast2 = PlayerId(1) → CastTornadoDTO(Seq(PointDTO(2, 2), PointDTO(4, 4)))
+    val cast1 = PlayerId(0) → CastTornado(Seq(PointDTO(0, 0), PointDTO(1, 1)))
+    val cast2 = PlayerId(1) → CastTornado(Seq(PointDTO(2, 2), PointDTO(4, 4)))
     val casts = Map(cast1, cast2)
 
     val gameState = gameStateMock(
@@ -1176,9 +1174,9 @@ class GameStateTest extends WordSpec with Matchers {
 
     val items = testItems(TORNADO)
 
-    val cast0 = PlayerId(0) → CastTornadoDTO(List(PointDTO(0, 0), PointDTO(1, 1)))
-    val cast1 = PlayerId(1) → CastTornadoDTO(List(PointDTO(0, 0), PointDTO(1, 1)))
-    val cast2 = PlayerId(2) → CastTornadoDTO(List(PointDTO(0, 0), PointDTO(1, 1)))
+    val cast0 = PlayerId(0) → CastTornado(List(PointDTO(0, 0), PointDTO(1, 1)))
+    val cast1 = PlayerId(1) → CastTornado(List(PointDTO(0, 0), PointDTO(1, 1)))
+    val cast2 = PlayerId(2) → CastTornado(List(PointDTO(0, 0), PointDTO(1, 1)))
 
     val gameState = gameStateMock(
       time = 0,

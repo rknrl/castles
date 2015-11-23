@@ -13,7 +13,7 @@ import flash.display.Sprite;
 import flash.utils.Dictionary;
 
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.dto.CellSize;
+import protos.CellSize;
 
 public class EditorGround extends Sprite {
     private static const cellSize:int = CellSize.SIZE.id();

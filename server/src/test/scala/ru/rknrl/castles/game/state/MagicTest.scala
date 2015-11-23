@@ -8,14 +8,14 @@
 
 package ru.rknrl.castles.game.state
 
-import org.scalatest.{WordSpec, FreeSpec, Matchers}
+import org.scalatest.{Matchers, WordSpec}
+import protos._
 import ru.rknrl.castles.game.state.Fireballs.castToFireball
 import ru.rknrl.castles.game.state.Strengthening.castToStrengthening
 import ru.rknrl.castles.game.state.Tornadoes.castToTornado
 import ru.rknrl.castles.game.state.Volcanoes.castToVolcano
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.Stat
-import ru.rknrl.dto.{BuildingId, CastTornadoDTO, PlayerId, PointDTO}
 
 // todo powerBonus работает не правильно
 class MagicTest extends WordSpec with Matchers {
@@ -99,7 +99,7 @@ class MagicTest extends WordSpec with Matchers {
   }
 
   "castToTornado" in {
-    val dto = CastTornadoDTO(Seq(
+    val dto = CastTornado(Seq(
       PointDTO(1f, 2f),
       PointDTO(1f, 4f)
     ))

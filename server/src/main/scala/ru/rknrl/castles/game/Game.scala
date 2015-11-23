@@ -9,15 +9,12 @@
 package ru.rknrl.castles.game
 
 import akka.actor.{Actor, ActorRef, Props}
+import protos._
 import ru.rknrl.Supervisor._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
-import ru.rknrl.castles.rmi.B2C.{GameOver, GameStateUpdated, JoinedGame}
-import ru.rknrl.castles.rmi.C2B
-import ru.rknrl.castles.rmi.C2B._
-import ru.rknrl.dto._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 object Game {
 
@@ -64,14 +61,14 @@ class Game(var gameState: GameState,
     clientToPlayerId(sender).isDefined &&
       !(gameOvers contains senderPlayerId)
 
-  var moveActions = Map.empty[PlayerId, MoveDTO]
+  var moveActions = Map.empty[PlayerId, protos.Move]
   var fireballCasts = Map.empty[PlayerId, PointDTO]
   var strengtheningCasts = Map.empty[PlayerId, BuildingId]
   var volcanoCasts = Map.empty[PlayerId, PointDTO]
-  var tornadoCasts = Map.empty[PlayerId, CastTornadoDTO]
+  var tornadoCasts = Map.empty[PlayerId, CastTornado]
   var assistanceCasts = Map.empty[PlayerId, BuildingId]
 
-  var gameOvers = Map.empty[PlayerId, GameOverDTO]
+  var gameOvers = Map.empty[PlayerId, GameOver]
   var leaved = Set.empty[PlayerId]
 
   def sendToPlayers(msg: Any): Unit =
@@ -96,7 +93,7 @@ class Game(var gameState: GameState,
     case Join(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
       playerIdToClient = playerIdToClient + (playerId → client)
-      send(client, JoinedGame(gameState.dto(playerId, gameOvers.values.toSeq)))
+      send(client, gameState.dto(playerId, gameOvers.values.toSeq))
 
     case Offline(accountId, client) ⇒
       val playerId = accountIdToPlayerId(accountId)
@@ -117,7 +114,7 @@ class Game(var gameState: GameState,
 
       val gameStateUpdate = GameStateDiff.diff(gameState, newGameState)
 
-      sendToPlayers(GameStateUpdated(gameStateUpdate))
+      sendToPlayers(gameStateUpdate)
 
       gameState = newGameState
 
@@ -137,12 +134,12 @@ class Game(var gameState: GameState,
     case Surrender ⇒
       if (isDev && senderCanPlay) addLoser(senderPlayerId)
 
-    case C2B.LeaveGame ⇒
+    case LeaveGame() ⇒
       if (clientToPlayerId(sender).isDefined &&
         (gameOvers contains senderPlayerId) &&
         !(leaved contains senderPlayerId)) leave(senderPlayerId)
 
-    case Move(moveDto) ⇒
+    case moveDto: protos.Move ⇒
       if (senderCanPlay) moveActions = moveActions + (senderPlayerId → moveDto)
 
     case CastFireball(pointDto) ⇒
@@ -154,7 +151,7 @@ class Game(var gameState: GameState,
     case CastVolcano(pointDto) ⇒
       if (senderCanPlay) volcanoCasts = volcanoCasts + (senderPlayerId → pointDto)
 
-    case CastTornado(castTornadoDto) ⇒
+    case castTornadoDto: CastTornado ⇒
       if (senderCanPlay) tornadoCasts = tornadoCasts + (senderPlayerId → castTornadoDto)
 
     case CastAssistance(buildingId) ⇒
@@ -167,10 +164,10 @@ class Game(var gameState: GameState,
   def addLoser(playerId: PlayerId): Unit = {
     val place = playersIds.size - gameOvers.size
     val reward = placeToReward(place)
-    val gameOver = GameOverDTO(playerId = playerId, place = place, reward = reward)
+    val gameOver = GameOver(playerId = playerId, place = place, reward = reward)
     gameOvers = gameOvers + (playerId → gameOver)
 
-    sendToPlayers(GameOver(gameOver))
+    sendToPlayers(gameOver)
 
     if (gameOvers.size == playersIds.size - 1) {
       val winnerId = playersIds.find(id ⇒ !gameOvers.contains(id)).get

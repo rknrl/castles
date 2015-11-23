@@ -8,10 +8,10 @@
 
 package ru.rknrl.castles.game.state
 
+import protos.{UnitDTO, UnitId, UnitUpdate}
 import ru.rknrl.Assertion
 import ru.rknrl.core.points.Points
 import ru.rknrl.core.{Damage, Damaged, Damager, Movable}
-import ru.rknrl.dto.{UnitDTO, UnitId, UnitUpdateDTO}
 
 class GameUnit(val id: UnitId,
                val startTime: Long,
@@ -71,7 +71,7 @@ class GameUnit(val id: UnitId,
     )
 
   def updateDto =
-    UnitUpdateDTO(
+    UnitUpdate(
       id = id,
       count = floorCount
     )

@@ -8,11 +8,11 @@
 
 package ru.rknrl.castles.game.state
 
+import protos._
 import ru.rknrl.Assertion
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.core.points.Point
 import ru.rknrl.core.{Damage, Damaged, Damager, Stat}
-import ru.rknrl.dto._
 
 class Building(val id: BuildingId,
                val buildingPrototype: BuildingPrototype,
@@ -123,7 +123,7 @@ class Building(val id: BuildingId,
     )
 
   def updateDto =
-    BuildingUpdateDTO(
+    BuildingUpdate(
       id,
       floorCount,
       if (owner.isDefined) Some(owner.get.id) else None,

@@ -19,7 +19,16 @@ import flash.utils.ByteArray;
 import flash.utils.setInterval;
 import flash.utils.setTimeout;
 
-import ru.rknrl.Log;
+import protos.AccountId;
+import protos.AuthenticationSecret;
+import protos.DeviceType;
+import protos.ItemType;
+import protos.PlatformType;
+import protos.PlayerId;
+import protos.SkillType;
+import protos.SlotId;
+
+import ru.rknrl.log.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
@@ -36,14 +45,6 @@ import ru.rknrl.castles.view.menu.main.popups.icons.UpgradeIcon;
 import ru.rknrl.castles.view.menu.navigate.points.NavigationPoint;
 import ru.rknrl.castles.view.menu.shop.ShopMagicItem;
 import ru.rknrl.castles.view.menu.skills.FlaskView;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.DeviceType;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.dto.PlatformType;
-import ru.rknrl.dto.PlayerId;
-import ru.rknrl.dto.SkillType;
-import ru.rknrl.dto.SlotId;
 
 public class MainBotBase extends Sprite {
     [Embed(source="/locale - RU.tsv", mimeType="application/octet-stream")]
@@ -54,13 +55,13 @@ public class MainBotBase extends Sprite {
     private var policyPort:int;
     private var httpPort:int;
     private var accountId:AccountId;
-    private var authenticationSecret:AuthenticationSecretDTO;
+    private var authenticationSecret:AuthenticationSecret;
     private var social:ISocial;
 
     private var myUserInfo:UserInfo;
     private var main:Main;
 
-    public function MainBotBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountId, authenticationSecret:AuthenticationSecretDTO, social:ISocial) {
+    public function MainBotBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountId, authenticationSecret:AuthenticationSecret, social:ISocial) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;

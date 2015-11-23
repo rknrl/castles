@@ -10,12 +10,10 @@ package ru.rknrl.castles.database
 
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
+import protos.AccountType.DEV
+import protos.{AccountId, TutorState}
 import ru.rknrl.castles.database.Database.{GetTutorState, TutorStateResponse}
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, TutorStateDTO}
 import ru.rknrl.test.ActorsTest
-
-import scala.concurrent.duration._
 
 class DatabaseQueueTest extends ActorsTest {
 
@@ -46,8 +44,8 @@ class DatabaseQueueTest extends ActorsTest {
     database.send(queue, TutorStateResponse(accountId1, None))
     client2.expectMsg(TutorStateResponse(accountId1, None))
 
-    database.send(queue, TutorStateResponse(accountId2, Some(TutorStateDTO())))
-    client1.expectMsg(TutorStateResponse(accountId2, Some(TutorStateDTO())))
+    database.send(queue, TutorStateResponse(accountId2, Some(TutorState())))
+    client1.expectMsg(TutorStateResponse(accountId2, Some(TutorState())))
 
     // accountId again
 

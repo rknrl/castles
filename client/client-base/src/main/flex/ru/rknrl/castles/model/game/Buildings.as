@@ -8,11 +8,11 @@
 
 package ru.rknrl.castles.model.game {
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.CellSize;
-import ru.rknrl.dto.PlayerId;
+import protos.BuildingId;
+import protos.BuildingLevel;
+import protos.BuildingType;
+import protos.CellSize;
+import protos.PlayerId;
 
 public class Buildings {
     private static const mouseAreaRadius:Number = CellSize.SIZE.id() * 2 / 3;

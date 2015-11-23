@@ -8,13 +8,15 @@
 
 package ru.rknrl.castlesbot
 
-import akka.actor.{ActorSystem, Props}
-import ru.rknrl.dto.AccountId
-import ru.rknrl.dto.AccountType.DEV
+import akka.actor.ActorSystem
+import generated.Serializer
+import protos.AccountId
+import protos.AccountType.DEV
+import ru.rknrl.rpc.Connection
 
 object BotMain {
   val host = "localhost"
-//  val host = "dev.rknrl.ru"
+  //  val host = "dev.rknrl.ru"
   val port = 2335
   val count = 100
 
@@ -23,6 +25,6 @@ object BotMain {
 
     implicit val system = ActorSystem("main-actor-system")
     for (i ← 1 to count)
-      system.actorOf(Props(classOf[BotConnection], host, port, AccountId(DEV, i.toString)), "bot-connection-" + i)
+      system.actorOf(Connection.props(host, port, server ⇒ Bot.props(server, AccountId(DEV, i.toString)), new Serializer), "bot-connection-" + i)
   }
 }

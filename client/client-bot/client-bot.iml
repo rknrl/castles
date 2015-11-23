@@ -5,9 +5,6 @@
       <configuration name="client-bot" pure-as="true" main-class="ru.rknrl.castles.MainBotStandalone" output-file="client-bot.swf" output-folder="$MODULE_DIR$/target">
         <dependencies target-player="10.1">
           <entries>
-            <entry module-name="aslog" build-configuration-name="aslog">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="asocial-web" build-configuration-name="web">
               <dependency linkage="Merged" />
             </entry>
@@ -20,10 +17,13 @@
             <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="dto-client" build-configuration-name="dto-core-client">
+            <entry library-name="protobuf-as3" library-level="application">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="rmi-client" build-configuration-name="rmi-core-client">
+            <entry library-name="protobuf-rpc" library-level="application">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry module-name="common-as3" build-configuration-name="common-as3">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -48,9 +48,9 @@
     <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
     <orderEntry type="module" module-name="asocial-base" exported="" />
-    <orderEntry type="module" module-name="aslog" exported="" />
     <orderEntry type="module" module-name="asocial-web" exported="" />
-    <orderEntry type="module" module-name="dto-client" exported="" />
-    <orderEntry type="module" module-name="rmi-client" exported="" />
+    <orderEntry type="library" exported="" name="protobuf-as3" level="application" />
+    <orderEntry type="library" exported="" name="protobuf-rpc" level="application" />
+    <orderEntry type="module" module-name="common-as3" exported="" />
   </component>
 </module>

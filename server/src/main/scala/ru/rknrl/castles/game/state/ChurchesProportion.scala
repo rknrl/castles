@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.game.state
 
+import protos.BuildingType.CHURCH
+import protos.PlayerId
 import ru.rknrl.castles.game.GameConfig
-import ru.rknrl.dto.BuildingType.CHURCH
-import ru.rknrl.dto.PlayerId
 
 class ChurchesProportion(val map: Map[PlayerId, Double]) {
 

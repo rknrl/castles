@@ -23,7 +23,7 @@ import ru.rknrl.castles.view.utils.tutor.commands.ITutorCommand;
 import ru.rknrl.castles.view.utils.tutor.commands.Move;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.core.points.Points;
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 import ru.rknrl.easers.IEaser;
 import ru.rknrl.easers.Linear;
 import ru.rknrl.easers.interpolate;

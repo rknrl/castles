@@ -7,8 +7,8 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.userInfo {
-import ru.rknrl.dto.PlayerDTO;
-import ru.rknrl.dto.PlayerId;
+import protos.Player;
+import protos.PlayerId;
 
 public class PlayerInfo {
     private var _playerId:PlayerId;
@@ -28,13 +28,13 @@ public class PlayerInfo {
         _info = info;
     }
 
-    public static function fromDto(dto:PlayerDTO):PlayerInfo {
+    public static function fromDto(dto:Player):PlayerInfo {
         return new PlayerInfo(dto.id, CastlesUserInfo.fromDto(dto.info));
     }
 
-    public static function fromDtoVector(vector:Vector.<PlayerDTO>):Vector.<PlayerInfo> {
+    public static function fromDtoVector(vector:Vector.<Player>):Vector.<PlayerInfo> {
         const result:Vector.<PlayerInfo> = new <PlayerInfo>[];
-        for each(var dto:PlayerDTO in vector) {
+        for each(var dto:Player in vector) {
             result.push(fromDto(dto))
         }
         return result;

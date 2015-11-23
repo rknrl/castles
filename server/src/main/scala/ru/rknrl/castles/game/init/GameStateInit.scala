@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles.game.init
 
+import protos.{SlotsOrientation, SlotsPos}
 import ru.rknrl.Assertion
 import ru.rknrl.castles.account.IJ
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.init.GameArea.PlayerIdToSlotsPositions
 import ru.rknrl.castles.game.state._
-import ru.rknrl.dto.{SlotsOrientation, SlotsPosDTO}
 
 object GameStateInit {
   def getPlayerBuildings(players: List[Player], playersSlotsPositions: PlayerIdToSlotsPositions, buildingIdIterator: BuildingIdIterator, config: GameConfig) =
@@ -44,7 +44,7 @@ object GameStateInit {
       yield {
         val id = player.id.id
         val pos = positions(id)
-        SlotsPosDTO(
+        SlotsPos(
           player.id,
           pos.centerXY.dto,
           orientations(id)

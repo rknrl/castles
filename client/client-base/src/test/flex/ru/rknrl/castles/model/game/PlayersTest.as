@@ -11,9 +11,10 @@ import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 
+import protos.PlayerId;
+
 import ru.rknrl.castles.model.DtoMock;
 import ru.rknrl.core.kit.assertVectors;
-import ru.rknrl.dto.PlayerId;
 
 public class PlayersTest {
     private const players2:Players = new Players(DtoMock.playerInfosPortrait(), DtoMock.playerId(0));

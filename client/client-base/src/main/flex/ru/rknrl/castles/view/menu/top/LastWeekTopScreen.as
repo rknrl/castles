@@ -7,23 +7,27 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.view.menu.top {
+import protos.Place;
+
 import flash.display.Bitmap;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.text.TextField;
 
+import protos.Top;
+
 import ru.rknrl.castles.model.events.AcceptTopEvent;
-import ru.rknrl.castles.model.menu.top.Top;
+import ru.rknrl.castles.model.menu.top.TopUtils;
+import ru.rknrl.castles.model.menu.top.TopUtils;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.Fonts;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.core.points.Point;
-import ru.rknrl.dto.PlaceDTO;
 import ru.rknrl.loaders.ILoadImageManager;
-import ru.rknrl.utils.Align;
-import ru.rknrl.utils.createTextField;
+import ru.rknrl.display.Align;
+import ru.rknrl.display.createTextField;
 
 public class LastWeekTopScreen extends Sprite {
     private static const topSize:int = 5;
@@ -38,7 +42,7 @@ public class LastWeekTopScreen extends Sprite {
 
     private var title:Sprite;
 
-    public function LastWeekTopScreen(top:Top, place:PlaceDTO, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
+    public function LastWeekTopScreen(top:Top, place:Place, layout:Layout, locale:CastlesLocale, loadImageManager:ILoadImageManager) {
         this.loadImageManager = loadImageManager;
         _layout = layout;
 
@@ -63,7 +67,7 @@ public class LastWeekTopScreen extends Sprite {
         addEventListener(MouseEvent.MOUSE_DOWN, onClick);
     }
 
-    public function set place(value:PlaceDTO):void {
+    public function set place(value:Place):void {
         placeTextField.text = value ? "Вы заняли " + value.place.toNumber() + " место" : "Вы не играли на прошлой неделе";
         alignPlace();
     }
@@ -78,7 +82,7 @@ public class LastWeekTopScreen extends Sprite {
 
         for (var i:int = 1; i <= topSize; i++) {
             const avatarBitmapSize:Number = Layout.itemSize * _layout.bitmapDataScale;
-            const photoUrl:String = value.getPlace(i).info.getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
+            const photoUrl:String = TopUtils.getPlace(value, i).getPhotoUrl(avatarBitmapSize, avatarBitmapSize);
             const avatar:FlyAvatar = new FlyAvatar(photoUrl, _layout.bitmapDataScale, loadImageManager, Colors.top(i));
             avatars.push(avatar);
             avatarsHolder.addChild(avatar);

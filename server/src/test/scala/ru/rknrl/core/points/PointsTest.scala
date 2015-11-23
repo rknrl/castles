@@ -9,8 +9,8 @@
 package ru.rknrl.core.points
 
 import org.scalatest.{Matchers, WordSpec}
+import protos.PointDTO
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.dto.PointDTO
 
 class PointsTest extends WordSpec with Matchers {
 

@@ -14,7 +14,7 @@ import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.Event;
 
-import ru.rknrl.BitmapUtils;
+import ru.rknrl.display.BitmapUtils;
 import ru.rknrl.castles.view.Colors;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.utils.LockView;

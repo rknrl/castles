@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.game.state
 
+import protos.{BuildingId, PlayerId}
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.{BuildingId, PlayerId}
 
 object Assistance {
   def castToUnit(cast: (Player, BuildingId),

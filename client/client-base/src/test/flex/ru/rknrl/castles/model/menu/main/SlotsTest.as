@@ -12,21 +12,22 @@ import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 
+import protos.BuildingLevel;
+import protos.BuildingPrototype;
+import protos.BuildingType;
+import protos.Slot;
+import protos.SlotId;
+
 import ru.rknrl.castles.model.DtoMock;
-import ru.rknrl.dto.BuildingLevel;
-import ru.rknrl.dto.BuildingPrototype;
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.SlotDTO;
-import ru.rknrl.dto.SlotId;
 
 public class SlotsTest {
-    private const slot1:SlotDTO = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_2));
-    private const slot2:SlotDTO = DtoMock.slot(SlotId.SLOT_2, null);
-    private const slot3:SlotDTO = DtoMock.slot(SlotId.SLOT_3, DtoMock.buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1));
-    private const slot4:SlotDTO = DtoMock.slot(SlotId.SLOT_4, null);
-    private const slot5:SlotDTO = DtoMock.slot(SlotId.SLOT_5, DtoMock.buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1));
+    private const slot1:Slot = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_2));
+    private const slot2:Slot = DtoMock.slot(SlotId.SLOT_2, null);
+    private const slot3:Slot = DtoMock.slot(SlotId.SLOT_3, DtoMock.buildingPrototype(BuildingType.TOWER, BuildingLevel.LEVEL_1));
+    private const slot4:Slot = DtoMock.slot(SlotId.SLOT_4, null);
+    private const slot5:Slot = DtoMock.slot(SlotId.SLOT_5, DtoMock.buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1));
 
-    private const slots:Vector.<SlotDTO> = new <SlotDTO>[slot1, slot2, slot3, slot4, slot5];
+    private const slots:Vector.<Slot> = new <Slot>[slot1, slot2, slot3, slot4, slot5];
 
     [Test("buildingsCount")]
     public function t0():void {
@@ -43,7 +44,7 @@ public class SlotsTest {
 
     [Test("getSlot invalid", expects="Error")]
     public function t2():void {
-        new Slots(new <SlotDTO>[]).getSlot(SlotId.SLOT_1);
+        new Slots(new <Slot>[]).getSlot(SlotId.SLOT_1);
     }
 
     [Test("getEmptySlot")]
@@ -55,7 +56,7 @@ public class SlotsTest {
     public function t3a():void {
         const prototype:BuildingPrototype = DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_2);
 
-        const slots:Vector.<SlotDTO> = new <SlotDTO>[
+        const slots:Vector.<Slot> = new <Slot>[
             DtoMock.slot(SlotId.SLOT_1, prototype),
             DtoMock.slot(SlotId.SLOT_2, prototype),
             DtoMock.slot(SlotId.SLOT_3, prototype),
@@ -73,7 +74,7 @@ public class SlotsTest {
 
     [Test('getNotEmprtSlot invalid', expects="Error")]
     public function t4a():void {
-        const slots:Vector.<SlotDTO> = new <SlotDTO>[
+        const slots:Vector.<Slot> = new <Slot>[
             DtoMock.slot(SlotId.SLOT_1, null),
             DtoMock.slot(SlotId.SLOT_2, null),
             DtoMock.slot(SlotId.SLOT_3, null),
@@ -102,10 +103,10 @@ public class SlotsTest {
 
     [Test("equals")]
     public function t6():void {
-        const a:SlotDTO = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1));
-        const b:SlotDTO = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_2));
-        const c:SlotDTO = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1));
-        const empty:SlotDTO = DtoMock.slot(SlotId.SLOT_1, null);
+        const a:Slot = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_1));
+        const b:Slot = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.CHURCH, BuildingLevel.LEVEL_2));
+        const c:Slot = DtoMock.slot(SlotId.SLOT_1, DtoMock.buildingPrototype(BuildingType.HOUSE, BuildingLevel.LEVEL_1));
+        const empty:Slot = DtoMock.slot(SlotId.SLOT_1, null);
 
         assertTrue(Slots.equals(a, a));
         assertTrue(Slots.equals(empty, empty));

@@ -8,12 +8,12 @@
 
 package ru.rknrl.castles.game.state
 
-import ru.rknrl.dto.{MoveDTO, PlayerId}
+import protos.PlayerId
 
 object Moving {
   /**
-   * Сколько юнитов выйдут из здания
-   */
+    * Сколько юнитов выйдут из здания
+    */
   def unitsToExit(buildingPopulation: Double): Int =
     Math.floor(buildingPopulation * 0.5).toInt
 
@@ -33,7 +33,7 @@ object Moving {
 
   case class Move(playerId: PlayerId, fromBuilding: Building, toBuilding: Building)
 
-  def convert(moveActions: Map[PlayerId, MoveDTO], buildings: Iterable[Building]) =
+  def convert(moveActions: Map[PlayerId, protos.Move], buildings: Iterable[Building]) =
     for ((playerId, move) ← moveActions;
          fromBuildingId ← move.fromBuildings)
       yield Move(
@@ -42,7 +42,7 @@ object Moving {
         toBuilding = buildings.find(_.id == move.toBuilding).get
       )
 
-  def moveActionsToExitUnits(moveActions: Map[PlayerId, MoveDTO], buildings: Iterable[Building], unitIdIterator: UnitIdIterator, time: Long) =
+  def moveActionsToExitUnits(moveActions: Map[PlayerId, protos.Move], buildings: Iterable[Building], unitIdIterator: UnitIdIterator, time: Long) =
     convert(moveActions, buildings)
       .filter(m ⇒ m.fromBuilding.id != m.toBuilding.id)
       .filter(m ⇒ m.fromBuilding.owner.isDefined && m.fromBuilding.owner.get.id == m.playerId)

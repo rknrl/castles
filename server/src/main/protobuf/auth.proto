@@ -1,38 +1,38 @@
-package ru.rknrl.dto;
+package protos;
 
-option java_outer_classname = "AuthDTO";
-
-option optimize_for = SPEED;
-
+import "options.proto";
 import "common.proto";
-
 import "account.proto";
 
-message AuthenticationSecretDTO {
+message AuthenticationSecret {
     required string body = 1;
     optional string params = 2;
     optional string accessToken = 3;
 }
 
-message AuthenticateDTO {
-    required UserInfoDTO userInfo = 1;
+message Authenticate {
+    option (msgid) = 60;
+
+    required UserInfo userInfo = 1;
     required PlatformType platformType = 2;
     required DeviceType deviceType = 3;
-    required AuthenticationSecretDTO secret = 4;
+    required AuthenticationSecret secret = 4;
 }
 
-message AuthenticatedDTO {
-    required AccountStateDTO accountState = 1;
+message Authenticated {
+    option (msgid) = 1;
 
-    required AccountConfigDTO config = 2;
+    required AccountState accountState = 1;
 
-    required TopDTO top = 3;
+    required AccountConfig config = 2;
 
-    optional PlaceDTO place = 4;
+    required Top top = 3;
 
-    repeated ProductDTO products = 5;
+    optional Place place = 4;
 
-    required TutorStateDTO tutor = 6;
+    repeated Product products = 5;
+
+    required TutorState tutor = 6;
 
     // Клиент находится в процессе поиска противников для игры
     required bool searchOpponents = 7;
@@ -40,26 +40,28 @@ message AuthenticatedDTO {
     // Клиент находится в игре
     optional NodeLocator game = 8;
 
-    optional TopDTO lastWeekTop = 9;
+    optional Top lastWeekTop = 9;
 
-    optional PlaceDTO lastWeekPlace = 10;
+    optional Place lastWeekPlace = 10;
 }
 
-message TopDTO {
+message Top {
+    option (msgid) = 22;
+
     required int32 weekNumber = 1;
-    repeated TopUserInfoDTO users = 3;
+    repeated TopUserInfo users = 3;
 }
 
-message WeekNumberDTO {
+message WeekNumber {
     required int32 weekNumber = 1;
 }
 
-message TopUserInfoDTO {
+message TopUserInfo {
     required int32 place = 1;
-    required UserInfoDTO info = 2;
+    required UserInfo info = 2;
 }
 
-message ProductDTO {
+message Product {
     required uint32 id = 1;
     required string title = 2;
     required string description = 3;
@@ -67,4 +69,10 @@ message ProductDTO {
     required int32 count = 5;
     required int32 price = 6;
     required string currency = 7;
+}
+
+message AcceptWeekTop {
+    option (msgid) = 88;
+
+    required WeekNumber weekNumber = 1;
 }

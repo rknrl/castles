@@ -14,7 +14,7 @@ import flash.utils.Dictionary;
 import ru.rknrl.castles.model.game.BuildingOwner;
 import ru.rknrl.core.points.Point;
 import ru.rknrl.castles.view.Colors;
-import ru.rknrl.dto.CellSize;
+import protos.CellSize;
 
 public class Ground extends Sprite {
     private static const cellSize:int = CellSize.SIZE.id();

@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.controller.game {
 import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
-import ru.rknrl.dto.ItemType;
+import protos.ItemType;
 
 public class MagicItems {
     private var view:MagicItemsView;

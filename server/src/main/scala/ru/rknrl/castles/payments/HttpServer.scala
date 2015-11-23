@@ -17,15 +17,13 @@ import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.dto.AccountStateDTO
-import ru.rknrl.logging.ActorLog
-import ru.rknrl.logging.Bugs.Bug
+import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.log.Logging.Bugs.Bug
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
 import spray.routing.HttpService
 
-import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object HttpServer {
@@ -41,12 +39,13 @@ class HttpServer(config: Config,
                  matchmaking: ActorRef,
                  bugs: ActorRef) extends Actor with ActorLog with HttpService {
 
-  val crossdomain = """<?xml version="1.0"?>
-                      |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
-                      |<cross-domain-policy>
-                      |<site-control permitted-cross-domain-policies="master-only"/>
-                      |<allow-access-from domain="*" to-ports="*"/>
-                      |</cross-domain-policy>""".stripMargin
+  val crossdomain =
+    """<?xml version="1.0"?>
+      |<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
+      |<cross-domain-policy>
+      |<site-control permitted-cross-domain-policies="master-only"/>
+      |<allow-access-from domain="*" to-ports="*"/>
+      |</cross-domain-policy>""".stripMargin
 
   implicit val UTF8StringMarshaller =
     Marshaller.of[String](ContentType(`text/plain`, HttpCharsets.`UTF-8`)) { (value, contentType, ctx) ⇒
@@ -119,7 +118,7 @@ class HttpServer(config: Config,
           } else {
             log.info("ApplyProduct")
 
-            val transform = (stateOption: Option[AccountStateDTO]) ⇒ {
+            val transform = (stateOption: Option[protos.AccountState]) ⇒ {
               val state = stateOption.getOrElse(config.account.initState)
               AccountState.applyProduct(state, product, productInfo.count)
             }

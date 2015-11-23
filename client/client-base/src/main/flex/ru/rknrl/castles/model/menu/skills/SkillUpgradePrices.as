@@ -7,17 +7,17 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model.menu.skills {
-import ru.rknrl.dto.SkillUpgradePriceDTO;
+import protos.SkillUpgradePrice;
 
 public class SkillUpgradePrices {
-    private var prices:Vector.<SkillUpgradePriceDTO>;
+    private var prices:Vector.<SkillUpgradePrice>;
 
-    function SkillUpgradePrices(prices:Vector.<SkillUpgradePriceDTO>) {
+    function SkillUpgradePrices(prices:Vector.<SkillUpgradePrice>) {
         this.prices = prices;
     }
 
     public function getPrice(totalLevel:int):int {
-        for each(var price:SkillUpgradePriceDTO in prices) {
+        for each(var price:SkillUpgradePrice in prices) {
             if (price.totalLevel == totalLevel) return price.price;
         }
         throw new Error("can't find skill upgrade price for level " + totalLevel)

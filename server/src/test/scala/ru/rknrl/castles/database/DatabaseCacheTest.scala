@@ -10,12 +10,11 @@ package ru.rknrl.castles.database
 
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
+import protos.AccountType.DEV
+import protos._
 import ru.rknrl.castles.database.Database._
-import ru.rknrl.castles.database.TestDatabase.GetUserInfo
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.dto.AccountType.DEV
-import ru.rknrl.dto.{AccountId, TutorStateDTO, UserInfoDTO}
 import ru.rknrl.test.ActorsTest
 
 class DatabaseCacheTest extends ActorsTest {
@@ -65,8 +64,8 @@ class DatabaseCacheTest extends ActorsTest {
     val databaseCache = newDatabaseCache(database.ref)
     val accountId = AccountId(DEV, "1")
 
-    val tutorState = TutorStateDTO()
-    val newTutorState = TutorStateDTO(navigate = Some(true))
+    val tutorState = TutorState()
+    val newTutorState = TutorState(navigate = Some(true))
 
     // при первом запросе запрашиваем у бд
 
@@ -120,8 +119,8 @@ class DatabaseCacheTest extends ActorsTest {
 
       // update
 
-      client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfoDTO(accountId)))
-      database.expectMsg(UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfoDTO(accountId)))
+      client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfo(accountId)))
+      database.expectMsg(UpdateRating(accountId, weekNumber = weekNumber, newRating, UserInfo(accountId)))
       database.reply(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(newRating)))
       client.expectMsg(RatingResponse(accountId, weekNumber = weekNumber, rating = Some(newRating)))
 
@@ -144,11 +143,11 @@ class DatabaseCacheTest extends ActorsTest {
     def test(weekNumber: Int): Unit = {
       val top = Top(
         Seq(
-          TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-          TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfoDTO(AccountId(DEV, "2"))),
-          TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-          TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-          TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+          TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+          TopUser(AccountId(DEV, "2"), rating = 1400, info = UserInfo(AccountId(DEV, "2"))),
+          TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+          TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+          TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
         ),
         weekNumber = weekNumber
       )
@@ -169,8 +168,8 @@ class DatabaseCacheTest extends ActorsTest {
 
       val accountId = AccountId(DEV, "2")
 
-      client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating = 2000, UserInfoDTO(accountId)))
-      database expectMsg UpdateRating(accountId, weekNumber = weekNumber, 2000, UserInfoDTO(accountId))
+      client.send(databaseCache, UpdateRating(accountId, weekNumber = weekNumber, newRating = 2000, UserInfo(accountId)))
+      database expectMsg UpdateRating(accountId, weekNumber = weekNumber, 2000, UserInfo(accountId))
       database reply RatingResponse(accountId, weekNumber = weekNumber, rating = Some(2000))
       client expectMsg RatingResponse(accountId, weekNumber = weekNumber, rating = Some(2000))
 
@@ -179,11 +178,11 @@ class DatabaseCacheTest extends ActorsTest {
       client.send(databaseCache, GetTop(weekNumber = weekNumber))
       client.expectMsg(Top(
         Seq(
-          TopUser(AccountId(DEV, "2"), rating = 2000, info = UserInfoDTO(AccountId(DEV, "2"))),
-          TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfoDTO(AccountId(DEV, "1"))),
-          TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfoDTO(AccountId(DEV, "3"))),
-          TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfoDTO(AccountId(DEV, "4"))),
-          TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfoDTO(AccountId(DEV, "5")))
+          TopUser(AccountId(DEV, "2"), rating = 2000, info = UserInfo(AccountId(DEV, "2"))),
+          TopUser(AccountId(DEV, "1"), rating = 1500, info = UserInfo(AccountId(DEV, "1"))),
+          TopUser(AccountId(DEV, "3"), rating = 1300, info = UserInfo(AccountId(DEV, "3"))),
+          TopUser(AccountId(DEV, "4"), rating = 1200, info = UserInfo(AccountId(DEV, "4"))),
+          TopUser(AccountId(DEV, "5"), rating = 1100, info = UserInfo(AccountId(DEV, "5")))
         ),
         weekNumber = weekNumber
       ))
@@ -212,7 +211,7 @@ class DatabaseCacheTest extends ActorsTest {
     val databaseCache = newDatabaseCache(database.ref)
     val accountId = AccountId(DEV, "1")
 
-    val userInfo = UserInfoDTO(accountId)
+    val userInfo = UserInfo(accountId)
     client.send(databaseCache, UpdateUserInfo(accountId, userInfo))
     database.expectMsg(UpdateUserInfo(accountId, userInfo))
     database.reply(UserInfoResponse(accountId, Some(userInfo)))

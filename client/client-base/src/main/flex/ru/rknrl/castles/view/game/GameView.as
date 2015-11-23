@@ -26,8 +26,8 @@ import ru.rknrl.castles.view.game.ui.magicItems.MagicItemsView;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.locale.CastlesLocale;
 import ru.rknrl.castles.view.menu.factory.DeviceFactory;
-import ru.rknrl.dto.BuildingId;
-import ru.rknrl.dto.PlayerId;
+import protos.BuildingId;
+import protos.PlayerId;
 import ru.rknrl.loaders.ILoadImageManager;
 
 public class GameView extends Sprite {

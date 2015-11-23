@@ -1,9 +1,8 @@
-package ru.rknrl.dto;
-
-option java_outer_classname = "GameDTO";
+package protos;
 
 option optimize_for = SPEED;
 
+import "options.proto";
 import "common.proto";
 
 enum CellSize {
@@ -22,9 +21,9 @@ message PlayerId {
     required int32 id = 1;
 }
 
-message PlayerDTO {
+message Player {
     required PlayerId id = 1;
-    required UserInfoDTO info = 2;
+    required UserInfo info = 2;
 }
 
 message PointDTO {
@@ -34,31 +33,45 @@ message PointDTO {
 
 // server -> client
 
-message GameStateDTO {
+message EnteredGame {
+    option (msgid) = 21;
+
+    required NodeLocator node = 1;
+}
+
+message LeavedGame {
+    option (msgid) = 31;
+}
+
+message GameState {
+    option (msgid) = 30;
+
     required int32 width = 1;
     required int32 height = 2;
-    repeated PlayerDTO players = 3;
-    repeated SlotsPosDTO slots = 4;
+    repeated Player players = 3;
+    repeated SlotsPos slots = 4;
     required PlayerId selfId = 5;
     repeated BuildingDTO buildings = 6;
     repeated UnitDTO units = 7;
-    repeated FireballDTO fireballs = 8;
-    repeated TornadoDTO tornadoes = 9;
-    repeated VolcanoDTO volcanoes = 10;
-    repeated BulletDTO bullets = 11;
+    repeated Fireball fireballs = 8;
+    repeated Tornado tornadoes = 9;
+    repeated Volcano volcanoes = 10;
+    repeated Bullet bullets = 11;
     required ItemStatesDTO itemStates = 12;
-    repeated GameOverDTO gameOvers = 13;
+    repeated GameOver gameOvers = 13;
 }
 
-message GameStateUpdateDTO {
-    repeated BuildingUpdateDTO buildingUpdates = 1;
+message GameStateUpdate {
+    option (msgid) = 40;
+
+    repeated BuildingUpdate buildingUpdates = 1;
     repeated UnitDTO newUnits = 2;
-    repeated UnitUpdateDTO unitUpdates = 3;
+    repeated UnitUpdate unitUpdates = 3;
     repeated UnitId killUnits = 4;
-    repeated FireballDTO newFireballs = 5;
-    repeated TornadoDTO newTornadoes = 6;
-    repeated VolcanoDTO newVolcanoes = 7;
-    repeated BulletDTO newBullets = 8;
+    repeated Fireball newFireballs = 5;
+    repeated Tornado newTornadoes = 6;
+    repeated Volcano newVolcanoes = 7;
+    repeated Bullet newBullets = 8;
     repeated ItemStatesDTO itemStatesUpdates = 9;
 }
 
@@ -69,7 +82,7 @@ enum SlotsOrientation {
     BOTTOM_RIGHT = 4;
 }
 
-message SlotsPosDTO {
+message SlotsPos {
     required PlayerId playerId = 1;
     required PointDTO pos = 2;
     required SlotsOrientation orientation = 3;
@@ -84,7 +97,7 @@ message BuildingDTO {
     required bool strengthened = 6;
 }
 
-message BuildingUpdateDTO {
+message BuildingUpdate {
     required BuildingId id = 1;
     required int32 population = 2;
     optional PlayerId owner = 3;
@@ -102,34 +115,36 @@ message UnitDTO {
     required bool strengthened = 8;
 }
 
-message UnitUpdateDTO {
+message UnitUpdate {
     required UnitId id = 1;
     required int32 count = 4;
 }
 
-message FireballDTO {
+message Fireball {
     required PointDTO pos = 1;
     required int32 millisTillSplash = 2;
 }
 
-message VolcanoDTO {
+message Volcano {
     required PointDTO pos = 1;
     required int32 millisTillEnd = 2;
 }
 
-message TornadoDTO {
+message Tornado {
     repeated PointDTO points = 1;
     required int32 millisFromStart = 3;
     required int32 millisTillEnd = 4;
 }
 
-message BulletDTO {
+message Bullet {
     required BuildingId buildingId = 1;
     required UnitId unitId = 2;
     required int32 duration = 3;
 }
 
-message GameOverDTO {
+message GameOver {
+    option (msgid) = 41;
+
     required PlayerId playerId = 1;
     required int32 place = 3;
     required int32 reward = 4;
@@ -149,11 +164,51 @@ message ItemStateDTO {
 
 // client -> server
 
-message MoveDTO {
+message JoinGame {
+    option (msgid) = 95;
+}
+
+message Surrender {
+    option (msgid) = 96;
+}
+
+message LeaveGame {
+    option (msgid) = 97;
+}
+
+message Move {
+    option (msgid) = 100;
+
     repeated BuildingId fromBuildings = 1;
     required BuildingId toBuilding = 2;
 }
 
-message CastTornadoDTO {
+message CastFireball {
+    option (msgid) = 101;
+
+    required PointDTO points = 1;
+}
+
+message CastStrengthening {
+    option (msgid) = 102;
+
+    required BuildingId buildingId = 1;
+}
+
+message CastVolcano {
+    option (msgid) = 103;
+
+    required PointDTO points = 1;
+}
+
+message CastTornado {
+    option (msgid) = 104;
+
     repeated PointDTO points = 1;
+}
+
+message CastAssistance {
+    option (msgid) = 105;
+
+    required BuildingId buildingId = 1;
 }

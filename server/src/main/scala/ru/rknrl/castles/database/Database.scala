@@ -13,11 +13,11 @@ import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, ResultSet, RowData}
+import protos._
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction.{Request, Response}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.dto._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.log.Logging.ActorLog
 
 class DbConfiguration(username: String,
                       host: String,
@@ -50,23 +50,23 @@ object Database {
 
   case class GetAccountState(accountId: AccountId) extends Request
 
-  case class AccountStateResponse(accountId: AccountId, state: Option[AccountStateDTO]) extends Response
+  case class AccountStateResponse(accountId: AccountId, state: Option[AccountState]) extends Response
 
-  case class UpdateAccountState(accountId: AccountId, newState: AccountStateDTO) extends Request
+  case class UpdateAccountState(accountId: AccountId, newState: AccountState) extends Request
 
 
   case class GetRating(accountId: AccountId, weekNumber: Int) extends Request
 
   case class RatingResponse(accountId: AccountId, weekNumber: Int, rating: Option[Double]) extends Response
 
-  case class UpdateRating(accountId: AccountId, weekNumber: Int, newRating: Double, userInfoDTO: UserInfoDTO) extends Request
+  case class UpdateRating(accountId: AccountId, weekNumber: Int, newRating: Double, userInfoDTO: UserInfo) extends Request
 
 
   case class GetTutorState(accountId: AccountId) extends Request
 
-  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorStateDTO]) extends Response
+  case class TutorStateResponse(accountId: AccountId, tutorState: Option[TutorState]) extends Response
 
-  case class UpdateTutorState(accountId: AccountId, newTutorState: TutorStateDTO) extends Request
+  case class UpdateTutorState(accountId: AccountId, newTutorState: TutorState) extends Request
 
 
   case class GetPlace(rating: Double, weekNumber: Int)
@@ -74,9 +74,9 @@ object Database {
   case class PlaceResponse(rating: Double, weekNumber: Int, place: Long)
 
 
-  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfoDTO) extends Request
+  case class UpdateUserInfo(accountId: AccountId, userInfo: UserInfo) extends Request
 
-  case class UserInfoResponse(accountId: AccountId, userInfo: Option[UserInfoDTO]) extends Response
+  case class UserInfoResponse(accountId: AccountId, userInfo: Option[UserInfo]) extends Response
 
 }
 
@@ -190,12 +190,12 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
 
   def rowDataToAccountState(row: RowData) = {
     val byteArray = row("state").asInstanceOf[Array[Byte]]
-    AccountStateDTO.parseFrom(byteArray)
+    AccountState.parseFrom(byteArray)
   }
 
   def rowDataToTutorState(row: RowData) = {
     val byteArray = row("state").asInstanceOf[Array[Byte]]
-    TutorStateDTO.parseFrom(byteArray)
+    TutorState.parseFrom(byteArray)
   }
 
   def rowDataToRating(row: RowData) =
@@ -208,10 +208,10 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
     val rating = rowData(1).asInstanceOf[Double]
 
     val userInfo = if (rowData(2) == null)
-      UserInfoDTO(id)
+      UserInfo(id)
     else {
       val userInfoByteArray = rowData(2).asInstanceOf[Array[Byte]]
-      UserInfoDTO.parseFrom(userInfoByteArray)
+      UserInfo.parseFrom(userInfoByteArray)
     }
 
     TopUser(id, rating, userInfo)
@@ -224,7 +224,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
           onWrite()
         else
           log.error("Invalid rows affected count " + queryResult)
-    ) onFailure {
+      ) onFailure {
       case t: Throwable ⇒ log.error("Database error", t)
     }
 
@@ -234,7 +234,7 @@ class Database(configuration: DbConfiguration) extends Actor with ActorLog {
         case Some(resultSet) ⇒ onRead(resultSet)
         case None ⇒ log.error("Get none " + queryResult)
       }
-    ) onFailure {
+      ) onFailure {
       case t: Throwable ⇒ log.error("Database error", t)
     }
 }

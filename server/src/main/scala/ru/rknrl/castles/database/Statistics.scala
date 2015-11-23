@@ -8,9 +8,9 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{ActorContext, ActorRef}
-import ru.rknrl.castles.matchmaking.MatchMaking.{GameInfo, GameOrder}
-import ru.rknrl.dto._
+import akka.actor.ActorRef
+import protos._
+import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 
 object Statistics {
   def buyItem(itemType: ItemType) =

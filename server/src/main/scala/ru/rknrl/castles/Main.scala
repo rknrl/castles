@@ -8,25 +8,28 @@
 
 package ru.rknrl.castles
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.io.{IO, Tcp}
-import net.liftweb.json._
+import generated.Serializer
+import net.liftweb.json.{DefaultFormats, JsonParser}
 import ru.rknrl.PolicyServer
-import ru.rknrl.castles.account.SecretChecker
-import ru.rknrl.castles.admin.AdminTcpServer
+import ru.rknrl.castles.account.{Account, SecretChecker}
+import ru.rknrl.castles.admin.Admin
 import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
 import ru.rknrl.castles.database.{Database, DatabaseCache, DatabaseQueue, DatabaseTransaction}
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
-import ru.rknrl.logging.Bugs
+import ru.rknrl.log.Logging.Bugs
+import ru.rknrl.rpc.Server
 import spray.can.Http
 
 import scala.concurrent.duration._
 import scala.io.Source
 
 object Main {
+
   implicit val formats = DefaultFormats + new BuildingPricesSerializer + new SkillUpgradePricesSerializer
 
   def main(configPaths: Array[String]): Unit = {
@@ -72,7 +75,15 @@ object Main {
 
     val tcp = IO(Tcp)
     system.actorOf(PolicyServer.props(tcp, config.host, config.policyPort), "policy-server")
-    system.actorOf(AdminTcpServer.props(tcp, config, databaseQueue, matchmaking), "admin-server")
-    system.actorOf(TcpServer.props(tcp, config, matchmaking, databaseQueue, graphite, secretChecker, calendar), "tcp-server")
+
+    system.actorOf(Server.props(config.host, config.adminPort,
+      client ⇒ Admin.props(client, databaseQueue, matchmaking, config),
+      new Serializer),
+      "admin-server")
+
+    system.actorOf(Server.props(config.host, config.gamePort,
+      client ⇒ Account.props(matchmaking, secretChecker, databaseQueue, graphite, config, calendar),
+      new Serializer),
+      "tcp-server")
   }
 }

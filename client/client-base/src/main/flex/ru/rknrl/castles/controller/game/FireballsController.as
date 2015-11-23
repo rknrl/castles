@@ -21,7 +21,7 @@ public class FireballsController extends GameObjectsController {
     private var explosionsFactory:GameObjectViewFactory;
 
     public function FireballsController(fireballsLayer:Sprite,
-                                         explosionsLayer:Sprite, explosionsFactory:GameObjectViewFactory) {
+                                        explosionsLayer:Sprite, explosionsFactory:GameObjectViewFactory) {
         this.explosionsFactory = explosionsFactory;
         explosions = new GameObjectsController(explosionsLayer);
         super(fireballsLayer);

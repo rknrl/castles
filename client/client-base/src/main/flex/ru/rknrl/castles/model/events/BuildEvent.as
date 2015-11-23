@@ -9,8 +9,8 @@
 package ru.rknrl.castles.model.events {
 import flash.events.Event;
 
-import ru.rknrl.dto.BuildingType;
-import ru.rknrl.dto.SlotId;
+import protos.BuildingType;
+import protos.SlotId;
 
 public class BuildEvent extends Event {
     public static const BUILD:String = "build";

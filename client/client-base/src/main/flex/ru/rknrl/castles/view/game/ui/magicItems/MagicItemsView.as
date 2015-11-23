@@ -13,8 +13,8 @@ import flash.events.MouseEvent;
 
 import ru.rknrl.castles.model.events.MagicItemClickEvent;
 import ru.rknrl.castles.view.layout.Layout;
-import ru.rknrl.dto.ItemType;
-import ru.rknrl.utils.Align;
+import protos.ItemType;
+import ru.rknrl.display.Align;
 
 public class MagicItemsView extends Sprite {
     private var holder:Sprite = new Sprite();

@@ -13,17 +13,18 @@ import flash.events.UncaughtErrorEvent;
 import flash.system.Security;
 import flash.utils.ByteArray;
 
-import ru.rknrl.Log;
+import protos.AccountId;
+import protos.AuthenticationSecret;
+import protos.DeviceType;
+import protos.PlatformType;
+
+import ru.rknrl.log.Log;
 import ru.rknrl.asocial.ISocial;
 import ru.rknrl.asocial.userInfo.Sex;
 import ru.rknrl.asocial.userInfo.UserInfo;
 import ru.rknrl.castles.view.layout.Layout;
 import ru.rknrl.castles.view.layout.LayoutLandscape;
 import ru.rknrl.castles.view.menu.factory.CanvasFactory;
-import ru.rknrl.dto.AccountId;
-import ru.rknrl.dto.AuthenticationSecretDTO;
-import ru.rknrl.dto.DeviceType;
-import ru.rknrl.dto.PlatformType;
 
 public class MainWebBase extends Sprite {
     [Embed(source="/locale - RU.tsv", mimeType="application/octet-stream")]
@@ -34,13 +35,13 @@ public class MainWebBase extends Sprite {
     private var policyPort:int;
     private var httpPort:int;
     private var accountId:AccountId;
-    private var authenticationSecret:AuthenticationSecretDTO;
+    private var authenticationSecret:AuthenticationSecret;
     private var social:ISocial;
 
     private var myUserInfo:UserInfo;
     private var main:Main;
 
-    public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountId, authenticationSecret:AuthenticationSecretDTO, social:ISocial) {
+    public function MainWebBase(host:String, gamePort:int, policyPort:int, httpPort:int, accountId:AccountId, authenticationSecret:AuthenticationSecret, social:ISocial) {
         this.host = host;
         this.gamePort = gamePort;
         this.policyPort = policyPort;

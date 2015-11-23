@@ -8,15 +8,15 @@
 
 package ru.rknrl.castles.game.game
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef}
 import org.scalatest.{Matchers, WordSpecLike}
+import protos.AccountType.{FACEBOOK, VKONTAKTE}
+import protos.ItemType._
+import protos._
 import ru.rknrl.castles.game.state.{GameItems, GameState}
 import ru.rknrl.castles.game.{BotFactory, Game, IBotFactory}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.core.points.Point
-import ru.rknrl.dto.AccountType.{FACEBOOK, VKONTAKTE}
-import ru.rknrl.dto.ItemType._
-import ru.rknrl.dto._
 import ru.rknrl.test.ActorsTest
 
 import scala.concurrent.duration._
@@ -44,10 +44,10 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
 
   def updateGameState(gameState: GameState,
                       newTime: Long = 1,
-                      moveActions: Map[PlayerId, MoveDTO] = Map.empty,
+                      moveActions: Map[PlayerId, protos.Move] = Map.empty,
                       fireballCasts: Map[PlayerId, PointDTO] = Map.empty,
                       volcanoCasts: Map[PlayerId, PointDTO] = Map.empty,
-                      tornadoCasts: Map[PlayerId, CastTornadoDTO] = Map.empty,
+                      tornadoCasts: Map[PlayerId, CastTornado] = Map.empty,
                       strengtheningCasts: Map[PlayerId, BuildingId] = Map.empty,
                       assistanceCasts: Map[PlayerId, BuildingId] = Map.empty) =
     gameState.update(
@@ -61,11 +61,11 @@ class GameTestSpec extends ActorsTest with WordSpecLike with Matchers {
     )
 
   def initItems = List(
-    ItemDTO(FIREBALL, 4),
-    ItemDTO(TORNADO, 4),
-    ItemDTO(VOLCANO, 4),
-    ItemDTO(STRENGTHENING, 4),
-    ItemDTO(ASSISTANCE, 4)
+    Item(FIREBALL, 4),
+    Item(TORNADO, 4),
+    Item(VOLCANO, 4),
+    Item(STRENGTHENING, 4),
+    Item(ASSISTANCE, 4)
   )
 
   val player0 = playerMock(
