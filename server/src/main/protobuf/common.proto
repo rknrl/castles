@@ -185,26 +185,36 @@ enum SlotId {
 }
 
 enum Slot1Pos {
+    option allow_alias = true;
+
     SLOT_1_X = -1;
     SLOT_1_Y = -1;
 }
 
 enum Slot2Pos {
+    option allow_alias = true;
+
     SLOT_2_X = 1;
     SLOT_2_Y = -1;
 }
 
 enum Slot3Pos {
+    option allow_alias = true;
+
     SLOT_3_X = -2;
     SLOT_3_Y = 0;
 }
 
 enum Slot4Pos {
+    option allow_alias = true;
+
     SLOT_4_X = 0;
     SLOT_4_Y = 0;
 }
 
 enum Slot5Pos {
+    option allow_alias = true;
+
     SLOT_5_X = 2;
     SLOT_5_Y = 0;
 }

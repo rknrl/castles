@@ -13,7 +13,7 @@ import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.database.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.core.Graphite.GraphiteConfig
-import ru.rknrl.core.social.{Product, SocialConfigs}
+import ru.rknrl.core.social.SocialConfigs
 
 class Config(val host: String,
              val staticHost: String,
@@ -28,7 +28,7 @@ class Config(val host: String,
              val clientBugsDir: String,
              val db: DbConfiguration,
              val graphite: GraphiteConfig,
-             val products: List[Product],
+             val products: List[ru.rknrl.core.social.Product],
              val social: SocialConfigs,
              val account: AccountConfig,
              val game: GameConfig) {

@@ -12,7 +12,6 @@ import akka.testkit.TestProbe
 import protos.AccountType.{FACEBOOK, VKONTAKTE}
 import protos._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
-import ru.rknrl.castles.game.state.Moving.Move
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 
 class GameCastsTest extends GameTestSpec {

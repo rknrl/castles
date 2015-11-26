@@ -14,7 +14,9 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
+
+trait GameMsg
 
 object Game {
 

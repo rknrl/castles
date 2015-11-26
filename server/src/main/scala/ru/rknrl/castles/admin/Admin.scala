@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 object Admin {
   def props(client: ActorRef,

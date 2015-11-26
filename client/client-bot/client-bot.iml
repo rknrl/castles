@@ -14,9 +14,6 @@
             <entry module-name="client-base" build-configuration-name="client-base">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="common-client" build-configuration-name="common-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-name="protobuf-as3" library-level="application">
               <dependency linkage="Merged" />
             </entry>
@@ -45,7 +42,6 @@
     </content>
     <orderEntry type="jdk" jdkName="Apache-Flex-Mac" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="client-base" exported="" />
     <orderEntry type="module" module-name="asocial-base" exported="" />
     <orderEntry type="module" module-name="asocial-web" exported="" />

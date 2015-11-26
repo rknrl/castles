@@ -16,7 +16,7 @@ import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import protos.StatAction
 import ru.rknrl.core.Graphite.{GraphiteConfig, Health}
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 object Graphite {
 

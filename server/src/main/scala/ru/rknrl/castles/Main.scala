@@ -21,7 +21,7 @@ import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
-import ru.rknrl.log.Logging.Bugs
+import ru.rknrl.logging.Bugs
 import ru.rknrl.rpc.Server
 import spray.can.Http
 

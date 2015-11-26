@@ -16,7 +16,7 @@ import protos._
 import ru.rknrl.castles.MigrateDatabase1.Migrate
 import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
 import ru.rknrl.castles.database.DbConfiguration
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 object MigrateDatabase1 {
   def main(args: Array[String]) {

@@ -20,7 +20,7 @@ import protos.Authenticate
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.{SecretChecked, _}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 object SecretChecker {
   def props(config: Config) = Props(classOf[SecretChecker], config)

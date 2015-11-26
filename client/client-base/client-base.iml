@@ -5,9 +5,6 @@
       <configuration name="client-base" pure-as="true" output-type="Library" output-file="castles-base.swc" output-folder="$MODULE_DIR$/target">
         <dependencies target-player="19.0">
           <entries>
-            <entry module-name="common-client" build-configuration-name="common-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry library-id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc">
               <dependency linkage="Merged" />
             </entry>
@@ -56,7 +53,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Maven: ru.rknrl.castles:base-swc:swc:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.flexunit:flexunit:swc:as3:4.1.0" level="project" />
-    <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="8b2c4275-5f34-49f7-a5b4-11ded6e705fc" />

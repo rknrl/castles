@@ -4,6 +4,7 @@ option optimize_for = SPEED;
 
 import "options.proto";
 import "common.proto";
+import "scalapb/scalapb.proto";
 
 enum CellSize {
     SIZE = 39;
@@ -169,14 +170,19 @@ message JoinGame {
 }
 
 message Surrender {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
+
     option (msgid) = 96;
 }
 
 message LeaveGame {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
+
     option (msgid) = 97;
 }
 
 message Move {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 100;
 
     repeated BuildingId fromBuildings = 1;
@@ -184,30 +190,35 @@ message Move {
 }
 
 message CastFireball {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 101;
 
     required PointDTO points = 1;
 }
 
 message CastStrengthening {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 102;
 
     required BuildingId buildingId = 1;
 }
 
 message CastVolcano {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 103;
 
     required PointDTO points = 1;
 }
 
 message CastTornado {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 104;
 
     repeated PointDTO points = 1;
 }
 
 message CastAssistance {
+    option (scalapb.message).extends = "ru.rknrl.castles.game.GameMsg";
     option (msgid) = 105;
 
     required BuildingId buildingId = 1;

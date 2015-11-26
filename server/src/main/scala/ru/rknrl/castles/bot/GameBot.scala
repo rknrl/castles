@@ -13,7 +13,7 @@ import protos._
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
 import ru.rknrl.core.points.Point
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 class GameBot(accountId: AccountId) extends Actor with ActorLog {
   val moveInterval = 5000

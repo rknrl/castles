@@ -19,7 +19,6 @@ import protos._
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.database.DatabaseTransaction.FakeCalendar
 import ru.rknrl.castles.kit.Mocks._
-import ru.rknrl.core.social.Product
 
 class AccountStateTest extends WordSpec with Matchers {
 
@@ -271,11 +270,11 @@ class AccountStateTest extends WordSpec with Matchers {
     "если STARS увеличиваем деньги на нужную сумму и не меняем ничего другого" in {
 
       val oldState = accountStateMock()
-      val state = applyProduct(oldState, new Product(id = 1, title = "", description = "", photoUrl = ""), 1)
+      val state = applyProduct(oldState, new ru.rknrl.core.social.Product(id = 1, title = "", description = "", photoUrl = ""), 1)
       state.gold shouldBe 11
 
       val oldState2 = accountStateMock()
-      val state2 = applyProduct(oldState2, new Product(id = 1, title = "", description = "", photoUrl = ""), 100)
+      val state2 = applyProduct(oldState2, new ru.rknrl.core.social.Product(id = 1, title = "", description = "", photoUrl = ""), 100)
       state2.gold shouldBe 110
 
       checkEquals(oldState, state, Set(GOLD))
@@ -285,7 +284,7 @@ class AccountStateTest extends WordSpec with Matchers {
     "если не STARS - кидаем эксепшн" in {
 
       a[Exception] shouldBe thrownBy {
-        applyProduct(accountStateMock(), new Product(id = 3, title = "", description = "", photoUrl = ""), 1)
+        applyProduct(accountStateMock(), new ru.rknrl.core.social.Product(id = 3, title = "", description = "", photoUrl = ""), 1)
       }
 
     }

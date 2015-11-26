@@ -17,7 +17,7 @@ import protos._
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction.{Request, Response}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 class DbConfiguration(username: String,
                       host: String,

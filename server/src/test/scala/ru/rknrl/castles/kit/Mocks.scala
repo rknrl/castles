@@ -24,7 +24,7 @@ import ru.rknrl.castles.matchmaking.GameCreator
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.points.{Point, Points}
-import ru.rknrl.core.social.{Product, ProductInfo, SocialConfig, SocialConfigs}
+import ru.rknrl.core.social.{ProductInfo, SocialConfig, SocialConfigs}
 import ru.rknrl.core.{Damaged, Damager, Stat}
 
 object Mocks extends Matchers {
@@ -225,7 +225,7 @@ object Mocks extends Matchers {
                  clientBugsDir: String = "bugs/",
                  db: DbConfiguration = dbConfigMock(),
                  graphite: GraphiteConfig = graphiteConfigMock(),
-                 products: List[Product] = List.empty,
+                 products: List[ru.rknrl.core.social.Product] = List.empty,
                  social: SocialConfigs = socialConfigsMock(),
                  account: AccountConfig = accountConfigMock(),
                  game: GameConfig = gameConfigMock()) =

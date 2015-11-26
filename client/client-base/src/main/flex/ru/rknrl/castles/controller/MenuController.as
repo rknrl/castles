@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller {
-import com.netease.protobuf.Bool;
+import ru.rknrl.protobuf.Bool;
 
 import flash.events.Event;
 import flash.utils.Dictionary;

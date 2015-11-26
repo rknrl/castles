@@ -10,19 +10,20 @@ import com.trueaccord.scalapb.{ScalaPbPlugin ⇒ PB}
 
 PB.protobufSettings
 
-version in PB.protobufConfig := "2.4.1"
+version in PB.protobufConfig := "2.6.1"
 
 PB.includePaths in PB.protobufConfig += file("/Users/tolyayanot/dev/rknrl/protobuf-rpc/plugin/src/main/proto")
+PB.includePaths in PB.protobufConfig += file("/Users/tolyayanot/dev/rknrl/protobuf-rpc/plugin/src/main/protobuf")
 PB.generatedTargets in PB.protobufConfig := Seq((file(baseDirectory.value + "/src/generated/scala"), "*.scala"))
 scalaSource in PB.protobufConfig := file(baseDirectory.value + "/src/generated/scala")
 PB.flatPackage in PB.protobufConfig := true
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.2",
 
   "com.typesafe.akka" %% "akka-actor" % "2.3.6",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.6" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.6",
 
   "com.typesafe.akka" %% "akka-slf4j" % "2.3.6",
   "ch.qos.logback" % "logback-classic" % "1.0.9",
@@ -34,11 +35,11 @@ libraryDependencies ++= Seq(
   "com.github.mauricio" %% "mysql-async" % "0.2.15",
 
   "net.liftweb" %% "lift-json" % "3.0-M2",
+  "org.json" % "json" % "20151123",
+  "commons-codec" % "commons-codec" % "1.9",
 
-  "com.trueaccord.scalapb" %% "scalapb-runtime" % "0.4.8" % PB.protobufConfig,
+  "com.trueaccord.scalapb" %% "scalapb-runtime" % "0.4.19" % PB.protobufConfig,
 
-  "ru.rknrl" %% "common-server" % "1.0",
-  "ru.rknrl" %% "social-server" % "1.0",
   "ru.rknrl" %% "rpc" % "1.0"
 )
 

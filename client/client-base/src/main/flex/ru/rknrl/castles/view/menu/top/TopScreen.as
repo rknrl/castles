@@ -60,7 +60,7 @@ public class TopScreen extends Screen {
     }
 
     public function set place(value:Place):void {
-        placeTextField.text = value ? "Вы занимаете " + value.place.toNumber() + " место" : "Вы еще не играли на этой неделе";
+        placeTextField.text = value ? "Вы занимаете " + value.place + " место" : "Вы еще не играли на этой неделе";
         alignPlace();
     }
 

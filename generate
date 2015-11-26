@@ -11,7 +11,7 @@ as3_out="${project}/client/client-base/src/generated/flex/"
 # Generate java and action-script dto classes by protobuf
 
 sbt clean
-sbt protobuf:protobufScalaGenerate
+sbt protobuf:protobufGenerate
 
 rm -rf ${as3_out}/protos/*
 
@@ -20,6 +20,7 @@ protoc \
 --plugin=protoc-gen-as3=${protobuf_as3}/generate-as3 \
 --proto_path=${proto_dir} \
 --proto_path=${protobuf_rpc}/plugin/src/main/proto \
+--proto_path=${protobuf_rpc}/plugin/src/main/protobuf \
 ${proto_dir}/auth.proto \
 ${proto_dir}/common.proto \
 ${proto_dir}/account.proto \
@@ -33,6 +34,7 @@ protoc \
 --plugin=protoc-gen-rpc=${protobuf_rpc}/generate-rpc-as3 \
 --proto_path=${proto_dir} \
 --proto_path=${protobuf_rpc}/plugin/src/main/proto \
+--proto_path=${protobuf_rpc}/plugin/src/main/protobuf \
 ${proto_dir}/auth.proto \
 ${proto_dir}/common.proto \
 ${proto_dir}/account.proto \
@@ -44,6 +46,7 @@ protoc \
 --plugin=protoc-gen-rpc=${protobuf_rpc}/generate-rpc-scala \
 --proto_path=${proto_dir} \
 --proto_path=${protobuf_rpc}/plugin/src/main/proto \
+--proto_path=${protobuf_rpc}/plugin/src/main/protobuf \
 ${proto_dir}/auth.proto \
 ${proto_dir}/common.proto \
 ${proto_dir}/account.proto \

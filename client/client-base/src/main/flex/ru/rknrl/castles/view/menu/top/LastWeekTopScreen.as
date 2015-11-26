@@ -68,7 +68,7 @@ public class LastWeekTopScreen extends Sprite {
     }
 
     public function set place(value:Place):void {
-        placeTextField.text = value ? "Вы заняли " + value.place.toNumber() + " место" : "Вы не играли на прошлой неделе";
+        placeTextField.text = value ? "Вы заняли " + value.place + " место" : "Вы не играли на прошлой неделе";
         alignPlace();
     }
 

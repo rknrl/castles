@@ -8,9 +8,6 @@
             <entry module-name="client-base" build-configuration-name="client-base">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="common-client" build-configuration-name="common-client">
-              <dependency linkage="Merged" />
-            </entry>
             <entry module-name="common-as3" build-configuration-name="common-as3">
               <dependency linkage="Merged" />
             </entry>
@@ -26,9 +23,6 @@
         <dependencies>
           <entries>
             <entry module-name="client-base" build-configuration-name="client-base">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry module-name="common-client" build-configuration-name="common-client">
               <dependency linkage="Merged" />
             </entry>
             <entry module-name="common-as3" build-configuration-name="common-as3">
@@ -55,7 +49,6 @@
     <orderEntry type="jdk" jdkName="Apache-Flex-Mac" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="client-base" exported="" />
-    <orderEntry type="module" module-name="common-client" exported="" />
     <orderEntry type="module" module-name="common-as3" exported="" />
   </component>
 </module>

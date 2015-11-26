@@ -18,9 +18,10 @@ import ru.rknrl.castles.database.Database.UpdateUserInfo
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.database.{Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
+import ru.rknrl.castles.game.GameMsg
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 
 object Account {
@@ -185,14 +186,7 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def inGame: Receive = logged {
-    case msg@(Surrender |
-         LeaveGame |
-         Move |
-         CastFireball |
-         CastStrengthening |
-         CastVolcano |
-         CastTornado |
-         CastAssistance) ⇒ forward(game, msg)
+    case msg: GameMsg ⇒ forward(game, msg)
 
     case stat: protos.Stat ⇒
       forward(game, stat.action)

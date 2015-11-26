@@ -17,7 +17,7 @@ import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeave
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.core.Graphite.Health
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 import scala.concurrent.duration.{FiniteDuration, _}
 

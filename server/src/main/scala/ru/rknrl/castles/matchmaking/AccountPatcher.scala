@@ -13,7 +13,7 @@ import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction._
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 object AccountPatcher {
   def props(accountId: AccountId,

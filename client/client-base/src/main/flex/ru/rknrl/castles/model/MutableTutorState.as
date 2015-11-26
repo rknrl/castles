@@ -7,7 +7,7 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.model {
-import com.netease.protobuf.Bool;
+import ru.rknrl.protobuf.Bool;
 
 import protos.TutorState;
 

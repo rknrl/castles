@@ -14,7 +14,7 @@ import protos.{AccountId, AccountState, TutorState, UserInfo}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 import scala.concurrent.duration._
 

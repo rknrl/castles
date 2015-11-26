@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import protos._
 import ru.rknrl.castles.database.Database.{UpdateAccountState, UpdateRating, UpdateTutorState}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.log.Logging.ActorLog
+import ru.rknrl.logging.ActorLog
 
 class LRU[K, V](capacity: Int) extends java.util.LinkedHashMap[K, V](capacity, 0.7f, true) {
   override def removeEldestEntry(entry: java.util.Map.Entry[K, V]): Boolean = {

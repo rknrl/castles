@@ -12,7 +12,6 @@ import protos.BuildingLevel.LEVEL_1
 import protos._
 import ru.rknrl.Assertion
 import ru.rknrl.castles.database.DatabaseTransaction.Calendar
-import ru.rknrl.core.social.Product
 
 object AccountState {
   def buyBuilding(stateOption: Option[AccountState], id: SlotId, buildingType: BuildingType, config: AccountConfig) = {
@@ -102,7 +101,7 @@ object AccountState {
     s
   }
 
-  def applyProduct(state: AccountState, product: Product, count: Int) =
+  def applyProduct(state: AccountState, product: ru.rknrl.core.social.Product, count: Int) =
     product.id match {
       case ProductId.STARS.id ⇒ addGold(state, count)
     }
