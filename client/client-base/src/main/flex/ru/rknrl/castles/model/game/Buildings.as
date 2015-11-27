@@ -15,7 +15,7 @@ import protos.CellSize;
 import protos.PlayerId;
 
 public class Buildings {
-    private static const mouseAreaRadius:Number = CellSize.SIZE.id() * 2 / 3;
+    private static const mouseAreaRadius:Number = CellSize.SIZE.id * 2 / 3;
 
     public var buildings:Vector.<Building>;
 

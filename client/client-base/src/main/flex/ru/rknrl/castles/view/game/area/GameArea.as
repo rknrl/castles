@@ -88,7 +88,7 @@ public class GameArea extends Sprite {
     }
 
     public function addSlots(dto:SlotsPos):void {
-        const cellSize:int = CellSize.SIZE.id();
+        const cellSize:int = CellSize.SIZE.id;
         for each(var slotId:SlotId in SlotId.values) {
             const pos:Point = getSlotPos(slotId);
             const orientation:SlotsOrientation = dto.orientation;

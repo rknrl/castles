@@ -36,7 +36,7 @@ public class FlaskFill extends Sprite {
     }
 
     public function set skillLevel(value:SkillLevel):void {
-        tweener.nextValue = value.id() * levelHeight;
+        tweener.nextValue = value.id * levelHeight;
     }
 
     public function onEnterFrame(fraction:Number):void {

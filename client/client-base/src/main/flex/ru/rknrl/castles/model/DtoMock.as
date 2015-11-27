@@ -264,7 +264,7 @@ public class DtoMock {
     public static function slotsPos(playerId:int, orientation:SlotsOrientation, i:int, j:int):SlotsPos {
         const dto:SlotsPos = new SlotsPos(
                 new PlayerId(playerId),
-                new PointDTO(i * CellSize.SIZE.id(), j * CellSize.SIZE.id()),
+                new PointDTO(i * CellSize.SIZE.id, j * CellSize.SIZE.id),
                 orientation
         );
         return dto;
@@ -296,8 +296,8 @@ public class DtoMock {
         return new BuildingDTO(
                 buildingId(buildingIdIterator++),
                 buildingPrototype(buildingType, level),
-                point(i * CellSize.SIZE.id() + CellSize.SIZE.id() / 2,
-                        j * CellSize.SIZE.id() + CellSize.SIZE.id() / 2),
+                point(i * CellSize.SIZE.id + CellSize.SIZE.id / 2,
+                        j * CellSize.SIZE.id + CellSize.SIZE.id / 2),
                 47,
                 ownerId > -1 ? playerId(ownerId) : null,
                 false

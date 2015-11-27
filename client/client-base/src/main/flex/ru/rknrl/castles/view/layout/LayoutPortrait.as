@@ -69,7 +69,7 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function gameAreaPos(areaH:int, areaV:int):Point {
-        const width:Number = areaH * CellSize.SIZE.id() * scale;
+        const width:Number = areaH * CellSize.SIZE.id * scale;
         return new Point(screenCenterX - width / 2, 40 * scale);
     }
 
@@ -110,8 +110,8 @@ public class LayoutPortrait extends Layout {
     }
 
     override public function gameAvatarPos(playerId:PlayerId, areaH:int, areaV:int):Point {
-        const areaWidth:Number = areaH * CellSize.SIZE.id() * scale;
-        const areaHeight:Number = areaV * CellSize.SIZE.id() * scale;
+        const areaWidth:Number = areaH * CellSize.SIZE.id * scale;
+        const areaHeight:Number = areaV * CellSize.SIZE.id * scale;
 
         const areaLeft:Number = gameAreaPos(areaH, areaV).x;
         const areaTop:Number = gameAreaPos(areaH, areaV).y;

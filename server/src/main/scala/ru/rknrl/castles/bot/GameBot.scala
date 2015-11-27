@@ -56,7 +56,7 @@ class GameBot(accountId: AccountId) extends Actor with ActorLog {
 
     case gameOver: GameOver ⇒
       if (gameOver.playerId == playerId.get)
-        send(game.get, LeaveGame)
+        send(game.get, LeaveGame())
   }
 
   def update(newGameState: GameState) = {

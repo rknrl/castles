@@ -186,11 +186,11 @@ public class CastlesLocale extends Locale {
     }
 
     public function tutorItemClick(itemType:ItemType):String {
-        return translate(TUTOR_CLICK_PREFIX + itemType.name().toLowerCase());
+        return translate(TUTOR_CLICK_PREFIX + itemType.name.toLowerCase());
     }
 
     public function tutorItemCast(itemType:ItemType):String {
-        return translate(TUTOR_CAST_PREFIX + itemType.name().toLowerCase());
+        return translate(TUTOR_CAST_PREFIX + itemType.name.toLowerCase());
     }
 
     public function get tutorWin():String {

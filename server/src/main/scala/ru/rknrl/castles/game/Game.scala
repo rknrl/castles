@@ -133,7 +133,7 @@ class Game(var gameState: GameState,
 
       newLosers.foreach(addLoser)
 
-    case Surrender ⇒
+    case Surrender() ⇒
       if (isDev && senderCanPlay) addLoser(senderPlayerId)
 
     case LeaveGame() ⇒

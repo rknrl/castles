@@ -132,8 +132,8 @@ public class Controller {
 
         const gameState:GameState = e.getGameState();
 
-        const h:int = Math.round(gameState.width / CellSize.SIZE.id());
-        const v:int = Math.round(gameState.height / CellSize.SIZE.id());
+        const h:int = Math.round(gameState.width / CellSize.SIZE.id);
+        const v:int = Math.round(gameState.height / CellSize.SIZE.id);
 
         const playerInfos:Vector.<PlayerInfo> = PlayerInfo.fromDtoVector(gameState.players);
         const gameView:GameView = view.createGame(playerInfos, h, v);

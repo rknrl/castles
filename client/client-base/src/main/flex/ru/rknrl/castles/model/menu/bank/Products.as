@@ -21,7 +21,7 @@ public class Products {
 
     public function Products(products:Vector.<Product>) {
         this.products = products;
-        _product = getProductById(ProductId.STARS.id());
+        _product = getProductById(ProductId.STARS.id);
     }
 
     private function getProductById(id:int):Product {

@@ -7,8 +7,6 @@
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
 package ru.rknrl.castles.controller {
-import ru.rknrl.protobuf.Bool;
-
 import flash.events.Event;
 import flash.utils.Dictionary;
 import flash.utils.setTimeout;
@@ -38,6 +36,7 @@ import ru.rknrl.castles.model.events.UpgradeClickEvent;
 import ru.rknrl.castles.model.events.ViewEvents;
 import ru.rknrl.castles.model.menu.MenuModel;
 import ru.rknrl.castles.view.menu.MenuView;
+import ru.rknrl.protobuf.Bool;
 
 public class MenuController {
     private var view:MenuView;
@@ -103,7 +102,7 @@ public class MenuController {
 
     private function onAdvertComplete(event:VideoAdvertEvent):void {
         setTimeout(function ():void {
-            server.acceptAdvert(new AcceptAdvert(true))
+            server.acceptAdvert(true)
         }, 2000); // таймаут, чтобы игрок увидел анимацию
     }
 
@@ -264,7 +263,7 @@ public class MenuController {
 
     public function cancelAdvert():void {
         if (view.advertVisible) {
-            server.acceptAdvert(new AcceptAdvert(false));
+            server.acceptAdvert(false);
             view.advertVisible = false;
         }
     }

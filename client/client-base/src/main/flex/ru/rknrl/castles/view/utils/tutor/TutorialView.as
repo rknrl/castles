@@ -73,7 +73,7 @@ public class TutorialView extends Sprite {
     }
 
     public final function get playing():Boolean {
-        return command;
+        return command != null;
     }
 
     public function get screenCorner():Point {

@@ -17,7 +17,7 @@ import ru.rknrl.castles.view.Colors;
 import protos.CellSize;
 
 public class Ground extends Sprite {
-    private static const cellSize:int = CellSize.SIZE.id();
+    private static const cellSize:int = CellSize.SIZE.id;
 
     private const grounds:Dictionary = new Dictionary();
 

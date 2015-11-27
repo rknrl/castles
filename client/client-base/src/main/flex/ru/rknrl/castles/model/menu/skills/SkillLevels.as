@@ -19,7 +19,7 @@ public class SkillLevels {
 
         var totalLevel:int = 0;
         for each(var level:Skill in skills) {
-            totalLevel += level.level.id();
+            totalLevel += level.level.id;
         }
         _totalLevel = totalLevel;
     }

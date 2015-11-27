@@ -128,7 +128,7 @@ class Account(matchmaking: ActorRef,
   }.orElse(persistent)
 
   def account: Receive = logged {
-    case AcceptPresent ⇒
+    case AcceptPresent() ⇒
       getAndUpdate(state ⇒ acceptPresent(state, config.account, calendar))
 
     case accept: AcceptAdvert ⇒
@@ -165,7 +165,7 @@ class Account(matchmaking: ActorRef,
       getAndUpdate(state ⇒ AccountState.buyItem(state, dto.itemType, config.account))
       send(graphite, Statistics.buyItem(dto.itemType))
 
-    case EnterGame ⇒ sendGameOrder()
+    case EnterGame() ⇒ sendGameOrder()
 
   }.orElse(persistent)
 

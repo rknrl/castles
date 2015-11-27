@@ -15,11 +15,11 @@ public class GameTutorEvents {
     public static const BUILDING_CAPTURED:String = "buildingCaptured";
 
     public static function selected(itemType:ItemType):String {
-        return itemType.name() + "selected";
+        return itemType.name + "selected";
     }
 
     public static function casted(itemType:ItemType):String {
-        return itemType.name() + "casted";
+        return itemType.name + "casted";
     }
 }
 }

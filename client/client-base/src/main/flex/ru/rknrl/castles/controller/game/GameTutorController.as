@@ -496,7 +496,7 @@ public class GameTutorController extends TutorControllerBase {
     // COORDS
 
     private static function ij(i:int, j:int):Point {
-        return new Point((i + 0.5) * CellSize.SIZE.id(), (j + 0.5) * CellSize.SIZE.id())
+        return new Point((i + 0.5) * CellSize.SIZE.id, (j + 0.5) * CellSize.SIZE.id)
     }
 
     private function get sourceBuilding1():Point {

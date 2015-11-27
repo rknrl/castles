@@ -78,7 +78,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
       _accountState = Some(dto.accountState)
 
       if (dto.game.isDefined) {
-        send(JoinGame)
+        send(JoinGame())
         context become enterGame
       } else if (dto.searchOpponents) {
         context become enterGame
@@ -155,14 +155,14 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
           case BUY_STARS ⇒ // todo
 
           case ENTER_GAME ⇒
-            send(EnterGame)
+            send(EnterGame())
             context become enterGame
         }
   } orElse persistent
 
   def enterGame: Receive = logged {
     case EnteredGame(node) ⇒
-      send(JoinGame)
+      send(JoinGame())
 
     case msg: GameState ⇒
       gameBot = Some(context.actorOf(Props(classOf[GameBot], accountId), "game-bot-" + accountId.id))
@@ -178,7 +178,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
     case msg: GameOver ⇒
       gameBot.get forward msg
 
-    case LeavedGame ⇒
+    case LeavedGame() ⇒
       context stop gameBot.get
       waitForAccountStateUpdate = true
       context become inMenu
