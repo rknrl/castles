@@ -16,7 +16,7 @@ import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
 import ru.rknrl.castles.database.Database.UpdateUserInfo
 import ru.rknrl.castles.database.DatabaseTransaction._
-import ru.rknrl.castles.database.{Database, Statistics}
+import ru.rknrl.castles.database.{Calendar, Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameMsg
 import ru.rknrl.castles.matchmaking.MatchMaking._

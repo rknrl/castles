@@ -15,7 +15,8 @@ import protos.PlatformType.CANVAS
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.DatabaseTransaction.{Calendar, FakeCalendar, GetAccount}
+import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.{Calendar, FakeCalendar}
 import ru.rknrl.castles.database.{Database, DatabaseTransaction}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}

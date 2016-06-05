@@ -17,7 +17,7 @@ import protos.SkillType._
 import protos.SlotId._
 import protos._
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.DatabaseTransaction.FakeCalendar
+import ru.rknrl.castles.database.FakeCalendar
 import ru.rknrl.castles.kit.Mocks._
 
 class AccountStateTest extends WordSpec with Matchers {

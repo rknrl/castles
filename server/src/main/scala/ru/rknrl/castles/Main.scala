@@ -14,8 +14,7 @@ import net.liftweb.json.{DefaultFormats, JsonParser}
 import rknrl.CrossDomainPolicyServer
 import ru.rknrl.castles.account.{Account, SecretChecker}
 import ru.rknrl.castles.admin.Admin
-import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
-import ru.rknrl.castles.database.{Database, DatabaseCache, DatabaseQueue, DatabaseTransaction}
+import ru.rknrl.castles.database._
 import ru.rknrl.castles.game.init.GameMaps
 import ru.rknrl.castles.matchmaking.{GameCreator, GameFactory, MatchMaking}
 import ru.rknrl.castles.payments.HttpServer
@@ -48,11 +47,9 @@ object Main {
     val graphite = system.actorOf(Graphite.props(config.graphite, config.isDev), "graphite")
     val secretChecker = system.actorOf(SecretChecker.props(config), "secret-checker")
 
-    val database = system.actorOf(Database.props(config.db), "database")
-    val databaseCache = system.actorOf(DatabaseCache.props(database), "database-cache")
     val calendar = new RealCalendar
-    val databaseTransaction = system.actorOf(DatabaseTransaction.props(databaseCache, calendar), "database-transaction")
-    val databaseQueue = system.actorOf(DatabaseQueue.props(databaseTransaction), "database-queue")
+    val database = system.actorOf(Database.props(config.db), "database")
+    val databaseTransaction = system.actorOf(DatabaseTransaction.props(database, calendar), "database-transaction")
 
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(
@@ -61,7 +58,7 @@ object Main {
         gameFactory = new GameFactory(),
         interval = 7 seconds,
         config = config,
-        databaseQueue = databaseQueue,
+        databaseQueue = databaseTransaction,
         graphite = graphite
       ),
       "matchmaking"
@@ -69,17 +66,17 @@ object Main {
 
     val bugs = system.actorOf(Bugs.props(config.clientBugsDir), "bugs")
 
-    system.actorOf(HttpServer.props(config, databaseQueue, matchmaking, bugs), "http-server")
+    system.actorOf(HttpServer.props(config, databaseTransaction, matchmaking, bugs), "http-server")
 
     system.actorOf(CrossDomainPolicyServer.props(config.host, config.policyPort), "policy-server")
 
     system.actorOf(Server.props(config.host, config.gamePort,
-      client ⇒ Account.props(matchmaking, secretChecker, databaseQueue, graphite, config, calendar),
+      client ⇒ Account.props(matchmaking, secretChecker, databaseTransaction, graphite, config, calendar),
       Serializer),
       "client-server")
 
     system.actorOf(Server.props(config.host, config.adminPort,
-      client ⇒ Admin.props(client, databaseQueue, matchmaking, config),
+      client ⇒ Admin.props(client, databaseTransaction, matchmaking, config),
       Serializer),
       "admin-server")
   }

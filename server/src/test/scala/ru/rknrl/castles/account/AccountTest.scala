@@ -17,8 +17,8 @@ import protos.SkillType.ATTACK
 import protos.SlotId.{SLOT_1, SLOT_3}
 import protos._
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.DatabaseTransaction.{FakeCalendar, GetAccount}
-import ru.rknrl.castles.database.{DatabaseTransaction, Statistics}
+import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.{DatabaseTransaction, FakeCalendar, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Top

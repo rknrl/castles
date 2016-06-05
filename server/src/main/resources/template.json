@@ -14,9 +14,9 @@
     "username": "username",
     "password": "enter mysql password",
     "database": "castles",
-    "poolMaxObjects": 20,
+    "poolMaxObjects": 1,
     "poolMaxIdle": 8,
-    "poolMaxQueueSize": 20
+    "poolMaxQueueSize": 1000000
   },
   "products": [
     {
