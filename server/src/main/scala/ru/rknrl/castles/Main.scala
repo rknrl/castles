@@ -9,10 +9,9 @@
 package ru.rknrl.castles
 
 import akka.actor.ActorSystem
-import akka.io.{IO, Tcp}
 import generated.Serializer
 import net.liftweb.json.{DefaultFormats, JsonParser}
-import ru.rknrl.PolicyServer
+import rknrl.CrossDomainPolicyServer
 import ru.rknrl.castles.account.{Account, SecretChecker}
 import ru.rknrl.castles.admin.Admin
 import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
@@ -23,7 +22,6 @@ import ru.rknrl.castles.payments.HttpServer
 import ru.rknrl.core.Graphite
 import ru.rknrl.logging.Bugs
 import ru.rknrl.rpc.Server
-import spray.can.Http
 
 import scala.concurrent.duration._
 import scala.io.Source
@@ -70,20 +68,19 @@ object Main {
     )
 
     val bugs = system.actorOf(Bugs.props(config.clientBugsDir), "bugs")
-    val httpServer = system.actorOf(HttpServer.props(config, databaseQueue, matchmaking, bugs), "http-server")
-    IO(Http) ! Http.Bind(httpServer, config.host, config.httpPort)
 
-    val tcp = IO(Tcp)
-    system.actorOf(PolicyServer.props(tcp, config.host, config.policyPort), "policy-server")
+    system.actorOf(HttpServer.props(config, databaseQueue, matchmaking, bugs), "http-server")
 
-    system.actorOf(Server.props(config.host, config.adminPort,
-      client ⇒ Admin.props(client, databaseQueue, matchmaking, config),
-      new Serializer),
-      "admin-server")
+    system.actorOf(CrossDomainPolicyServer.props(config.host, config.policyPort), "policy-server")
 
     system.actorOf(Server.props(config.host, config.gamePort,
       client ⇒ Account.props(matchmaking, secretChecker, databaseQueue, graphite, config, calendar),
-      new Serializer),
-      "tcp-server")
+      Serializer),
+      "client-server")
+
+    system.actorOf(Server.props(config.host, config.adminPort,
+      client ⇒ Admin.props(client, databaseQueue, matchmaking, config),
+      Serializer),
+      "admin-server")
   }
 }

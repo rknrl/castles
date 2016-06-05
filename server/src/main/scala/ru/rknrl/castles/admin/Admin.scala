@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object Admin {
   def props(client: ActorRef,
@@ -25,7 +25,7 @@ object Admin {
 class Admin(client: ActorRef,
             databaseQueue: ActorRef,
             matchmaking: ActorRef,
-            config: Config) extends Actor with ActorLog {
+            config: Config) extends Actor with ShortActorLogging {
 
   var accountId: Option[AccountId] = None
 

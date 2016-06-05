@@ -10,7 +10,7 @@ package ru.rknrl.castles.matchmaking
 
 import protos.AccountType.DEV
 import protos.{AccountId, Item, PlayerId}
-import ru.rknrl.IdIterator
+import ru.rknrl.IntIterator
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.game.init.{GameMaps, GameStateInit}
 import ru.rknrl.castles.game.state.{GameState, Player}
@@ -27,11 +27,11 @@ object GameCreator {
 
 }
 
-class BotIdIterator extends IdIterator {
+class BotIdIterator extends IntIterator {
   def next = AccountId(DEV, "bot" + nextInt)
 }
 
-class PlayerIdIterator extends IdIterator {
+class PlayerIdIterator extends IntIterator {
   def next = PlayerId(nextInt)
 }
 

@@ -17,7 +17,7 @@ import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeave
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.core.Graphite.Health
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 import scala.concurrent.duration.{FiniteDuration, _}
 
@@ -72,7 +72,7 @@ class MatchMaking(gameCreator: GameCreator,
                   interval: FiniteDuration,
                   config: Config,
                   databaseQueue: ActorRef,
-                  graphite: ActorRef) extends Actor with ActorLog {
+                  graphite: ActorRef) extends Actor with ShortActorLogging {
 
   override def supervisorStrategy = OneForOneStrategy() {
     case e: Exception ⇒

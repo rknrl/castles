@@ -16,7 +16,7 @@ import protos._
 import ru.rknrl.castles.MigrateDatabase1.Migrate
 import ru.rknrl.castles.database.DatabaseTransaction.RealCalendar
 import ru.rknrl.castles.database.DbConfiguration
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object MigrateDatabase1 {
   def main(args: Array[String]) {
@@ -39,7 +39,7 @@ object MigrateDatabase1 {
 
 }
 
-class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ActorLog {
+class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ShortActorLogging {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 

@@ -11,7 +11,7 @@ package ru.rknrl.logging
 import java.io.{File, PrintWriter}
 import java.util.regex.Pattern
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import ru.rknrl.logging.Bugs._
 
 object Bugs {
@@ -32,7 +32,7 @@ object Bugs {
   }
 }
 
-class Bugs(dir: String) extends Actor with ActorLog {
+class Bugs(dir: String) extends Actor with ShortActorLogging {
   var counts = Map.empty[String, Int]
 
   def receive = {

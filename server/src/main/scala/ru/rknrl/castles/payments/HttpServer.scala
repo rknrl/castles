@@ -11,14 +11,16 @@ package ru.rknrl.castles.payments
 import java.net.URLDecoder
 
 import akka.actor.{Actor, ActorRef, Props}
+import akka.io.IO
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.logging.ActorLog
 import ru.rknrl.logging.Bugs.Bug
+import ru.rknrl.logging.ShortActorLogging
+import spray.can.Http
 import spray.http.MediaTypes._
 import spray.http._
 import spray.httpx.marshalling.Marshaller
@@ -37,7 +39,11 @@ object HttpServer {
 class HttpServer(config: Config,
                  databaseQueue: ActorRef,
                  matchmaking: ActorRef,
-                 bugs: ActorRef) extends Actor with ActorLog with HttpService {
+                 bugs: ActorRef) extends Actor with ShortActorLogging with HttpService {
+
+  implicit val system = context.system
+
+  IO(Http) ! Http.Bind(self, config.host, config.httpPort)
 
   val crossdomain =
     """<?xml version="1.0"?>

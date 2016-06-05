@@ -46,7 +46,7 @@ public class MainWeb extends MainWebBase {
 
     private static function getAccountType(name:String):AccountType {
         for each(var accountType:AccountType in AccountType.values) {
-            if (accountType.name() == name) return accountType;
+            if (accountType.name == name) return accountType;
         }
         throw new Error("unknown account type " + name);
     }

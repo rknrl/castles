@@ -16,7 +16,7 @@ import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import protos.StatAction
 import ru.rknrl.core.Graphite.{GraphiteConfig, Health}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object Graphite {
 
@@ -50,7 +50,7 @@ class Graphite(config: GraphiteConfig, isDev: Boolean) extends Actor {
   def currentTime = (System.currentTimeMillis / 1000).toString
 }
 
-class GraphiteConnection(host: String, port: Int) extends Actor with ActorLog {
+class GraphiteConnection(host: String, port: Int) extends Actor with ShortActorLogging {
 
   import context.system
 

@@ -14,7 +14,7 @@ import protos.{AccountId, AccountState, TutorState, UserInfo}
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 import scala.concurrent.duration._
 
@@ -72,7 +72,7 @@ object DatabaseTransaction {
 
 }
 
-class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor with ActorLog {
+class DatabaseTransaction(database: ActorRef, calendar: Calendar) extends Actor with ShortActorLogging {
 
   def receive = logged {
     case GetAccount(accountId) ⇒

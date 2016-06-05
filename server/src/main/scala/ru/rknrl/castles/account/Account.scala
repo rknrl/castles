@@ -21,8 +21,7 @@ import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameMsg
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.logging.ActorLog
-
+import ru.rknrl.logging.ShortActorLogging
 
 object Account {
 
@@ -47,7 +46,7 @@ class Account(matchmaking: ActorRef,
               databaseQueue: ActorRef,
               graphite: ActorRef,
               config: Config,
-              calendar: Calendar) extends Actor with ActorLog {
+              calendar: Calendar) extends Actor with ShortActorLogging {
 
   var _client: Option[ClientInfo] = None
   var _game: Option[ActorRef] = None

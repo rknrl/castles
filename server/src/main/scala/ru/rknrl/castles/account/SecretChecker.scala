@@ -20,7 +20,7 @@ import protos.Authenticate
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.{SecretChecked, _}
 import ru.rknrl.core.social.SocialConfig
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object SecretChecker {
   def props(config: Config) = Props(classOf[SecretChecker], config)
@@ -73,7 +73,7 @@ object SecretChecker {
   private def encode(bs: Array[Byte]): String = new String(Base64.encodeBase64URLSafe(bs), charset)
 }
 
-class SecretChecker(config: Config) extends Actor with ActorLog {
+class SecretChecker(config: Config) extends Actor with ShortActorLogging {
   def receive = logged {
     case authenticate: Authenticate ⇒
       send(sender, SecretChecked(checkSecret(authenticate)))

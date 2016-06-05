@@ -13,7 +13,7 @@ import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
 import ru.rknrl.castles.database.DatabaseTransaction._
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object AccountPatcher {
   def props(accountId: AccountId,
@@ -44,7 +44,7 @@ class AccountPatcher(accountId: AccountId,
                      userInfo: UserInfo,
                      config: Config,
                      matchmaking: ActorRef,
-                     databaseQueue: ActorRef) extends Actor with ActorLog {
+                     databaseQueue: ActorRef) extends Actor with ShortActorLogging {
 
   val transform = (stateDto: Option[protos.AccountState], ratingDto: Option[Double]) ⇒ {
     val state = stateDto.getOrElse(config.account.initState)

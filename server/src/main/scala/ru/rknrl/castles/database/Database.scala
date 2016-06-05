@@ -17,7 +17,7 @@ import protos._
 import ru.rknrl.castles.database.Database._
 import ru.rknrl.castles.database.DatabaseTransaction.{Request, Response}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 class DbConfiguration(username: String,
                       host: String,
@@ -80,7 +80,7 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration) extends Actor with ActorLog {
+class Database(configuration: DbConfiguration) extends Actor with ShortActorLogging {
 
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)

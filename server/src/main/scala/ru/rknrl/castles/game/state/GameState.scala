@@ -10,7 +10,7 @@ package ru.rknrl.castles.game.state
 
 import protos.ItemType._
 import protos._
-import ru.rknrl.IdIterator
+import ru.rknrl.IntIterator
 import ru.rknrl.castles.game.GameConfig
 import ru.rknrl.castles.game.state.Assistance.castToUnit
 import ru.rknrl.castles.game.state.Building._
@@ -23,11 +23,11 @@ import ru.rknrl.castles.game.state.Tornadoes._
 import ru.rknrl.castles.game.state.Volcanoes._
 import ru.rknrl.core.points.Point
 
-class BuildingIdIterator extends IdIterator {
+class BuildingIdIterator extends IntIterator {
   def next = BuildingId(nextInt)
 }
 
-class UnitIdIterator extends IdIterator {
+class UnitIdIterator extends IntIterator {
   def next = UnitId(nextInt)
 }
 

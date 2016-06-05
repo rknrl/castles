@@ -10,13 +10,13 @@ package ru.rknrl.castles.database
 
 import akka.actor.{Actor, ActorRef, Props}
 import protos.AccountId
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 object DatabaseQueue {
   def props(database: ActorRef) = Props(classOf[DatabaseQueue], database)
 }
 
-class DatabaseQueue(database: ActorRef) extends Actor with ActorLog {
+class DatabaseQueue(database: ActorRef) extends Actor with ShortActorLogging {
 
   case class QueueRequest(msg: DatabaseTransaction.Request, sender: ActorRef)
 

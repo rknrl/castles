@@ -20,7 +20,7 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.GameBot
 import ru.rknrl.castles.matchmaking.MatchMaking.ConnectToGame
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 import scala.concurrent.duration._
 
@@ -42,7 +42,7 @@ object Bot {
     Props(classOf[Bot], server, accountId)
 }
 
-class Bot(server: ActorRef, accountId: AccountId) extends Actor with ActorLog {
+class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorLogging {
 
   override def supervisorStrategy = EscalateStrategy
 

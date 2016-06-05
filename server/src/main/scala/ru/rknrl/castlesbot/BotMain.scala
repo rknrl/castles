@@ -25,6 +25,6 @@ object BotMain {
 
     implicit val system = ActorSystem("main-actor-system")
     for (i ← 1 to count)
-      system.actorOf(Connection.props(host, port, server ⇒ Bot.props(server, AccountId(DEV, i.toString)), new Serializer), "bot-connection-" + i)
+      system.actorOf(Connection.props(host, port, server ⇒ Bot.props(server, AccountId(DEV, i.toString)), Serializer), "bot-connection-" + i)
   }
 }

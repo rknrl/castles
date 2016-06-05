@@ -14,7 +14,7 @@ import ru.rknrl.Supervisor._
 import ru.rknrl.castles.game.Game.{Join, UpdateGameState}
 import ru.rknrl.castles.game.state.{GameState, GameStateDiff}
 import ru.rknrl.castles.matchmaking.MatchMaking.{AllPlayersLeaveGame, ConnectToGame, Offline, PlayerLeaveGame}
-import ru.rknrl.logging.ActorLog
+import ru.rknrl.logging.ShortActorLogging
 
 trait GameMsg
 
@@ -38,7 +38,7 @@ class Game(var gameState: GameState,
            isTutor: Boolean,
            botFactory: IBotFactory,
            schedulerClass: Class[_],
-           matchmaking: ActorRef) extends Actor with ActorLog {
+           matchmaking: ActorRef) extends Actor with ShortActorLogging {
 
   override def supervisorStrategy = StopStrategy
 
