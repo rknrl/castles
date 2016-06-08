@@ -138,9 +138,9 @@ class GameCastsTest extends GameTestSpec {
 
     // Игроки получают в ответ JoinedGame
 
-    client0.expectMsgClass(classOf[GameState])
+    client0.expectMsgClass(classOf[protos.GameState])
 
-    client1.expectMsgClass(classOf[GameState])
+    client1.expectMsgClass(classOf[protos.GameState])
 
     // Игроки делают касты
 
@@ -193,7 +193,7 @@ class GameCastsTest extends GameTestSpec {
     // -------------------------------------------------------
     // Если игрок проиграл или сдался - его касты игнорируются
 
-    client0.send(game, Surrender)
+    client0.send(game, Surrender())
 
     // Оба игрока получают GameOver в ответ
 

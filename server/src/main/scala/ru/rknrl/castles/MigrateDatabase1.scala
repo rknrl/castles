@@ -14,8 +14,8 @@ import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.ConnectionPool
 import protos._
 import ru.rknrl.castles.MigrateDatabase1.Migrate
-import ru.rknrl.castles.database.RealCalendar
-import ru.rknrl.castles.database.DbConfiguration
+import ru.rknrl.castles.storage.RealCalendar
+import ru.rknrl.castles.storage.DbConfiguration
 import ru.rknrl.logging.ShortActorLogging
 
 object MigrateDatabase1 {

@@ -10,7 +10,7 @@ package ru.rknrl.castles
 
 import protos._
 import ru.rknrl.castles.account.AccountConfig
-import ru.rknrl.castles.database.DbConfiguration
+import ru.rknrl.castles.storage.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.social.SocialConfigs

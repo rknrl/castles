@@ -31,7 +31,7 @@ class MatchmakingTestSpec extends ActorsTest {
         gameFactory = gameFactory,
         interval = interval,
         config = config,
-        databaseQueue = database,
+        storage = database,
         graphite = graphite
       ),
       "matchmaking-" + matchmakingIterator

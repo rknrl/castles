@@ -14,12 +14,12 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database.{UpdateUserInfo, _}
-import ru.rknrl.castles.database.{Calendar, Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameMsg
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage.{UpdateUserInfo, _}
+import ru.rknrl.castles.storage.{Calendar, Statistics, Storage}
 import ru.rknrl.logging.ShortActorLogging
 
 object Account {
@@ -208,7 +208,7 @@ class Account(matchmaking: ActorRef,
     case stat: protos.Stat ⇒ send(graphite, stat.action)
 
     case state: TutorState ⇒
-      send(storage, Database.UpdateTutorState(client.accountId, state))
+      send(storage, Storage.UpdateTutorState(client.accountId, state))
 
     case DuplicateAccount ⇒ send(client.ref, PoisonPill)
   }

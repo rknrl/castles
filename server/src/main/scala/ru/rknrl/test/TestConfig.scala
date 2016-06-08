@@ -14,6 +14,8 @@ object TestConfig {
   val config = ConfigFactory.parseString(
     """
       |akka {
+      |  loggers = ["akka.event.slf4j.Slf4jLogger"]
+      |  loglevel = DEBUG
       |  test {
       |    # factor by which to scale timeouts during tests, e.g. to account for shared
       |    # build system load

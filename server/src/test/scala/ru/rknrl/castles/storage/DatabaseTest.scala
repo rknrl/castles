@@ -6,12 +6,12 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.database
+package ru.rknrl.castles.storage
 
 import protos.AccountType.DEV
 import protos._
-import ru.rknrl.castles.database.Database._
-import ru.rknrl.castles.database.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
+import ru.rknrl.castles.storage.Storage._
+import ru.rknrl.castles.storage.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.test.ActorsTest

@@ -13,7 +13,7 @@ import akka.testkit.TestProbe
 import protos.AccountType.VKONTAKTE
 import protos.StatAction.START_GAME_4_WITH_BOTS
 import protos._
-import ru.rknrl.castles.database.Database.AccountStateUpdated
+import ru.rknrl.castles.storage.Storage.AccountStateUpdated
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 

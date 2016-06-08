@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.storage.Storage._
 import ru.rknrl.logging.ShortActorLogging
 
 object AccountPatcher {
@@ -23,7 +23,7 @@ object AccountPatcher {
             userInfo: UserInfo,
             config: Config,
             matchmaking: ActorRef,
-            databaseQueue: ActorRef) =
+            storage: ActorRef) =
     Props(
       classOf[AccountPatcher],
       accountId,
@@ -33,7 +33,7 @@ object AccountPatcher {
       userInfo,
       config,
       matchmaking,
-      databaseQueue
+      storage
     )
 }
 
@@ -44,7 +44,7 @@ class AccountPatcher(accountId: AccountId,
                      userInfo: UserInfo,
                      config: Config,
                      matchmaking: ActorRef,
-                     databaseQueue: ActorRef) extends Actor with ShortActorLogging {
+                     storage: ActorRef) extends Actor with ShortActorLogging {
 
   val transform = (stateDto: Option[protos.AccountState], ratingDto: Option[Double]) ⇒ {
     val state = stateDto.getOrElse(config.account.initState)
@@ -62,7 +62,7 @@ class AccountPatcher(accountId: AccountId,
     (newState, ratingDto.getOrElse(1400.0) + ratingAmount)
   }
 
-  send(databaseQueue, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
+  send(storage, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
 
   def receive = logged {
     case msg: AccountStateAndRatingResponse ⇒

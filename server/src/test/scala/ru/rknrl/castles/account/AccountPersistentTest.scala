@@ -11,10 +11,10 @@ package ru.rknrl.castles.account
 import akka.actor.PoisonPill
 import akka.testkit.TestProbe
 import protos._
-import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage
 
 class AccountPersistentTest extends AccountTestSpec {
 
@@ -39,8 +39,9 @@ class AccountPersistentTest extends AccountTestSpec {
         client = client,
         account = account
       )
+      watch(client.ref)
       account ! DuplicateAccount
-      client.expectMsg(PoisonPill)
+      expectTerminated(client.ref)
     })
 
     multi("Если клиент НЕ авторизовался - игнорируется", {
@@ -107,7 +108,7 @@ class AccountPersistentTest extends AccountTestSpec {
       )
       val newTutorState = TutorState(emptySlot = Some(true))
       client.send(account, newTutorState)
-      database.expectMsg(Database.UpdateTutorState(accountId, newTutorState))
+      database.expectMsg(Storage.UpdateTutorState(accountId, newTutorState))
     })
 
     multi("Если клиент НЕ авторизовался - игнорируется", {
@@ -166,7 +167,7 @@ class AccountPersistentTest extends AccountTestSpec {
       config = config
     )
     val newState = accountStateMock(gold = 777)
-    matchmaking.send(account, Database.AccountStateUpdated(accountId, newState))
+    matchmaking.send(account, Storage.AccountStateUpdated(accountId, newState))
     client.expectMsg(newState)
   })
 
@@ -196,7 +197,7 @@ class AccountPersistentTest extends AccountTestSpec {
     )
     val newState = accountStateMock(gold = 777)
     val top = Top(List.empty, 1)
-    matchmaking.send(account, Database.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
+    matchmaking.send(account, Storage.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
     client.expectMsg(newState)
     client.expectMsg(Place(3))
     client.expectMsg(top.dto)

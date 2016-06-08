@@ -17,11 +17,11 @@ import protos.SkillType.ATTACK
 import protos.SlotId.{SLOT_1, SLOT_3}
 import protos._
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.Database.GetAccount
-import ru.rknrl.castles.database.{Database, FakeCalendar, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage.GetAccount
+import ru.rknrl.castles.storage.{FakeCalendar, Statistics, Storage}
 
 import scala.concurrent.duration._
 
@@ -33,7 +33,7 @@ class AccountTest extends AccountTestSpec {
   multi("AcceptPresent", {
     check(
       expectedAccountState = acceptPresent(Some(accountState), config.account, new FakeCalendar(week = 3)),
-      clientMessage = AcceptPresent,
+      clientMessage = AcceptPresent(),
       statMessage = None
     )
   })
@@ -129,12 +129,12 @@ class AccountTest extends AccountTestSpec {
     client.send(account, clientMessage)
 
     database.expectMsgPF(TIMEOUT) {
-      case Database.GetAndUpdateAccountState(accountId, transform) ⇒
+      case Storage.GetAndUpdateAccountState(accountId, transform) ⇒
         val newState = transform(Some(accountState))
         newState shouldBe expectedAccountState
     }
     if (statMessage.isDefined) graphite.expectMsg(statMessage.get)
-    database.send(account, Database.AccountStateUpdated(accountId, expectedAccountState))
+    database.send(account, Storage.AccountStateUpdated(accountId, expectedAccountState))
 
     client.expectMsg(expectedAccountState)
   }
@@ -164,10 +164,10 @@ class AccountTest extends AccountTestSpec {
       accountState = accountState
     )
 
-    client.send(account, EnterGame)
+    client.send(account, EnterGame())
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, Database.AccountResponse(
+    database.send(account, Storage.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(config.account.initRating),

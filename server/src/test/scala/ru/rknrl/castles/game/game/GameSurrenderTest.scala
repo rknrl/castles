@@ -44,7 +44,7 @@ class GameSurrenderTest extends GameTestSpec {
 
     // Первый игрок посылает Surrender
 
-    client0.send(game, Surrender)
+    client0.send(game, Surrender())
 
     // Оба игрока получают GameOver в ответ
 
@@ -90,8 +90,8 @@ class GameSurrenderTest extends GameTestSpec {
 
     // Если еще раз отправить Surrender - они будут игнорироваться
 
-    client0.send(game, Surrender)
-    client1.send(game, Surrender)
+    client0.send(game, Surrender())
+    client1.send(game, Surrender())
     client0.expectNoMsg(noMsgTimeout)
     client1.expectNoMsg(noMsgTimeout)
   })

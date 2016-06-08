@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.database
+package ru.rknrl.castles.storage
 
 trait Calendar {
   def getCurrentWeek: Int

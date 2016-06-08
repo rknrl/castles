@@ -15,11 +15,11 @@ import protos.PlatformType.CANVAS
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database.GetAccount
-import ru.rknrl.castles.database.{Calendar, Database, FakeCalendar}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage.GetAccount
+import ru.rknrl.castles.storage.{Calendar, FakeCalendar, Storage}
 import ru.rknrl.test.ActorsTest
 
 class AccountTestSpec extends ActorsTest {
@@ -72,9 +72,9 @@ class AccountTestSpec extends ActorsTest {
     val rating = config.account.initRating
 
     database.expectMsg(GetAccount(accountId))
-    database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
+    database.expectMsg(Storage.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
-    database.send(account, Database.AccountResponse(
+    database.send(account, Storage.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(rating),

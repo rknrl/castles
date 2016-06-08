@@ -10,12 +10,12 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import protos._
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.GetAccount
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage
+import ru.rknrl.castles.storage.Storage.GetAccount
 
 class AccountEnterGameTest extends AccountTestSpec {
   val config = configMock()
@@ -46,10 +46,10 @@ class AccountEnterGameTest extends AccountTestSpec {
       accountState = accountState
     )
 
-    client.send(account, EnterGame)
+    client.send(account, EnterGame())
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, Database.AccountResponse(
+    database.send(account, Storage.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(config.account.initRating),

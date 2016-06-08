@@ -16,7 +16,7 @@ import protos.SlotId._
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
-import ru.rknrl.castles.database.DbConfiguration
+import ru.rknrl.castles.storage.DbConfiguration
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMap, GameMaps}
 import ru.rknrl.castles.game.state.{Bullet, Fireball, GameState, Player, Tornado, Volcano, _}

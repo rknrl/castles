@@ -6,7 +6,7 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.database
+package ru.rknrl.castles.storage
 
 import akka.actor.{Actor, Props}
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
@@ -14,7 +14,7 @@ import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, Connection, ResultSet, RowData}
 import protos._
-import ru.rknrl.castles.database.Database.{AccountStateAndRatingResponse, AccountStateResponse, GetAndUpdateAccountStateAndRating, _}
+import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingResponse, AccountStateResponse, GetAndUpdateAccountStateAndRating, _}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.logging.ShortActorLogging
 
@@ -43,9 +43,9 @@ class DbConfiguration(username: String,
   )
 }
 
-object Database {
+object Storage {
 
-  def props(config: DbConfiguration, calendar: Calendar) = Props(classOf[Database], config, calendar)
+  def props(config: DbConfiguration, calendar: Calendar) = Props(classOf[Storage], config, calendar)
 
   case class GetTop(weekNumber: Int)
 
@@ -100,7 +100,7 @@ object Database {
 
 }
 
-class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor with ShortActorLogging {
+class Storage(configuration: DbConfiguration, calendar: Calendar) extends Actor with ShortActorLogging {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 

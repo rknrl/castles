@@ -11,7 +11,7 @@ package ru.rknrl.castles.admin
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.Database._
+import ru.rknrl.castles.storage.Storage._
 import ru.rknrl.logging.ShortActorLogging
 
 object Admin {

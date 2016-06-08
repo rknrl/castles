@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import protos.BuildingLevel.LEVEL_1
 import protos._
 import ru.rknrl.Assertion
-import ru.rknrl.castles.database.Calendar
+import ru.rknrl.castles.storage.Calendar
 
 object AccountState {
   def buyBuilding(stateOption: Option[AccountState], id: SlotId, buildingType: BuildingType, config: AccountConfig) = {

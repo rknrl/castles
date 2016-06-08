@@ -6,18 +6,18 @@
 //     |:\/__/   |:|  |     |:/  /   |:\/__/   \:\__\
 //      \|__|     \|__|     \/__/     \|__|     \/__/
 
-package ru.rknrl.castles.database
+package ru.rknrl.castles.storage
 
 import akka.actor.Props
 import com.github.mauricio.async.db.RowData
 import protos.{AccountId, UserInfo}
-import ru.rknrl.castles.database.Database.UserInfoResponse
-import ru.rknrl.castles.database.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
+import ru.rknrl.castles.storage.Storage.UserInfoResponse
+import ru.rknrl.castles.storage.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
 
 import scala.concurrent.Future
 
 object TestDatabase {
-  def props(config: DbConfiguration) = Props(classOf[TestDatabase], config)
+  def props(config: DbConfiguration) = Props(classOf[TestDatabase], config, new RealCalendar)
 
   case class TruncateTable(table: String)
 
@@ -27,7 +27,7 @@ object TestDatabase {
 
 }
 
-class TestDatabase(configuration: DbConfiguration, calendar: Calendar) extends Database(configuration, calendar) {
+class TestDatabase(configuration: DbConfiguration, calendar: Calendar) extends Storage(configuration, calendar) {
 
   import context.dispatcher
 

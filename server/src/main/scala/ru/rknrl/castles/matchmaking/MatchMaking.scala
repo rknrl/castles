@@ -12,9 +12,9 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.AccountStateUpdated
-import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
+import ru.rknrl.castles.storage.Storage$
+import ru.rknrl.castles.storage.Storage.AccountStateUpdated
+import ru.rknrl.castles.storage.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.core.Graphite.Health
@@ -63,16 +63,16 @@ object MatchMaking {
             gameFactory: IGameFactory,
             interval: FiniteDuration,
             config: Config,
-            databaseQueue: ActorRef,
+            storage: ActorRef,
             graphite: ActorRef) =
-    Props(classOf[MatchMaking], gameCreator, gameFactory, interval, config, databaseQueue, graphite)
+    Props(classOf[MatchMaking], gameCreator, gameFactory, interval, config, storage, graphite)
 }
 
 class MatchMaking(gameCreator: GameCreator,
                   gameFactory: IGameFactory,
                   interval: FiniteDuration,
                   config: Config,
-                  databaseQueue: ActorRef,
+                  storage: ActorRef,
                   graphite: ActorRef) extends Actor with ShortActorLogging {
 
   override def supervisorStrategy = OneForOneStrategy() {
@@ -165,7 +165,7 @@ class MatchMaking(gameCreator: GameCreator,
       val order = gameInfo.order(accountId)
       val ratingAmount = ELO.ratingAmount(gameInfo.orders, order, place)
 
-      context.actorOf(AccountPatcher.props(accountId, reward, usedItems, ratingAmount, order.userInfo, config, self, databaseQueue), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
+      context.actorOf(AccountPatcher.props(accountId, reward, usedItems, ratingAmount, order.userInfo, config, self, storage), "account-patcher-" + accountId.accountType.name + "-" + accountId.id)
 
       sendToAccount(accountId, AccountLeaveGame)
 

@@ -15,7 +15,7 @@ import akka.io.IO
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAndUpdateAccountState}
+import ru.rknrl.castles.storage.Storage.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.logging.Bugs.Bug
@@ -30,14 +30,14 @@ import scala.concurrent.duration._
 
 object HttpServer {
   def props(config: Config,
-            databaseQueue: ActorRef,
+            storage: ActorRef,
             matchmaking: ActorRef,
             bugs: ActorRef) =
-    Props(classOf[HttpServer], config, databaseQueue, matchmaking, bugs)
+    Props(classOf[HttpServer], config, storage, matchmaking, bugs)
 }
 
 class HttpServer(config: Config,
-                 databaseQueue: ActorRef,
+                 storage: ActorRef,
                  matchmaking: ActorRef,
                  bugs: ActorRef) extends Actor with ShortActorLogging with HttpService {
 
@@ -131,7 +131,7 @@ class HttpServer(config: Config,
 
             import context.dispatcher
 
-            val result = Patterns.ask(databaseQueue, GetAndUpdateAccountState(accountId, transform), 5 seconds) map {
+            val result = Patterns.ask(storage, GetAndUpdateAccountState(accountId, transform), 5 seconds) map {
               case AccountStateResponse(accountId, accountStateDto) ⇒
                 send(matchmaking, AccountStateResponse(accountId, accountStateDto))
                 httpResponse

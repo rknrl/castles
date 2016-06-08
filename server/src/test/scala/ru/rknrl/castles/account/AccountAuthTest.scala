@@ -14,11 +14,11 @@ import protos.AccountType.VKONTAKTE
 import protos.PlatformType.CANVAS
 import protos._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database
-import ru.rknrl.castles.database.Database.GetAccount
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
+import ru.rknrl.castles.storage.Storage
+import ru.rknrl.castles.storage.Storage.GetAccount
 
 class AccountAuthTest extends AccountTestSpec {
   "auth" should {
@@ -34,9 +34,10 @@ class AccountAuthTest extends AccountTestSpec {
       client.send(account, authenticate)
 
       secretChecker.expectMsg(authenticate)
+      watch(client.ref)
       secretChecker.send(account, SecretChecked(valid = false))
 
-      client.expectMsg(PoisonPill)
+      expectTerminated(client.ref)
 
       graphite.expectMsg(StatAction.NOT_AUTHENTICATED)
     })
@@ -45,14 +46,14 @@ class AccountAuthTest extends AccountTestSpec {
 
       val config = configMock()
       val secretChecker = new TestProbe(system)
-      val database = new TestProbe(system)
+      val storage = new TestProbe(system)
       val graphite = new TestProbe(system)
       val matchmaking = new TestProbe(system)
       val client = new TestProbe(system)
       val account = newAccount(
         matchmaking = matchmaking.ref,
         secretChecker = secretChecker.ref,
-        database = database.ref,
+        database = storage.ref,
         graphite = graphite.ref,
         config = config
       )
@@ -64,10 +65,10 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
-      database.expectMsg(Database.GetAccount(accountId))
-      database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
+      storage.expectMsg(Storage.GetAccount(accountId))
+      storage.expectMsg(Storage.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountResponse(
+      storage.send(account, Storage.AccountResponse(
         accountId,
         state = None,
         rating = None,
@@ -100,8 +101,8 @@ class AccountAuthTest extends AccountTestSpec {
       ))
 
       graphite.expectMsg(StatAction.START_TUTOR)
-      database.expectMsg(GetAccount(accountId))
-      database.send(account, Database.AccountResponse(
+      storage.expectMsg(GetAccount(accountId))
+      storage.send(account, Storage.AccountResponse(
         accountId,
         state = None,
         rating = None,
@@ -141,10 +142,10 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorState()
       val rating = config.account.initRating
 
-      database.expectMsg(Database.GetAccount(accountId))
-      database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
+      database.expectMsg(Storage.GetAccount(accountId))
+      database.expectMsg(Storage.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, Database.AccountResponse(
+      database.send(account, Storage.AccountResponse(
         accountId,
         state = Some(accountState),
         rating = Some(rating),
