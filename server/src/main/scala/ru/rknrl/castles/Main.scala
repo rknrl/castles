@@ -48,8 +48,7 @@ object Main {
     val secretChecker = system.actorOf(SecretChecker.props(config), "secret-checker")
 
     val calendar = new RealCalendar
-    val database = system.actorOf(Database.props(config.db), "database")
-    val databaseTransaction = system.actorOf(DatabaseTransaction.props(database, calendar), "database-transaction")
+    val database = system.actorOf(Database.props(config.db, calendar), "database")
 
     val gameCreator = new GameCreator(gameMaps, config)
     val matchmaking = system.actorOf(
@@ -58,7 +57,7 @@ object Main {
         gameFactory = new GameFactory(),
         interval = 7 seconds,
         config = config,
-        databaseQueue = databaseTransaction,
+        databaseQueue = database,
         graphite = graphite
       ),
       "matchmaking"
@@ -66,17 +65,17 @@ object Main {
 
     val bugs = system.actorOf(Bugs.props(config.clientBugsDir), "bugs")
 
-    system.actorOf(HttpServer.props(config, databaseTransaction, matchmaking, bugs), "http-server")
+    system.actorOf(HttpServer.props(config, database, matchmaking, bugs), "http-server")
 
     system.actorOf(CrossDomainPolicyServer.props(config.host, config.policyPort), "policy-server")
 
     system.actorOf(Server.props(config.host, config.gamePort,
-      client ⇒ Account.props(matchmaking, secretChecker, databaseTransaction, graphite, config, calendar),
+      client ⇒ Account.props(matchmaking, secretChecker, database, graphite, config, calendar),
       Serializer),
       "client-server")
 
     system.actorOf(Server.props(config.host, config.adminPort,
-      client ⇒ Admin.props(client, databaseTransaction, matchmaking, config),
+      client ⇒ Admin.props(client, database, matchmaking, config),
       Serializer),
       "admin-server")
   }
