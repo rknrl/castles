@@ -166,31 +166,31 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
     //
 
     case GetTop(weekNumber) ⇒
-      getTop(sender, weekNumber)
+      answer(getTop(weekNumber))
 
     case GetPlace(rating, weekNumber) ⇒
-      getPlace(sender, rating, weekNumber)
+      answer(getPlace(rating, weekNumber))
 
     case GetRating(accountId, weekNumber) ⇒
-      getRating(sender, accountId, weekNumber)
+      answer(getRating(accountId, weekNumber))
 
     case UpdateRating(accountId, weekNumber, newRating, userInfo) ⇒
-      replaceRating(sender, accountId, weekNumber, newRating, userInfo)
+      answer(replaceRating(accountId, weekNumber, newRating, userInfo))
 
     case UpdateAccountState(accountId, newState) ⇒
-      replaceAccountState(sender, accountId, newState)
+      answer(replaceAccountState(accountId, newState))
 
     case GetAccountState(accountId) ⇒
-      getAccountState(sender, accountId)
+      answer(getAccountState(accountId))
 
     case GetTutorState(accountId) ⇒
-      getTutorState(sender, accountId)
+      answer(getTutorState(accountId))
 
     case UpdateTutorState(accountId, tutorState) ⇒
-      replaceTutorState(sender, accountId, tutorState)
+      answer(replaceTutorState(accountId, tutorState))
 
     case UpdateUserInfo(accountId, userInfo) ⇒
-      replaceUserInfo(sender, accountId, userInfo)
+      answer(replaceUserInfo(accountId, userInfo))
   }
 
   def getTop(weekNumber: Int): Future[Top] =
@@ -202,7 +202,7 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
         "GROUP BY ratings.id " +
         "ORDER BY ratings.rating DESC " +
         "LIMIT 5;",
-      Seq(weekNumber),
+      Seq(weekNumber)
     ) flatMap { resultSet ⇒
       Future.successful(Top(resultSet.map(rowDataToTopUser).toList, weekNumber))
     }
@@ -221,7 +221,7 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
   def getRating(accountId: AccountId, weekNumber: Int): Future[RatingResponse] =
     read(
       "SELECT rating FROM ratings WHERE weekNumber = ? AND id=?;",
-      Seq(weekNumber, accountId.toByteArray),
+      Seq(weekNumber, accountId.toByteArray)
     ) flatMap { resultSet ⇒
       if (resultSet.isEmpty)
         Future.successful(RatingResponse(accountId, weekNumber, None))
