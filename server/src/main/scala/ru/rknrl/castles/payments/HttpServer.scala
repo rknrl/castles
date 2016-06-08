@@ -15,7 +15,7 @@ import akka.io.IO
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.DatabaseTransaction.{AccountStateResponse, GetAndUpdateAccountState}
+import ru.rknrl.castles.database.Database.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.logging.Bugs.Bug

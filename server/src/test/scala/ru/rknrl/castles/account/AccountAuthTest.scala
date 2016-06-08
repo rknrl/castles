@@ -14,8 +14,8 @@ import protos.AccountType.VKONTAKTE
 import protos.PlatformType.CANVAS
 import protos._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
-import ru.rknrl.castles.database.{Database, DatabaseTransaction}
+import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.GetAccount
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
@@ -64,10 +64,10 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.expectMsg(authenticate)
       secretChecker.send(account, SecretChecked(valid = true))
 
-      database.expectMsg(DatabaseTransaction.GetAccount(accountId))
+      database.expectMsg(Database.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, DatabaseTransaction.AccountResponse(
+      database.send(account, Database.AccountResponse(
         accountId,
         state = None,
         rating = None,
@@ -101,7 +101,7 @@ class AccountAuthTest extends AccountTestSpec {
 
       graphite.expectMsg(StatAction.START_TUTOR)
       database.expectMsg(GetAccount(accountId))
-      database.send(account, DatabaseTransaction.AccountResponse(
+      database.send(account, Database.AccountResponse(
         accountId,
         state = None,
         rating = None,
@@ -141,10 +141,10 @@ class AccountAuthTest extends AccountTestSpec {
       val tutorState = TutorState()
       val rating = config.account.initRating
 
-      database.expectMsg(DatabaseTransaction.GetAccount(accountId))
+      database.expectMsg(Database.GetAccount(accountId))
       database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
-      database.send(account, DatabaseTransaction.AccountResponse(
+      database.send(account, Database.AccountResponse(
         accountId,
         state = Some(accountState),
         rating = Some(rating),

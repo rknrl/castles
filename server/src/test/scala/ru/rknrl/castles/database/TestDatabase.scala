@@ -14,6 +14,8 @@ import protos.{AccountId, UserInfo}
 import ru.rknrl.castles.database.Database.UserInfoResponse
 import ru.rknrl.castles.database.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
 
+import scala.concurrent.Future
+
 object TestDatabase {
   def props(config: DbConfiguration) = Props(classOf[TestDatabase], config)
 
@@ -25,11 +27,11 @@ object TestDatabase {
 
 }
 
-class TestDatabase(configuration: DbConfiguration) extends Database(configuration) {
+class TestDatabase(configuration: DbConfiguration, calendar: Calendar) extends Database(configuration, calendar) {
 
   import context.dispatcher
 
-  def testReceive = logged {
+  def testReceive: Receive = logged {
     case TruncateTable(table) ⇒
       val ref = sender
       pool.sendPreparedStatement("TRUNCATE TABLE " + table + ";", Seq.empty).map(
@@ -39,17 +41,19 @@ class TestDatabase(configuration: DbConfiguration) extends Database(configuratio
       }
 
     case GetUserInfo(accountId) ⇒
-      val ref = sender
-      read(
-        "SELECT userInfo FROM user_info WHERE id=?;",
-        Seq(accountId.toByteArray),
-        resultSet ⇒
-          if (resultSet.isEmpty)
-            send(ref, UserInfoResponse(accountId, None))
-          else if (resultSet.size == 1)
-            send(ref, UserInfoResponse(accountId, Some(rowDataToUserInfo(resultSet.head))))
-          else
-            log.error("Get user info: invalid result rows count = " + resultSet.size)
+      answer(implicit connection ⇒
+        read(
+          "SELECT userInfo FROM user_info WHERE id=?;",
+          Seq(accountId.toByteArray)
+        ) flatMap {
+          resultSet ⇒
+            if (resultSet.isEmpty)
+              Future.successful(UserInfoResponse(accountId, None))
+            else if (resultSet.size == 1)
+              Future.successful(UserInfoResponse(accountId, Some(rowDataToUserInfo(resultSet.head))))
+            else
+              Future.failed(new Throwable("Get user info: invalid result rows count = " + resultSet.size))
+        }
       )
   }
 

@@ -13,7 +13,7 @@ import akka.testkit.TestProbe
 import protos.AccountType.VKONTAKTE
 import protos.StatAction.START_GAME_4_WITH_BOTS
 import protos._
-import ru.rknrl.castles.database.DatabaseTransaction.AccountStateResponse
+import ru.rknrl.castles.database.Database.AccountStateUpdated
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 
@@ -299,7 +299,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client1.send(matchmaking, Online(accountId1))
     client2.send(matchmaking, Online(accountId2))
 
-    val msg = AccountStateResponse(accountId1, accountStateMock())
+    val msg = AccountStateUpdated(accountId1, accountStateMock())
     matchmaking ! msg
 
     client1.expectMsg(msg)

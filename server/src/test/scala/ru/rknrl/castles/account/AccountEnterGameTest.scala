@@ -10,8 +10,8 @@ package ru.rknrl.castles.account
 
 import akka.testkit.TestProbe
 import protos._
-import ru.rknrl.castles.database.DatabaseTransaction
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
+import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.GetAccount
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{AccountLeaveGame, ConnectToGame, GameOrder}
@@ -49,7 +49,7 @@ class AccountEnterGameTest extends AccountTestSpec {
     client.send(account, EnterGame)
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, DatabaseTransaction.AccountResponse(
+    database.send(account, Database.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(config.account.initRating),

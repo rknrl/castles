@@ -11,25 +11,25 @@ package ru.rknrl.castles.admin
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.DatabaseTransaction.{AccountResponse, AccountStateResponse, GetAccount, GetAndUpdateAccountState}
+import ru.rknrl.castles.database.Database._
 import ru.rknrl.logging.ShortActorLogging
 
 object Admin {
   def props(client: ActorRef,
-            databaseQueue: ActorRef,
+            storage: ActorRef,
             matchmaking: ActorRef,
             config: Config) =
-    Props(classOf[Admin], client, databaseQueue, matchmaking, config)
+    Props(classOf[Admin], client, storage, matchmaking, config)
 }
 
 class Admin(client: ActorRef,
-            databaseQueue: ActorRef,
+            storage: ActorRef,
             matchmaking: ActorRef,
             config: Config) extends Actor with ShortActorLogging {
 
   var accountId: Option[AccountId] = None
 
-  override def receive = auth
+  def receive = auth
 
   def auth: Receive = logged {
     case authenticate: AdminAuthenticate ⇒
@@ -45,11 +45,11 @@ class Admin(client: ActorRef,
   def admin: Receive = logged {
     case dto: AdminGetAccountState ⇒
       accountId = Some(dto.accountId)
-      send(databaseQueue, GetAccount(dto.accountId))
+      send(storage, GetAccount(dto.accountId))
       become(waitForState, "waitForState")
 
     case AdminSetAccountState(accountState) ⇒
-      send(databaseQueue, GetAndUpdateAccountState(accountId.get, oldState ⇒ accountState)) // todo checkAndUpdate
+      send(storage, GetAndUpdateAccountState(accountId.get, oldState ⇒ accountState)) // todo checkAndUpdate
       become(waitForUpdatedState, "waitForUpdatedState")
   }
 
@@ -61,7 +61,7 @@ class Admin(client: ActorRef,
   }
 
   def waitForUpdatedState = logged {
-    case msg@AccountStateResponse(_, accountState) ⇒
+    case msg@AccountStateUpdated(_, accountState) ⇒
       send(client, AdminAccountState(accountId.get, accountState))
       send(matchmaking, msg)
       become(admin, "admin")

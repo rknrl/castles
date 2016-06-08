@@ -17,8 +17,8 @@ import protos.SkillType.ATTACK
 import protos.SlotId.{SLOT_1, SLOT_3}
 import protos._
 import ru.rknrl.castles.account.AccountState._
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
-import ru.rknrl.castles.database.{DatabaseTransaction, FakeCalendar, Statistics}
+import ru.rknrl.castles.database.Database.GetAccount
+import ru.rknrl.castles.database.{Database, FakeCalendar, Statistics}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
 import ru.rknrl.castles.matchmaking.Top
@@ -129,12 +129,12 @@ class AccountTest extends AccountTestSpec {
     client.send(account, clientMessage)
 
     database.expectMsgPF(TIMEOUT) {
-      case DatabaseTransaction.GetAndUpdateAccountState(accountId, transform) ⇒
+      case Database.GetAndUpdateAccountState(accountId, transform) ⇒
         val newState = transform(Some(accountState))
         newState shouldBe expectedAccountState
     }
     if (statMessage.isDefined) graphite.expectMsg(statMessage.get)
-    database.send(account, DatabaseTransaction.AccountStateResponse(accountId, expectedAccountState))
+    database.send(account, Database.AccountStateUpdated(accountId, expectedAccountState))
 
     client.expectMsg(expectedAccountState)
   }
@@ -167,7 +167,7 @@ class AccountTest extends AccountTestSpec {
     client.send(account, EnterGame)
 
     database.expectMsg(GetAccount(accountId))
-    database.send(account, DatabaseTransaction.AccountResponse(
+    database.send(account, Database.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(config.account.initRating),

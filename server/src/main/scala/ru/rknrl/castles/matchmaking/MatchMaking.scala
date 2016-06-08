@@ -12,7 +12,8 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.database.DatabaseTransaction
+import ru.rknrl.castles.database.Database
+import ru.rknrl.castles.database.Database.AccountStateUpdated
 import ru.rknrl.castles.database.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
@@ -172,7 +173,7 @@ class MatchMaking(gameCreator: GameCreator,
 
     case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 
-    case msg: DatabaseTransaction.Response ⇒
+    case msg: AccountStateUpdated ⇒
       sendToAccount(msg.accountId, msg)
 
     case RegisterHealth ⇒

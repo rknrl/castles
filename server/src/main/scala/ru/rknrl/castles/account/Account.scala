@@ -14,8 +14,7 @@ import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
 import ru.rknrl.castles.account.AccountState._
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.Database.UpdateUserInfo
-import ru.rknrl.castles.database.DatabaseTransaction._
+import ru.rknrl.castles.database.Database.{UpdateUserInfo, _}
 import ru.rknrl.castles.database.{Calendar, Database, Statistics}
 import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameMsg
@@ -33,17 +32,17 @@ object Account {
 
   def props(matchmaking: ActorRef,
             secretChecker: ActorRef,
-            databaseQueue: ActorRef,
+            storage: ActorRef,
             graphite: ActorRef,
             config: Config,
             calendar: Calendar) =
-    Props(classOf[Account], matchmaking, secretChecker, databaseQueue, graphite, config, calendar)
+    Props(classOf[Account], matchmaking, secretChecker, storage, graphite, config, calendar)
 
 }
 
 class Account(matchmaking: ActorRef,
               secretChecker: ActorRef,
-              databaseQueue: ActorRef,
+              storage: ActorRef,
               graphite: ActorRef,
               config: Config,
               calendar: Calendar) extends Actor with ShortActorLogging {
@@ -64,8 +63,8 @@ class Account(matchmaking: ActorRef,
 
     case SecretChecked(valid) ⇒
       if (valid) {
-        send(databaseQueue, GetAccount(client.accountId))
-        send(databaseQueue, UpdateUserInfo(client.accountId, client.userInfo))
+        send(storage, GetAccount(client.accountId))
+        send(storage, UpdateUserInfo(client.accountId, client.userInfo))
         send(graphite, StatAction.AUTHENTICATED)
       } else {
         send(graphite, StatAction.NOT_AUTHENTICATED)
@@ -124,7 +123,7 @@ class Account(matchmaking: ActorRef,
       } else
         become(account, "account")
 
-  }.orElse(persistent)
+  } orElse persistent
 
   def account: Receive = logged {
     case AcceptPresent() ⇒
@@ -166,7 +165,7 @@ class Account(matchmaking: ActorRef,
 
     case EnterGame() ⇒ sendGameOrder()
 
-  }.orElse(persistent)
+  } orElse persistent
 
   def enterGame: Receive = logged {
     case msg: AccountResponse ⇒
@@ -182,7 +181,7 @@ class Account(matchmaking: ActorRef,
       send(game, Join(client.accountId, client.ref))
       become(inGame, "inGame")
 
-  }.orElse(persistent)
+  } orElse persistent
 
   def inGame: Receive = logged {
     case msg: GameMsg ⇒ forward(game, msg)
@@ -195,10 +194,10 @@ class Account(matchmaking: ActorRef,
       send(client.ref, LeavedGame())
       become(account, "account")
 
-  }.orElse(persistent)
+  } orElse persistent
 
   def persistent: Receive = logged {
-    case AccountStateResponse(accountId, state) ⇒
+    case AccountStateUpdated(accountId, state) ⇒
       send(client.ref, state)
 
     case AccountStateAndRatingResponse(accountId, state, newRating, newPlace, top) ⇒
@@ -209,16 +208,16 @@ class Account(matchmaking: ActorRef,
     case stat: protos.Stat ⇒ send(graphite, stat.action)
 
     case state: TutorState ⇒
-      send(databaseQueue, Database.UpdateTutorState(client.accountId, state))
+      send(storage, Database.UpdateTutorState(client.accountId, state))
 
     case DuplicateAccount ⇒ send(client.ref, PoisonPill)
   }
 
   def getAndUpdate(transform: Option[AccountState] ⇒ AccountState): Unit =
-    send(databaseQueue, GetAndUpdateAccountState(client.accountId, transform))
+    send(storage, GetAndUpdateAccountState(client.accountId, transform))
 
   def sendGameOrder(): Unit = {
-    send(databaseQueue, GetAccount(client.accountId)) // todo нужно только accountState и rating, не надо запрашивать весь account
+    send(storage, GetAccount(client.accountId)) // todo нужно только accountState и rating, не надо запрашивать весь account
     become(enterGame, "enterGame")
   }
 

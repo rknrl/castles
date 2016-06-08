@@ -15,9 +15,8 @@ import protos.PlatformType.CANVAS
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.SecretChecker.SecretChecked
-import ru.rknrl.castles.database.DatabaseTransaction.GetAccount
-import ru.rknrl.castles.database.{Calendar, FakeCalendar}
-import ru.rknrl.castles.database.{Database, DatabaseTransaction}
+import ru.rknrl.castles.database.Database.GetAccount
+import ru.rknrl.castles.database.{Calendar, Database, FakeCalendar}
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking.{InGame, InGameResponse, Online}
 import ru.rknrl.castles.matchmaking.Top
@@ -38,7 +37,7 @@ class AccountTestSpec extends ActorsTest {
       Account.props(
         matchmaking = matchmaking,
         secretChecker = secretChecker,
-        databaseQueue = database,
+        storage = database,
         graphite = graphite,
         config = config,
         calendar = calendar
@@ -75,7 +74,7 @@ class AccountTestSpec extends ActorsTest {
     database.expectMsg(GetAccount(accountId))
     database.expectMsg(Database.UpdateUserInfo(accountId, authenticate.userInfo))
     graphite.expectMsg(StatAction.AUTHENTICATED)
-    database.send(account, DatabaseTransaction.AccountResponse(
+    database.send(account, Database.AccountResponse(
       accountId,
       state = Some(accountState),
       rating = Some(rating),

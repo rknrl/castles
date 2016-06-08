@@ -11,7 +11,7 @@ package ru.rknrl.castles.account
 import akka.actor.PoisonPill
 import akka.testkit.TestProbe
 import protos._
-import ru.rknrl.castles.database.{Database, DatabaseTransaction}
+import ru.rknrl.castles.database.Database
 import ru.rknrl.castles.kit.Mocks._
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
@@ -166,7 +166,7 @@ class AccountPersistentTest extends AccountTestSpec {
       config = config
     )
     val newState = accountStateMock(gold = 777)
-    matchmaking.send(account, DatabaseTransaction.AccountStateResponse(accountId, newState))
+    matchmaking.send(account, Database.AccountStateUpdated(accountId, newState))
     client.expectMsg(newState)
   })
 
@@ -196,7 +196,7 @@ class AccountPersistentTest extends AccountTestSpec {
     )
     val newState = accountStateMock(gold = 777)
     val top = Top(List.empty, 1)
-    matchmaking.send(account, DatabaseTransaction.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
+    matchmaking.send(account, Database.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
     client.expectMsg(newState)
     client.expectMsg(Place(3))
     client.expectMsg(top.dto)

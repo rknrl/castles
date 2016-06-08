@@ -12,7 +12,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.database.DatabaseTransaction._
+import ru.rknrl.castles.database.Database._
 import ru.rknrl.logging.ShortActorLogging
 
 object AccountPatcher {
