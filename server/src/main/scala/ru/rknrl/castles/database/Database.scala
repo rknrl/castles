@@ -8,7 +8,7 @@
 
 package ru.rknrl.castles.database
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, Props}
 import akka.pattern.Patterns
 import com.github.mauricio.async.db.mysql.pool.MySQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
@@ -193,7 +193,7 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
       replaceUserInfo(sender, accountId, userInfo)
   }
 
-  def getTop(sender: ActorRef, weekNumber: Int): Unit =
+  def getTop(weekNumber: Int): Future[Top] =
     read(
       "SELECT ratings.id, ratings.rating, userInfo " +
         "FROM ratings " +
@@ -203,47 +203,49 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
         "ORDER BY ratings.rating DESC " +
         "LIMIT 5;",
       Seq(weekNumber),
-      resultSet ⇒ send(sender, Top(resultSet.map(rowDataToTopUser).toList, weekNumber))
-    )
+    ) flatMap { resultSet ⇒
+      Future.successful(Top(resultSet.map(rowDataToTopUser).toList, weekNumber))
+    }
 
-  def getPlace(sender: ActorRef, rating: Double, weekNumber: Int): Unit =
+  def getPlace(rating: Double, weekNumber: Int): Future[PlaceResponse] =
     read(
       "SELECT COUNT(*) `place` " +
         "FROM ratings " +
         "WHERE weekNumber = ? AND rating > ?",
-      Seq(weekNumber, rating),
-      resultSet ⇒ {
-        val place = resultSet.head("place").asInstanceOf[Long] + 1
-        send(sender, PlaceResponse(rating, weekNumber, place))
-      }
-    )
+      Seq(weekNumber, rating)
+    ) flatMap { resultSet ⇒
+      val place = resultSet.head("place").asInstanceOf[Long] + 1
+      Future.successful(PlaceResponse(rating, weekNumber, place))
+    }
 
-  def getRating(sender: ActorRef, accountId: AccountId, weekNumber: Int): Unit =
+  def getRating(accountId: AccountId, weekNumber: Int): Future[RatingResponse] =
     read(
       "SELECT rating FROM ratings WHERE weekNumber = ? AND id=?;",
       Seq(weekNumber, accountId.toByteArray),
-      resultSet ⇒
-        if (resultSet.isEmpty)
-          send(sender, RatingResponse(accountId, weekNumber, None))
-        else if (resultSet.size == 1)
-          send(sender, RatingResponse(accountId, weekNumber, Some(rowDataToRating(resultSet.head))))
-        else
-          log.error("Get rating: invalid result rows count = " + resultSet.size)
-    )
+    ) flatMap { resultSet ⇒
+      if (resultSet.isEmpty)
+        Future.successful(RatingResponse(accountId, weekNumber, None))
+      else if (resultSet.size == 1)
+        Future.successful(RatingResponse(accountId, weekNumber, Some(rowDataToRating(resultSet.head))))
+      else
+        Future.failed(new Exception("Get rating: invalid result rows count = " + resultSet.size))
+    }
 
-  def replaceRating(sender: ActorRef, accountId: AccountId, weekNumber: Int, newRating: Double, userInfo: UserInfo): Unit =
+  def replaceRating(accountId: AccountId, weekNumber: Int, newRating: Double, userInfo: UserInfo): Future[RatingResponse] =
     write(
       "REPLACE INTO ratings (id,weekNumber,rating) VALUES (?,?,?);",
-      Seq(accountId.toByteArray, weekNumber, newRating),
-      () ⇒ send(sender, RatingResponse(accountId, weekNumber, Some(newRating)))
-    )
+      Seq(accountId.toByteArray, weekNumber, newRating)
+    ) flatMap { _ ⇒
+      Future.successful(RatingResponse(accountId, weekNumber, Some(newRating)))
+    }
 
-  def replaceAccountState(sender: ActorRef, accountId: AccountId, newState: AccountState): Unit =
+  def replaceAccountState(accountId: AccountId, newState: AccountState): Future[AccountStateResponse] =
     write(
       "REPLACE INTO account_state (id,state) VALUES (?,?);",
-      Seq(accountId.toByteArray, newState.toByteArray),
-      () ⇒ send(sender, AccountStateResponse(accountId, Some(newState)))
-    )
+      Seq(accountId.toByteArray, newState.toByteArray)
+    ) flatMap { _ ⇒
+      Future.successful(AccountStateResponse(accountId, Some(newState)))
+    }
 
   def getAccountState(accountId: AccountId): Future[AccountStateResponse] =
     read(
@@ -262,7 +264,7 @@ class Database(configuration: DbConfiguration, calendar: Calendar) extends Actor
     read(
       "SELECT state FROM tutor_state WHERE id=?;",
       Seq(accountId.toByteArray)
-    ) flatMap {      resultSet ⇒
+    ) flatMap { resultSet ⇒
       if (resultSet.isEmpty)
         Future.successful(TutorStateResponse(accountId, None))
       else if (resultSet.size == 1)
