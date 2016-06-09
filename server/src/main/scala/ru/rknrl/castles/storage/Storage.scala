@@ -14,20 +14,20 @@ import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionContext
 import com.github.mauricio.async.db.{Configuration, Connection, ResultSet, RowData}
 import protos._
-import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingResponse, AccountStateResponse, GetAndUpdateAccountStateAndRating, _}
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
+import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingResponse, AccountStateResponse, GetAndUpdateAccountStateAndRating, _}
 import ru.rknrl.logging.ShortActorLogging
 
 import scala.concurrent.Future
 
-class DbConfiguration(username: String,
-                      host: String,
-                      port: Int,
-                      password: String,
-                      database: String,
-                      poolMaxObjects: Int,
-                      poolMaxIdle: Long,
-                      poolMaxQueueSize: Int) {
+class StorageConfig(username: String,
+                    host: String,
+                    port: Int,
+                    password: String,
+                    database: String,
+                    poolMaxObjects: Int,
+                    poolMaxIdle: Long,
+                    poolMaxQueueSize: Int) {
   def configuration = Configuration(
     username = username,
     host = host,
@@ -45,7 +45,7 @@ class DbConfiguration(username: String,
 
 object Storage {
 
-  def props(config: DbConfiguration, calendar: Calendar) = Props(classOf[Storage], config, calendar)
+  def props(config: StorageConfig, calendar: Calendar) = Props(classOf[Storage], config, calendar)
 
   case class GetTop(weekNumber: Int)
 
@@ -100,7 +100,7 @@ object Storage {
 
 }
 
-class Storage(configuration: DbConfiguration, calendar: Calendar) extends Actor with ShortActorLogging {
+class Storage(configuration: StorageConfig, calendar: Calendar) extends Actor with ShortActorLogging {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 

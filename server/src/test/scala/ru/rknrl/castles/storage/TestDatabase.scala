@@ -17,7 +17,7 @@ import ru.rknrl.castles.storage.TestDatabase.{GetUserInfo, TableTruncated, Trunc
 import scala.concurrent.Future
 
 object TestDatabase {
-  def props(config: DbConfiguration) = Props(classOf[TestDatabase], config, new RealCalendar)
+  def props(config: StorageConfig) = Props(classOf[TestDatabase], config, new RealCalendar)
 
   case class TruncateTable(table: String)
 
@@ -27,7 +27,7 @@ object TestDatabase {
 
 }
 
-class TestDatabase(configuration: DbConfiguration, calendar: Calendar) extends Storage(configuration, calendar) {
+class TestDatabase(configuration: StorageConfig, calendar: Calendar) extends Storage(configuration, calendar) {
 
   import context.dispatcher
 

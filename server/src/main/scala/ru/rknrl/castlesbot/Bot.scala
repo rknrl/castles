@@ -15,7 +15,7 @@ import protos.DeviceType.PC
 import protos.PlatformType.CANVAS
 import protos.SkillLevel.SKILL_LEVEL_3
 import protos._
-import ru.rknrl.RandomUtil.random
+import ru.rknrl.RandomUtil.pickRandomFromList
 import ru.rknrl.Supervisor._
 import ru.rknrl.castles.account.AccountConfig
 import ru.rknrl.castles.bot.GameBot
@@ -101,7 +101,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorL
 
   def inMenu: Receive = logged {
     case DoMenuAction ⇒
-      val action = random(MenuAction.values.toSeq)
+      val action = pickRandomFromList(MenuAction.values.toSeq)
 
       if (!waitForAccountStateUpdate)
         action match {
@@ -109,8 +109,8 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorL
             if (accountState.gold >= buildingPrice(LEVEL_1)) {
               val emptySlots = accountState.slots.filter(_.buildingPrototype.isEmpty)
               if (emptySlots.nonEmpty) {
-                val slotId = random(emptySlots).id
-                val buildingType = random(BuildingType.values)
+                val slotId = pickRandomFromList(emptySlots).id
+                val buildingType = pickRandomFromList(BuildingType.values)
                 waitForAccountStateUpdate = true
                 send(BuyBuilding(slotId, buildingType))
               }
@@ -123,7 +123,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorL
                 accountState.gold >= buildingPrice(AccountConfig.nextBuildingLevel(s.buildingPrototype.get.buildingLevel))
             )
             if (upgradableSlots.nonEmpty) {
-              val slotId = random(upgradableSlots).id
+              val slotId = pickRandomFromList(upgradableSlots).id
               waitForAccountStateUpdate = true
               send(UpgradeBuilding(slotId))
             }
@@ -131,14 +131,14 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorL
           case REMOVE_BUILDING ⇒
             val notEmptySlots = accountState.slots.filter(_.buildingPrototype.isDefined)
             if (notEmptySlots.size > 1) {
-              val slotId = random(notEmptySlots).id
+              val slotId = pickRandomFromList(notEmptySlots).id
               waitForAccountStateUpdate = true
               send(RemoveBuilding(slotId))
             }
 
           case BUY_ITEM ⇒
             if (accountState.gold >= config.itemPrice) {
-              val itemType = random(ItemType.values)
+              val itemType = pickRandomFromList(ItemType.values)
               waitForAccountStateUpdate = true
               send(BuyItem(itemType))
             }
@@ -147,7 +147,7 @@ class Bot(server: ActorRef, accountId: AccountId) extends Actor with ShortActorL
             val totalLevel = AccountConfig.getTotalLevel(accountState.skills)
             if (totalLevel < 9 && accountState.gold >= skillUpgradePrice(totalLevel + 1)) {
               val upgradableSkills = accountState.skills.filter(_.level != SKILL_LEVEL_3)
-              val skillType = random(upgradableSkills).skillType
+              val skillType = pickRandomFromList(upgradableSkills).skillType
               waitForAccountStateUpdate = true
               send(UpgradeSkill(skillType))
             }

@@ -9,6 +9,6 @@
 package ru.rknrl
 
 object RandomUtil {
-  def random[T](list: Seq[T]): T =
+  def pickRandomFromList[T](list: Seq[T]): T =
     list((Math.random() * list.length).toInt)
 }

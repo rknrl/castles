@@ -27,8 +27,8 @@ class GameMap(val cells: Iterable[MapCell]) {
 
   private def topLeftBuildings(iterator: BuildingIdIterator, config: GameConfig) =
     for (cell ← cells) yield {
-      val buildingType = cell.buildingType.getOrElse(RandomUtil.random(BuildingType.values))
-      val buildingLevel = cell.buildingLevel.getOrElse(RandomUtil.random(BuildingLevel.values))
+      val buildingType = cell.buildingType.getOrElse(RandomUtil.pickRandomFromList(BuildingType.values))
+      val buildingLevel = cell.buildingLevel.getOrElse(RandomUtil.pickRandomFromList(BuildingLevel.values))
       val prototype = BuildingPrototype(buildingType, buildingLevel)
 
       val stat = config.units(prototype)
@@ -99,7 +99,7 @@ class GameMaps(val big: Array[GameMap],
                val bigTutor: GameMap,
                val smallTutor: GameMap) {
   def random(isBig: Boolean) =
-    if (isBig) RandomUtil.random(big) else RandomUtil.random(small)
+    if (isBig) RandomUtil.pickRandomFromList(big) else RandomUtil.pickRandomFromList(small)
 
   def tutor(isBig: Boolean) =
     if (isBig) bigTutor else smallTutor

@@ -17,7 +17,7 @@ import ru.rknrl.castles.matchmaking.{Top, TopUser}
 import ru.rknrl.test.ActorsTest
 
 class DatabaseTest extends ActorsTest {
-  val config = new DbConfiguration(
+  val config = new StorageConfig(
     username = "testuser",
     host = "localhost",
     port = 3306,

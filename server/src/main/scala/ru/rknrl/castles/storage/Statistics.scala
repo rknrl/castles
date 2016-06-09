@@ -8,9 +8,10 @@
 
 package ru.rknrl.castles.storage
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import protos._
 import ru.rknrl.castles.matchmaking.MatchMaking.GameOrder
+import ru.rknrl.logging.ShortActorLogging
 
 object Statistics {
   def buyItem(itemType: ItemType) =
@@ -70,59 +71,55 @@ object Statistics {
     }
 
 
-  // todo: send logging
-  def sendLeaveGameStatistics(place: Int,
+  def leaveGameStatistics(place: Int,
                               isTutor: Boolean,
                               orders: Iterable[GameOrder],
-                              order: GameOrder,
-                              graphite: ActorRef)
-                             (implicit sender: ActorRef): Unit = {
+                              order: GameOrder): Option[StatAction] = {
     if (!order.isBot) {
       val gameWithBots = orders.count(_.isBot) == orders.size - 1
       if (gameWithBots) {
         if (orders.size == 4) {
           if (place == 1) {
             if (isTutor)
-              graphite ! StatAction.TUTOR_4_WIN
+              return Some(StatAction.TUTOR_4_WIN)
             else
-              graphite ! StatAction.WIN_4_BOTS
+              return Some(StatAction.WIN_4_BOTS)
           } else {
             if (isTutor)
-              graphite ! StatAction.TUTOR_4_LOSE
+              return Some(StatAction.TUTOR_4_LOSE)
             else
-              graphite ! StatAction.LOSE_4_BOTS
+              return Some(StatAction.LOSE_4_BOTS)
           }
         } else if (orders.size == 2) {
           if (place == 1) {
             if (isTutor)
-              graphite ! StatAction.TUTOR_2_WIN
+              return Some(StatAction.TUTOR_2_WIN)
             else
-              graphite ! StatAction.WIN_2_BOTS
+              return Some(StatAction.WIN_2_BOTS)
           } else {
             if (isTutor)
-              graphite ! StatAction.TUTOR_2_LOSE
+              return Some(StatAction.TUTOR_2_LOSE)
             else
-              graphite ! StatAction.LOSE_2_BOTS
+              return Some(StatAction.LOSE_2_BOTS)
           }
         }
       }
     }
+
+    None
   }
 
-  // todo: send logging
-  def sendCreateGameStatistics(orders: Iterable[GameOrder],
-                               graphite: ActorRef)
-                              (implicit sender: ActorRef): Unit = {
+  def createGameStatistics(orders: Iterable[GameOrder]): StatAction = {
     if (orders.count(_.isBot) == orders.size - 1) {
       if (orders.size == 4)
-        graphite ! StatAction.START_GAME_4_WITH_BOTS
+        StatAction.START_GAME_4_WITH_BOTS
       else
-        graphite ! StatAction.START_GAME_2_WITH_BOTS
+        StatAction.START_GAME_2_WITH_BOTS
     } else {
       if (orders.size == 4)
-        graphite ! StatAction.START_GAME_4_WITH_PLAYERS
+        StatAction.START_GAME_4_WITH_PLAYERS
       else
-        graphite ! StatAction.START_GAME_2_WITH_PLAYERS
+        StatAction.START_GAME_2_WITH_PLAYERS
     }
   }
 }

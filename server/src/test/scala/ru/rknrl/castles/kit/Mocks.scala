@@ -16,7 +16,7 @@ import protos.SlotId._
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.{AccountConfig, BuildingPrices, SkillUpgradePrices}
-import ru.rknrl.castles.storage.DbConfiguration
+import ru.rknrl.castles.storage.StorageConfig
 import ru.rknrl.castles.game._
 import ru.rknrl.castles.game.init.{GameMap, GameMaps}
 import ru.rknrl.castles.game.state.{Bullet, Fireball, GameState, Player, Tornado, Volcano, _}
@@ -158,7 +158,7 @@ object Mocks extends Matchers {
                    poolMaxObjects: Int = 10,
                    poolMaxIdle: Long = 11,
                    poolMaxQueueSize: Int = 12) =
-    new DbConfiguration(
+    new StorageConfig(
       username = username,
       host = host,
       port = port,
@@ -223,7 +223,7 @@ object Mocks extends Matchers {
                  isDev: Boolean = true,
                  mapsDir: String = "maps/dir/",
                  clientBugsDir: String = "bugs/",
-                 db: DbConfiguration = dbConfigMock(),
+                 db: StorageConfig = dbConfigMock(),
                  graphite: GraphiteConfig = graphiteConfigMock(),
                  products: List[ru.rknrl.core.social.Product] = List.empty,
                  social: SocialConfigs = socialConfigsMock(),

@@ -12,9 +12,8 @@ import akka.actor.SupervisorStrategy.Stop
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.storage.Storage$
 import ru.rknrl.castles.storage.Storage.AccountStateUpdated
-import ru.rknrl.castles.storage.Statistics.{sendCreateGameStatistics, sendLeaveGameStatistics}
+import ru.rknrl.castles.storage.Statistics.{createGameStatistics, leaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
 import ru.rknrl.core.Graphite.Health
@@ -147,7 +146,7 @@ class MatchMaking(gameCreator: GameCreator,
         val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self)
         gamesCount = gamesCount + 1
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
-        if (!newGame.isTutor) sendCreateGameStatistics(newGame.orders, graphite)
+        if (!newGame.isTutor) send(graphite, createGameStatistics(newGame.orders))
 
         for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
@@ -169,7 +168,8 @@ class MatchMaking(gameCreator: GameCreator,
 
       sendToAccount(accountId, AccountLeaveGame)
 
-      sendLeaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order, graphite)
+      val stat = leaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order)
+      if(stat.isDefined) send(graphite, stat.get)
 
     case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 

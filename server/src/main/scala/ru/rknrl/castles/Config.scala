@@ -10,7 +10,7 @@ package ru.rknrl.castles
 
 import protos._
 import ru.rknrl.castles.account.AccountConfig
-import ru.rknrl.castles.storage.DbConfiguration
+import ru.rknrl.castles.storage.StorageConfig
 import ru.rknrl.castles.game._
 import ru.rknrl.core.Graphite.GraphiteConfig
 import ru.rknrl.core.social.SocialConfigs
@@ -26,7 +26,7 @@ class Config(val host: String,
              val isDev: Boolean,
              val mapsDir: String,
              val clientBugsDir: String,
-             val db: DbConfiguration,
+             val db: StorageConfig,
              val graphite: GraphiteConfig,
              val products: List[ru.rknrl.core.social.Product],
              val social: SocialConfigs,

@@ -15,13 +15,13 @@ import com.github.mauricio.async.db.pool.ConnectionPool
 import protos._
 import ru.rknrl.castles.MigrateDatabase1.Migrate
 import ru.rknrl.castles.storage.RealCalendar
-import ru.rknrl.castles.storage.DbConfiguration
+import ru.rknrl.castles.storage.StorageConfig
 import ru.rknrl.logging.ShortActorLogging
 
 object MigrateDatabase1 {
   def main(args: Array[String]) {
     implicit val system = ActorSystem("main-actor-system")
-    val config = new DbConfiguration(
+    val config = new StorageConfig(
       username = "root",
       host = args(0),
       port = 3306,
@@ -39,7 +39,7 @@ object MigrateDatabase1 {
 
 }
 
-class MigrateDatabase1(configuration: DbConfiguration) extends Actor with ShortActorLogging {
+class MigrateDatabase1(configuration: StorageConfig) extends Actor with ShortActorLogging {
   val factory = new MySQLConnectionFactory(configuration.configuration)
   val pool = new ConnectionPool(factory, configuration.poolConfiguration)
 
