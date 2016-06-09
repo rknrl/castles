@@ -9,25 +9,22 @@
 package ru.rknrl.castles.storage
 
 import akka.actor.Props
-import com.github.mauricio.async.db.RowData
+import com.github.mauricio.async.db.{Connection, RowData}
 import protos.{AccountId, UserInfo}
-import ru.rknrl.castles.storage.Storage.UserInfoResponse
-import ru.rknrl.castles.storage.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
+import ru.rknrl.castles.storage.TestStorage.{TableTruncated, TruncateTable}
 
 import scala.concurrent.Future
 
-object TestDatabase {
-  def props(config: StorageConfig) = Props(classOf[TestDatabase], config, new RealCalendar)
+object TestStorage {
+  def props(config: StorageConfig) = Props(classOf[TestStorage], config, new RealCalendar)
 
   case class TruncateTable(table: String)
 
   case class TableTruncated(table: String)
 
-  case class GetUserInfo(accountId: AccountId)
-
 }
 
-class TestDatabase(configuration: StorageConfig, calendar: Calendar) extends Storage(configuration, calendar) {
+class TestStorage(configuration: StorageConfig, calendar: Calendar) extends Storage(configuration, calendar) {
 
   import context.dispatcher
 
@@ -39,23 +36,21 @@ class TestDatabase(configuration: StorageConfig, calendar: Calendar) extends Sto
       ) onFailure {
         case t: Throwable ⇒ log.error("Database error", t)
       }
-
-    case GetUserInfo(accountId) ⇒
-      answer(implicit connection ⇒
-        read(
-          "SELECT userInfo FROM user_info WHERE id=?;",
-          Seq(accountId.toByteArray)
-        ) flatMap {
-          resultSet ⇒
-            if (resultSet.isEmpty)
-              Future.successful(UserInfoResponse(accountId, None))
-            else if (resultSet.size == 1)
-              Future.successful(UserInfoResponse(accountId, Some(rowDataToUserInfo(resultSet.head))))
-            else
-              Future.failed(new Throwable("Get user info: invalid result rows count = " + resultSet.size))
-        }
-      )
   }
+
+  def getUserInfo(accountId: AccountId)(implicit connection: Connection): Future[Option[UserInfo]] =
+    get(
+      "SELECT userInfo FROM user_info WHERE id=?;",
+      Seq(accountId.toByteArray)
+    ) flatMap {
+      resultSet ⇒
+        if (resultSet.isEmpty)
+          Future.successful(None)
+        else if (resultSet.size == 1)
+          Future.successful(Some(rowDataToUserInfo(resultSet.head)))
+        else
+          Future.failed(new Throwable("Get user info: invalid result rows count = " + resultSet.size))
+    }
 
   def rowDataToUserInfo(row: RowData) = {
     val byteArray = row("userInfo").asInstanceOf[Array[Byte]]

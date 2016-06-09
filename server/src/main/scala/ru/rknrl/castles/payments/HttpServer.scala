@@ -15,8 +15,8 @@ import akka.io.IO
 import akka.pattern.Patterns
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.AccountState
-import ru.rknrl.castles.storage.Storage.{AccountStateResponse, GetAndUpdateAccountState}
 import ru.rknrl.castles.payments.PaymentsCallback.{PaymentResponse, Response}
+import ru.rknrl.castles.storage.Storage.{AccountStateUpdated, GetAndUpdateAccountState}
 import ru.rknrl.core.social.SocialConfig
 import ru.rknrl.logging.Bugs.Bug
 import ru.rknrl.logging.ShortActorLogging
@@ -132,8 +132,8 @@ class HttpServer(config: Config,
             import context.dispatcher
 
             val result = Patterns.ask(storage, GetAndUpdateAccountState(accountId, transform), 5 seconds) map {
-              case AccountStateResponse(accountId, accountStateDto) ⇒
-                send(matchmaking, AccountStateResponse(accountId, accountStateDto))
+              case msg: AccountStateUpdated ⇒
+                send(matchmaking, msg)
                 httpResponse
               case invalid ⇒
                 log.info("invalid update result=" + invalid)

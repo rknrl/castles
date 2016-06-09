@@ -66,7 +66,7 @@ class AccountAuthTest extends AccountTestSpec {
       secretChecker.send(account, SecretChecked(valid = true))
 
       storage.expectMsg(Storage.GetAccount(accountId))
-      storage.expectMsg(Storage.UpdateUserInfo(accountId, authenticate.userInfo))
+      storage.expectMsg(Storage.ReplaceUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
       storage.send(account, Storage.AccountResponse(
         accountId,
@@ -143,7 +143,7 @@ class AccountAuthTest extends AccountTestSpec {
       val rating = config.account.initRating
 
       database.expectMsg(Storage.GetAccount(accountId))
-      database.expectMsg(Storage.UpdateUserInfo(accountId, authenticate.userInfo))
+      database.expectMsg(Storage.ReplaceUserInfo(accountId, authenticate.userInfo))
       graphite.expectMsg(StatAction.AUTHENTICATED)
       database.send(account, Storage.AccountResponse(
         accountId,

@@ -108,7 +108,7 @@ class AccountPersistentTest extends AccountTestSpec {
       )
       val newTutorState = TutorState(emptySlot = Some(true))
       client.send(account, newTutorState)
-      database.expectMsg(Storage.UpdateTutorState(accountId, newTutorState))
+      database.expectMsg(Storage.ReplaceTutorState(accountId, newTutorState))
     })
 
     multi("Если клиент НЕ авторизовался - игнорируется", {

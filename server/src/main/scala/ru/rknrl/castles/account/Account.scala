@@ -18,7 +18,7 @@ import ru.rknrl.castles.game.Game.Join
 import ru.rknrl.castles.game.GameMsg
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Top
-import ru.rknrl.castles.storage.Storage.{UpdateUserInfo, _}
+import ru.rknrl.castles.storage.Storage.{ReplaceUserInfo, _}
 import ru.rknrl.castles.storage.{Calendar, Statistics, Storage}
 import ru.rknrl.logging.ShortActorLogging
 
@@ -64,7 +64,7 @@ class Account(matchmaking: ActorRef,
     case SecretChecked(valid) ⇒
       if (valid) {
         send(storage, GetAccount(client.accountId))
-        send(storage, UpdateUserInfo(client.accountId, client.userInfo))
+        send(storage, ReplaceUserInfo(client.accountId, client.userInfo))
         send(graphite, StatAction.AUTHENTICATED)
       } else {
         send(graphite, StatAction.NOT_AUTHENTICATED)
@@ -208,7 +208,7 @@ class Account(matchmaking: ActorRef,
     case stat: protos.Stat ⇒ send(graphite, stat.action)
 
     case state: TutorState ⇒
-      send(storage, Storage.UpdateTutorState(client.accountId, state))
+      send(storage, Storage.ReplaceTutorState(client.accountId, state))
 
     case DuplicateAccount ⇒ send(client.ref, PoisonPill)
   }

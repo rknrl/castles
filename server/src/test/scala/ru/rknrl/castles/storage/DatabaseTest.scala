@@ -8,13 +8,17 @@
 
 package ru.rknrl.castles.storage
 
+import akka.testkit.TestActorRef
+import com.github.mauricio.async.db.Connection
 import protos.AccountType.DEV
 import protos._
-import ru.rknrl.castles.storage.Storage._
-import ru.rknrl.castles.storage.TestDatabase.{GetUserInfo, TableTruncated, TruncateTable}
 import ru.rknrl.castles.kit.Mocks
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
+import ru.rknrl.castles.storage.Storage._
+import ru.rknrl.castles.storage.TestStorage.{TableTruncated, TruncateTable}
 import ru.rknrl.test.ActorsTest
+
+import scala.concurrent.{Await, Future}
 
 class DatabaseTest extends ActorsTest {
   val config = new StorageConfig(
@@ -28,23 +32,23 @@ class DatabaseTest extends ActorsTest {
     poolMaxQueueSize = 1000
   )
 
-  val database = system.actorOf(TestDatabase.props(config))
+  val storageRef = TestActorRef[TestStorage](TestStorage.props(config))
+  val storage = storageRef.underlyingActor
+
+  def await[T](f: (Connection ⇒ Future[T])): T =
+    Await.result(storage.pool.inTransaction(f), noMsgTimeout)
 
   "AccountState" in {
     val accountId = AccountId(DEV, "1")
 
-    database ! TruncateTable("account_state")
+    storageRef ! TruncateTable("account_state")
     expectMsg(TableTruncated("account_state"))
 
-    database ! GetAccountState(accountId)
-    expectMsg(AccountStateResponse(accountId, None))
+    await(implicit c ⇒ storage.getAccountState(accountId)) shouldBe None
 
     def updateAccountState(accountState: AccountState): Unit = {
-      database ! UpdateAccountState(accountId, accountState)
-      expectMsg(AccountStateResponse(accountId, Some(accountState)))
-
-      database ! GetAccountState(accountId)
-      expectMsg(AccountStateResponse(accountId, Some(accountState)))
+      await(implicit c ⇒ storage.replaceAccountState(accountId, accountState)) shouldBe()
+      await(implicit c ⇒ storage.getAccountState(accountId)) shouldBe Some(accountState)
     }
 
     updateAccountState(Mocks.accountStateMock())
@@ -54,18 +58,16 @@ class DatabaseTest extends ActorsTest {
   "TutorState" in {
     val accountId = AccountId(DEV, "1")
 
-    database ! TruncateTable("tutor_state")
+    storageRef ! TruncateTable("tutor_state")
     expectMsg(TableTruncated("tutor_state"))
 
-    database ! GetTutorState(accountId)
-    expectMsg(TutorStateResponse(accountId, None))
+    await(implicit c ⇒ storage.getTutorState(accountId)) shouldBe None
 
     def updateTutorState(tutorState: TutorState): Unit = {
-      database ! UpdateTutorState(accountId, tutorState)
-      expectMsg(TutorStateResponse(accountId, Some(tutorState)))
+      storageRef ! ReplaceTutorState(accountId, tutorState)
+      expectMsg(TutorStateUpdated(accountId, tutorState))
 
-      database ! GetTutorState(accountId)
-      expectMsg(TutorStateResponse(accountId, Some(tutorState)))
+      await(implicit c ⇒ storage.getTutorState(accountId)) shouldBe Some(tutorState)
     }
 
     updateTutorState(TutorState())
@@ -75,64 +77,51 @@ class DatabaseTest extends ActorsTest {
   "Rating" in {
     val accountId = AccountId(DEV, "1")
 
-    database ! TruncateTable("ratings")
+    storageRef ! TruncateTable("ratings")
     expectMsg(TableTruncated("ratings"))
 
-    database ! GetRating(accountId, weekNumber = 1)
-    expectMsg(RatingResponse(accountId, 1, None))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 1)) shouldBe None
 
-    database ! GetRating(accountId, weekNumber = 2)
-    expectMsg(RatingResponse(accountId, 2, None))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 2)) shouldBe None
 
     // weekNumber = 1
 
-    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1567, UserInfo(accountId))
-    expectMsg(RatingResponse(accountId, 1, Some(1567)))
+    await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = 1, newRating = 1567, UserInfo(accountId))) shouldBe()
 
-    database ! GetRating(accountId, weekNumber = 1)
-    expectMsg(RatingResponse(accountId, 1, Some(1567)))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 1)) shouldBe Some(1567)
 
-    database ! GetRating(accountId, weekNumber = 2)
-    expectMsg(RatingResponse(accountId, 2, None))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 2)) shouldBe None
 
     // weekNumber = 2
 
-    database ! UpdateRating(accountId, weekNumber = 2, newRating = 1400, UserInfo(accountId))
-    expectMsg(RatingResponse(accountId, 2, Some(1400)))
+    await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = 2, newRating = 1400, UserInfo(accountId))) shouldBe()
 
-    database ! GetRating(accountId, weekNumber = 1)
-    expectMsg(RatingResponse(accountId, 1, Some(1567)))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 1)) shouldBe Some(1567)
 
-    database ! GetRating(accountId, weekNumber = 2)
-    expectMsg(RatingResponse(accountId, 2, Some(1400)))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 2)) shouldBe Some(1400)
 
     // weekNumber = 1 again
 
-    database ! UpdateRating(accountId, weekNumber = 1, newRating = 1600, UserInfo(accountId))
-    expectMsg(RatingResponse(accountId, 1, Some(1600)))
+    await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = 1, newRating = 1600, UserInfo(accountId))) shouldBe()
 
-    database ! GetRating(accountId, weekNumber = 1)
-    expectMsg(RatingResponse(accountId, 1, Some(1600)))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 1)) shouldBe Some(1600)
 
-    database ! GetRating(accountId, weekNumber = 2)
-    expectMsg(RatingResponse(accountId, 2, Some(1400)))
+    await(implicit c ⇒ storage.getRating(accountId, weekNumber = 2)) shouldBe Some(1400)
   }
 
   "UpdateUserInfo" in {
     val accountId = AccountId(DEV, "1")
 
-    database ! TruncateTable("user_info")
+    storageRef ! TruncateTable("user_info")
     expectMsg(TableTruncated("user_info"))
 
-    database ! GetUserInfo(accountId)
-    expectMsg(UserInfoResponse(accountId, None))
+    await(implicit c ⇒ storage.getUserInfo(accountId)) shouldBe None
 
     def updateUserInfo(userInfo: UserInfo): Unit = {
-      database ! UpdateUserInfo(accountId, userInfo)
-      expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+      storageRef ! ReplaceUserInfo(accountId, userInfo)
+      expectMsg(UserInfoUpdated(accountId, userInfo))
 
-      database ! GetUserInfo(accountId)
-      expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+      await(implicit c ⇒ storage.getUserInfo(accountId)) shouldBe Some(userInfo)
     }
 
     updateUserInfo(UserInfo(accountId, firstName = Some("tolya"), lastName = Some("yanot")))
@@ -140,13 +129,12 @@ class DatabaseTest extends ActorsTest {
   }
 
   "GetPlace" in {
-    database ! TruncateTable("ratings")
+    storageRef ! TruncateTable("ratings")
     expectMsg(TableTruncated("ratings"))
 
     def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
       val accountId = AccountId(DEV, id)
-      database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
-      expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
+      await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))) shouldBe()
     }
 
     writeRating("1", 1, 1400)
@@ -158,195 +146,166 @@ class DatabaseTest extends ActorsTest {
 
     // 1 week
 
-    database ! GetPlace(rating = 1400, weekNumber = 1)
-    expectMsg(PlaceResponse(rating = 1400, weekNumber = 1, place = 2))
+    await(implicit c ⇒ storage.getPlace(rating = 1400, weekNumber = 1)) shouldBe 2
 
-    database ! GetPlace(rating = 900, weekNumber = 1)
-    expectMsg(PlaceResponse(rating = 900, weekNumber = 1, place = 5))
+    await(implicit c ⇒ storage.getPlace(rating = 900, weekNumber = 1)) shouldBe 5
 
     // 2 week
 
-    database ! GetPlace(rating = 1400, weekNumber = 2)
-    expectMsg(PlaceResponse(rating = 1400, weekNumber = 2, place = 2))
+    await(implicit c ⇒ storage.getPlace(rating = 1400, weekNumber = 2)) shouldBe 2
 
-    database ! GetPlace(rating = 900, weekNumber = 2)
-    expectMsg(PlaceResponse(rating = 900, weekNumber = 2, place = 3))
+    await(implicit c ⇒ storage.getPlace(rating = 900, weekNumber = 2)) shouldBe 3
 
     // 3 week
 
-    database ! GetPlace(rating = 900, weekNumber = 3)
-    expectMsg(PlaceResponse(rating = 900, weekNumber = 3, place = 1))
+    await(implicit c ⇒ storage.getPlace(rating = 900, weekNumber = 3)) shouldBe 1
   }
 
   "GetTop" should {
 
     "empty" in {
-      database ! TruncateTable("ratings")
+      storageRef ! TruncateTable("ratings")
       expectMsg(TableTruncated("ratings"))
-      database ! TruncateTable("user_info")
+      storageRef ! TruncateTable("user_info")
       expectMsg(TableTruncated("user_info"))
 
-      database ! GetTop(weekNumber = 1)
-      expectMsg(Top(Seq.empty, weekNumber = 1))
-
+      await(implicit c ⇒ storage.getTop(weekNumber = 1)) shouldBe Top(Seq.empty, weekNumber = 1)
     }
 
     "without user info" in {
-      database ! TruncateTable("ratings")
+      storageRef ! TruncateTable("ratings")
       expectMsg(TableTruncated("ratings"))
-      database ! TruncateTable("user_info")
+      storageRef ! TruncateTable("user_info")
       expectMsg(TableTruncated("user_info"))
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
-        expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
+        await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))) shouldBe()
       }
 
       for (i ← 0 to 50) {
         writeRating((50 - i).toString, i % 2, 50 - i)
       }
 
-      database ! GetTop(weekNumber = 0)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"))),
-            TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"))),
-            TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42")))
-          ),
-          weekNumber = 0
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 0)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"))),
+          TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"))),
+          TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"))),
+          TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"))),
+          TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42")))
+        ),
+        weekNumber = 0
       )
 
-      database ! GetTop(weekNumber = 1)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"))),
-            TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"))),
-            TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41")))
-          ),
-          weekNumber = 1
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 1)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"))),
+          TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"))),
+          TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"))),
+          TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"))),
+          TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41")))
+        ),
+        weekNumber = 1
       )
 
     }
 
     "with user info" in {
-      database ! TruncateTable("ratings")
+      storageRef ! TruncateTable("ratings")
       expectMsg(TableTruncated("ratings"))
-      database ! TruncateTable("user_info")
+      storageRef ! TruncateTable("user_info")
       expectMsg(TableTruncated("user_info"))
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
-        expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
+        await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))) shouldBe()
         val userInfo = UserInfo(accountId, firstName = Some(id))
-        database ! UpdateUserInfo(accountId, userInfo)
-        expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+        storageRef ! ReplaceUserInfo(accountId, userInfo)
+        expectMsg(UserInfoUpdated(accountId, userInfo))
       }
 
       for (i ← 0 to 50) {
         writeRating((50 - i).toString, i % 2, 50 - i)
       }
 
-      database ! GetTop(weekNumber = 0)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46"))),
-            TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"), Some("44"))),
-            TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42"), Some("42")))
-          ),
-          weekNumber = 0
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 0)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
+          TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
+          TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46"))),
+          TopUser(AccountId(DEV, "44"), 44, UserInfo(AccountId(DEV, "44"), Some("44"))),
+          TopUser(AccountId(DEV, "42"), 42, UserInfo(AccountId(DEV, "42"), Some("42")))
+        ),
+        weekNumber = 0
       )
 
-      database ! GetTop(weekNumber = 1)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45"))),
-            TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"), Some("43"))),
-            TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41"), Some("41")))
-          ),
-          weekNumber = 1
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 1)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
+          TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
+          TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45"))),
+          TopUser(AccountId(DEV, "43"), 43, UserInfo(AccountId(DEV, "43"), Some("43"))),
+          TopUser(AccountId(DEV, "41"), 41, UserInfo(AccountId(DEV, "41"), Some("41")))
+        ),
+        weekNumber = 1
       )
     }
 
     "without ratings" in {
-      database ! TruncateTable("ratings")
+      storageRef ! TruncateTable("ratings")
       expectMsg(TableTruncated("ratings"))
-      database ! TruncateTable("user_info")
+      storageRef ! TruncateTable("user_info")
       expectMsg(TableTruncated("user_info"))
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
         val userInfo = UserInfo(accountId, firstName = Some(id))
-        database ! UpdateUserInfo(accountId, userInfo)
-        expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+        storageRef ! ReplaceUserInfo(accountId, userInfo)
+        expectMsg(UserInfoUpdated(accountId, userInfo))
       }
 
       for (i ← 0 to 50) {
         writeRating(i.toString, i % 2, 50 - i)
       }
 
-      database ! GetTop(weekNumber = 1)
-      expectMsg(Top(Seq.empty, weekNumber = 1))
+      await(implicit c ⇒ storage.getTop(weekNumber = 1)) shouldBe Top(Seq.empty, weekNumber = 1)
     }
 
     "5 entries" in {
-      database ! TruncateTable("ratings")
+      storageRef ! TruncateTable("ratings")
       expectMsg(TableTruncated("ratings"))
-      database ! TruncateTable("user_info")
+      storageRef ! TruncateTable("user_info")
       expectMsg(TableTruncated("user_info"))
 
       def writeRating(id: String, weekNumber: Int, rating: Double): Unit = {
         val accountId = AccountId(DEV, id)
-        database ! UpdateRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))
-        expectMsg(RatingResponse(accountId, weekNumber, Some(rating)))
+        await(implicit c ⇒ storage.replaceRating(accountId, weekNumber = weekNumber, newRating = rating, UserInfo(accountId))) shouldBe()
         val userInfo = UserInfo(accountId, firstName = Some(id))
-        database ! UpdateUserInfo(accountId, userInfo)
-        expectMsg(UserInfoResponse(accountId, Some(userInfo)))
+        storageRef ! ReplaceUserInfo(accountId, userInfo)
+        expectMsg(UserInfoUpdated(accountId, userInfo))
       }
 
       for (i ← 0 to 5) {
         writeRating((50 - i).toString, i % 2, 50 - i)
       }
 
-      database ! GetTop(weekNumber = 0)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
-            TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
-            TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46")))
-          ),
-          weekNumber = 0
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 0)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "50"), 50, UserInfo(AccountId(DEV, "50"), Some("50"))),
+          TopUser(AccountId(DEV, "48"), 48, UserInfo(AccountId(DEV, "48"), Some("48"))),
+          TopUser(AccountId(DEV, "46"), 46, UserInfo(AccountId(DEV, "46"), Some("46")))
+        ),
+        weekNumber = 0
       )
 
-      database ! GetTop(weekNumber = 1)
-      expectMsg(
-        Top(
-          Seq(
-            TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
-            TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
-            TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45")))
-          ),
-          weekNumber = 1
-        )
+      await(implicit c ⇒ storage.getTop(weekNumber = 1)) shouldBe Top(
+        Seq(
+          TopUser(AccountId(DEV, "49"), 49, UserInfo(AccountId(DEV, "49"), Some("49"))),
+          TopUser(AccountId(DEV, "47"), 47, UserInfo(AccountId(DEV, "47"), Some("47"))),
+          TopUser(AccountId(DEV, "45"), 45, UserInfo(AccountId(DEV, "45"), Some("45")))
+        ),
+        weekNumber = 1
       )
     }
   }
