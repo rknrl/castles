@@ -11,7 +11,7 @@ package ru.rknrl.castles.matchmaking
 import akka.actor.{Actor, ActorRef, Props}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.account.AccountState
+import ru.rknrl.castles.account.AccountState.{addGold, applyUsedItems, incGamesCount}
 import ru.rknrl.castles.storage.Storage._
 import ru.rknrl.logging.ShortActorLogging
 
@@ -49,9 +49,9 @@ class AccountPatcher(accountId: AccountId,
   val transform = (stateDto: Option[protos.AccountState], ratingDto: Option[Double]) ⇒ {
     val state = stateDto.getOrElse(config.account.initState)
 
-    val newState = AccountState.addGold(
-      AccountState.incGamesCount(
-        AccountState.applyUsedItems(
+    val newState = addGold(
+      incGamesCount(
+        applyUsedItems(
           state,
           usedItems
         )
@@ -65,7 +65,7 @@ class AccountPatcher(accountId: AccountId,
   send(storage, GetAndUpdateAccountStateAndRating(accountId, transform, userInfo))
 
   def receive = logged {
-    case msg: AccountStateAndRatingResponse ⇒
+    case msg: AccountStateAndRatingUpdated ⇒
       send(matchmaking, msg)
       context stop self
   }

@@ -100,7 +100,7 @@ class Config(val host: String,
       case 1 ⇒
         UserInfo(
           accountId,
-          Some("oleon"),
+          Some("Napoleon"),
           Some("1769"),
           Some("http://" + staticHost + "/avatars/Napoleon96.png"),
           Some("http://" + staticHost + "/avatars/Napoleon256.png")

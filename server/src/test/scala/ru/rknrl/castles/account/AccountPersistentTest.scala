@@ -197,7 +197,7 @@ class AccountPersistentTest extends AccountTestSpec {
     )
     val newState = accountStateMock(gold = 777)
     val top = Top(List.empty, 1)
-    matchmaking.send(account, Storage.AccountStateAndRatingResponse(accountId, newState, 1666, 3, top))
+    matchmaking.send(account, Storage.AccountStateAndRatingUpdated(accountId, newState, 1666, 3, top))
     client.expectMsg(newState)
     client.expectMsg(Place(3))
     client.expectMsg(top.dto)

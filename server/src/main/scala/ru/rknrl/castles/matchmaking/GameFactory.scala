@@ -21,7 +21,7 @@ trait IGameFactory {
 }
 
 class GameFactory extends IGameFactory {
-  private var gameIterator = 0L
+  var gameIterator = 0L
 
   def create(gameState: GameState,
              isDev: Boolean,

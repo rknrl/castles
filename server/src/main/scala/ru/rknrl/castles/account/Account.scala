@@ -9,6 +9,7 @@
 package ru.rknrl.castles.account
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
+import protos.StatAction._
 import protos._
 import ru.rknrl.castles.Config
 import ru.rknrl.castles.account.Account.ClientInfo
@@ -24,11 +25,11 @@ import ru.rknrl.logging.ShortActorLogging
 
 object Account {
 
-  sealed case class ClientInfo(ref: ActorRef,
-                               accountId: AccountId,
-                               deviceType: DeviceType,
-                               platformType: PlatformType,
-                               userInfo: UserInfo)
+  case class ClientInfo(ref: ActorRef,
+                        accountId: AccountId,
+                        deviceType: DeviceType,
+                        platformType: PlatformType,
+                        userInfo: UserInfo)
 
   def props(matchmaking: ActorRef,
             secretChecker: ActorRef,
@@ -65,22 +66,26 @@ class Account(matchmaking: ActorRef,
       if (valid) {
         send(storage, GetAccount(client.accountId))
         send(storage, ReplaceUserInfo(client.accountId, client.userInfo))
-        send(graphite, StatAction.AUTHENTICATED)
+        sendStat(AUTHENTICATED)
       } else {
-        send(graphite, StatAction.NOT_AUTHENTICATED)
+        sendStat(NOT_AUTHENTICATED)
         send(client.ref, PoisonPill)
       }
 
-    case AccountResponse(accountId, stateDto, ratingDto, tutorStateDto, top, place, lastWeekPlace, lastWeekTop) ⇒
-      val state = stateDto.getOrElse(config.account.initState)
-      val rating = ratingDto.getOrElse(config.account.initRating)
-      val tutorState = tutorStateDto.getOrElse(TutorState())
-
-      if (stateDto.isEmpty) send(graphite, StatAction.FIRST_AUTHENTICATED)
-
+    case AccountResponse(accountId, state, rating, tutorState, top, place, lastWeekTop, lastWeekPlace) ⇒
+      if (state.isEmpty) sendStat(FIRST_AUTHENTICATED)
       send(matchmaking, Online(client.accountId))
       send(matchmaking, InGame(client.accountId))
-      become(enterAccount(state, rating, tutorState, top, place, lastWeekPlace, lastWeekTop), "enterAccount")
+
+      become(enterAccount(
+        state = state getOrElse config.account.initState,
+        rating = rating getOrElse config.account.initRating,
+        tutorState = tutorState getOrElse TutorState(),
+        top,
+        place,
+        lastWeekTop,
+        lastWeekPlace
+      ), "enterAccount")
   }
 
   def enterAccount(state: AccountState,
@@ -88,8 +93,9 @@ class Account(matchmaking: ActorRef,
                    tutorState: TutorState,
                    top: Top,
                    place: Option[Long],
-                   lastWeekPlace: Option[Long],
-                   lastWeekTop: Top): Receive = logged {
+                   lastWeekTop: Top,
+                   lastWeekPlace: Option[Long]): Receive = logged(persistent orElse {
+
     case InGameResponse(gameRef, searchOpponents) ⇒
 
       val isTutor = state.gamesCount == 0
@@ -118,59 +124,58 @@ class Account(matchmaking: ActorRef,
         _game = gameRef
         become(enterGame, "enterGame")
       } else if (isTutor) {
-        send(graphite, StatAction.START_TUTOR)
+        sendStat(START_TUTOR)
         sendGameOrder()
       } else
         become(account, "account")
+  })
 
-  } orElse persistent
-
-  def account: Receive = logged {
+  def account: Receive = logged(persistent orElse {
     case AcceptPresent() ⇒
       getAndUpdate(state ⇒ acceptPresent(state, config.account, calendar))
 
-    case accept: AcceptAdvert ⇒
-      getAndUpdate(state ⇒ acceptAdvert(state, accept.accepted, config.account))
+    case AcceptAdvert(accepted) ⇒
+      getAndUpdate(state ⇒ acceptAdvert(state, accepted, config.account))
 
     case AcceptWeekTop(weekNumber) ⇒
       getAndUpdate(state ⇒ acceptWeekTop(state, config.account, weekNumber.weekNumber))
 
-    case dto: BuyBuilding ⇒
-      getAndUpdate(state ⇒ AccountState.buyBuilding(state, dto.id, dto.buildingType, config.account))
-      send(graphite, Statistics.buyBuilding(dto.buildingType, BuildingLevel.LEVEL_1))
+    case buy: BuyBuilding ⇒
+      getAndUpdate(state ⇒ buyBuilding(state, buy.id, buy.buildingType, config.account))
+      sendStat(Statistics.buyBuilding(buy.buildingType, BuildingLevel.LEVEL_1))
 
-    case dto: UpgradeBuilding ⇒
+    case upgrade: UpgradeBuilding ⇒
       val transform = (state: Option[AccountState]) ⇒ {
-        val newState = AccountState.upgradeBuilding(state, dto.id, config.account)
-        send(graphite, Statistics.buyBuilding(newState.slots.find(_.id == dto.id).get.buildingPrototype.get)) // todo
+        val newState = upgradeBuilding(state, upgrade.id, config.account)
+        sendStat(Statistics.buyBuilding(newState.slots.find(_.id == upgrade.id).get.buildingPrototype.get)) // todo: send stat in closure
         newState
       }
       getAndUpdate(transform)
 
-    case dto: RemoveBuilding ⇒
-      getAndUpdate(state ⇒ removeBuilding(state, dto.id, config.account))
-      send(graphite, StatAction.REMOVE_BUILDING)
+    case remove: RemoveBuilding ⇒
+      getAndUpdate(state ⇒ removeBuilding(state, remove.id, config.account))
+      sendStat(REMOVE_BUILDING)
 
-    case dto: UpgradeSkill ⇒
+    case upgrade: UpgradeSkill ⇒
       val transform = (state: Option[AccountState]) ⇒ {
-        val newState = AccountState.upgradeSkill(state, dto.skillType, config.account)
-        send(graphite, Statistics.buySkill(dto.skillType, newState.skills.find(_.skillType == dto.skillType).get.level)) // todo
+        val newState = upgradeSkill(state, upgrade.skillType, config.account)
+        sendStat(Statistics.buySkill(upgrade.skillType, newState.skills.find(_.skillType == upgrade.skillType).get.level)) // todo: send stat in closure
         newState
       }
       getAndUpdate(transform)
 
-    case dto: BuyItem ⇒
-      getAndUpdate(state ⇒ AccountState.buyItem(state, dto.itemType, config.account))
-      send(graphite, Statistics.buyItem(dto.itemType))
+    case buy: BuyItem ⇒
+      getAndUpdate(state ⇒ buyItem(state, buy.itemType, config.account))
+      sendStat(Statistics.buyItem(buy.itemType))
 
     case EnterGame() ⇒ sendGameOrder()
 
-  } orElse persistent
+  })
 
-  def enterGame: Receive = logged {
+  def enterGame: Receive = logged(persistent orElse {
     case msg: AccountResponse ⇒
-      val state = msg.state.getOrElse(config.account.initState)
-      val rating = msg.rating.getOrElse(config.account.initRating)
+      val state = msg.state getOrElse config.account.initState
+      val rating = msg.rating getOrElse config.account.initRating
       send(matchmaking, GameOrder(client.accountId, client.deviceType, client.userInfo, state, rating, isBot = false))
 
     case ConnectToGame(gameRef) ⇒
@@ -181,9 +186,9 @@ class Account(matchmaking: ActorRef,
       send(game, Join(client.accountId, client.ref))
       become(inGame, "inGame")
 
-  } orElse persistent
+  })
 
-  def inGame: Receive = logged {
+  def inGame: Receive = logged(persistent orElse {
     case msg: GameMsg ⇒ forward(game, msg)
 
     case stat: protos.Stat ⇒
@@ -194,24 +199,27 @@ class Account(matchmaking: ActorRef,
       send(client.ref, LeavedGame())
       become(account, "account")
 
-  } orElse persistent
+  })
 
-  def persistent: Receive = logged {
+  def persistent: Receive = {
     case AccountStateUpdated(accountId, state) ⇒
       send(client.ref, state)
 
-    case AccountStateAndRatingResponse(accountId, state, newRating, newPlace, top) ⇒
+    case AccountStateAndRatingUpdated(accountId, state, newRating, newPlace, top) ⇒
       send(client.ref, state)
       send(client.ref, Place(newPlace))
       send(client.ref, top.dto)
 
-    case stat: protos.Stat ⇒ send(graphite, stat.action)
+    case stat: protos.Stat ⇒ sendStat(stat.action)
 
     case state: TutorState ⇒
       send(storage, Storage.ReplaceTutorState(client.accountId, state))
 
     case DuplicateAccount ⇒ send(client.ref, PoisonPill)
   }
+
+  def sendStat(statAction: StatAction): Unit =
+    send(graphite, statAction)
 
   def getAndUpdate(transform: Option[AccountState] ⇒ AccountState): Unit =
     send(storage, GetAndUpdateAccountState(client.accountId, transform))
@@ -222,7 +230,4 @@ class Account(matchmaking: ActorRef,
   }
 
   def nodeLocator = NodeLocator(config.host, config.gamePort)
-
-  override def postStop(): Unit =
-    if (_client.isDefined) send(matchmaking, Offline(client.accountId, client.ref))
 }

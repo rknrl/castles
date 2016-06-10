@@ -9,13 +9,13 @@
 package ru.rknrl.castles.matchmaking
 
 import akka.actor.SupervisorStrategy.Stop
-import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props}
+import akka.actor.{Actor, ActorRef, OneForOneStrategy, Props, Terminated}
 import protos._
 import ru.rknrl.castles.Config
-import ru.rknrl.castles.storage.Storage.AccountStateUpdated
-import ru.rknrl.castles.storage.Statistics.{createGameStatistics, leaveGameStatistics}
 import ru.rknrl.castles.matchmaking.MatchMaking._
 import ru.rknrl.castles.matchmaking.Matcher.matchOrders
+import ru.rknrl.castles.storage.Statistics.{createGameStat, leaveGameStat}
+import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingUpdated, AccountStateUpdated}
 import ru.rknrl.core.Graphite.Health
 import ru.rknrl.logging.ShortActorLogging
 
@@ -75,6 +75,8 @@ class MatchMaking(gameCreator: GameCreator,
                   graphite: ActorRef) extends Actor with ShortActorLogging {
 
   override def supervisorStrategy = OneForOneStrategy() {
+    // Если в игре произошла ошибка
+    // то оповещаем всех игроков, о том, что игра закончена
     case e: Exception ⇒
       val gameEntry = accountIdToGameInfo.find { case (accountId, gameInfo) ⇒ gameInfo.gameRef == sender }
       if (gameEntry.isDefined) {
@@ -85,6 +87,7 @@ class MatchMaking(gameCreator: GameCreator,
           sendToAccount(order.accountId, AccountLeaveGame)
         }
       }
+      gamesCount = gamesCount - 1
       Stop
   }
 
@@ -101,6 +104,7 @@ class MatchMaking(gameCreator: GameCreator,
 
   override val logFilter: Any ⇒ Boolean = {
     case TryCreateGames ⇒ false
+    case RegisterHealth ⇒ false
     case _ ⇒ true
   }
 
@@ -109,20 +113,26 @@ class MatchMaking(gameCreator: GameCreator,
       if ((accountIdToAccount contains accountId) && (accountIdToAccount(accountId) != sender))
         send(accountIdToAccount(accountId), DuplicateAccount)
 
+      context watch sender
       accountIdToAccount = accountIdToAccount + (accountId → sender)
 
-    case o@Offline(accountId, client) ⇒
-      accountIdToAccount = accountIdToAccount - accountId
-      if (accountIdToGameInfo contains accountId) {
-        val gameInfo = accountIdToGameInfo(accountId)
+    case Terminated(ref) ⇒
+      val entry = accountIdToAccount.find { case (accountId, accountRef) ⇒ accountRef == ref }
 
-        if (gameInfo.isTutor) {
-          // Если это тутор и игрок отвалился, то убиваем игру.
-          // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
-          accountIdToGameInfo = accountIdToGameInfo - accountId
-          stopGame(gameInfo.gameRef)
-        } else
-          forward(gameInfo.gameRef, o)
+      if (entry.isDefined) {
+        val accountId = entry.get._1
+        accountIdToAccount = accountIdToAccount - accountId
+        if (accountIdToGameInfo contains accountId) {
+          val gameInfo = accountIdToGameInfo(accountId)
+
+          if (gameInfo.isTutor) {
+            // Если это тутор и игрок отвалился, то убиваем игру.
+            // При перезаходе игрока будет создана новая игра (Иначе новичок не поймет, что произошло)
+            accountIdToGameInfo = accountIdToGameInfo - accountId
+            stopGame(gameInfo.gameRef)
+          } else
+            forward(gameInfo.gameRef, Offline(accountId, ref))
+        }
       }
 
     case InGame(accountId) ⇒
@@ -146,7 +156,7 @@ class MatchMaking(gameCreator: GameCreator,
         val game = gameFactory.create(newGame.gameState, config.isDev, newGame.isTutor, self)
         gamesCount = gamesCount + 1
         val gameInfo = GameInfo(game, newGame.orders, newGame.isTutor)
-        if (!newGame.isTutor) send(graphite, createGameStatistics(newGame.orders))
+        if (!newGame.isTutor) send(graphite, createGameStat(newGame.orders))
 
         for (order ← newGame.orders if !order.isBot) {
           accountIdToGameInfo = accountIdToGameInfo + (order.accountId → gameInfo)
@@ -168,12 +178,15 @@ class MatchMaking(gameCreator: GameCreator,
 
       sendToAccount(accountId, AccountLeaveGame)
 
-      val stat = leaveGameStatistics(place, gameInfo.isTutor, gameInfo.orders, order)
-      if(stat.isDefined) send(graphite, stat.get)
+      val stat = leaveGameStat(place, gameInfo.isTutor, gameInfo.orders, order)
+      if (stat.isDefined) send(graphite, stat.get)
 
     case AllPlayersLeaveGame(gameRef) ⇒ stopGame(gameRef)
 
     case msg: AccountStateUpdated ⇒
+      sendToAccount(msg.accountId, msg)
+
+    case msg: AccountStateAndRatingUpdated ⇒
       sendToAccount(msg.accountId, msg)
 
     case RegisterHealth ⇒

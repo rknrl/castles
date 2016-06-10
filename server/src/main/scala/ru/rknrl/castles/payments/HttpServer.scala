@@ -27,6 +27,8 @@ import spray.httpx.marshalling.Marshaller
 import spray.routing.HttpService
 
 import scala.concurrent.duration._
+import akka.pattern.ask
+import akka.util.Timeout
 
 object HttpServer {
   def props(config: Config,
@@ -130,10 +132,11 @@ class HttpServer(config: Config,
             }
 
             import context.dispatcher
+            implicit val askTimeout = Timeout(5 seconds)
 
-            val result = Patterns.ask(storage, GetAndUpdateAccountState(accountId, transform), 5 seconds) map {
+            val result = storage ? GetAndUpdateAccountState(accountId, transform) map {
               case msg: AccountStateUpdated ⇒
-                send(matchmaking, msg)
+                send(matchmaking, msg) // todo: send in closure
                 httpResponse
               case invalid ⇒
                 log.info("invalid update result=" + invalid)

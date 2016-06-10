@@ -15,7 +15,8 @@ import com.github.mauricio.async.db.util.ExecutorServiceUtils.CachedExecutionCon
 import com.github.mauricio.async.db.{Configuration, Connection, ResultSet, RowData}
 import protos._
 import ru.rknrl.castles.matchmaking.{Top, TopUser}
-import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingResponse, GetAndUpdateAccountStateAndRating, _}
+import ru.rknrl.castles.storage.Parsers._
+import ru.rknrl.castles.storage.Storage.{AccountStateAndRatingUpdated, GetAndUpdateAccountStateAndRating, _}
 import ru.rknrl.logging.ShortActorLogging
 
 import scala.concurrent.Future
@@ -62,22 +63,22 @@ object Storage {
 
   case class GetAndUpdateAccountState(accountId: AccountId, transform: Option[AccountState] ⇒ AccountState)
 
-  case class AccountStateUpdated(accountId: AccountId, state: AccountState)
+  case class AccountStateUpdated(accountId: AccountId, newState: AccountState)
 
 
   case class GetAndUpdateAccountStateAndRating(accountId: AccountId, transform: (Option[AccountState], Option[Double]) ⇒ (AccountState, Double), userInfo: UserInfo)
 
-  case class AccountStateAndRatingResponse(accountId: AccountId, state: AccountState, rating: Double, place: Long, top: Top)
+  case class AccountStateAndRatingUpdated(accountId: AccountId, newState: AccountState, newRating: Double, newPlace: Long, newTop: Top)
 
 
   case class ReplaceTutorState(accountId: AccountId, newTutorState: TutorState)
 
-  case class TutorStateUpdated(accountId: AccountId, tutorState: TutorState)
+  case class TutorStateUpdated(accountId: AccountId, newTutorState: TutorState)
 
 
-  case class ReplaceUserInfo(accountId: AccountId, userInfo: UserInfo)
+  case class ReplaceUserInfo(accountId: AccountId, newUserInfo: UserInfo)
 
-  case class UserInfoUpdated(accountId: AccountId, userInfo: UserInfo)
+  case class UserInfoUpdated(accountId: AccountId, newUserInfo: UserInfo)
 
 }
 
@@ -130,7 +131,7 @@ class Storage(config: StorageConfig, calendar: Calendar) extends Actor with Shor
               replaceRating(accountId, currentWeek, newRating, userInfo) flatMap { _ ⇒
                 getPlace(newRating, currentWeek) flatMap { place ⇒
                   getTop(currentWeek) flatMap { top ⇒
-                    successful(AccountStateAndRatingResponse(accountId, newState, newRating, place, top))
+                    successful(AccountStateAndRatingUpdated(accountId, newState, newRating, place, top))
                   }
                 }
               }
@@ -229,7 +230,7 @@ class Storage(config: StorageConfig, calendar: Calendar) extends Actor with Shor
       successful(UserInfoUpdated(accountId, userInfo))
     }
 
-  // base
+  // utils
 
   def answer(f: Connection ⇒ Future[Any]): Unit = {
     val ref = sender
@@ -270,9 +271,9 @@ class Storage(config: StorageConfig, calendar: Calendar) extends Actor with Shor
         case None ⇒ failed(new Exception("Get none " + queryResult))
       }
     }
+}
 
-  // serialize
-
+private object Parsers {
   def rowDataToAccountState(row: RowData) = {
     val byteArray = row("state").asInstanceOf[Array[Byte]]
     AccountState.parseFrom(byteArray)

@@ -201,7 +201,7 @@ class Game(var gameState: GameState,
         usedItems = gameState.items.states(playerId).usedItems
       ))
 
-    if (humansLeft.size == 0)
+    if (humansLeft.isEmpty)
       send(matchmaking, AllPlayersLeaveGame(self))
   }
 }
