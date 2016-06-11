@@ -57,7 +57,7 @@ class Account(matchmaking: ActorRef,
 
   def receive = auth
 
-  def auth: Receive = logged {
+  def auth = logged {
     case authenticate: Authenticate ⇒
       _client = Some(ClientInfo(sender, authenticate.userInfo.accountId, authenticate.deviceType, authenticate.platformType, authenticate.userInfo))
       send(secretChecker, authenticate)
@@ -94,7 +94,7 @@ class Account(matchmaking: ActorRef,
                    top: Top,
                    place: Option[Long],
                    lastWeekTop: Top,
-                   lastWeekPlace: Option[Long]): Receive = logged(persistent orElse {
+                   lastWeekPlace: Option[Long]) = loggedAndPersistent {
 
     case InGameResponse(gameRef, searchOpponents) ⇒
 
@@ -128,9 +128,9 @@ class Account(matchmaking: ActorRef,
         sendGameOrder()
       } else
         become(account, "account")
-  })
+  }
 
-  def account: Receive = logged(persistent orElse {
+  def account = loggedAndPersistent {
     case AcceptPresent() ⇒
       getAndUpdate(state ⇒ acceptPresent(state, config.account, calendar))
 
@@ -170,9 +170,9 @@ class Account(matchmaking: ActorRef,
 
     case EnterGame() ⇒ sendGameOrder()
 
-  })
+  }
 
-  def enterGame: Receive = logged(persistent orElse {
+  def enterGame = loggedAndPersistent {
     case msg: AccountResponse ⇒
       val state = msg.state getOrElse config.account.initState
       val rating = msg.rating getOrElse config.account.initRating
@@ -186,20 +186,21 @@ class Account(matchmaking: ActorRef,
       send(game, Join(client.accountId, client.ref))
       become(inGame, "inGame")
 
-  })
+  }
 
-  def inGame: Receive = logged(persistent orElse {
+  def inGame = loggedAndPersistent {
     case msg: GameMsg ⇒ forward(game, msg)
 
-    case stat: protos.Stat ⇒
+    case stat: Stat ⇒
       forward(game, stat.action)
       forward(graphite, stat.action)
 
     case AccountLeaveGame ⇒
       send(client.ref, LeavedGame())
       become(account, "account")
+  }
 
-  })
+  def loggedAndPersistent(r: Receive) = logged(r orElse persistent)
 
   def persistent: Receive = {
     case AccountStateUpdated(accountId, state) ⇒

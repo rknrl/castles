@@ -221,7 +221,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     val accountId = AccountId(VKONTAKTE, "1")
     client.send(matchmaking, Online(accountId))
     client.send(matchmaking, newGameOrder(accountId))
-    client.send(matchmaking, Offline(accountId, self))
+    system stop client.ref
     matchmaking ! TryCreateGames
     graphite.expectMsg(START_GAME_4_WITH_BOTS)
     client.expectNoMsg(noMsgTimeout)
@@ -240,7 +240,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ true
     }
-    client.send(matchmaking, Offline(accountId, client.ref))
+    system stop client.ref
     expectMsgPF(timeout.duration) {
       case Offline(id, client) ⇒ id shouldBe accountId
     }
@@ -260,7 +260,7 @@ class MatchmakingTest extends MatchmakingTestSpec {
     client.expectMsgPF(timeout.duration) {
       case ConnectToGame(gameRef) ⇒ game = Some(gameRef)
     }
-    client.send(matchmaking, Offline(accountId, client.ref))
+    system stop client.ref
     watch(game.get)
     expectTerminated(game.get)
   })

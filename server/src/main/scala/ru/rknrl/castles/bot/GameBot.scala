@@ -41,7 +41,9 @@ class GameBot(accountId: AccountId) extends Actor with ShortActorLogging {
     case _ ⇒ true
   }
 
-  override def receive: Receive = logged {
+  override def receive: Receive = baseReceive
+
+  val baseReceive: Receive = {
     case ConnectToGame(gameRef) ⇒
       game = Some(gameRef)
       send(gameRef, Join(accountId, self))
@@ -72,7 +74,7 @@ class GameBot(accountId: AccountId) extends Actor with ShortActorLogging {
 
       val enemyBuildings = getEnemyBuildings
 
-      if (fromBuildings.size > 0 && enemyBuildings.size > 0) {
+      if (fromBuildings.nonEmpty && enemyBuildings.nonEmpty) {
 
         if (toBuildingId.isEmpty ||
           my(gameState.get.buildings.find(_.id == toBuildingId.get).get) ||
@@ -110,7 +112,7 @@ class GameBot(accountId: AccountId) extends Actor with ShortActorLogging {
             itemState.count > 0 &&
               itemState.itemType != ItemType.TORNADO)
 
-          if (availableCast.size > 0) {
+          if (availableCast.nonEmpty) {
             val rnd = Math.floor(Math.random() * availableCast.size).toInt
             val itemType = availableCast.toList(rnd).itemType
 

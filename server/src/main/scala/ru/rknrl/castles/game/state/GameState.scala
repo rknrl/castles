@@ -77,7 +77,7 @@ case class GameState(width: Int,
 
     val validAssistanceCasts = items.checkCasts(assistanceCasts, ASSISTANCE, config, newTime)
       .map { case (playerId, buildingId) ⇒ players(playerId) → buildingId }
-      .filter { case (player, buildingId) ⇒ buildings.find(_.id == buildingId).get.owner == Some(player) }
+      .filter { case (player, buildingId) ⇒ buildings.find(_.id == buildingId).get.owner.contains(player) }
 
     val assistanceUnits = validAssistanceCasts.map(castToUnit(_, buildings, config, churchesProportion, unitIdIterator, assistancePositions, newTime))
 
